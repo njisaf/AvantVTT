@@ -1,0 +1,58 @@
+{
+  "id": "avant",
+  "title": "Avant",
+  "description": "A cutting-edge narrative RPG system focused on experimental storytelling, collaborative worldbuilding, and innovative narrative mechanics",
+  "version": "0.1.0",
+  "compatibility": {
+    "minimum": "12",
+    "verified": "13"
+  },
+  "authors": [
+    {
+      "name": "Nassir Isaf",
+      "discord": "ManSally"
+    },
+    {
+      "name": "Rob Athienitis",
+      "discord": "bipolardiceroller"
+    }
+  ],
+  "esmodules": [
+    "scripts/avant.js"
+  ],
+  "styles": [
+    "styles/avant.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "documentTypes": {
+    "Actor": {
+      "character": {},
+      "npc": {},
+      "vehicle": {}
+    },
+    "Item": {
+      "action": {},
+      "feature": {},
+      "talent": {},
+      "augment": {},
+      "weapon": {},
+      "armor": {},
+      "gear": {}
+    }
+  },
+  "grid": {
+    "distance": 5,
+    "units": "ft"
+  },
+  "primaryTokenAttribute": "health",
+  "secondaryTokenAttribute": "power",
+  "url": "https://github.com/njisaf/AvantVTT",
+  "manifest": "https://raw.githubusercontent.com/njisaf/AvantVTT/main/system.json",
+  "download": "https://github.com/njisaf/AvantVTT/archive/main.zip"
+} 

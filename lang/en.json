@@ -1,0 +1,12 @@
+{
+  "avant": {
+    "title": "Avant",
+    "description": "Clean regenerated Avant system",
+    "health": "Health",
+    "power": "Power",
+    "biography": "Biography",
+    "items": "Items",
+    "attributes": "Attributes",
+    "description": "Description"
+  }
+} 
