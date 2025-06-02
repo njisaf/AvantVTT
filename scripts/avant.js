@@ -135,18 +135,6 @@ class AvantActorData extends foundry.abstract.TypeDataModel {
             
             // Skills System (12 skills from prototype)
             skills: new fields.SchemaField({
-                acrobatics: new fields.NumberField({
-                    required: true,
-                    nullable: false,
-                    integer: true,
-                    initial: 0
-                }),
-                athletics: new fields.NumberField({
-                    required: true,
-                    nullable: false,
-                    integer: true,
-                    initial: 0
-                }),
                 debate: new fields.NumberField({
                     required: true,
                     nullable: false,
@@ -177,31 +165,43 @@ class AvantActorData extends foundry.abstract.TypeDataModel {
                     integer: true,
                     initial: 0
                 }),
-                influence: new fields.NumberField({
+                command: new fields.NumberField({
                     required: true,
                     nullable: false,
                     integer: true,
                     initial: 0
                 }),
-                investigate: new fields.NumberField({
+                charm: new fields.NumberField({
                     required: true,
                     nullable: false,
                     integer: true,
                     initial: 0
                 }),
-                lore: new fields.NumberField({
+                hide: new fields.NumberField({
                     required: true,
                     nullable: false,
                     integer: true,
                     initial: 0
                 }),
-                stealth: new fields.NumberField({
+                inspect: new fields.NumberField({
                     required: true,
                     nullable: false,
                     integer: true,
                     initial: 0
                 }),
-                survival: new fields.NumberField({
+                intuit: new fields.NumberField({
+                    required: true,
+                    nullable: false,
+                    integer: true,
+                    initial: 0
+                }),
+                recall: new fields.NumberField({
+                    required: true,
+                    nullable: false,
+                    integer: true,
+                    initial: 0
+                }),
+                surge: new fields.NumberField({
                     required: true,
                     nullable: false,
                     integer: true,
@@ -357,18 +357,18 @@ class AvantActorData extends foundry.abstract.TypeDataModel {
     // Helper method to get skill ability mapping
     static getSkillAbilities() {
         return {
-            acrobatics: 'grace',
-            athletics: 'might',
             debate: 'intellect',
             discern: 'focus',
             endure: 'focus',
             finesse: 'grace',
             force: 'might',
-            influence: 'focus',
-            investigate: 'intellect',
-            lore: 'intellect',
-            stealth: 'grace',
-            survival: 'might'
+            command: 'might',
+            charm: 'grace',
+            hide: 'grace',
+            inspect: 'intellect',
+            intuit: 'focus',
+            recall: 'intellect',
+            surge: 'might'
         };
     }
 }
@@ -728,6 +728,31 @@ class AvantActorSheet extends foundry.appv1.sheets.ActorSheet {
         const itemTypes = ['action', 'feature', 'talent', 'augment', 'weapon', 'armor', 'gear'];
         itemTypes.forEach(type => {
             if (!context.items[type]) context.items[type] = [];
+        });
+        
+        // Dynamically organize skills by ability for template rendering
+        const skillAbilities = AvantActorData.getSkillAbilities();
+        context.skillsByAbility = {
+            might: [],
+            grace: [],
+            intellect: [],
+            focus: []
+        };
+        
+        // Group skills by their abilities
+        for (const [skillName, abilityName] of Object.entries(skillAbilities)) {
+            if (context.skillsByAbility[abilityName]) {
+                context.skillsByAbility[abilityName].push({
+                    name: skillName,
+                    label: skillName.charAt(0).toUpperCase() + skillName.slice(1),
+                    value: actorData.system.skills[skillName] || 0
+                });
+            }
+        }
+        
+        // Sort skills within each ability group alphabetically
+        Object.keys(context.skillsByAbility).forEach(ability => {
+            context.skillsByAbility[ability].sort((a, b) => a.label.localeCompare(b.label));
         });
         
         return context;
@@ -1478,7 +1503,7 @@ Hooks.once('init', async function() {
         scope: 'world',
         config: false,
         type: String,
-        default: '2.1.0'
+        default: '2.1.9'
     });
 
     // Configure system
@@ -1593,7 +1618,7 @@ Hooks.on('createItem', (item, options, userId) => {
 
 // Export system API
 window['AVANT'] = {
-    version: '2.1.7',
+    version: '2.1.9',
     AvantActorData,
     AvantActionData,
     AvantFeatureData,

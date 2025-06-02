@@ -436,7 +436,7 @@
                     </div>
                 </div>
 
-                <!-- Skills Tab (reorganized with 2x2 grid layout like Attributes) -->
+                <!-- Skills Tab (Dynamic - generated from AvantActorData.getSkillAbilities()) -->
                 <div class="tab" data-group="primary" data-tab="skills">
                     <div class="skills-section">
                         <h3>Skills</h3>
@@ -447,21 +447,13 @@
                             <div class="skills-ability-section">
                                 <h4 class="skills-ability-header">Might</h4>
                                 <div class="skills-ability-list">
+                                    {{#each skillsByAbility.might as |skill|}}
                                     <div class="skill-tile">
-                                        <label>Athletics</label>
-                                        <input type="text" name="system.skills.athletics" value="{{system.skills.athletics}}" data-dtype="Number"/>
-                                        <button type="button" class="skill-roll" data-skill="athletics" title="Roll Athletics">Roll</button>
+                                        <label>{{skill.label}}</label>
+                                        <input type="text" name="system.skills.{{skill.name}}" value="{{skill.value}}" data-dtype="Number"/>
+                                        <button type="button" class="skill-roll" data-skill="{{skill.name}}" title="Roll {{skill.label}}">Roll</button>
                                     </div>
-                                    <div class="skill-tile">
-                                        <label>Force</label>
-                                        <input type="text" name="system.skills.force" value="{{system.skills.force}}" data-dtype="Number"/>
-                                        <button type="button" class="skill-roll" data-skill="force" title="Roll Force">Roll</button>
-                                    </div>
-                                    <div class="skill-tile">
-                                        <label>Survival</label>
-                                        <input type="text" name="system.skills.survival" value="{{system.skills.survival}}" data-dtype="Number"/>
-                                        <button type="button" class="skill-roll" data-skill="survival" title="Roll Survival">Roll</button>
-                                    </div>
+                                    {{/each}}
                                 </div>
                             </div>
 
@@ -469,21 +461,13 @@
                             <div class="skills-ability-section">
                                 <h4 class="skills-ability-header">Grace</h4>
                                 <div class="skills-ability-list">
+                                    {{#each skillsByAbility.grace as |skill|}}
                                     <div class="skill-tile">
-                                        <label>Acrobatics</label>
-                                        <input type="text" name="system.skills.acrobatics" value="{{system.skills.acrobatics}}" data-dtype="Number"/>
-                                        <button type="button" class="skill-roll" data-skill="acrobatics" title="Roll Acrobatics">Roll</button>
+                                        <label>{{skill.label}}</label>
+                                        <input type="text" name="system.skills.{{skill.name}}" value="{{skill.value}}" data-dtype="Number"/>
+                                        <button type="button" class="skill-roll" data-skill="{{skill.name}}" title="Roll {{skill.label}}">Roll</button>
                                     </div>
-                                    <div class="skill-tile">
-                                        <label>Finesse</label>
-                                        <input type="text" name="system.skills.finesse" value="{{system.skills.finesse}}" data-dtype="Number"/>
-                                        <button type="button" class="skill-roll" data-skill="finesse" title="Roll Finesse">Roll</button>
-                                    </div>
-                                    <div class="skill-tile">
-                                        <label>Stealth</label>
-                                        <input type="text" name="system.skills.stealth" value="{{system.skills.stealth}}" data-dtype="Number"/>
-                                        <button type="button" class="skill-roll" data-skill="stealth" title="Roll Stealth">Roll</button>
-                                    </div>
+                                    {{/each}}
                                 </div>
                             </div>
 
@@ -491,21 +475,13 @@
                             <div class="skills-ability-section">
                                 <h4 class="skills-ability-header">Intellect</h4>
                                 <div class="skills-ability-list">
+                                    {{#each skillsByAbility.intellect as |skill|}}
                                     <div class="skill-tile">
-                                        <label>Debate</label>
-                                        <input type="text" name="system.skills.debate" value="{{system.skills.debate}}" data-dtype="Number"/>
-                                        <button type="button" class="skill-roll" data-skill="debate" title="Roll Debate">Roll</button>
+                                        <label>{{skill.label}}</label>
+                                        <input type="text" name="system.skills.{{skill.name}}" value="{{skill.value}}" data-dtype="Number"/>
+                                        <button type="button" class="skill-roll" data-skill="{{skill.name}}" title="Roll {{skill.label}}">Roll</button>
                                     </div>
-                                    <div class="skill-tile">
-                                        <label>Investigate</label>
-                                        <input type="text" name="system.skills.investigate" value="{{system.skills.investigate}}" data-dtype="Number"/>
-                                        <button type="button" class="skill-roll" data-skill="investigate" title="Roll Investigate">Roll</button>
-                                    </div>
-                                    <div class="skill-tile">
-                                        <label>Lore</label>
-                                        <input type="text" name="system.skills.lore" value="{{system.skills.lore}}" data-dtype="Number"/>
-                                        <button type="button" class="skill-roll" data-skill="lore" title="Roll Lore">Roll</button>
-                                    </div>
+                                    {{/each}}
                                 </div>
                             </div>
 
@@ -513,21 +489,13 @@
                             <div class="skills-ability-section">
                                 <h4 class="skills-ability-header">Focus</h4>
                                 <div class="skills-ability-list">
+                                    {{#each skillsByAbility.focus as |skill|}}
                                     <div class="skill-tile">
-                                        <label>Discern</label>
-                                        <input type="text" name="system.skills.discern" value="{{system.skills.discern}}" data-dtype="Number"/>
-                                        <button type="button" class="skill-roll" data-skill="discern" title="Roll Discern">Roll</button>
+                                        <label>{{skill.label}}</label>
+                                        <input type="text" name="system.skills.{{skill.name}}" value="{{skill.value}}" data-dtype="Number"/>
+                                        <button type="button" class="skill-roll" data-skill="{{skill.name}}" title="Roll {{skill.label}}">Roll</button>
                                     </div>
-                                    <div class="skill-tile">
-                                        <label>Endure</label>
-                                        <input type="text" name="system.skills.endure" value="{{system.skills.endure}}" data-dtype="Number"/>
-                                        <button type="button" class="skill-roll" data-skill="endure" title="Roll Endure">Roll</button>
-                                    </div>
-                                    <div class="skill-tile">
-                                        <label>Influence</label>
-                                        <input type="text" name="system.skills.influence" value="{{system.skills.influence}}" data-dtype="Number"/>
-                                        <button type="button" class="skill-roll" data-skill="influence" title="Roll Influence">Roll</button>
-                                    </div>
+                                    {{/each}}
                                 </div>
                             </div>
                         </div>
