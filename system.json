@@ -51,7 +51,7 @@
     "units": "ft"
   },
   "primaryTokenAttribute": "health",
-  "secondaryTokenAttribute": "power",
+  "secondaryTokenAttribute": "powerPoints",
   "url": "https://github.com/njisaf/AvantVTT",
   "manifest": "https://raw.githubusercontent.com/njisaf/AvantVTT/main/system.json",
   "download": "https://github.com/njisaf/AvantVTT/archive/main.zip"
