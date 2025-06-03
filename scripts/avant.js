@@ -1438,6 +1438,60 @@ class AvantItemSheet extends foundry.appv1.sheets.ItemSheet {
             }
         }
     }
+
+    /**
+     * Override the default update object method to ensure proper data type conversion
+     * @param {Event} event - The form submission event
+     * @param {Object} formData - The form data to process
+     * @returns {Promise<Object>} The processed update data
+     */
+    async _updateObject(event, formData) {
+        // Convert string values to numbers for specific fields that should be integers
+        const processedData = foundry.utils.expandObject(formData);
+        
+        // Handle talent and augment specific fields
+        if (processedData.system) {
+            // Convert powerPointCost to integer if present
+            if (processedData.system.powerPointCost !== undefined) {
+                processedData.system.powerPointCost = parseInt(processedData.system.powerPointCost) || 0;
+            }
+            
+            // Convert uses fields to integers if present
+            if (processedData.system.uses) {
+                if (processedData.system.uses.value !== undefined) {
+                    processedData.system.uses.value = parseInt(processedData.system.uses.value) || 0;
+                }
+                if (processedData.system.uses.max !== undefined) {
+                    processedData.system.uses.max = parseInt(processedData.system.uses.max) || 0;
+                }
+            }
+            
+            // Handle weapon/armor specific integer fields
+            if (processedData.system.modifier !== undefined) {
+                processedData.system.modifier = parseInt(processedData.system.modifier) || 0;
+            }
+            if (processedData.system.threshold !== undefined) {
+                processedData.system.threshold = parseInt(processedData.system.threshold) || 11;
+            }
+            if (processedData.system.armorClass !== undefined) {
+                processedData.system.armorClass = parseInt(processedData.system.armorClass) || 10;
+            }
+            
+            // Handle numeric fields that should be numbers (not necessarily integers)
+            if (processedData.system.weight !== undefined) {
+                processedData.system.weight = parseFloat(processedData.system.weight) || 0;
+            }
+            if (processedData.system.cost !== undefined) {
+                processedData.system.cost = parseFloat(processedData.system.cost) || 0;
+            }
+        }
+        
+        // Convert back to flat object for FoundryVTT
+        const flatData = foundry.utils.flattenObject(processedData);
+        
+        // Call parent method with processed data
+        return super._updateObject(event, flatData);
+    }
 }
 
 // CLEAN ACTOR VALIDATION APPROACH
