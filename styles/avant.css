@@ -42,13 +42,14 @@
 
 /* Global Reset and Base Styling */
 .avant * {
-    box-sizing: border-box;
+    box-sizing: border-box !important; /* Force box-sizing for v12 compatibility */
 }
 
 .avant input,
 .avant select,
 .avant textarea {
     font-family: inherit;
+    box-sizing: border-box !important; /* Ensure form elements use border-box */
 }
 
 /* Window Container - Fixed height with proper border visibility */
@@ -104,6 +105,8 @@
     min-height: 60px; /* Enforce minimum height */
     flex-shrink: 0; /* Prevent header from shrinking */
     z-index: 10;
+    overflow: hidden; /* Prevent content overflow in v12 */
+    box-sizing: border-box !important; /* Explicit box-sizing for v12 */
 }
 
 .avant .profile-img {
@@ -115,6 +118,8 @@
     width: 40px; /* Reduced from 60px */
     height: 40px; /* Reduced from 60px */
     flex-shrink: 0; /* Prevent shrinking */
+    box-sizing: border-box !important; /* Explicit box-sizing for v12 */
+    object-fit: cover; /* Ensure image fits properly */
 }
 
 .avant .profile-img:hover {
@@ -126,6 +131,8 @@
     display: flex;
     align-items: center;
     min-width: 0; /* Allow shrinking */
+    overflow: hidden; /* Prevent overflow in v12 */
+    box-sizing: border-box !important; /* Explicit box-sizing for v12 */
 }
 
 /* Header Stats - New styling for stats moved to header */
@@ -134,6 +141,8 @@
     align-items: center;
     gap: 20px;
     flex-shrink: 0;
+    overflow: hidden; /* Prevent overflow in v12 */
+    box-sizing: border-box !important; /* Explicit box-sizing for v12 */
 }
 
 .avant .header-stat {
@@ -141,6 +150,8 @@
     flex-direction: column;
     align-items: center;
     gap: 2px;
+    flex-shrink: 0; /* Prevent shrinking in v12 */
+    box-sizing: border-box !important; /* Explicit box-sizing for v12 */
 }
 
 .avant .header-stat-label {
@@ -164,6 +175,8 @@
     border-radius: 0;
     transition: all 0.3s ease;
     width: 50px;
+    box-sizing: border-box !important; /* Explicit box-sizing for v12 */
+    flex-shrink: 0; /* Prevent shrinking in v12 */
 }
 
 .avant .header-stat-input:focus {
@@ -183,6 +196,8 @@
     padding: 4px 8px;
     border: 1px solid var(--accent-cyan);
     width: 50px;
+    box-sizing: border-box !important; /* Explicit box-sizing for v12 */
+    flex-shrink: 0; /* Prevent shrinking in v12 */
 }
 
 /* Character Name - More compact */
@@ -194,6 +209,10 @@
     text-transform: uppercase;
     letter-spacing: 1px; /* Reduced from 2px */
     text-shadow: 0 0 5px var(--accent-cyan);
+    flex: 1; /* Take available space but allow shrinking */
+    min-width: 0; /* Allow shrinking in flexbox */
+    overflow: hidden; /* Prevent overflow in v12 */
+    box-sizing: border-box !important; /* Explicit box-sizing for v12 */
 }
 
 .avant .charname input {
@@ -210,6 +229,8 @@
     transition: all 0.3s ease;
     width: 100%;
     max-width: 300px; /* Limit width */
+    box-sizing: border-box !important; /* Explicit box-sizing for v12 */
+    min-width: 0; /* Allow input to shrink if needed */
 }
 
 .avant .charname input:focus {
