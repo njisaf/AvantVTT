@@ -682,6 +682,15 @@ class AvantActorSheet extends ActorSheet {
         context.system = actorData.system;
         context.flags = actorData.flags;
         
+        // Calculate ability modifiers from ability scores (D&D style: (score-10)/2)
+        if (context.system.abilities) {
+            for (const [abilityName, abilityData] of Object.entries(context.system.abilities)) {
+                if (abilityData && typeof abilityData.value === 'number') {
+                    context.system.abilities[abilityName].mod = Math.floor((abilityData.value - 10) / 2);
+                }
+            }
+        }
+        
         // Prepare items by type for organized tabs
         context.items = {};
         for (let item of this.actor.items) {
@@ -946,14 +955,44 @@ class AvantActorSheet extends ActorSheet {
             console.warn(`Avant | Ability '${ability}' not found on actor`);
             return;
         }
+
+        // Check if this is a generation roll (Shift+Click) or a check roll (normal click)
+        const isGenerationRoll = event.shiftKey;
         
         try {
-            const roll = new Roll("1d20 + @mod", { mod: abilityData.mod });
-            await roll.evaluate();
+            let roll, flavorText;
+            
+            if (isGenerationRoll) {
+                // Ability Score Generation: 4d6 drop lowest
+                roll = new Roll("4d6kh3");
+                await roll.evaluate();
+                
+                // Update the actor's ability score with the new value
+                const newValue = roll.total;
+                const updatePath = `system.abilities.${ability}.value`;
+                await actor.update({
+                    [updatePath]: newValue
+                });
+                
+                flavorText = `${ability.charAt(0).toUpperCase() + ability.slice(1)} Score Generation`;
+                ui.notifications.info(`Generated ${ability} score: ${newValue}`);
+            } else {
+                // Ability Check: 2d10 + Level + Ability Modifier (Avant system)
+                // Calculate ability modifier from ability score (standard D&D-style: (score-10)/2)
+                const abilityMod = Math.floor((abilityData.value - 10) / 2);
+                
+                roll = new Roll("2d10 + @level + @abilityMod", { 
+                    level: actor.system.level,
+                    abilityMod: abilityMod
+                });
+                await roll.evaluate();
+                
+                flavorText = `${ability.charAt(0).toUpperCase() + ability.slice(1)} Check`;
+            }
             
             await roll.toMessage({
                 speaker: ChatMessage.getSpeaker({ actor: actor }),
-                flavor: `${ability.charAt(0).toUpperCase() + ability.slice(1)} Check`,
+                flavor: flavorText,
                 rollMode: game.settings.get('core', 'rollMode'),
             });
             
@@ -1100,7 +1139,10 @@ class AvantActorSheet extends ActorSheet {
         const skillValue = actor.system.skills[skill];
         const skillAbilities = AvantActorData.getSkillAbilities();
         const abilityKey = skillAbilities[skill];
-        const abilityMod = actor.system.abilities[abilityKey]?.mod || 0;
+        const abilityData = actor.system.abilities[abilityKey];
+        
+        // Calculate ability modifier dynamically from ability score (standard D&D-style: (score-10)/2)
+        const abilityMod = abilityData ? Math.floor((abilityData.value - 10) / 2) : 0;
         
         if (skillValue === undefined) {
             console.warn(`Avant | Skill '${skill}' not found on actor`);
