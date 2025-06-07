@@ -1,0 +1,246 @@
+{
+  "Actor": {
+    "types": ["character", "npc", "vehicle"],
+    "character": {
+      "level": 1,
+      "fortunePoints": 3,
+      "ancestry": "",
+      "lineage": "",
+      "culture": "",
+      "vocation": "",
+      "background": "",
+      "languages": "",
+      "abilities": {
+        "might": {
+          "value": 10,
+          "mod": 0
+        },
+        "grace": {
+          "value": 10,
+          "mod": 0
+        },
+        "intellect": {
+          "value": 10,
+          "mod": 0
+        },
+        "focus": {
+          "value": 10,
+          "mod": 0
+        }
+      },
+      "skills": {
+        "debate": 0,
+        "discern": 0,
+        "endure": 0,
+        "finesse": 0,
+        "force": 0,
+        "command": 0,
+        "charm": 0,
+        "hide": 0,
+        "inspect": 0,
+        "intuit": 0,
+        "recall": 0,
+        "surge": 0
+      },
+      "powerPoints": {
+        "value": 0,
+        "max": 0,
+        "limit": 0
+      },
+      "expertisePoints": {
+        "total": 0,
+        "spent": 0,
+        "remaining": 0
+      },
+      "health": {
+        "value": 25,
+        "max": 25,
+        "temp": 0
+      },
+      "defenseThreshold": 11,
+      "biography": "",
+      "notes": ""
+    },
+    "npc": {
+      "level": 1,
+      "fortunePoints": 3,
+      "ancestry": "",
+      "lineage": "",
+      "culture": "",
+      "vocation": "",
+      "background": "",
+      "languages": "",
+      "abilities": {
+        "might": {
+          "value": 10,
+          "mod": 0
+        },
+        "grace": {
+          "value": 10,
+          "mod": 0
+        },
+        "intellect": {
+          "value": 10,
+          "mod": 0
+        },
+        "focus": {
+          "value": 10,
+          "mod": 0
+        }
+      },
+      "skills": {
+        "debate": 0,
+        "discern": 0,
+        "endure": 0,
+        "finesse": 0,
+        "force": 0,
+        "command": 0,
+        "charm": 0,
+        "hide": 0,
+        "inspect": 0,
+        "intuit": 0,
+        "recall": 0,
+        "surge": 0
+      },
+      "powerPoints": {
+        "value": 0,
+        "max": 0,
+        "limit": 0
+      },
+      "expertisePoints": {
+        "total": 0,
+        "spent": 0,
+        "remaining": 0
+      },
+      "health": {
+        "value": 25,
+        "max": 25,
+        "temp": 0
+      },
+      "defenseThreshold": 11,
+      "biography": "",
+      "notes": ""
+    },
+    "vehicle": {
+      "level": 1,
+      "fortunePoints": 3,
+      "ancestry": "",
+      "lineage": "",
+      "culture": "",
+      "vocation": "",
+      "background": "",
+      "languages": "",
+      "abilities": {
+        "might": {
+          "value": 10,
+          "mod": 0
+        },
+        "grace": {
+          "value": 10,
+          "mod": 0
+        },
+        "intellect": {
+          "value": 10,
+          "mod": 0
+        },
+        "focus": {
+          "value": 10,
+          "mod": 0
+        }
+      },
+      "skills": {
+        "debate": 0,
+        "discern": 0,
+        "endure": 0,
+        "finesse": 0,
+        "force": 0,
+        "command": 0,
+        "charm": 0,
+        "hide": 0,
+        "inspect": 0,
+        "intuit": 0,
+        "recall": 0,
+        "surge": 0
+      },
+      "powerPoints": {
+        "value": 0,
+        "max": 0,
+        "limit": 0
+      },
+      "expertisePoints": {
+        "total": 0,
+        "spent": 0,
+        "remaining": 0
+      },
+      "health": {
+        "value": 25,
+        "max": 25,
+        "temp": 0
+      },
+      "defenseThreshold": 11,
+      "biography": "",
+      "notes": ""
+    }
+  },
+  "Item": {
+    "types": ["action", "feature", "talent", "augment", "weapon", "armor", "gear"],
+    "action": {
+      "description": "",
+      "ability": "might",
+      "difficulty": 11
+    },
+    "feature": {
+      "description": "",
+      "source": "",
+      "category": "general",
+      "uses": {
+        "value": 0,
+        "max": 0
+      }
+    },
+    "talent": {
+      "description": "",
+      "source": "",
+      "tier": 1,
+      "category": "general",
+      "prerequisites": "",
+      "uses": {
+        "value": 0,
+        "max": 0
+      }
+    },
+    "augment": {
+      "description": "",
+      "source": "",
+      "tier": 1,
+      "category": "general",
+      "prerequisites": "",
+      "uses": {
+        "value": 0,
+        "max": 0
+      }
+    },
+    "weapon": {
+      "description": "",
+      "damage": "1d6",
+      "damageType": "physical",
+      "range": "melee",
+      "weight": 0,
+      "cost": 0,
+      "qualities": ""
+    },
+    "armor": {
+      "description": "",
+      "defense": 0,
+      "weight": 0,
+      "cost": 0,
+      "qualities": ""
+    },
+    "gear": {
+      "description": "",
+      "weight": 0,
+      "cost": 0,
+      "quantity": 1
+    }
+  }
+} 
