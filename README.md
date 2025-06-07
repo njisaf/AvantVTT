@@ -34,7 +34,7 @@ avantVtt/
 
 ## Requirements
 
-- FoundryVTT v13+
+- FoundryVTT v13+ (v12 compatible)
 
 ## Support
 
