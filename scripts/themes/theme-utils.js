@@ -53,7 +53,7 @@ class ThemeConfigUtil extends BrowserThemeConfigUtil {
 
 class AvantThemeUtils {
     constructor() {
-        this.rootDir = path.resolve(__dirname, '..');
+        this.rootDir = path.resolve(__dirname, '..', '..');
     }
 
     /**
@@ -64,7 +64,7 @@ class AvantThemeUtils {
 🎨 Avant Theme Utilities - Designer-Friendly Theme Management
 
 USAGE:
-  node scripts/theme-utils.js [command] [options]
+  node scripts/themes/theme-utils.js [command] [options]
 
 COMMANDS:
   help                     Show this help message
@@ -85,9 +85,9 @@ COMMANDS:
   generate-mappings       Generate JavaScript mappings from config
   
   💡 EXAMPLES:
-  node scripts/theme-utils.js template > my-theme.json
-  node scripts/theme-utils.js validate my-theme.json
-  node scripts/theme-utils.js docs > THEME-VARIABLES.md
+  node scripts/themes/theme-utils.js template > my-theme.json
+  node scripts/themes/theme-utils.js validate my-theme.json
+  node scripts/themes/theme-utils.js docs > THEME-VARIABLES.md
 
 Made for designers, by developers ❤️
         `);
