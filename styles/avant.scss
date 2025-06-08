@@ -1,7 +1,15 @@
 /* Avant - Futuristic Character Sheet Design */
 /* Neo-Futurist & Minimalist Aesthetic with Cyberpunk Elements */
+/* Now with Dynamic Theming Support for v12/v13 compatibility */
 
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&display=swap');
+
+// Import theme system
+@import 'themes/base';
+@import 'themes/dark';
+@import 'themes/light';
 
 // SCSS Variables - Color Palette
 $bg-primary: #1C1C1C;        // Dark charcoal/graphite background
@@ -49,44 +57,45 @@ $spacing-xxl: 30px;
   transition: all 0.3s ease;
 }
 
+// Updated mixins to use CSS custom properties (theme-aware)
 @mixin orbitron-header($size: 12px, $weight: 700) {
-  font-family: $font-display;
+  font-family: var(--theme-font-display, $font-display);
   font-size: $size;
   font-weight: $weight;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: $accent-cyan;
+  color: var(--theme-accent-primary, $accent-cyan);
 }
 
 @mixin exo-body($size: 12px, $weight: 400) {
-  font-family: $font-primary;
+  font-family: var(--theme-font-primary, $font-primary);
   font-size: $size;
   font-weight: $weight;
-  color: $text-primary;
+  color: var(--theme-text-primary, $text-primary);
 }
 
 @mixin form-input-base {
-  background: $bg-tertiary;
-  border: 1px solid $border-primary;
-  color: $text-primary;
-  font-family: $font-primary;
+  background: var(--theme-bg-tertiary, $bg-tertiary);
+  border: 1px solid var(--theme-border-primary, $border-primary);
+  color: var(--theme-text-primary, $text-primary);
+  font-family: var(--theme-font-primary, $font-primary);
   border-radius: 0;
   @include transition-standard;
   @include box-sizing-border-box;
 
   &:focus {
-    background: $bg-primary;
-    border-color: $accent-cyan;
+    background: var(--theme-bg-primary, $bg-primary);
+    border-color: var(--theme-accent-primary, $accent-cyan);
     outline: none;
-    box-shadow: inset 0 0 10px rgba(0, 224, 220, 0.2);
+    box-shadow: inset 0 0 10px var(--theme-shadow-primary, rgba(0, 224, 220, 0.2));
   }
 }
 
 @mixin button-base {
-  background: $bg-tertiary;
-  border: 1px solid $accent-cyan;
-  color: $accent-cyan;
-  font-family: $font-display;
+  background: var(--theme-bg-tertiary, $bg-tertiary);
+  border: 1px solid var(--theme-accent-primary, $accent-cyan);
+  color: var(--theme-accent-primary, $accent-cyan);
+  font-family: var(--theme-font-display, $font-display);
   font-weight: 600;
   border-radius: 0;
   cursor: pointer;
@@ -95,22 +104,34 @@ $spacing-xxl: 30px;
   letter-spacing: 0.5px;
 
   &:hover {
-    background: $accent-cyan;
-    color: $bg-primary;
-    box-shadow: 0 0 15px rgba(0, 224, 220, 0.5);
+    background: var(--theme-accent-primary, $accent-cyan);
+    color: var(--theme-bg-primary, $bg-primary);
+    box-shadow: var(--theme-shadow-accent, 0 0 15px rgba(0, 224, 220, 0.5));
   }
 }
 
 @mixin section-base {
-  background: $bg-secondary;
-  border: 1px solid $border-primary;
-  border-left: 4px solid $accent-cyan;
+  background: var(--theme-bg-secondary, $bg-secondary);
+  border: 1px solid var(--theme-border-primary, $border-primary);
+  border-left: 4px solid var(--theme-accent-primary, $accent-cyan);
   border-radius: 0;
 }
 
-// Main Avant Class with CSS Custom Properties for v12 compatibility
+// Theme Classes - Apply specific themes
+.avant.theme-dark {
+  @include theme-dark;
+}
+
+.avant.theme-light {
+  @include theme-light;
+}
+
+// Main Avant Class with Theme System
 .avant {
-  // CSS Custom Properties - Maintain for backwards compatibility
+  // Default to dark theme if no theme class specified
+  @include theme-dark;
+  
+  // Legacy CSS Custom Properties - Maintain for backwards compatibility
   --bg-primary: #{$bg-primary};
   --text-primary: #{$text-primary};
   --accent-cyan: #{$accent-cyan};
@@ -129,14 +150,30 @@ $spacing-xxl: 30px;
   --shadow-accent: #{$shadow-accent};
   --shadow-deep: #{$shadow-deep};
 
-  // Base Styling
-  font-family: $font-primary;
+  // Base Styling using theme variables
+  font-family: var(--theme-font-primary, $font-primary);
   font-weight: 400;
-  color: $text-primary;
-  background: $bg-primary;
+  color: var(--theme-text-primary, $text-primary);
+  background: var(--theme-bg-primary, $bg-primary);
   border-radius: 0;
-  box-shadow: $shadow-deep;
-  border: 1px solid $border-primary;
+  box-shadow: var(--theme-shadow-deep, $shadow-deep);
+  border: 1px solid var(--theme-border-primary, $border-primary);
+
+  // Data attribute support for dynamic theme switching
+  &[data-theme="light"] {
+    @include theme-light;
+  }
+  
+  &[data-theme="dark"] {
+    @include theme-dark;
+  }
+
+  // User theme support via CSS custom properties
+  &[data-theme="custom"] {
+    // Custom themes will override these variables via JavaScript
+    // This provides a fallback structure
+    @include theme-interface;
+  }
 
   // Global Reset and Base Styling
   * {
@@ -152,10 +189,10 @@ $spacing-xxl: 30px;
 
   // Window Container - Fixed height with proper border visibility
   .window-app {
-    background: $bg-primary;
-    border: 2px solid $border-primary;
+    background: var(--theme-bg-primary, $bg-primary);
+    border: 2px solid var(--theme-border-primary, $border-primary);
     border-radius: 0;
-    box-shadow: $shadow-deep;
+    box-shadow: var(--theme-shadow-deep, $shadow-deep);
     position: relative;
     height: 630px; // Fixed height matching the default
     max-height: 630px; // Prevent growing beyond default
@@ -174,9 +211,9 @@ $spacing-xxl: 30px;
 
   // FoundryVTT Window Header - Keep functional for dragging and controls
   .window-header {
-    background: $gradient-primary;
-    border-bottom: 2px solid $accent-cyan;
-    color: $text-primary;
+    background: var(--theme-gradient-primary, $gradient-primary);
+    border-bottom: 2px solid var(--theme-accent-primary, $accent-cyan);
+    color: var(--theme-text-primary, $text-primary);
     @include orbitron-header(700);
     letter-spacing: 2px;
     flex-shrink: 0; // Prevent header from shrinking

@@ -1,0 +1,64 @@
+/**
+ * Avant VTT - Light Theme (Clean Minimal)
+ * A clean, professional light theme for better readability
+ * Compatible with FoundryVTT v12 and v13
+ */
+
+@mixin theme-light {
+  @include theme-base;
+  
+  // Theme Metadata
+  --theme-name: "Clean Light";
+  --theme-author: "Avant VTT Team";
+  --theme-version: "1.0.0";
+  
+  // Primary Colors - Clean light palette
+  --theme-bg-primary: #FFFFFF;         // Pure white background
+  --theme-bg-secondary: #F8F9FA;       // Very light grey
+  --theme-bg-tertiary: #E9ECEF;        // Light grey for cards/sections
+  
+  // Text Colors - High contrast for readability
+  --theme-text-primary: #212529;       // Dark grey primary text
+  --theme-text-secondary: #6C757D;     // Medium grey for secondary text
+  --theme-text-muted: #ADB5BD;         // Light grey for muted text
+  
+  // Accent Colors - Professional blue palette
+  --theme-accent-primary: #0066CC;     // Professional blue
+  --theme-accent-secondary: #3498DB;   // Lighter blue
+  --theme-accent-tertiary: #004499;    // Darker blue for variety
+  
+  // Border Colors - Subtle borders
+  --theme-border-primary: #DEE2E6;     // Light grey borders
+  --theme-border-accent: var(--theme-accent-primary);
+  
+  // State Colors - Standard web colors
+  --theme-success: #28A745;           // Bootstrap green
+  --theme-warning: #FFC107;           // Bootstrap yellow
+  --theme-error: #DC3545;             // Bootstrap red
+  --theme-info: var(--theme-accent-primary);
+  
+  // Shadows - Subtle light theme shadows
+  --theme-shadow-primary: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --theme-shadow-accent: 0 0 15px rgba(0, 102, 204, 0.2);
+  --theme-shadow-deep: 0 4px 20px rgba(0, 0, 0, 0.15);
+  
+  // Gradients - Subtle light gradients
+  --theme-gradient-primary: linear-gradient(135deg, var(--theme-bg-primary) 0%, var(--theme-bg-secondary) 100%);
+  --theme-gradient-accent: linear-gradient(135deg, var(--theme-accent-primary) 0%, var(--theme-accent-secondary) 100%);
+  
+  // Typography - Clean, readable fonts
+  --theme-font-primary: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --theme-font-display: 'Roboto Mono', 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+  
+  // Additional light theme effects
+  --theme-glow-primary: 0 0 8px var(--theme-accent-primary);
+  --theme-glow-secondary: 0 0 12px var(--theme-accent-secondary);
+  
+  // Backdrop filters for modern browsers
+  --theme-backdrop-blur: blur(5px);
+  --theme-backdrop-saturate: saturate(120%);
+  
+  // Light theme specific variables
+  --theme-hover-overlay: rgba(0, 102, 204, 0.1);
+  --theme-focus-outline: var(--theme-accent-primary);
+} 

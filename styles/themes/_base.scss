@@ -1,0 +1,94 @@
+/**
+ * Avant VTT - Base Theme Structure
+ * Defines the core theme variables and structure for extensibility
+ * Compatible with FoundryVTT v12 and v13
+ */
+
+// Theme Interface - All themes must define these variables
+@mixin theme-interface {
+  // Primary Colors
+  --theme-bg-primary: initial;
+  --theme-bg-secondary: initial;
+  --theme-bg-tertiary: initial;
+  
+  // Text Colors
+  --theme-text-primary: initial;
+  --theme-text-secondary: initial;
+  --theme-text-muted: initial;
+  
+  // Accent Colors
+  --theme-accent-primary: initial;
+  --theme-accent-secondary: initial;
+  --theme-accent-tertiary: initial;
+  
+  // Border Colors
+  --theme-border-primary: initial;
+  --theme-border-accent: initial;
+  
+  // State Colors
+  --theme-success: initial;
+  --theme-warning: initial;
+  --theme-error: initial;
+  --theme-info: initial;
+  
+  // Shadows
+  --theme-shadow-primary: initial;
+  --theme-shadow-accent: initial;
+  --theme-shadow-deep: initial;
+  
+  // Gradients
+  --theme-gradient-primary: initial;
+  --theme-gradient-accent: initial;
+  
+  // Typography
+  --theme-font-primary: initial;
+  --theme-font-display: initial;
+  
+  // Theme Metadata
+  --theme-name: initial;
+  --theme-author: initial;
+  --theme-version: initial;
+}
+
+// Base theme mixin that provides fallbacks and validation
+@mixin theme-base {
+  @include theme-interface;
+  
+  // Add theme attribution (hidden but accessible for debugging)
+  &::before {
+    content: "Theme: " var(--theme-name, "Unknown") " by " var(--theme-author, "Unknown");
+    position: fixed;
+    top: -100px;
+    left: -100px;
+    opacity: 0;
+    pointer-events: none;
+    z-index: -1;
+  }
+}
+
+// Utility mixin for theme-aware colors
+@mixin theme-color($property, $theme-var, $fallback: null) {
+  @if $fallback {
+    #{$property}: var(#{$theme-var}, #{$fallback});
+  } @else {
+    #{$property}: var(#{$theme-var});
+  }
+}
+
+// Utility mixin for theme-aware shadows
+@mixin theme-shadow($shadow-var, $fallback: null) {
+  @if $fallback {
+    box-shadow: var(#{$shadow-var}, #{$fallback});
+  } @else {
+    box-shadow: var(#{$shadow-var});
+  }
+}
+
+// Utility mixin for theme-aware gradients
+@mixin theme-gradient($gradient-var, $fallback: null) {
+  @if $fallback {
+    background: var(#{$gradient-var}, #{$fallback});
+  } @else {
+    background: var(#{$gradient-var});
+  }
+} 

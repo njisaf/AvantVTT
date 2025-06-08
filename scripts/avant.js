@@ -3,6 +3,9 @@
 
 console.log("Avant | Loading game system...");
 
+// Import theme manager
+import { AvantThemeManager } from './theme-manager.js';
+
 /**
  * Actor Data Model for Avant - v12/v13 Compatible
  * @extends {foundry.abstract.DataModel}
@@ -1558,6 +1561,9 @@ Hooks.on('preCreateActor', (document, data, options, userId) => {
 Hooks.once('init', async function() {
     console.log("Avant | Initializing game system");
     
+    // Register theme manager settings first
+    AvantThemeManager.registerSettings();
+    
     // Register system settings
     game.settings.register('avant', 'systemVersion', {
         name: 'System Version',
@@ -1621,6 +1627,11 @@ Hooks.once('init', async function() {
 // System ready
 Hooks.once('ready', async function() {
     console.log("Avant | System ready");
+    
+    // Initialize theme manager
+    game.avant = game.avant || {};
+    game.avant.themeManager = new AvantThemeManager();
+    
     ui.notifications.info("Avant game system loaded successfully!");
 });
 
@@ -1690,5 +1701,6 @@ window['AVANT'] = {
     AvantArmorData,
     AvantGearData,
     AvantActorSheet,
-    AvantItemSheet
+    AvantItemSheet,
+    AvantThemeManager
 };

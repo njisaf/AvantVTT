@@ -13,10 +13,37 @@ avantVtt/
 │   ├── actor-sheet.html # Character sheet template
 │   └── item/            # Item sheet templates
 ├── styles/
-│   └── avant.css        # System styling
+│   ├── avant.scss       # SCSS source file (edit this)
+│   └── avant.css        # Compiled CSS (generated from SCSS)
 ├── lang/
 │   └── en.json          # English localization
 └── assets/              # System assets
+```
+
+## Development
+
+### SCSS Compilation
+
+The system uses SCSS for styling. When making style changes:
+
+1. **Edit** `styles/avant.scss` (the source file)
+2. **Compile** to CSS using Dart Sass:
+   ```bash
+   npx sass styles/avant.scss styles/avant.css
+   ```
+3. **Deploy** using your normal deployment process
+
+**Important**: 
+- Always edit the `.scss` file, never the `.css` file directly
+- The `.css` file is generated and will be overwritten
+- Both `.scss` and `.css` files should be committed to version control
+
+### Watch Mode (Optional)
+
+For continuous development, you can use watch mode to automatically recompile on changes:
+
+```bash
+npx sass --watch styles/avant.scss styles/avant.css
 ```
 
 ## Installation
