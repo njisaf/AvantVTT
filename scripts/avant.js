@@ -1570,7 +1570,7 @@ Hooks.once('init', async function() {
         scope: 'world',
         config: false,
         type: String,
-        default: '2.1.9'
+        default: '0.2.0'
     });
 
     // Configure system
@@ -1611,6 +1611,7 @@ Hooks.once('init', async function() {
     // Preload templates
     loadTemplates([
         "systems/avant/templates/actor-sheet.html",
+        "systems/avant/templates/reroll-dialog.html",
         "systems/avant/templates/item/item-action-sheet.html",
         "systems/avant/templates/item/item-feature-sheet.html",
         "systems/avant/templates/item/item-talent-sheet.html",
@@ -1630,6 +1631,9 @@ Hooks.once('ready', async function() {
     // Initialize theme manager
     game.avant = game.avant || {};
     game.avant.themeManager = new AvantThemeManager();
+    
+    // Initialize chat context menu for Fortune Point rerolls
+    AvantChatContextMenu.addContextMenuListeners();
     
     ui.notifications.info("Avant game system loaded successfully!");
 });
@@ -1690,7 +1694,7 @@ Hooks.on('createItem', (item, options, userId) => {
 
 // Export system API
 window['AVANT'] = {
-    version: '2.1.9',
+    version: '0.2.0',
     AvantActorData,
     AvantActionData,
     AvantFeatureData,
@@ -1701,5 +1705,326 @@ window['AVANT'] = {
     AvantGearData,
     AvantActorSheet,
     AvantItemSheet,
-    AvantThemeManager
+    AvantThemeManager,
+    AvantRerollDialog,
+    AvantChatContextMenu
 };
+
+/**
+ * Fortune Point Reroll Dialog
+ * Allows players to reroll individual d10s from their previous roll
+ * @extends {Application}
+ */
+class AvantRerollDialog extends Application {
+    constructor(originalRoll, actor, originalFlavor, options = {}) {
+        super(options);
+        this.originalRoll = originalRoll;
+        this.actor = actor;
+        this.originalFlavor = originalFlavor;
+        this.selectedDice = new Set();
+        
+        // Extract d10 dice results from the original roll
+        this.d10Results = this._extractD10Results(originalRoll);
+        this.staticModifiers = this._extractStaticModifiers(originalRoll);
+    }
+    
+    static get defaultOptions() {
+        return foundry.utils.mergeObject(super.defaultOptions, {
+            id: "avant-reroll-dialog",
+            classes: ["avant", "dialog", "reroll-dialog"],
+            title: "Fortune Point Reroll",
+            template: "systems/avant/templates/reroll-dialog.html",
+            width: 400,
+            height: 300,
+            resizable: false
+        });
+    }
+    
+    getData() {
+        const fortunePoints = this.actor.system.fortunePoints || 0;
+        const maxRerolls = Math.min(this.d10Results.length, fortunePoints);
+        
+        return {
+            d10Results: this.d10Results.map((result, index) => ({
+                index: index,
+                value: result,
+                selected: this.selectedDice.has(index)
+            })),
+            selectedCount: this.selectedDice.size,
+            fortunePoints: fortunePoints,
+            maxRerolls: maxRerolls,
+            canReroll: fortunePoints > 0 && this.selectedDice.size > 0,
+            costMessage: this._getCostMessage(fortunePoints),
+            originalTotal: this.originalRoll.total,
+            originalFlavor: this.originalFlavor
+        };
+    }
+    
+    activateListeners(html) {
+        super.activateListeners(html);
+        
+        // Dice selection
+        html.find('.reroll-die').click(this._onDieClick.bind(this));
+        
+        // Reroll button
+        html.find('.reroll-confirm').click(this._onRerollConfirm.bind(this));
+        
+        // Cancel button
+        html.find('.reroll-cancel').click(this._onCancel.bind(this));
+    }
+    
+    async _onDieClick(event) {
+        const dieIndex = parseInt(event.currentTarget.dataset.index);
+        const fortunePoints = this.actor.system.fortunePoints || 0;
+        
+        if (this.selectedDice.has(dieIndex)) {
+            // Deselect die
+            this.selectedDice.delete(dieIndex);
+        } else {
+            // Select die if we have enough Fortune Points
+            if (this.selectedDice.size < fortunePoints) {
+                this.selectedDice.add(dieIndex);
+            } else {
+                ui.notifications.warn("Not enough Fortune Points to select more dice!");
+                return;
+            }
+        }
+        
+        this.render(false);
+    }
+    
+    async _onRerollConfirm(event) {
+        const fortunePoints = this.actor.system.fortunePoints || 0;
+        const selectedCount = this.selectedDice.size;
+        
+        if (selectedCount === 0) {
+            ui.notifications.warn("Please select at least one die to reroll.");
+            return;
+        }
+        
+        if (selectedCount > fortunePoints) {
+            ui.notifications.warn("Not enough Fortune Points!");
+            return;
+        }
+        
+        try {
+            // Create new roll with rerolled dice
+            const newRoll = await this._createReroll();
+            
+            // Deduct Fortune Points
+            const newFortunePoints = Math.max(0, fortunePoints - selectedCount);
+            await this.actor.update({
+                "system.fortunePoints": newFortunePoints
+            });
+            
+            // Post new roll to chat
+            await newRoll.toMessage({
+                speaker: ChatMessage.getSpeaker({ actor: this.actor }),
+                flavor: `${this.originalFlavor} (Rerolled with ${selectedCount} Fortune Point${selectedCount > 1 ? 's' : ''})`,
+                rollMode: game.settings.get('core', 'rollMode'),
+            });
+            
+            ui.notifications.info(`Rerolled ${selectedCount} die with Fortune Points. Remaining: ${newFortunePoints}`);
+            this.close();
+            
+        } catch (error) {
+            console.error('Avant | Error in reroll:', error);
+            ui.notifications.error(`Reroll failed: ${error.message}`);
+        }
+    }
+    
+    _onCancel(event) {
+        this.close();
+    }
+    
+    /**
+     * Extract d10 results from the original roll
+     * @param {Roll} roll - The original roll
+     * @returns {Array} Array of d10 die values
+     */
+    _extractD10Results(roll) {
+        const d10Results = [];
+        
+        // Navigate through the roll terms to find d10 dice
+        for (const term of roll.terms) {
+            if (term instanceof foundry.dice.terms.Die && term.faces === 10) {
+                // Extract individual die results
+                for (const result of term.results) {
+                    if (result.active) {
+                        d10Results.push(result.result);
+                    }
+                }
+            }
+        }
+        
+        return d10Results;
+    }
+    
+    /**
+     * Extract static modifiers from the original roll (level, ability mod, etc.)
+     * @param {Roll} roll - The original roll
+     * @returns {number} Total static modifiers
+     */
+    _extractStaticModifiers(roll) {
+        let staticModifiers = 0;
+        
+        for (const term of roll.terms) {
+            if (term instanceof foundry.dice.terms.NumericTerm) {
+                staticModifiers += term.number;
+            }
+        }
+        
+        return staticModifiers;
+    }
+    
+    /**
+     * Create a new roll with rerolled dice
+     * @returns {Roll} New roll with rerolled dice
+     */
+    async _createReroll() {
+        const newD10Results = [...this.d10Results];
+        
+        // Reroll selected dice
+        for (const dieIndex of this.selectedDice) {
+            const newRoll = await new Roll("1d10").evaluate();
+            newD10Results[dieIndex] = newRoll.total;
+        }
+        
+        // Calculate new total
+        const diceTotal = newD10Results.reduce((sum, die) => sum + die, 0);
+        const newTotal = diceTotal + this.staticModifiers;
+        
+        // Create a new Roll object with the new results
+        // We'll create a simple roll that represents the final result
+        const rollFormula = `${newD10Results.join(' + ')} + ${this.staticModifiers}`;
+        const roll = new Roll(rollFormula);
+        
+        // Manually set the evaluated state and total
+        roll._evaluated = true;
+        roll._total = newTotal;
+        
+        // Create the roll terms manually to show individual dice
+        const diceTerms = [];
+        for (let i = 0; i < newD10Results.length; i++) {
+            if (i > 0) diceTerms.push(new foundry.dice.terms.OperatorTerm({ operator: '+' }));
+            
+            const dieTerm = new foundry.dice.terms.Die({ 
+                number: 1, 
+                faces: 10 
+            });
+            dieTerm.results = [{
+                result: newD10Results[i],
+                active: true,
+                rerolled: this.selectedDice.has(i)
+            }];
+            dieTerm._evaluated = true;
+            diceTerms.push(dieTerm);
+        }
+        
+        if (this.staticModifiers !== 0) {
+            diceTerms.push(new foundry.dice.terms.OperatorTerm({ operator: '+' }));
+            diceTerms.push(new foundry.dice.terms.NumericTerm({ number: this.staticModifiers }));
+        }
+        
+        roll.terms = diceTerms;
+        
+        return roll;
+    }
+    
+    /**
+     * Generate cost message based on current Fortune Points
+     * @param {number} fortunePoints - Current Fortune Points
+     * @returns {string} Cost message
+     */
+    _getCostMessage(fortunePoints) {
+        if (fortunePoints === 0) {
+            return "No Fortune Points available!";
+        }
+        
+        const selectedCount = this.selectedDice.size;
+        if (selectedCount === 0) {
+            return `Select dice to reroll (${fortunePoints} Fortune Point${fortunePoints > 1 ? 's' : ''} available)`;
+        }
+        
+        return `Reroll for ${selectedCount} Fortune Point${selectedCount > 1 ? 's' : ''}`;
+    }
+}
+
+/**
+ * Chat Message Context Menu Handler
+ */
+class AvantChatContextMenu {
+    static addContextMenuListeners() {
+        // Add context menu to chat messages containing 2d10 rolls
+        $(document).on('contextmenu', '.message .dice-roll', AvantChatContextMenu._onChatRightClick.bind(this));
+    }
+    
+    static async _onChatRightClick(event) {
+        event.preventDefault();
+        
+        const messageElement = event.currentTarget.closest('.message');
+        if (!messageElement) return;
+        
+        const messageId = messageElement.dataset.messageId;
+        const message = game.messages.get(messageId);
+        
+        if (!message || !message.rolls || message.rolls.length === 0) return;
+        
+        const roll = message.rolls[0];
+        const actor = AvantChatContextMenu._getActorFromMessage(message);
+        
+        // Check if this is a 2d10 roll (eligible for reroll)
+        if (!AvantChatContextMenu._isEligibleRoll(roll) || !actor) return;
+        
+        // Create context menu
+        const menu = $(`
+            <div class="avant-context-menu" style="position: fixed; left: ${event.pageX}px; top: ${event.pageY}px; z-index: 1000;">
+                <ul class="context-menu">
+                    <li class="context-menu-item" data-action="reroll">
+                        <i class="fas fa-dice"></i> Reroll with Fortune Points
+                    </li>
+                </ul>
+            </div>
+        `);
+        
+        // Add to body
+        $('body').append(menu);
+        
+        // Handle menu click
+        menu.find('.context-menu-item[data-action="reroll"]').click(async () => {
+            menu.remove();
+            
+            // Open reroll dialog
+            const dialog = new AvantRerollDialog(roll, actor, message.flavor);
+            dialog.render(true);
+        });
+        
+        // Remove menu on click elsewhere
+        const removeMenu = () => {
+            menu.remove();
+            $(document).off('click', removeMenu);
+        };
+        
+        setTimeout(() => $(document).on('click', removeMenu), 10);
+    }
+    
+    static _getActorFromMessage(message) {
+        if (message.speaker?.actor) {
+            return game.actors.get(message.speaker.actor);
+        }
+        return null;
+    }
+    
+    static _isEligibleRoll(roll) {
+        // Check if roll contains exactly 2d10
+        let d10Count = 0;
+        
+        for (const term of roll.terms) {
+            if (term instanceof foundry.dice.terms.Die && term.faces === 10) {
+                d10Count += term.number;
+            }
+        }
+        
+        return d10Count === 2;
+    }
+}

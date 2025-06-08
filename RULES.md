@@ -26,6 +26,28 @@ This document summarizes the core mechanics, rolling rules, and data conventions
 - **Skill-Ability Mapping:** Each skill is associated with a primary ability (see below).
 - **Chat Output:** The result is posted to chat as "[Skill] Check ([Ability])" (e.g., "Finesse Check (Grace)").
 
+### **Fortune Point Rerolls**
+- **Eligibility:** Any roll that uses 2d10 (Ability Checks, Skill Checks, Attack Rolls, etc.) can be rerolled.
+- **How to Access:** Right-click on any 2d10 roll result in the chat window and select "Reroll with Fortune Points".
+- **Reroll Mechanics:**
+  - Opens a dialog showing both d10 dice results as selectable dice graphics.
+  - Players can select which individual d10(s) to reroll by clicking on them.
+  - Selected dice highlight to show they will be rerolled.
+  - Unselected dice retain their original values.
+  - All modifiers (Level, Ability Modifier, Skill Value, etc.) are preserved.
+- **Fortune Point Costs:**
+  - 1 Fortune Point per die rerolled.
+  - Players can only select as many dice as they have Fortune Points available.
+  - If a player has 0 Fortune Points, the reroll button is disabled.
+- **Process:**
+  1. Right-click on a 2d10 roll result in chat.
+  2. Select "Reroll with Fortune Points" from the context menu.
+  3. In the dialog, click on the d10(s) you want to reroll (they will highlight).
+  4. Click "Reroll Selected Dice" to confirm.
+  5. Fortune Points are deducted and a new roll is posted to chat.
+- **Chat Output:** New roll shows "[Original Roll Name] (Rerolled with X Fortune Point(s))".
+- **Limitations:** Only works with rolls that contain exactly 2d10 dice.
+
 ---
 
 ## 🧑‍💻 Data Model
@@ -103,6 +125,17 @@ This document summarizes the core mechanics, rolling rules, and data conventions
 2. System rolls `4d6kh3` and updates the Grace score.
 3. Modifier recalculates and UI updates.
 4. Result is posted to chat as "Grace Score Generation".
+
+## 📚 Example: Fortune Point Reroll Flow
+
+1. Player makes a Skill Check and rolls poorly (e.g., rolls 2 and 3 on the d10s).
+2. Player right-clicks on the roll result in chat.
+3. Selects "Reroll with Fortune Points" from the context menu.
+4. Dialog opens showing two d10 dice: one showing "2" and one showing "3".
+5. Player clicks on the die showing "2" to select it for reroll (it highlights).
+6. Player clicks "Reroll Selected Dice" button.
+7. System deducts 1 Fortune Point and rerolls only the selected die.
+8. New result is posted to chat: e.g., "Finesse Check (Grace) (Rerolled with 1 Fortune Point)" with the new total.
 
 ---
 

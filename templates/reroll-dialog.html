@@ -1,0 +1,43 @@
+<form class="avant reroll-dialog">
+    <div class="dialog-content">
+        <div class="reroll-header">
+            <h3>Fortune Point Reroll</h3>
+            <p class="original-roll">Original Roll: {{originalFlavor}} = {{originalTotal}}</p>
+        </div>
+        
+        <div class="dice-selection">
+            <h4>Select dice to reroll:</h4>
+            <div class="dice-container">
+                {{#each d10Results}}
+                <div class="reroll-die {{#if selected}}selected{{/if}}" data-index="{{index}}" title="Click to select/deselect">
+                    <div class="die-face d10">
+                        <span class="die-value">{{value}}</span>
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+        </div>
+        
+        <div class="fortune-points-info">
+            <div class="fortune-points-display">
+                <i class="fas fa-star"></i>
+                <span class="fortune-count">{{fortunePoints}}</span>
+                <span class="fortune-label">Fortune Point{{#unless (eq fortunePoints 1)}}s{{/unless}} Available</span>
+            </div>
+            <div class="cost-message">
+                {{costMessage}}
+            </div>
+        </div>
+        
+        <div class="dialog-buttons">
+            <button type="button" class="reroll-confirm" {{#unless canReroll}}disabled{{/unless}}>
+                <i class="fas fa-dice"></i>
+                Reroll Selected Dice
+            </button>
+            <button type="button" class="reroll-cancel">
+                <i class="fas fa-times"></i>
+                Cancel
+            </button>
+        </div>
+    </div>
+</form> 
