@@ -5,7 +5,7 @@
  */
 
 import { THEME_CONFIG } from './theme-config.js';
-import { ThemeConfigUtil } from './theme-utils.js';
+import { ThemeConfigUtil } from './theme-config-utils.js';
 
 export class AvantThemeManager {
     constructor() {
