@@ -5,6 +5,7 @@ console.log("Avant | Loading game system...");
 
 // Import theme manager
 import { AvantThemeManager } from './theme-manager.js';
+import { ThemeConfigUtil } from './theme-config.js';
 
 /**
  * Actor Data Model for Avant - v12/v13 Compatible

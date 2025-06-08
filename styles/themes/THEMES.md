@@ -173,6 +173,121 @@ Create a `.json` file with the following structure:
 }
 ```
 
+### Theme Development CLI Tools
+
+The Avant system includes powerful command-line tools for theme development. These tools help designers and developers create, validate, and manage themes more efficiently.
+
+#### Prerequisites
+
+Ensure you have Node.js 16+ installed and run:
+```bash
+npm install
+```
+
+#### Available Commands
+
+**Help and Documentation**:
+- `npm run theme:help` - Display help information and available commands
+- `npm run theme:docs` - Generate comprehensive theme variable documentation
+- `npm run theme:list` - List all available theme variables with descriptions
+
+**Theme Templates**:
+- `npm run theme:template` - Generate a basic theme template (required variables only)
+- `npm run theme:template:full` - Generate a complete theme template (all variables)
+
+**Validation and Testing**:
+- `npm run theme:validate <file>` - Validate a theme JSON file
+- `npm run test:themes` - Create example themes and validate them
+
+**Development Tools**:
+- `npm run theme:examples` - Create example theme files in `styles/themes/examples/`
+- `npm run theme:mappings` - Generate JavaScript mappings for developers
+- `npm run docs:update` - Update theme documentation
+
+#### Quick Start Workflow
+
+1. **Generate a theme template**:
+   ```bash
+   npm run theme:template > my-new-theme.json
+   ```
+
+2. **Edit the theme** in your favorite editor:
+   ```bash
+   # Edit my-new-theme.json with your colors and settings
+   ```
+
+3. **Validate your theme**:
+   ```bash
+   npm run theme:validate my-new-theme.json
+   ```
+
+4. **Test in FoundryVTT** using the Theme Manager
+
+#### Advanced Usage
+
+**Generate a complete theme with all options**:
+```bash
+npm run theme:template:full > complete-theme.json
+```
+
+**List all available theme variables**:
+```bash
+npm run theme:list
+```
+
+**Create example themes for reference**:
+```bash
+npm run theme:examples
+# Creates minimal-example.json and complete-example.json in styles/themes/examples/
+```
+
+**Generate theme documentation**:
+```bash
+npm run theme:docs > THEME-VARIABLES.md
+```
+
+#### Theme Template Structure
+
+When you run `npm run theme:template`, you'll get a JSON file with this structure:
+
+```json
+{
+  "name": "New Theme",
+  "author": "Theme Author",
+  "version": "1.0.0",
+  "description": "Theme description",
+  "colors": {
+    "backgrounds": {
+      "primary": "#1C1C1C",
+      "secondary": "#2A2A2A",
+      "tertiary": "#333333"
+    },
+    "text": {
+      "primary": "#FFFFFF",
+      "secondary": "#BFBFBF"
+    },
+    "accents": {
+      "primary": "#00E0DC"
+    },
+    "borders": {
+      "primary": "#404040"
+    }
+  }
+}
+```
+
+This includes only the required variables. For a complete template with all optional variables, use `npm run theme:template:full`.
+
+#### Validation Features
+
+The validation tool checks for:
+- ✅ Valid JSON syntax
+- ✅ Required theme properties (name, author, version, colors)
+- ✅ Valid color formats (hex codes, rgb(), etc.)
+- ✅ Complete theme structure
+- ⚠️ Warnings for missing optional properties
+- 💡 Suggestions for improvements
+
 ### Installing Custom Themes
 
 1. **Open Theme Manager**: Access through game settings

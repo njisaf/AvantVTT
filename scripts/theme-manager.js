@@ -4,6 +4,8 @@
  * Compatible with FoundryVTT v12 and v13
  */
 
+import { ThemeConfigUtil } from './theme-config.js';
+
 export class AvantThemeManager {
     constructor() {
         this.currentTheme = 'dark';
@@ -197,94 +199,44 @@ export class AvantThemeManager {
     
     /**
      * Clear all custom theme CSS variables from an element
+     * Now uses the centralized configuration for automatic variable discovery
      */
     clearCustomThemeVariables(element) {
-        const customVars = [
-            '--theme-bg-primary', '--theme-bg-secondary', '--theme-bg-tertiary',
-            '--theme-text-primary', '--theme-text-secondary', '--theme-text-muted',
-            '--theme-accent-primary', '--theme-accent-secondary', '--theme-accent-tertiary',
-            '--theme-border-primary', '--theme-border-accent',
-            '--theme-success', '--theme-warning', '--theme-error', '--theme-info',
-            '--theme-shadow-primary', '--theme-shadow-accent', '--theme-shadow-deep',
-            '--theme-gradient-primary', '--theme-gradient-accent',
-            '--theme-font-primary', '--theme-font-display',
-            '--theme-name', '--theme-author', '--theme-version'
-        ];
+        // Get all CSS variables from the configuration automatically
+        const customVars = ThemeConfigUtil.getAllCSSVariables();
         
         customVars.forEach(varName => {
             element.style.removeProperty(varName);
         });
         
-        console.log(`Avant Theme Manager | Cleared custom variables from element`);
+        console.log(`Avant Theme Manager | Cleared ${customVars.length} custom variables from element`);
     }
     
     /**
      * Apply custom theme CSS variables
+     * Now uses the centralized configuration for automatic mapping
      */
     applyCustomTheme(element, themeId) {
         const theme = this.customThemes.get(themeId);
         if (!theme) return;
         
-        const colors = theme.colors || {};
-        const effects = theme.effects || {};
-        const typography = theme.typography || {};
-        const advanced = theme.advanced || {};
+        // Get the automatic JSON-to-CSS mapping from configuration
+        const mapping = ThemeConfigUtil.getJSONToCSSMapping();
         
-        // Apply color variables
-        if (colors.backgrounds) {
-            element.style.setProperty('--theme-bg-primary', colors.backgrounds.primary);
-            element.style.setProperty('--theme-bg-secondary', colors.backgrounds.secondary);
-            element.style.setProperty('--theme-bg-tertiary', colors.backgrounds.tertiary);
+        // Apply variables automatically based on configuration
+        for (const [jsonPath, cssVar] of Object.entries(mapping)) {
+            const value = ThemeConfigUtil.getNestedProperty(theme, jsonPath);
+            if (value !== undefined && value !== null) {
+                // Handle special cases for metadata that need quotes
+                if (cssVar.includes('name') || cssVar.includes('author') || cssVar.includes('version')) {
+                    element.style.setProperty(cssVar, `"${value}"`);
+                } else {
+                    element.style.setProperty(cssVar, value);
+                }
+            }
         }
         
-        if (colors.text) {
-            element.style.setProperty('--theme-text-primary', colors.text.primary);
-            element.style.setProperty('--theme-text-secondary', colors.text.secondary);
-            element.style.setProperty('--theme-text-muted', colors.text.muted);
-        }
-        
-        if (colors.accents) {
-            element.style.setProperty('--theme-accent-primary', colors.accents.primary);
-            element.style.setProperty('--theme-accent-secondary', colors.accents.secondary);
-            element.style.setProperty('--theme-accent-tertiary', colors.accents.tertiary);
-        }
-        
-        if (colors.borders) {
-            element.style.setProperty('--theme-border-primary', colors.borders.primary);
-            element.style.setProperty('--theme-border-accent', colors.borders.accent);
-        }
-        
-        if (colors.states) {
-            element.style.setProperty('--theme-success', colors.states.success);
-            element.style.setProperty('--theme-warning', colors.states.warning);
-            element.style.setProperty('--theme-error', colors.states.error);
-            element.style.setProperty('--theme-info', colors.states.info);
-        }
-        
-        // Apply effects
-        if (effects.shadows) {
-            element.style.setProperty('--theme-shadow-primary', effects.shadows.primary);
-            element.style.setProperty('--theme-shadow-accent', effects.shadows.accent);
-            element.style.setProperty('--theme-shadow-deep', effects.shadows.deep);
-        }
-        
-        if (effects.gradients) {
-            element.style.setProperty('--theme-gradient-primary', effects.gradients.primary);
-            element.style.setProperty('--theme-gradient-accent', effects.gradients.accent);
-        }
-        
-        // Apply typography
-        if (typography.fontPrimary) {
-            element.style.setProperty('--theme-font-primary', typography.fontPrimary);
-        }
-        if (typography.fontDisplay) {
-            element.style.setProperty('--theme-font-display', typography.fontDisplay);
-        }
-        
-        // Apply metadata
-        element.style.setProperty('--theme-name', `"${theme.name}"`);
-        element.style.setProperty('--theme-author', `"${theme.author}"`);
-        element.style.setProperty('--theme-version', `"${theme.version}"`);
+        console.log(`Avant Theme Manager | Applied custom theme "${theme.name}" using configuration-based mapping`);
     }
     
     /**
@@ -351,23 +303,19 @@ export class AvantThemeManager {
     
     /**
      * Validate theme JSON structure
+     * Now uses the centralized configuration for validation
      */
     validateTheme(theme) {
-        const required = [
-            'name', 'author', 'version', 'colors',
-            'colors.backgrounds.primary',
-            'colors.text.primary', 
-            'colors.accents.primary'
-        ];
+        const validation = ThemeConfigUtil.validateTheme(theme);
         
-        for (const path of required) {
-            if (!this.getNestedProperty(theme, path)) {
-                console.error(`Avant Theme Manager | Missing required theme property: ${path}`);
-                return false;
-            }
+        if (!validation.isValid) {
+            console.error('Avant Theme Manager | Theme validation failed:');
+            validation.errors.forEach(error => {
+                console.error(`  • ${error}`);
+            });
         }
         
-        return true;
+        return validation.isValid;
     }
     
     /**
