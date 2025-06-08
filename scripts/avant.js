@@ -1770,66 +1770,84 @@ class AvantRerollDialog extends Application {
 }
 
 /**
- * Chat Message Context Menu Handler - Simplified Single Approach
- * Uses only getChatLogEntryContext hook for v12/v13 compatibility
+ * Chat Message Context Menu Handler - Version-Aware Implementation
+ * Supports both v12 and v13 FoundryVTT versions
  */
 class AvantChatContextMenu {
     static addContextMenuListeners() {
-        console.log('Avant | Initializing context menu system (getChatLogEntryContext approach only)');
+        console.log('Avant | Initializing version-aware context menu system...');
         
-        // v13 approach: Directly extend ChatLog's _getEntryContextOptions method
-        console.log('Avant | Attempting to extend ChatLog._getEntryContextOptions...');
+        // Detect Foundry version
+        const foundryVersion = game.version || game.data.version;
+        const isMajorV13 = foundryVersion && foundryVersion.startsWith('13');
+        const isMajorV12 = foundryVersion && foundryVersion.startsWith('12');
         
-        // Wait for ChatLog to be available
-        if (ui.chat) {
-            AvantChatContextMenu._extendChatLogContextMenu();
+        console.log(`Avant | Detected Foundry version: ${foundryVersion}, Major v13: ${isMajorV13}, Major v12: ${isMajorV12}`);
+        
+        if (isMajorV13) {
+            console.log('Avant | Using v13 approach: Direct ChatLog._getEntryContextOptions extension');
+            AvantChatContextMenu._initializeV13Approach();
+        } else if (isMajorV12) {
+            console.log('Avant | Using v12 approach: Traditional hook-based method');
+            AvantChatContextMenu._initializeV12Approach();
         } else {
-            // Wait for UI to be ready
-            Hooks.once('ready', () => {
-                AvantChatContextMenu._extendChatLogContextMenu();
-            });
+            console.log('Avant | Unknown version, attempting v12 approach as fallback');
+            AvantChatContextMenu._initializeV12Approach();
         }
-        
-        // DEBUGGING: Test if ANY context menu hooks fire
-        console.log('Avant | Adding debug hooks to test what fires...');
-        
-        Hooks.on('getDocumentContextOptions', (...args) => {
-            console.log('Avant | 🔍 getDocumentContextOptions hook fired:', args);
-        });
-        
-        Hooks.on('getContextMenuOptions', (...args) => {
-            console.log('Avant | 🔍 getContextMenuOptions hook fired:', args);
-        });
-        
-        Hooks.on('contextMenu', (...args) => {
-            console.log('Avant | 🔍 contextMenu hook fired:', args);
-        });
-        
-        // Listen for ALL hook calls to see what's available
-        const originalCall = Hooks.call;
-        Hooks.call = function(hook, ...args) {
-            if (hook.toLowerCase().includes('context') || hook.toLowerCase().includes('chat')) {
-                console.log(`Avant | 🔍 Hook called: ${hook}`, args);
-            }
-            return originalCall.call(this, hook, ...args);
-        };
         
         console.log('Avant | Context menu listeners registered successfully');
     }
     
     /**
-     * Extend ChatLog's context menu to add reroll options
+     * Initialize context menu for FoundryVTT v13
+     * Uses direct ChatLog method extension (PROVEN WORKING)
      */
-    static _extendChatLogContextMenu() {
-        console.log('Avant | 🎯 Extending ChatLog context menu...');
+    static _initializeV13Approach() {
+        // Wait for ChatLog to be available
+        if (ui.chat) {
+            AvantChatContextMenu._extendChatLogContextMenuV13();
+        } else {
+            // Wait for UI to be ready
+            Hooks.once('ready', () => {
+                AvantChatContextMenu._extendChatLogContextMenuV13();
+            });
+        }
+    }
+    
+    /**
+     * Initialize context menu for FoundryVTT v12
+     * Uses traditional hook-based approach
+     */
+    static _initializeV12Approach() {
+        console.log('Avant | Setting up v12 hook-based context menu...');
+        
+        // Try getChatLogEntryContext hook first (most common in v12)
+        Hooks.on('getChatLogEntryContext', (html, options) => {
+            console.log('Avant | 🎯 getChatLogEntryContext hook fired (v12)');
+            AvantChatContextMenu._addRerollOptionV12(html, options);
+        });
+        
+        // Also try getDocumentContextOptions as backup
+        Hooks.on('getDocumentContextOptions', (document, options) => {
+            console.log('Avant | 🎯 getDocumentContextOptions hook fired (v12)');
+            if (document instanceof ChatMessage) {
+                AvantChatContextMenu._addRerollOptionForDocument(document, options);
+            }
+        });
+        
+        console.log('Avant | v12 hooks registered');
+    }
+    
+    /**
+     * Extend ChatLog's context menu for v13 (WORKING SOLUTION)
+     */
+    static _extendChatLogContextMenuV13() {
+        console.log('Avant | 🎯 Extending ChatLog context menu for v13...');
         
         if (!ui.chat) {
             console.log('Avant | ERROR: ui.chat not available');
             return;
         }
-        
-        console.log('Avant | ChatLog object:', ui.chat);
-        console.log('Avant | ChatLog methods:', Object.getOwnPropertyNames(ui.chat.constructor.prototype));
         
         // Store the original method
         const originalGetEntryContextOptions = ui.chat._getEntryContextOptions;
@@ -1843,7 +1861,7 @@ class AvantChatContextMenu {
         
         // Override the method
         ui.chat._getEntryContextOptions = function() {
-            console.log('Avant | 🎯 EXTENDED _getEntryContextOptions called!');
+            console.log('Avant | 🎯 EXTENDED _getEntryContextOptions called (v13)!');
             
             // Get the original options
             const options = originalGetEntryContextOptions.call(this);
@@ -1854,19 +1872,19 @@ class AvantChatContextMenu {
                 name: "Reroll with Fortune Points",
                 icon: '<i class="fas fa-dice"></i>',
                 condition: (li) => {
-                    console.log('Avant | Condition check - li element:', li);
+                    console.log('Avant | Condition check - li element (v13):', li);
                     
-                    // Get the message ID from the li element (v13 uses raw DOM, not jQuery)
+                    // v13 DOM compatibility: use vanilla DOM methods
                     const messageId = li.dataset?.messageId || li.getAttribute('data-message-id');
-                    console.log('Avant | Message ID from li:', messageId);
+                    console.log('Avant | Message ID from li (v13):', messageId);
                     
                     if (!messageId) return false;
                     
                     const message = game.messages.get(messageId);
-                    console.log('Avant | Message object:', message);
+                    console.log('Avant | Message object (v13):', message);
                     
                     if (!message || !message.rolls || message.rolls.length === 0) {
-                        console.log('Avant | No rolls in message');
+                        console.log('Avant | No rolls in message (v13)');
                         return false;
                     }
                     
@@ -1874,12 +1892,12 @@ class AvantChatContextMenu {
                     const actor = AvantChatContextMenu._getActorFromMessage(message);
                     const isEligible = AvantChatContextMenu._isEligibleRoll(roll);
                     
-                    console.log('Avant | Condition check result - eligible:', isEligible, 'actor:', !!actor);
+                    console.log('Avant | Condition check result (v13) - eligible:', isEligible, 'actor:', !!actor);
                     return isEligible && actor && actor.system?.fortunePoints > 0;
                 },
                 callback: (li) => {
-                    console.log('Avant | === CONTEXT MENU CALLBACK TRIGGERED ===');
-                    console.log('Avant | Callback li element:', li);
+                    console.log('Avant | === CONTEXT MENU CALLBACK TRIGGERED (v13) ===');
+                    console.log('Avant | Callback li element (v13):', li);
                     
                     const messageId = li.dataset?.messageId || li.getAttribute('data-message-id');
                     const message = game.messages.get(messageId);
@@ -1888,193 +1906,128 @@ class AvantChatContextMenu {
                     
                     const dialog = new AvantRerollDialog(roll, actor, message.flavor);
                     dialog.render(true);
-                    console.log('Avant | Dialog rendered');
+                    console.log('Avant | Dialog rendered (v13)');
                 }
             });
             
-            console.log('Avant | Extended options:', options.map(opt => opt.name));
+            console.log('Avant | Extended options (v13):', options.map(opt => opt.name));
             return options;
         };
         
-        console.log('Avant | ✅ ChatLog context menu extended successfully!');
+        console.log('Avant | ✅ ChatLog context menu extended successfully for v13!');
     }
     
     /**
-     * Add reroll option for document-based context menus (v13 style)
-     * @param {ChatMessage} document - The ChatMessage document
-     * @param {Array} options - Context menu options array
+     * Add reroll option for v12 hook-based approach
      */
-    static _addRerollOptionForDocument(document, options) {
-        console.log('Avant | === _addRerollOptionForDocument START ===');
-        console.log('Avant | Document ID:', document?.id);
-        console.log('Avant | Document rolls:', document?.rolls?.length);
-        console.log('Avant | Document flavor:', document?.flavor);
-        
-        if (!document || !document.rolls || document.rolls.length === 0) {
-            console.log('Avant | ERROR: Document has no rolls');
-            console.log('Avant | === _addRerollOptionForDocument END (no rolls) ===');
-            return;
-        }
-        
-        const roll = document.rolls[0];
-        console.log('Avant | First roll object:', roll);
-        console.log('Avant | Roll formula:', roll.formula);
-        console.log('Avant | Roll terms:', roll.terms);
-        
-        const actor = AvantChatContextMenu._getActorFromMessage(document);
-        console.log('Avant | Retrieved actor:', actor);
-        console.log('Avant | Actor fortune points:', actor?.system?.fortunePoints);
-        
-        // Check if this roll is eligible for reroll (2d10 roll)
-        const isEligible = AvantChatContextMenu._isEligibleRoll(roll);
-        console.log('Avant | Roll eligibility check result:', isEligible);
-        
-        if (!isEligible || !actor) {
-            console.log('Avant | ERROR: Roll not eligible or no actor found');
-            console.log('Avant | Eligible:', isEligible, 'Actor:', !!actor);
-            console.log('Avant | === _addRerollOptionForDocument END (not eligible) ===');
-            return;
-        }
-        
-        console.log('Avant | SUCCESS: Adding reroll option for document:', document.id);
-        
-        // Check for duplicate options
-        const existingRerollOption = options.find(opt => opt.name === "Reroll with Fortune Points");
-        if (existingRerollOption) {
-            console.log('Avant | WARNING: Reroll option already exists, skipping duplicate');
-            console.log('Avant | === _addRerollOptionForDocument END (duplicate) ===');
-            return;
-        }
+    static _addRerollOptionV12(html, options) {
+        console.log('Avant | Adding reroll option via v12 hook approach');
         
         options.push({
             name: "Reroll with Fortune Points",
             icon: '<i class="fas fa-dice"></i>',
-            condition: true,  // Always show the option, let the dialog handle validation
-            callback: () => {
-                console.log('Avant | === CONTEXT MENU CALLBACK TRIGGERED ===');
-                console.log('Avant | Callback for document:', document.id);
-                const dialog = new AvantRerollDialog(roll, actor, document.flavor);
+            condition: (li) => {
+                console.log('Avant | Condition check - li element (v12):', li);
+                
+                // v12 jQuery compatibility: use jQuery methods if available
+                let messageId;
+                if (li.data && typeof li.data === 'function') {
+                    messageId = li.data('messageId') || li.attr('data-message-id');
+                } else {
+                    // Fallback to vanilla DOM
+                    messageId = li.dataset?.messageId || li.getAttribute('data-message-id');
+                }
+                
+                console.log('Avant | Message ID from li (v12):', messageId);
+                
+                if (!messageId) return false;
+                
+                const message = game.messages.get(messageId);
+                console.log('Avant | Message object (v12):', message);
+                
+                if (!message || !message.rolls || message.rolls.length === 0) {
+                    console.log('Avant | No rolls in message (v12)');
+                    return false;
+                }
+                
+                const roll = message.rolls[0];
+                const actor = AvantChatContextMenu._getActorFromMessage(message);
+                const isEligible = AvantChatContextMenu._isEligibleRoll(roll);
+                
+                console.log('Avant | Condition check result (v12) - eligible:', isEligible, 'actor:', !!actor);
+                return isEligible && actor && actor.system?.fortunePoints > 0;
+            },
+            callback: (li) => {
+                console.log('Avant | === CONTEXT MENU CALLBACK TRIGGERED (v12) ===');
+                console.log('Avant | Callback li element (v12):', li);
+                
+                let messageId;
+                if (li.data && typeof li.data === 'function') {
+                    messageId = li.data('messageId') || li.attr('data-message-id');
+                } else {
+                    messageId = li.dataset?.messageId || li.getAttribute('data-message-id');
+                }
+                
+                const message = game.messages.get(messageId);
+                const roll = message.rolls[0];
+                const actor = AvantChatContextMenu._getActorFromMessage(message);
+                
+                const dialog = new AvantRerollDialog(roll, actor, message.flavor);
                 dialog.render(true);
-                console.log('Avant | Dialog rendered');
+                console.log('Avant | Dialog rendered (v12)');
             }
         });
         
-        console.log('Avant | SUCCESS: Reroll option added to options array');
-        console.log('Avant | Final options count:', options.length);
-        console.log('Avant | === _addRerollOptionForDocument END (success) ===');
+        console.log('Avant | Reroll option added via v12 hook');
     }
-    
-    static _addRerollOption(html, options) {
-        console.log('Avant | === _addRerollOption START ===');
-        console.log('Avant | Input HTML:', html);
-        console.log('Avant | Input HTML type:', html?.constructor?.name);
-        console.log('Avant | Input options length:', options?.length);
+
+    /**
+     * Add reroll option for document-based context menu (v12 fallback)
+     */
+    static _addRerollOptionForDocument(document, options) {
+        console.log('Avant | Adding reroll option for document approach (v12 fallback)');
         
-        // Get the message element - handle both jQuery and HTMLElement
-        let messageElement = html;
-        if (html instanceof jQuery) {
-            console.log('Avant | Converting jQuery object to DOM element');
-            messageElement = html.length > 0 ? html[0] : null;
-        }
-        
-        if (!messageElement) {
-            console.log('Avant | ERROR: No valid message element found');
-            console.log('Avant | === _addRerollOption END (no element) ===');
+        if (!(document instanceof ChatMessage)) {
+            console.log('Avant | Document is not a ChatMessage');
             return;
         }
         
-        console.log('Avant | Message element:', messageElement);
-        console.log('Avant | Message element tagName:', messageElement.tagName);
-        console.log('Avant | Message element classList:', messageElement.classList?.toString());
+        const message = document;
         
-        // Find message ID using various methods
-        let messageId = messageElement.dataset?.messageId || 
-                       messageElement.getAttribute?.('data-message-id');
-        
-        console.log('Avant | Initial messageId search result:', messageId);
-        
-        // If not found directly, try looking for parent message container
-        if (!messageId && messageElement.closest) {
-            console.log('Avant | Searching for parent message container...');
-            const messageContainer = messageElement.closest('.message') || 
-                                   messageElement.closest('li[data-message-id]');
-            if (messageContainer) {
-                console.log('Avant | Found message container:', messageContainer);
-                messageId = messageContainer.dataset?.messageId || 
-                           messageContainer.getAttribute('data-message-id');
-                console.log('Avant | Message ID from container:', messageId);
-            } else {
-                console.log('Avant | No message container found');
-            }
-        }
-        
-        if (!messageId) {
-            console.log('Avant | ERROR: No message ID found after all searches');
-            console.log('Avant | === _addRerollOption END (no messageId) ===');
-            return;
-        }
-        
-        console.log('Avant | Successfully found messageId:', messageId);
-        
-        const message = game.messages.get(messageId);
-        console.log('Avant | Retrieved message object:', message);
-        console.log('Avant | Message has rolls:', message?.rolls?.length);
-        
-        if (!message || !message.rolls || message.rolls.length === 0) {
-            console.log('Avant | ERROR: Message not found or has no rolls');
-            console.log('Avant | === _addRerollOption END (no rolls) ===');
+        if (!message.rolls || message.rolls.length === 0) {
+            console.log('Avant | No rolls in message (document approach)');
             return;
         }
         
         const roll = message.rolls[0];
-        console.log('Avant | First roll object:', roll);
-        console.log('Avant | Roll formula:', roll.formula);
-        console.log('Avant | Roll terms:', roll.terms);
-        
         const actor = AvantChatContextMenu._getActorFromMessage(message);
-        console.log('Avant | Retrieved actor:', actor);
-        console.log('Avant | Actor fortune points:', actor?.system?.fortunePoints);
-        
-        // Check if this roll is eligible for reroll (2d10 roll)
         const isEligible = AvantChatContextMenu._isEligibleRoll(roll);
-        console.log('Avant | Roll eligibility check result:', isEligible);
         
-        if (!isEligible || !actor) {
-            console.log('Avant | ERROR: Roll not eligible or no actor found');
-            console.log('Avant | Eligible:', isEligible, 'Actor:', !!actor);
-            console.log('Avant | === _addRerollOption END (not eligible) ===');
-            return;
-        }
-        
-        console.log('Avant | SUCCESS: Adding reroll option for message:', messageId);
-        
-        // Check for duplicate options
-        const existingRerollOption = options.find(opt => opt.name === "Reroll with Fortune Points");
-        if (existingRerollOption) {
-            console.log('Avant | WARNING: Reroll option already exists, skipping duplicate');
-            console.log('Avant | === _addRerollOption END (duplicate) ===');
+        if (!isEligible || !actor || actor.system?.fortunePoints <= 0) {
+            console.log('Avant | Message not eligible for reroll (document approach)');
             return;
         }
         
         options.push({
             name: "Reroll with Fortune Points",
             icon: '<i class="fas fa-dice"></i>',
-            condition: true,  // Always show the option, let the dialog handle validation
-            callback: li => {
-                console.log('Avant | === CONTEXT MENU CALLBACK TRIGGERED ===');
-                console.log('Avant | Callback for message:', messageId);
-                console.log('Avant | Callback li element:', li);
+            condition: () => true, // Already checked above
+            callback: () => {
+                console.log('Avant | === DOCUMENT CONTEXT MENU CALLBACK TRIGGERED ===');
                 const dialog = new AvantRerollDialog(roll, actor, message.flavor);
                 dialog.render(true);
-                console.log('Avant | Dialog rendered');
+                console.log('Avant | Dialog rendered (document approach)');
             }
         });
         
-        console.log('Avant | SUCCESS: Reroll option added to options array');
-        console.log('Avant | Final options count:', options.length);
-        console.log('Avant | === _addRerollOption END (success) ===');
+        console.log('Avant | Reroll option added via document approach');
     }
     
+    /**
+     * Get actor from chat message
+     * @param {ChatMessage} message - The chat message
+     * @returns {Actor|null} The actor or null
+     */
     static _getActorFromMessage(message) {
         console.log('Avant | === _getActorFromMessage START ===');
         console.log('Avant | Message ID:', message?.id);
@@ -2095,6 +2048,11 @@ class AvantChatContextMenu {
         return null;
     }
     
+    /**
+     * Check if roll is eligible for reroll (2d10 roll)
+     * @param {Roll} roll - The roll to check
+     * @returns {boolean} True if eligible
+     */
     static _isEligibleRoll(roll) {
         console.log('Avant | === _isEligibleRoll START ===');
         console.log('Avant | Roll object:', roll);
