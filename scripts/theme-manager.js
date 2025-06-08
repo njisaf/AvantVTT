@@ -4,7 +4,8 @@
  * Compatible with FoundryVTT v12 and v13
  */
 
-import { ThemeConfigUtil } from './theme-config.js';
+import { THEME_CONFIG } from './theme-config.js';
+import { ThemeConfigUtil } from './theme-utils.js';
 
 export class AvantThemeManager {
     constructor() {
