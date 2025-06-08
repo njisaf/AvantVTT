@@ -221,10 +221,10 @@ $spacing-xxl: 30px;
 
   // Custom Sheet Header - Compact and controlled height
   .sheet-header {
-    background: $bg-secondary;
-    color: $text-primary;
+    background: var(--theme-bg-secondary, $bg-secondary);
+    color: var(--theme-text-primary, $text-primary);
     padding: 10px $spacing-lg; // Reduced padding
-    border-bottom: 2px solid $accent-cyan;
+    border-bottom: 2px solid var(--theme-accent-primary, $accent-cyan);
     display: flex;
     align-items: center;
     gap: $spacing-lg; // Reduced gap
@@ -239,11 +239,11 @@ $spacing-xxl: 30px;
   }
 
   .profile-img {
-    border: 2px solid $accent-cyan;
+    border: 2px solid var(--theme-accent-primary, $accent-cyan);
     border-radius: 0;
     cursor: pointer;
     @include transition-standard;
-    box-shadow: $shadow-accent;
+    box-shadow: var(--theme-shadow-accent, $shadow-accent);
     width: 40px; // Reduced from 60px
     height: 40px; // Reduced from 60px
     flex-shrink: 0; // Prevent shrinking
@@ -251,7 +251,7 @@ $spacing-xxl: 30px;
     object-fit: cover; // Ensure image fits properly
 
     &:hover {
-      box-shadow: 0 0 20px $accent-cyan;
+      box-shadow: 0 0 20px var(--theme-accent-primary, $accent-cyan);
     }
   }
 
@@ -289,9 +289,9 @@ $spacing-xxl: 30px;
   }
 
   .header-stat-input {
-    background: $bg-tertiary;
-    border: 1px solid $border-primary;
-    color: $text-primary;
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    border: 1px solid var(--theme-border-primary, $border-primary);
+    color: var(--theme-text-primary, $text-primary);
     @include orbitron-header(12px, 700);
     text-align: center;
     padding: $spacing-xs $spacing-sm;
@@ -302,20 +302,20 @@ $spacing-xxl: 30px;
     flex-shrink: 0; // Prevent shrinking in v12
 
     &:focus {
-      background: $bg-primary;
-      border-color: $accent-cyan;
+      background: var(--theme-bg-primary, $bg-primary);
+      border-color: var(--theme-accent-primary, $accent-cyan);
       outline: none;
       box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
     }
   }
 
   .header-stat-display {
-    background: $bg-primary;
-    color: $accent-cyan;
+    background: var(--theme-bg-primary, $bg-primary);
+    color: var(--theme-accent-primary, $accent-cyan);
     @include orbitron-header(12px, 700);
     text-align: center;
     padding: $spacing-xs $spacing-sm;
-    border: 1px solid $accent-cyan;
+    border: 1px solid var(--theme-accent-primary, $accent-cyan);
     width: 50px;
     @include box-sizing-border-box;
     flex-shrink: 0; // Prevent shrinking in v12
@@ -326,7 +326,7 @@ $spacing-xxl: 30px;
     margin: 0;
     @include orbitron-header(18px, 900); // Reduced from 24px
     letter-spacing: 1px; // Reduced from 2px
-    text-shadow: 0 0 5px $accent-cyan;
+    text-shadow: 0 0 5px var(--theme-accent-primary, $accent-cyan);
     flex: 1; // Take available space but allow shrinking
     min-width: 0; // Allow shrinking in flexbox
     overflow: hidden; // Prevent overflow in v12
@@ -334,8 +334,8 @@ $spacing-xxl: 30px;
 
     input {
       background: rgba(0, 224, 220, 0.1);
-      border: 1px solid $accent-cyan;
-      color: $text-primary;
+      border: 1px solid var(--theme-accent-primary, $accent-cyan);
+      color: var(--theme-text-primary, $text-primary);
       @include orbitron-header(18px, 900); // Reduced from 24px
       letter-spacing: 1px; // Reduced from 2px
       padding: 6px 10px; // Reduced padding
@@ -348,7 +348,7 @@ $spacing-xxl: 30px;
 
       &:focus {
         background: rgba(0, 224, 220, 0.2);
-        border-color: $text-primary;
+        border-color: var(--theme-text-primary, $text-primary);
         outline: none;
         box-shadow: 0 0 10px rgba(0, 224, 220, 0.3);
       }
@@ -366,8 +366,8 @@ $spacing-xxl: 30px;
   // Left Sidebar for Stats - Fixed width, height constrained
   .stats-sidebar {
     width: 240px; // Reduced from 280px
-    background: $bg-secondary;
-    border-right: 2px solid $border-primary;
+    background: var(--theme-bg-secondary, $bg-secondary);
+    border-right: 2px solid var(--theme-border-primary, $border-primary);
     padding: $spacing-lg; // Reduced from 20px
     overflow-y: auto; // Allow sidebar to scroll if needed
     overflow-x: hidden; // Prevent horizontal scrolling
@@ -382,7 +382,7 @@ $spacing-xxl: 30px;
       margin: 0 0 $spacing-md 0; // Reduced from 15px
       @include orbitron-header(11px, 700); // Reduced from 12px
       letter-spacing: 1px;
-      border-bottom: 1px solid $border-primary;
+      border-bottom: 1px solid var(--theme-border-primary, $border-primary);
       padding-bottom: $spacing-xs; // Reduced from 5px
     }
   }
@@ -396,9 +396,9 @@ $spacing-xxl: 30px;
 
   .stat-tile {
     flex: 1;
-    background: $bg-tertiary;
-    border: 1px solid $border-primary;
-    border-bottom: 3px solid $accent-cyan;
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    border: 1px solid var(--theme-border-primary, $border-primary);
+    border-bottom: 3px solid var(--theme-accent-primary, $accent-cyan);
     padding: $spacing-sm 6px;
     text-align: center;
     display: flex;
@@ -407,13 +407,13 @@ $spacing-xxl: 30px;
     @include transition-standard;
 
     &.readonly {
-      border-bottom-color: $aqua-muted;
+      border-bottom-color: var(--theme-accent-secondary, $aqua-muted);
 
       .stat-tile-value {
         @include exo-body(14px, 700);
         line-height: 1;
-        background: $bg-primary;
-        border: 1px solid $border-primary;
+        background: var(--theme-bg-primary, $bg-primary);
+        border: 1px solid var(--theme-border-primary, $border-primary);
         padding: 6px $spacing-xs;
         border-radius: 0;
         text-align: center;
@@ -422,9 +422,9 @@ $spacing-xxl: 30px;
   }
 
   .stat-tile-input {
-    background: $bg-primary;
-    border: 1px solid $border-primary;
-    color: $text-primary;
+    background: var(--theme-bg-primary, $bg-primary);
+    border: 1px solid var(--theme-border-primary, $border-primary);
+    color: var(--theme-text-primary, $text-primary);
     @include exo-body(12px, 600);
     padding: 3px $spacing-xs;
     border-radius: 0;
@@ -433,7 +433,7 @@ $spacing-xxl: 30px;
     @include transition-standard;
 
     &:focus {
-      border-color: $accent-cyan;
+      border-color: var(--theme-accent-primary, $accent-cyan);
       outline: none;
       box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
     }
@@ -442,7 +442,7 @@ $spacing-xxl: 30px;
   .stat-tile-label {
     @include orbitron-header(8px, 600);
     letter-spacing: 0.5px;
-    color: $text-secondary;
+    color: var(--theme-text-secondary, $text-secondary);
     line-height: 1;
   }
 
@@ -453,21 +453,21 @@ $spacing-xxl: 30px;
     align-items: center;
     margin-bottom: 10px; // Reduced from 12px
     padding: 6px 10px; // Reduced from 8px 12px
-    background: $bg-tertiary;
-    border-left: 3px solid $accent-cyan;
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    border-left: 3px solid var(--theme-accent-primary, $accent-cyan);
   }
 
   .stat-label {
     @include orbitron-header(9px, 600); // Reduced from 10px
     letter-spacing: 0.5px;
-    color: $text-secondary;
+    color: var(--theme-text-secondary, $text-secondary);
     flex: 1;
   }
 
   .stat-input {
-    background: $bg-primary;
-    border: 1px solid $border-primary;
-    color: $text-primary;
+    background: var(--theme-bg-primary, $bg-primary);
+    border: 1px solid var(--theme-border-primary, $border-primary);
+    color: var(--theme-text-primary, $text-primary);
     @include exo-body(12px, 600); // Reduced from 14px
     padding: 3px 6px; // Reduced from 4px 8px
     border-radius: 0;
@@ -476,18 +476,18 @@ $spacing-xxl: 30px;
     @include transition-standard;
 
     &:focus {
-      border-color: $accent-cyan;
+      border-color: var(--theme-accent-primary, $accent-cyan);
       outline: none;
       box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
     }
   }
 
   .stat-display {
-    background: $bg-primary;
-    color: $text-primary;
+    background: var(--theme-bg-primary, $bg-primary);
+    color: var(--theme-text-primary, $text-primary);
     @include exo-body(12px, 600); // Reduced from 14px
     padding: 3px 6px; // Reduced from 4px 8px
-    border: 1px solid $border-primary;
+    border: 1px solid var(--theme-border-primary, $border-primary);
     width: 50px; // Reduced from 60px
     text-align: center;
   }
@@ -501,9 +501,9 @@ $spacing-xxl: 30px;
   }
 
   .sidebar-ability {
-    background: $bg-tertiary;
+    background: var(--theme-bg-tertiary, $bg-tertiary);
     padding: $spacing-sm; // Reduced from 12px
-    border: 1px solid $border-primary;
+    border: 1px solid var(--theme-border-primary, $border-primary);
     text-align: center;
     @include transition-standard;
 
@@ -511,14 +511,14 @@ $spacing-xxl: 30px;
       display: block;
       @include orbitron-header(10px, 600); // Increased from 8px as requested
       letter-spacing: 0.5px;
-      color: $text-secondary;
+      color: var(--theme-text-secondary, $text-secondary);
       margin-bottom: 6px; // Increased from 4px
     }
 
     input {
-      background: $bg-primary;
-      border: 1px solid $border-primary;
-      color: $text-primary;
+      background: var(--theme-bg-primary, $bg-primary);
+      border: 1px solid var(--theme-border-primary, $border-primary);
+      color: var(--theme-text-primary, $text-primary);
       @include exo-body(12px, 600); // Reduced from 14px
       padding: 3px 6px; // Reduced from 4px 8px
       border-radius: 0;
@@ -527,7 +527,7 @@ $spacing-xxl: 30px;
       @include transition-standard;
 
       &:focus {
-        border-color: $accent-cyan;
+        border-color: var(--theme-accent-primary, $accent-cyan);
         outline: none;
         box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
       }
@@ -542,11 +542,11 @@ $spacing-xxl: 30px;
   }
 
   .sidebar-ability-mod {
-    background: $bg-primary;
-    color: $accent-cyan;
+    background: var(--theme-bg-primary, $bg-primary);
+    color: var(--theme-accent-primary, $accent-cyan);
     @include orbitron-header(10px, 700);
     padding: $spacing-xs 6px;
-    border: 1px solid $accent-cyan;
+    border: 1px solid var(--theme-accent-primary, $accent-cyan);
     cursor: pointer;
     @include transition-standard;
     text-align: center;
@@ -554,8 +554,8 @@ $spacing-xxl: 30px;
     flex-shrink: 0;
 
     &:hover {
-      background: $accent-cyan;
-      color: $bg-primary;
+      background: var(--theme-accent-primary, $accent-cyan);
+      color: var(--theme-bg-primary, $bg-primary);
     }
   }
 
@@ -570,8 +570,8 @@ $spacing-xxl: 30px;
 
   // Navigation Tabs - More compact
   .sheet-tabs {
-    background: $bg-secondary;
-    border-bottom: 2px solid $accent-cyan;
+    background: var(--theme-bg-secondary, $bg-secondary);
+    border-bottom: 2px solid var(--theme-accent-primary, $accent-cyan);
     padding: 0;
     margin: 0;
     display: flex;
@@ -583,7 +583,7 @@ $spacing-xxl: 30px;
       background: transparent;
       border: none;
       border-bottom: 2px solid transparent;
-      color: $text-secondary;
+      color: var(--theme-text-secondary, $text-secondary);
       @include orbitron-header(10px, 600); // Reduced from 11px
       padding: $spacing-sm $spacing-md; // Reduced from 12px 20px
       text-decoration: none;
@@ -593,13 +593,13 @@ $spacing-xxl: 30px;
 
       &:hover {
         background: rgba(0, 224, 220, 0.1);
-        color: $accent-cyan;
+        color: var(--theme-accent-primary, $accent-cyan);
       }
 
       &.active {
-        background: $bg-primary;
-        border-bottom-color: $accent-cyan;
-        color: $text-primary;
+        background: var(--theme-bg-primary, $bg-primary);
+        border-bottom-color: var(--theme-accent-primary, $accent-cyan);
+        color: var(--theme-text-primary, $text-primary);
         box-shadow: 0 -3px 10px rgba(0, 224, 220, 0.2);
       }
     }
@@ -607,8 +607,8 @@ $spacing-xxl: 30px;
 
   // ITEM SHEET SPECIFIC TAB STYLING - More compact for smaller windows
   &.sheet.item .sheet-tabs {
-    background: $bg-secondary !important;
-    border-bottom: 2px solid $accent-cyan !important;
+    background: var(--theme-bg-secondary, $bg-secondary) !important;
+    border-bottom: 2px solid var(--theme-accent-primary, $accent-cyan) !important;
     padding: 0 !important;
     margin: 0 !important;
     display: flex !important;
@@ -624,7 +624,7 @@ $spacing-xxl: 30px;
       background: transparent !important;
       border: none !important;
       border-bottom: 2px solid transparent !important;
-      color: $text-secondary !important;
+      color: var(--theme-text-secondary, $text-secondary) !important;
       @include orbitron-header(9px, 600); // Force smaller font for item sheets
       letter-spacing: 0.5px !important; // Reduced letter spacing
       padding: 6px 10px !important; // More compact padding
@@ -642,13 +642,13 @@ $spacing-xxl: 30px;
 
       &:hover {
         background: rgba(0, 224, 220, 0.1) !important;
-        color: $accent-cyan !important;
+        color: var(--theme-accent-primary, $accent-cyan) !important;
       }
 
       &.active {
-        background: $bg-primary !important;
-        border-bottom-color: $accent-cyan !important;
-        color: $text-primary !important;
+        background: var(--theme-bg-primary, $bg-primary) !important;
+        border-bottom-color: var(--theme-accent-primary, $accent-cyan) !important;
+        color: var(--theme-text-primary, $text-primary) !important;
         box-shadow: 0 -2px 8px rgba(0, 224, 220, 0.2) !important; // Smaller shadow for item sheets
       }
     }
@@ -656,7 +656,7 @@ $spacing-xxl: 30px;
 
   // ITEM SHEET BODY - Adjust for compact tabs
   &.sheet.item .sheet-body {
-    background: $bg-primary;
+    background: var(--theme-bg-primary, $bg-primary);
     padding: $spacing-lg; // Reduced padding for item sheets
     flex: 1;
     overflow-y: auto;
@@ -704,10 +704,10 @@ $spacing-xxl: 30px;
 
   // ITEM SHEET HEADER - More compact for smaller windows
   &.sheet.item .sheet-header {
-    background: $bg-secondary;
-    color: $text-primary;
+    background: var(--theme-bg-secondary, $bg-secondary);
+    color: var(--theme-text-primary, $text-primary);
     padding: $spacing-sm $spacing-md; // More compact padding
-    border-bottom: 1px solid $accent-cyan; // Thinner border
+    border-bottom: 1px solid var(--theme-accent-primary, $accent-cyan); // Thinner border
     display: flex;
     align-items: center;
     gap: 10px; // Reduced gap
@@ -720,11 +720,11 @@ $spacing-xxl: 30px;
   }
 
   &.sheet.item .profile-img {
-    border: 1px solid $accent-cyan; // Thinner border
+    border: 1px solid var(--theme-accent-primary, $accent-cyan); // Thinner border
     border-radius: 0;
     cursor: pointer;
     @include transition-standard;
-    box-shadow: $shadow-accent;
+    box-shadow: var(--theme-shadow-accent, $shadow-accent);
     width: 32px; // Smaller for item sheets
     height: 32px;
     flex-shrink: 0;
@@ -734,12 +734,12 @@ $spacing-xxl: 30px;
     margin: 0;
     @include orbitron-header(14px, 900); // Smaller for item sheets
     letter-spacing: 0.5px;
-    text-shadow: 0 0 5px $accent-cyan;
+    text-shadow: 0 0 5px var(--theme-accent-primary, $accent-cyan);
 
     input {
       background: rgba(0, 224, 220, 0.1);
-      border: 1px solid $accent-cyan;
-      color: $text-primary;
+      border: 1px solid var(--theme-accent-primary, $accent-cyan);
+      color: var(--theme-text-primary, $text-primary);
       @include orbitron-header(14px, 900);
       letter-spacing: 0.5px;
       padding: $spacing-xs $spacing-sm; // Reduced padding
@@ -750,7 +750,7 @@ $spacing-xxl: 30px;
 
       &:focus {
         background: rgba(0, 224, 220, 0.2);
-        border-color: $text-primary;
+        border-color: var(--theme-text-primary, $text-primary);
         outline: none;
         box-shadow: 0 0 8px rgba(0, 224, 220, 0.3);
       }
@@ -759,7 +759,7 @@ $spacing-xxl: 30px;
 
   // Scrollable Content Area - ONLY this element should scroll
   .sheet-body {
-    background: $bg-primary;
+    background: var(--theme-bg-primary, $bg-primary);
     padding: $spacing-xl; // Reduced from 30px
     flex: 1;
     overflow-y: auto; // ONLY the tab content should scroll
@@ -795,7 +795,7 @@ $spacing-xxl: 30px;
         left: 0;
         width: 50px; // Reduced from 60px
         height: 2px;
-        background: $gradient-accent;
+        background: var(--theme-gradient-accent, $gradient-accent);
       }
     }
   }
@@ -836,9 +836,9 @@ $spacing-xxl: 30px;
   }
 
   .skills-ability-section {
-    background: $bg-tertiary;
-    border: 1px solid $border-primary;
-    border-left: 4px solid $accent-cyan;
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    border: 1px solid var(--theme-border-primary, $border-primary);
+    border-left: 4px solid var(--theme-accent-primary, $accent-cyan);
     padding: $spacing-sm; // Reduced from 15px
     border-radius: 0;
   }
@@ -848,7 +848,7 @@ $spacing-xxl: 30px;
     letter-spacing: 1px;
     margin: 0 0 $spacing-sm 0; // Reduced from 15px
     padding-bottom: $spacing-xs; // Reduced from 8px
-    border-bottom: 1px solid $border-primary;
+    border-bottom: 1px solid var(--theme-border-primary, $border-primary);
     position: relative;
 
     &::after {
@@ -858,7 +858,7 @@ $spacing-xxl: 30px;
       left: 0;
       width: 30px; // Reduced from 40px
       height: 2px;
-      background: $gradient-accent;
+      background: var(--theme-gradient-accent, $gradient-accent);
     }
   }
 
@@ -869,8 +869,8 @@ $spacing-xxl: 30px;
   }
 
   .skill-tile {
-    background: $bg-primary;
-    border: 1px solid $border-primary;
+    background: var(--theme-bg-primary, $bg-primary);
+    border: 1px solid var(--theme-border-primary, $border-primary);
     padding: 6px; // Reduced from 10px
     display: grid;
     grid-template-columns: 1fr 45px 45px; // Reduced from 60px
@@ -881,8 +881,8 @@ $spacing-xxl: 30px;
     min-height: 32px; // Reduced for compactness
 
     &:hover {
-      background: $bg-secondary;
-      border-color: $accent-cyan;
+      background: var(--theme-bg-secondary, $bg-secondary);
+      border-color: var(--theme-accent-primary, $accent-cyan);
     }
 
     &::before {
@@ -892,7 +892,7 @@ $spacing-xxl: 30px;
       right: 0;
       bottom: 0;
       height: 3px;
-      background: $gradient-accent;
+      background: var(--theme-gradient-accent, $gradient-accent);
       transform: scaleX(0);
       transition: transform 0.3s ease;
       transform-origin: left;
@@ -905,7 +905,7 @@ $spacing-xxl: 30px;
     label {
       @include orbitron-header(9px, 600); // Reduced from 11px
       letter-spacing: 0.5px; // Reduced from 1px
-      color: $text-secondary;
+      color: var(--theme-text-secondary, $text-secondary);
       margin: 0;
       white-space: nowrap;
       overflow: hidden;
@@ -913,9 +913,9 @@ $spacing-xxl: 30px;
     }
 
     input {
-      background: $bg-tertiary;
-      border: 1px solid $border-primary;
-      color: $text-primary;
+      background: var(--theme-bg-tertiary, $bg-tertiary);
+      border: 1px solid var(--theme-border-primary, $border-primary);
+      color: var(--theme-text-primary, $text-primary);
       @include exo-body(12px, 600); // Reduced from 14px
       padding: 3px $spacing-xs; // Reduced from 6px 8px
       border-radius: 0;
@@ -924,16 +924,16 @@ $spacing-xxl: 30px;
       @include transition-standard;
 
       &:focus {
-        border-color: $accent-cyan;
+        border-color: var(--theme-accent-primary, $accent-cyan);
         outline: none;
         box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
       }
     }
 
     .skill-roll {
-      background: $bg-tertiary;
-      border: 1px solid $accent-cyan;
-      color: $accent-cyan;
+      background: var(--theme-bg-tertiary, $bg-tertiary);
+      border: 1px solid var(--theme-accent-primary, $accent-cyan);
+      color: var(--theme-accent-primary, $accent-cyan);
       @include orbitron-header(7px, 700); // Reduced from 9px
       padding: 3px $spacing-xs; // Reduced from 6px 8px
       border-radius: 0;
@@ -943,8 +943,8 @@ $spacing-xxl: 30px;
       width: 100%;
 
       &:hover {
-        background: $accent-cyan;
-        color: $bg-primary;
+        background: var(--theme-accent-primary, $accent-cyan);
+        color: var(--theme-bg-primary, $bg-primary);
         box-shadow: 0 0 10px rgba(0, 224, 220, 0.5);
       }
     }
@@ -970,7 +970,7 @@ $spacing-xxl: 30px;
         left: 0;
         width: 40px; // Reduced from 50px
         height: 2px;
-        background: $gradient-accent;
+        background: var(--theme-gradient-accent, $gradient-accent);
       }
     }
   }
@@ -978,20 +978,20 @@ $spacing-xxl: 30px;
   // Skill Groups
   .skill-group {
     margin-bottom: 25px;
-    background: $bg-tertiary;
-    border: 1px solid $border-primary;
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    border: 1px solid var(--theme-border-primary, $border-primary);
     border-radius: 0;
     overflow: hidden;
   }
 
   .skill-group-header {
-    background: $bg-primary;
-    color: $accent-cyan;
+    background: var(--theme-bg-primary, $bg-primary);
+    color: var(--theme-accent-primary, $accent-cyan);
     @include orbitron-header(12px, 700);
     letter-spacing: 1px;
     margin: 0;
     padding: 10px $spacing-lg;
-    border-bottom: 1px solid $border-primary;
+    border-bottom: 1px solid var(--theme-border-primary, $border-primary);
     position: relative;
 
     &::before {
@@ -1001,7 +1001,7 @@ $spacing-xxl: 30px;
       top: 0;
       bottom: 0;
       width: 3px;
-      background: $gradient-accent;
+      background: var(--theme-gradient-accent, $gradient-accent);
     }
   }
 
@@ -1013,10 +1013,10 @@ $spacing-xxl: 30px;
   }
 
   .skill {
-    background: $bg-tertiary;
+    background: var(--theme-bg-tertiary, $bg-tertiary);
     padding: $spacing-md $spacing-lg;
-    border-bottom: 1px solid $border-primary;
-    border-right: 1px solid $border-primary;
+    border-bottom: 1px solid var(--theme-border-primary, $border-primary);
+    border-right: 1px solid var(--theme-border-primary, $border-primary);
     display: grid;
     grid-template-columns: 1fr 60px 60px;
     align-items: center;
@@ -1036,14 +1036,14 @@ $spacing-xxl: 30px;
       top: 0;
       bottom: 0;
       width: 3px;
-      background: $gradient-accent;
+      background: var(--theme-gradient-accent, $gradient-accent);
       transform: scaleY(0);
       transition: transform 0.3s ease;
       transform-origin: bottom;
     }
 
     &:hover {
-      background: $bg-primary;
+      background: var(--theme-bg-primary, $bg-primary);
 
       &::before {
         transform: scaleY(1);
@@ -1053,7 +1053,7 @@ $spacing-xxl: 30px;
     label {
       @include orbitron-header(11px, 600);
       letter-spacing: 1px;
-      color: $text-secondary;
+      color: var(--theme-text-secondary, $text-secondary);
       margin: 0;
       white-space: nowrap;
       overflow: hidden;
@@ -1061,9 +1061,9 @@ $spacing-xxl: 30px;
     }
 
     input {
-      background: $bg-primary;
-      border: 1px solid $border-primary;
-      color: $text-primary;
+      background: var(--theme-bg-primary, $bg-primary);
+      border: 1px solid var(--theme-border-primary, $border-primary);
+      color: var(--theme-text-primary, $text-primary);
       @include exo-body(14px, 600);
       padding: 6px $spacing-sm;
       border-radius: 0;
@@ -1072,7 +1072,7 @@ $spacing-xxl: 30px;
       @include transition-standard;
 
       &:focus {
-        border-color: $accent-cyan;
+        border-color: var(--theme-accent-primary, $accent-cyan);
         outline: none;
         box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
       }
@@ -1080,9 +1080,9 @@ $spacing-xxl: 30px;
   }
 
   .skill-roll {
-    background: $bg-primary;
-    border: 1px solid $accent-cyan;
-    color: $accent-cyan;
+    background: var(--theme-bg-primary, $bg-primary);
+    border: 1px solid var(--theme-accent-primary, $accent-cyan);
+    color: var(--theme-accent-primary, $accent-cyan);
     @include orbitron-header(9px, 700);
     padding: 6px $spacing-sm;
     border-radius: 0;
@@ -1092,8 +1092,8 @@ $spacing-xxl: 30px;
     width: 100%;
 
     &:hover {
-      background: $accent-cyan;
-      color: $bg-primary;
+      background: var(--theme-accent-primary, $accent-cyan);
+      color: var(--theme-bg-primary, $bg-primary);
       box-shadow: 0 0 10px rgba(0, 224, 220, 0.5);
     }
   }
@@ -1105,7 +1105,7 @@ $spacing-xxl: 30px;
     align-items: center;
     margin-bottom: $spacing-md; // Reduced from 20px
     padding-bottom: $spacing-sm; // Reduced from 15px
-    border-bottom: 1px solid $border-primary; // Thinner border
+    border-bottom: 1px solid var(--theme-border-primary, $border-primary); // Thinner border
 
     h3 {
       margin: 0;
@@ -1136,9 +1136,9 @@ $spacing-xxl: 30px;
   }
 
   .item {
-    background: $bg-tertiary;
-    border: 1px solid $border-primary;
-    border-left: 2px solid $accent-cyan; // Thinner accent border
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    border: 1px solid var(--theme-border-primary, $border-primary);
+    border-left: 2px solid var(--theme-accent-primary, $accent-cyan); // Thinner accent border
     padding: $spacing-sm $spacing-md; // Reduced from 15px
     display: flex;
     align-items: center;
@@ -1147,8 +1147,8 @@ $spacing-xxl: 30px;
     min-height: 36px; // Reduced from default
 
     &:hover {
-      background: $bg-secondary;
-      box-shadow: $shadow-primary;
+      background: var(--theme-bg-secondary, $bg-secondary);
+      box-shadow: var(--theme-shadow-primary, $shadow-primary);
     }
   }
 
@@ -1159,7 +1159,7 @@ $spacing-xxl: 30px;
     @include transition-standard;
 
     &:hover {
-      color: $accent-cyan;
+      color: var(--theme-accent-primary, $accent-cyan);
     }
   }
 
@@ -1176,7 +1176,7 @@ $spacing-xxl: 30px;
     &.item-delete {
       background: transparent;
       border: none;
-      color: $text-secondary;
+      color: var(--theme-text-secondary, $text-secondary);
       font-size: 12px; // Small icon size
       padding: 2px; // Minimal padding
       border-radius: 0;
@@ -1190,7 +1190,7 @@ $spacing-xxl: 30px;
     }
 
     &.item-edit:hover {
-      color: $aqua-muted;
+      color: var(--theme-accent-secondary, $aqua-muted);
       background: rgba(76, 226, 225, 0.1); // Subtle background highlight
     }
 
@@ -1201,9 +1201,9 @@ $spacing-xxl: 30px;
 
     // Keep other item controls (attack, damage, etc.) as buttons
     &:not(.item-edit):not(.item-delete) {
-      background: $bg-primary;
-      border: 1px solid $border-primary;
-      color: $text-secondary;
+      background: var(--theme-bg-primary, $bg-primary);
+      border: 1px solid var(--theme-border-primary, $border-primary);
+      color: var(--theme-text-secondary, $text-secondary);
       font-size: 10px; // Reduced from 12px
       padding: $spacing-xs 6px; // Reduced from 6px 10px
       border-radius: 0;
@@ -1215,8 +1215,8 @@ $spacing-xxl: 30px;
   .attack-roll,
   .damage-roll {
     &:hover {
-      border-color: $accent-cyan;
-      color: $accent-cyan;
+      border-color: var(--theme-accent-primary, $accent-cyan);
+      color: var(--theme-accent-primary, $accent-cyan);
     }
   }
 
@@ -1226,31 +1226,31 @@ $spacing-xxl: 30px;
     gap: $spacing-sm; // Reduced from 15px
     margin: $spacing-xs 0; // Reduced from 8px 0
     font-size: 10px; // Reduced from 11px
-    color: $text-secondary;
+    color: var(--theme-text-secondary, $text-secondary);
   }
 
   .item-threshold,
   .item-damage,
   .item-armor-class,
   .item-property {
-    background: $bg-tertiary;
-    border: 1px solid $accent-cyan;
-    color: $accent-cyan;
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    border: 1px solid var(--theme-accent-primary, $accent-cyan);
+    color: var(--theme-accent-primary, $accent-cyan);
     padding: 2px $spacing-xs; // Reduced from 4px 8px
     border-radius: 0;
     @include orbitron-header(8px, 600); // Reduced font size
     letter-spacing: 0.5px;
 
     &:hover {
-      background: $bg-primary;
+      background: var(--theme-bg-primary, $bg-primary);
       box-shadow: 0 0 5px rgba(0, 224, 220, 0.2); // Reduced glow
     }
   }
 
   .item-damage,
   .item-armor-class {
-    border-color: $aqua-muted;
-    color: $aqua-muted;
+    border-color: var(--theme-accent-secondary, $aqua-muted);
+    color: var(--theme-accent-secondary, $aqua-muted);
   }
 
   // Buttons and Interactive Elements
@@ -1263,9 +1263,9 @@ $spacing-xxl: 30px;
   }
 
   .power-point-use {
-    background: $bg-primary;
-    border: 1px solid $aqua-muted;
-    color: $aqua-muted;
+    background: var(--theme-bg-primary, $bg-primary);
+    border: 1px solid var(--theme-accent-secondary, $aqua-muted);
+    color: var(--theme-accent-secondary, $aqua-muted);
     @include orbitron-header(9px, 600);
     padding: $spacing-xs $spacing-sm;
     border-radius: 0;
@@ -1273,15 +1273,15 @@ $spacing-xxl: 30px;
     @include transition-standard;
 
     &:hover {
-      background: $aqua-muted;
-      color: $bg-primary;
+      background: var(--theme-accent-secondary, $aqua-muted);
+      color: var(--theme-bg-primary, $bg-primary);
       box-shadow: 0 0 10px rgba(76, 226, 225, 0.5);
     }
   }
 
   // Focus States
   *:focus {
-    outline: 2px solid $accent-cyan;
+    outline: 2px solid var(--theme-accent-primary, $accent-cyan);
     outline-offset: 2px;
   }
 
@@ -1298,8 +1298,8 @@ $spacing-xxl: 30px;
   .gear-subsection {
     margin-bottom: $spacing-xxl; // Add spacing between subsections
     padding: $spacing-lg;
-    background: $bg-tertiary;
-    border: 1px solid $border-primary;
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    border: 1px solid var(--theme-border-primary, $border-primary);
     border-radius: 0;
 
     &:last-child {
@@ -1308,17 +1308,17 @@ $spacing-xxl: 30px;
   }
 
   .expertise-section {
-    background: $bg-tertiary;
+    background: var(--theme-bg-tertiary, $bg-tertiary);
     padding: $spacing-lg; // Reduced from 20px
-    border: 1px solid $border-primary;
-    border-top: 3px solid $aqua-muted;
+    border: 1px solid var(--theme-border-primary, $border-primary);
+    border-top: 3px solid var(--theme-accent-secondary, $aqua-muted);
     margin-bottom: $spacing-lg; // Reduced from 20px
 
     h3 {
       margin: 0 0 $spacing-lg 0; // Reduced from 20px
       @include orbitron-header(13px, 700); // Reduced from 14px
       letter-spacing: 2px;
-      color: $aqua-muted;
+      color: var(--theme-accent-secondary, $aqua-muted);
     }
   }
 
@@ -1346,14 +1346,14 @@ $spacing-xxl: 30px;
     gap: $spacing-md;
     padding: $spacing-md;
     margin-bottom: $spacing-sm;
-    background: $bg-primary;
-    border: 1px solid $border-primary;
+    background: var(--theme-bg-primary, $bg-primary);
+    border: 1px solid var(--theme-border-primary, $border-primary);
     @include transition-standard;
     min-height: 60px;
 
     &:hover {
-      background: $bg-secondary;
-      box-shadow: $shadow-primary;
+      background: var(--theme-bg-secondary, $bg-secondary);
+      box-shadow: var(--theme-shadow-primary, $shadow-primary);
     }
   }
 
@@ -1368,7 +1368,7 @@ $spacing-xxl: 30px;
   .combat-action-btn {
     background: transparent;
     border: none;
-    color: $accent-cyan;
+    color: var(--theme-accent-primary, $accent-cyan);
     @include orbitron-header(12px, 700);
     padding: $spacing-sm 24px $spacing-sm $spacing-xs; // Added 20px padding-right
     border-radius: 0;
@@ -1388,16 +1388,16 @@ $spacing-xxl: 30px;
     }
 
     &:hover {
-      color: $text-primary;
-      text-shadow: 0 0 8px $accent-cyan;
+      color: var(--theme-text-primary, $text-primary);
+      text-shadow: 0 0 8px var(--theme-accent-primary, $accent-cyan);
     }
 
     &.armor-roll {
-      color: $aqua-muted;
+      color: var(--theme-accent-secondary, $aqua-muted);
 
       &:hover {
-        color: $text-primary;
-        text-shadow: 0 0 8px $aqua-muted;
+        color: var(--theme-text-primary, $text-primary);
+        text-shadow: 0 0 8px var(--theme-accent-secondary, $aqua-muted);
       }
     }
   }
@@ -1431,8 +1431,8 @@ $spacing-xxl: 30px;
 
   // Special Threshold Tile - Larger and prominent, no hover
   .combat-threshold-tile {
-    background: $bg-tertiary;
-    border: 2px solid $accent-cyan;
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    border: 2px solid var(--theme-accent-primary, $accent-cyan);
     padding: $spacing-md 16px;
     border-radius: 0;
     display: flex;
@@ -1447,14 +1447,14 @@ $spacing-xxl: 30px;
 
   .combat-threshold-value {
     @include orbitron-header(18px, 900);
-    color: $accent-cyan;
+    color: var(--theme-accent-primary, $accent-cyan);
     letter-spacing: 0.5px;
     line-height: 1;
   }
 
   .combat-threshold-label {
     @include exo-body(9px, 600);
-    color: $text-secondary;
+    color: var(--theme-text-secondary, $text-secondary);
     letter-spacing: 0.3px;
     margin-top: $spacing-xs;
   }
@@ -1468,8 +1468,8 @@ $spacing-xxl: 30px;
   }
 
   .combat-stat-tile {
-    background: $bg-tertiary;
-    border: 1px solid $accent-cyan;
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    border: 1px solid var(--theme-accent-primary, $accent-cyan);
     padding: $spacing-sm 6px;
     border-radius: 0;
     display: flex;
@@ -1483,14 +1483,14 @@ $spacing-xxl: 30px;
 
   .combat-stat-value {
     @include orbitron-header(11px, 700);
-    color: $accent-cyan;
+    color: var(--theme-accent-primary, $accent-cyan);
     letter-spacing: 0.5px;
     line-height: 1.2;
   }
 
   .combat-stat-label {
     @include exo-body(8px, 500);
-    color: $text-secondary;
+    color: var(--theme-text-secondary, $text-secondary);
     letter-spacing: 0.3px;
     margin-top: 2px;
   }
