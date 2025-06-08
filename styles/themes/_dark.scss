@@ -1,0 +1,60 @@
+/**
+ * Avant VTT - Dark Theme (Cyberpunk)
+ * The original dark cyberpunk aesthetic - maintains current design
+ * Compatible with FoundryVTT v12 and v13
+ */
+
+@mixin theme-dark {
+  @include theme-base;
+  
+  // Theme Metadata
+  --theme-name: "Cyberpunk Dark";
+  --theme-author: "Avant VTT Team";
+  --theme-version: "1.0.0";
+  
+  // Primary Colors - Matching current design
+  --theme-bg-primary: #1C1C1C;        // Dark charcoal/graphite background
+  --theme-bg-secondary: #2A2A2A;       // Slightly lighter background
+  --theme-bg-tertiary: #333333;        // Card/section backgrounds
+  
+  // Text Colors - Matching current design
+  --theme-text-primary: #FFFFFF;       // White primary text
+  --theme-text-secondary: #BFBFBF;     // Cool grey for structural elements
+  --theme-text-muted: #808080;         // Muted grey text
+  
+  // Accent Colors - Matching current design
+  --theme-accent-primary: #00E0DC;     // Bright cyan for emphasis
+  --theme-accent-secondary: #4CE2E1;   // Softer cyan variant
+  --theme-accent-tertiary: #00B8B5;    // Darker cyan for variety
+  
+  // Border Colors - Matching current design
+  --theme-border-primary: #404040;     // Primary borders
+  --theme-border-accent: var(--theme-accent-primary);
+  
+  // State Colors - Cyberpunk inspired
+  --theme-success: #10B981;           // Green success
+  --theme-warning: #F59E0B;           // Amber warning
+  --theme-error: #EF4444;             // Red error
+  --theme-info: var(--theme-accent-primary);
+  
+  // Shadows - Matching current design
+  --theme-shadow-primary: 0 4px 20px rgba(0, 224, 220, 0.1);
+  --theme-shadow-accent: 0 0 20px rgba(0, 224, 220, 0.3);
+  --theme-shadow-deep: 0 8px 32px rgba(0, 0, 0, 0.6);
+  
+  // Gradients - Matching current design
+  --theme-gradient-primary: linear-gradient(135deg, var(--theme-bg-primary) 0%, var(--theme-bg-secondary) 100%);
+  --theme-gradient-accent: linear-gradient(135deg, var(--theme-accent-primary) 0%, var(--theme-accent-secondary) 100%);
+  
+  // Typography - Matching current design
+  --theme-font-primary: 'Exo 2', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --theme-font-display: 'Orbitron', monospace;
+  
+  // Additional cyberpunk effects
+  --theme-glow-primary: 0 0 10px var(--theme-accent-primary);
+  --theme-glow-secondary: 0 0 15px var(--theme-accent-secondary);
+  
+  // Backdrop filters for modern browsers
+  --theme-backdrop-blur: blur(10px);
+  --theme-backdrop-saturate: saturate(180%);
+} 

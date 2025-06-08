@@ -1,0 +1,23 @@
+{
+  "name": "Minimal Example",
+  "author": "Your Name",
+  "version": "1.0.0",
+  "description": "A minimal theme with only required variables",
+  "colors": {
+    "backgrounds": {
+      "primary": "#1C1C1C",
+      "secondary": "#2A2A2A",
+      "tertiary": "#333333"
+    },
+    "text": {
+      "primary": "#FFFFFF",
+      "secondary": "#BFBFBF"
+    },
+    "accents": {
+      "primary": "#00E0DC"
+    },
+    "borders": {
+      "primary": "#404040"
+    }
+  }
+}

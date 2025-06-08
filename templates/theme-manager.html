@@ -1,0 +1,562 @@
+<div class="avant theme-manager-content">
+    <div class="theme-manager-header">
+        <h2>{{localize "AVANT.themeManager.title" default="Avant Theme Manager"}}</h2>
+        <p class="theme-manager-description">
+            {{localize "AVANT.themeManager.description" default="Choose and manage themes for your Avant character sheets. Upload custom JSON themes or select from built-in options."}}
+        </p>
+    </div>
+
+    <div class="theme-manager-body">
+        <!-- Theme Upload Section -->
+        <div class="theme-upload-section">
+            <h3>{{localize "AVANT.themeManager.upload.title" default="Upload Custom Theme"}}</h3>
+            <div class="theme-upload-controls">
+                <input type="file" 
+                       class="theme-upload" 
+                       accept=".json,.avant-theme"
+                       style="display: none;" 
+                       id="theme-upload-input">
+                <label for="theme-upload-input" class="theme-upload-button">
+                    <i class="fas fa-upload"></i>
+                    {{localize "AVANT.themeManager.upload.button" default="Choose Theme File"}}
+                </label>
+                <p class="theme-upload-hint">
+                    {{localize "AVANT.themeManager.upload.hint" default="Upload a .json theme file to add custom themes."}}
+                </p>
+            </div>
+        </div>
+
+        <!-- Theme Grid -->
+        <div class="theme-grid-section">
+            <h3>{{localize "AVANT.themeManager.available.title" default="Available Themes"}}</h3>
+            <div class="theme-grid">
+                {{#each themes}}
+                <div class="theme-card {{#if active}}theme-active{{/if}} {{#if isCustom}}theme-custom{{/if}}">
+                    <div class="theme-card-header">
+                        <h4 class="theme-name">{{name}}</h4>
+                        <div class="theme-badges">
+                            {{#if isBuiltIn}}
+                            <span class="theme-badge theme-builtin">
+                                {{localize "AVANT.themeManager.builtin" default="Built-in"}}
+                            </span>
+                            {{else}}
+                            <span class="theme-badge theme-custom-badge">
+                                {{localize "AVANT.themeManager.custom" default="Custom"}}
+                            </span>
+                            {{/if}}
+                            {{#if active}}
+                            <span class="theme-badge theme-active-badge">
+                                {{localize "AVANT.themeManager.active" default="Active"}}
+                            </span>
+                            {{/if}}
+                        </div>
+                    </div>
+                    
+                    <div class="theme-card-info">
+                        <p class="theme-author">
+                            {{localize "AVANT.themeManager.by" default="by"}} {{author}}
+                        </p>
+                        <p class="theme-version">
+                            {{localize "AVANT.themeManager.version" default="Version"}} {{version}}
+                        </p>
+                        {{#if description}}
+                        <p class="theme-description">{{description}}</p>
+                        {{/if}}
+                    </div>
+
+                    <div class="theme-card-actions">
+                        {{#unless active}}
+                        <button type="button" 
+                                class="theme-select theme-action-button" 
+                                data-theme-id="{{id}}"
+                                title="{{localize 'AVANT.themeManager.select' default='Select Theme'}}">
+                            <i class="fas fa-check"></i>
+                            {{localize "AVANT.themeManager.select" default="Select"}}
+                        </button>
+                        {{/unless}}
+                        
+                        {{#if isCustom}}
+                        <button type="button" 
+                                class="theme-export theme-action-button secondary" 
+                                data-theme-id="{{id}}"
+                                title="{{localize 'AVANT.themeManager.export' default='Export Theme'}}">
+                            <i class="fas fa-download"></i>
+                            {{localize "AVANT.themeManager.export" default="Export"}}
+                        </button>
+                        
+                        {{#unless active}}
+                        <button type="button" 
+                                class="theme-delete theme-action-button danger" 
+                                data-theme-id="{{id}}"
+                                title="{{localize 'AVANT.themeManager.delete' default='Delete Theme'}}">
+                            <i class="fas fa-trash"></i>
+                            {{localize "AVANT.themeManager.delete" default="Delete"}}
+                        </button>
+                        {{/unless}}
+                        {{/if}}
+                    </div>
+                </div>
+                {{/each}}
+            </div>
+        </div>
+
+        <!-- Theme Documentation -->
+        <div class="theme-documentation-section">
+            <h3>{{localize "AVANT.themeManager.docs.title" default="Creating Custom Themes"}}</h3>
+            <div class="theme-docs-content">
+                <p>{{localize "AVANT.themeManager.docs.intro" default="Create your own themes by uploading JSON files with the following structure:"}}</p>
+                
+                <details class="theme-docs-example">
+                    <summary>{{localize "AVANT.themeManager.docs.example" default="Example Theme Structure"}}</summary>
+                    <pre class="theme-json-example"><code>{
+  "name": "My Custom Theme",
+  "author": "Your Name",
+  "version": "1.0.0",
+  "description": "A description of your theme",
+  "colors": {
+    "backgrounds": {
+      "primary": "#1C1C1C",
+      "secondary": "#2A2A2A",
+      "tertiary": "#333333"
+    },
+    "text": {
+      "primary": "#FFFFFF",
+      "secondary": "#BFBFBF",
+      "muted": "#808080"
+    },
+    "accents": {
+      "primary": "#00E0DC",
+      "secondary": "#4CE2E1",
+      "tertiary": "#00B8B5"
+    },
+    "borders": {
+      "primary": "#404040",
+      "accent": "#00E0DC"
+    },
+    "states": {
+      "success": "#10B981",
+      "warning": "#F59E0B",
+      "error": "#EF4444",
+      "info": "#00E0DC"
+    }
+  },
+  "typography": {
+    "fontPrimary": "'Exo 2', sans-serif",
+    "fontDisplay": "'Orbitron', monospace"
+  },
+  "effects": {
+    "shadows": {
+      "primary": "0 4px 20px rgba(0, 224, 220, 0.1)",
+      "accent": "0 0 20px rgba(0, 224, 220, 0.3)",
+      "deep": "0 8px 32px rgba(0, 0, 0, 0.6)"
+    },
+    "gradients": {
+      "primary": "linear-gradient(135deg, #1C1C1C 0%, #2A2A2A 100%)",
+      "accent": "linear-gradient(135deg, #00E0DC 0%, #4CE2E1 100%)"
+    }
+  }
+}</code></pre>
+                </details>
+                
+                <div class="theme-docs-tips">
+                    <h4>{{localize "AVANT.themeManager.docs.tips.title" default="Tips:"}}</h4>
+                    <ul>
+                        <li>{{localize "AVANT.themeManager.docs.tips.contrast" default="Ensure sufficient contrast between text and background colors for readability"}}</li>
+                        <li>{{localize "AVANT.themeManager.docs.tips.test" default="Test your theme with different content to ensure it works well"}}</li>
+                        <li>{{localize "AVANT.themeManager.docs.tips.backup" default="Export themes to back them up before making changes"}}</li>
+                        <li>{{localize "AVANT.themeManager.docs.tips.examples" default="Use the example themes in the styles/themes/examples/ folder as templates"}}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Theme Manager Specific Styles */
+.theme-manager-content {
+    padding: 20px;
+    max-height: 500px;
+    overflow-y: auto;
+    font-family: var(--theme-font-primary, 'Exo 2', sans-serif);
+}
+
+.theme-manager-header {
+    margin-bottom: 30px;
+    border-bottom: 2px solid var(--theme-accent-primary, #00E0DC);
+    padding-bottom: 15px;
+}
+
+.theme-manager-header h2 {
+    margin: 0 0 10px 0;
+    color: var(--theme-accent-primary, #00E0DC);
+    font-family: var(--theme-font-display, 'Orbitron', monospace);
+    font-size: 24px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    word-wrap: break-word;
+}
+
+.theme-manager-description {
+    color: var(--theme-text-secondary, #BFBFBF);
+    margin: 0;
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+
+.theme-upload-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: var(--theme-bg-secondary, #2A2A2A);
+    border: 1px solid var(--theme-border-primary, #404040);
+    border-left: 4px solid var(--theme-accent-primary, #00E0DC);
+}
+
+.theme-upload-section h3 {
+    margin: 0 0 15px 0;
+    color: var(--theme-accent-primary, #00E0DC);
+    font-family: var(--theme-font-display, 'Orbitron', monospace);
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    word-wrap: break-word;
+}
+
+.theme-upload-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: var(--theme-bg-tertiary, #333333);
+    border: 2px solid var(--theme-accent-primary, #00E0DC);
+    color: var(--theme-accent-primary, #00E0DC);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: var(--theme-font-display, 'Orbitron', monospace);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 0;
+}
+
+.theme-upload-button:hover {
+    background: var(--theme-accent-primary, #00E0DC);
+    color: var(--theme-bg-primary, #1C1C1C);
+    box-shadow: 0 0 15px var(--theme-accent-primary, rgba(0, 224, 220, 0.5));
+}
+
+.theme-upload-hint {
+    margin: 10px 0 0 0;
+    color: var(--theme-text-muted, #808080);
+    font-size: 12px;
+    word-wrap: break-word;
+}
+
+.theme-grid-section h3 {
+    margin: 0 0 20px 0;
+    color: var(--theme-accent-primary, #00E0DC);
+    font-family: var(--theme-font-display, 'Orbitron', monospace);
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    word-wrap: break-word;
+}
+
+.theme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.theme-card {
+    background: var(--theme-bg-secondary, #2A2A2A);
+    border: 1px solid var(--theme-border-primary, #404040);
+    padding: 15px;
+    transition: all 0.3s ease;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 200px;
+    overflow: hidden;
+    word-wrap: break-word;
+}
+
+.theme-card:hover {
+    border-color: var(--theme-accent-primary, #00E0DC);
+    box-shadow: 0 4px 20px var(--theme-shadow-primary, rgba(0, 224, 220, 0.1));
+}
+
+.theme-card.theme-active {
+    border-left: 4px solid var(--theme-accent-primary, #00E0DC);
+    background: var(--theme-bg-tertiary, #333333);
+}
+
+.theme-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    min-height: 50px;
+}
+
+.theme-name {
+    margin: 0;
+    color: var(--theme-text-primary, #FFFFFF);
+    font-family: var(--theme-font-display, 'Orbitron', monospace);
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 70%;
+    line-height: 1.2;
+}
+
+.theme-badges {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-end;
+    flex-shrink: 0;
+    max-width: 30%;
+}
+
+.theme-badge {
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 0;
+    font-family: var(--theme-font-display, 'Orbitron', monospace);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.theme-builtin {
+    background: var(--theme-bg-tertiary, #333333);
+    color: var(--theme-text-secondary, #BFBFBF);
+    border: 1px solid var(--theme-border-primary, #404040);
+}
+
+.theme-custom-badge {
+    background: var(--theme-accent-secondary, #4CE2E1);
+    color: var(--theme-bg-primary, #1C1C1C);
+}
+
+.theme-active-badge {
+    background: var(--theme-accent-primary, #00E0DC);
+    color: var(--theme-bg-primary, #1C1C1C);
+}
+
+.theme-card-info {
+    margin-bottom: 15px;
+    flex: 1;
+    overflow: hidden;
+}
+
+.theme-author,
+.theme-version {
+    margin: 0 0 5px 0;
+    color: var(--theme-text-secondary, #BFBFBF);
+    font-size: 11px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.theme-description {
+    margin: 10px 0 0 0;
+    color: var(--theme-text-muted, #808080);
+    font-size: 12px;
+    line-height: 1.4;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.theme-card-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: auto;
+    justify-content: flex-start;
+}
+
+.theme-action-button {
+    padding: 6px 10px;
+    border-radius: 0;
+    border: 1px solid;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: var(--theme-font-display, 'Orbitron', monospace);
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+    flex: 0 0 auto;
+    min-width: 60px;
+    justify-content: center;
+}
+
+.theme-action-button:not(.secondary):not(.danger) {
+    border-color: var(--theme-accent-primary, #00E0DC);
+    color: var(--theme-accent-primary, #00E0DC);
+}
+
+.theme-action-button:not(.secondary):not(.danger):hover {
+    background: var(--theme-accent-primary, #00E0DC);
+    color: var(--theme-bg-primary, #1C1C1C);
+}
+
+.theme-action-button.secondary {
+    border-color: var(--theme-accent-secondary, #4CE2E1);
+    color: var(--theme-accent-secondary, #4CE2E1);
+}
+
+.theme-action-button.secondary:hover {
+    background: var(--theme-accent-secondary, #4CE2E1);
+    color: var(--theme-bg-primary, #1C1C1C);
+}
+
+.theme-action-button.danger {
+    border-color: var(--theme-error, #EF4444);
+    color: var(--theme-error, #EF4444);
+}
+
+.theme-action-button.danger:hover {
+    background: var(--theme-error, #EF4444);
+    color: var(--theme-text-primary, #FFFFFF);
+}
+
+.theme-documentation-section {
+    background: var(--theme-bg-secondary, #2A2A2A);
+    border: 1px solid var(--theme-border-primary, #404040);
+    border-left: 4px solid var(--theme-accent-secondary, #4CE2E1);
+    padding: 20px;
+}
+
+.theme-documentation-section h3 {
+    margin: 0 0 15px 0;
+    color: var(--theme-accent-secondary, #4CE2E1);
+    font-family: var(--theme-font-display, 'Orbitron', monospace);
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    word-wrap: break-word;
+}
+
+.theme-docs-content {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.theme-docs-example {
+    margin: 15px 0;
+    border: 1px solid var(--theme-border-primary, #404040);
+    overflow: hidden;
+}
+
+.theme-docs-example summary {
+    padding: 10px 15px;
+    background: var(--theme-bg-tertiary, #333333);
+    cursor: pointer;
+    color: var(--theme-accent-primary, #00E0DC);
+    font-family: var(--theme-font-display, 'Orbitron', monospace);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 12px;
+    word-wrap: break-word;
+}
+
+.theme-json-example {
+    background: var(--theme-bg-primary, #1C1C1C);
+    padding: 15px;
+    margin: 0;
+    border-top: 1px solid var(--theme-border-primary, #404040);
+    overflow-x: auto;
+}
+
+.theme-json-example code {
+    color: var(--theme-text-primary, #FFFFFF);
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.theme-docs-tips h4 {
+    margin: 15px 0 10px 0;
+    color: var(--theme-accent-primary, #00E0DC);
+    font-family: var(--theme-font-display, 'Orbitron', monospace);
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    word-wrap: break-word;
+}
+
+.theme-docs-tips ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.theme-docs-tips li {
+    color: var(--theme-text-secondary, #BFBFBF);
+    margin-bottom: 8px;
+    line-height: 1.4;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .theme-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .theme-card {
+        min-height: auto;
+        padding: 12px;
+    }
+    
+    .theme-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        min-height: auto;
+    }
+    
+    .theme-name {
+        max-width: 100%;
+        font-size: 14px;
+    }
+    
+    .theme-badges {
+        align-items: flex-start;
+        flex-direction: row;
+        max-width: 100%;
+        gap: 4px;
+    }
+    
+    .theme-action-button {
+        font-size: 8px;
+        padding: 4px 8px;
+        min-width: 50px;
+    }
+}
+</style> 
