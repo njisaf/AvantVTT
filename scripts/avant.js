@@ -660,9 +660,9 @@ class AvantGearData extends foundry.abstract.DataModel {
 }
 
 /**
- * Actor Sheet
+ * Actor Sheet - v12/v13 Compatible
  */
-class AvantActorSheet extends ActorSheet {
+class AvantActorSheet extends (foundry.appv1?.sheets?.ActorSheet || ActorSheet) {
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
             classes: ["avant", "sheet", "actor"],
@@ -1335,9 +1335,9 @@ class AvantActorSheet extends ActorSheet {
 }
 
 /**
- * Item Sheet
+ * Item Sheet - v12/v13 Compatible
  */
-class AvantItemSheet extends ItemSheet {
+class AvantItemSheet extends (foundry.appv1?.sheets?.ItemSheet || ItemSheet) {
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
             classes: ["avant", "sheet", "item"],
@@ -1528,187 +1528,6 @@ class AvantItemSheet extends ItemSheet {
         return super._updateObject(event, flatData);
     }
 }
-
-// CLEAN ACTOR VALIDATION APPROACH
-// Simple hook to ensure type is always set for actor creation
-Hooks.on('preCreateActor', (document, data, options, userId) => {
-    console.log('Avant | preCreateActor hook fired');
-    console.log('Avant | Actor data:', JSON.stringify(data));
-    
-    // Ensure type is set to a valid value
-    if (!data.type || typeof data.type !== 'string' || data.type.trim() === '') {
-        console.log('Avant | Setting default actor type to character');
-        data.type = 'character';
-    }
-    
-    // Validate type is supported
-    const supportedTypes = ['character', 'npc', 'vehicle'];
-    if (!supportedTypes.includes(data.type)) {
-        console.log(`Avant | Invalid actor type '${data.type}', defaulting to character`);
-        data.type = 'character';
-    }
-    
-    // Ensure system data exists
-    if (!data.system) {
-        console.log('Avant | Creating empty system data object');
-        data.system = {};
-    }
-    
-    console.log(`Avant | Actor validation complete - type: ${data.type}`);
-});
-
-Hooks.once('init', async function() {
-    console.log("Avant | Initializing game system");
-    
-    // Register theme manager settings first
-    AvantThemeManager.registerSettings();
-    
-    // Register system settings
-    game.settings.register('avant', 'systemVersion', {
-        name: 'System Version',
-        hint: 'The current version of the Avant system.',
-        scope: 'world',
-        config: false,
-        type: String,
-        default: '0.2.0'
-    });
-
-    // Configure system
-    CONFIG.Actor.documentClass = Actor;
-    CONFIG.Item.documentClass = Item;
-    
-    // Register data models for ALL actor types
-    CONFIG.Actor.dataModels = {
-        character: AvantActorData,
-        npc: AvantActorData,  // Use same model for NPCs
-        vehicle: AvantActorData  // And vehicles if needed
-    };
-    
-    // Register data models for all item types
-    CONFIG.Item.dataModels = {
-        action: AvantActionData,
-        feature: AvantFeatureData,
-        talent: AvantTalentData,
-        augment: AvantAugmentData,
-        weapon: AvantWeaponData,
-        armor: AvantArmorData,
-        gear: AvantGearData
-    };
-    
-    // Register sheet application classes
-    Actors.unregisterSheet("core", ActorSheet);
-    Actors.registerSheet("avant", AvantActorSheet, { 
-        makeDefault: true,
-        types: ["character", "npc", "vehicle"]  // Specify supported types
-    });
-    
-    Items.unregisterSheet("core", ItemSheet);
-    Items.registerSheet("avant", AvantItemSheet, { 
-        makeDefault: true,
-        types: ["action", "feature", "talent", "augment", "weapon", "armor", "gear"]
-    });
-    
-    // Preload templates
-    loadTemplates([
-        "systems/avant/templates/actor-sheet.html",
-        "systems/avant/templates/reroll-dialog.html",
-        "systems/avant/templates/item/item-action-sheet.html",
-        "systems/avant/templates/item/item-feature-sheet.html",
-        "systems/avant/templates/item/item-talent-sheet.html",
-        "systems/avant/templates/item/item-augment-sheet.html",
-        "systems/avant/templates/item/item-weapon-sheet.html",
-        "systems/avant/templates/item/item-armor-sheet.html",
-        "systems/avant/templates/item/item-gear-sheet.html"
-    ]);
-    
-    console.log("Avant | System initialization complete");
-});
-
-// System ready
-Hooks.once('ready', async function() {
-    console.log("Avant | System ready");
-    
-    // Initialize theme manager
-    game.avant = game.avant || {};
-    game.avant.themeManager = new AvantThemeManager();
-    
-    // Initialize chat context menu for Fortune Point rerolls
-    AvantChatContextMenu.addContextMenuListeners();
-    
-    ui.notifications.info("Avant game system loaded successfully!");
-});
-
-// Item validation hook
-Hooks.on('preCreateItem', (document, data, options, userId) => {
-    console.log("Avant | preCreateItem called with data:", data);
-    const itemType = data.type;
-    if (itemType === "action" && !data.system?.ability) {
-        document.updateSource({ "system.ability": "might" });
-    }
-    if (itemType === "feature" && !data.system?.category) {
-        document.updateSource({ "system.category": "general" });
-    }
-    if (itemType === "augment" && !data.system?.augmentType) {
-        document.updateSource({ "system.augmentType": "enhancement" });
-    }
-    if (itemType === "weapon") {
-        if (!data.system?.ability) {
-            document.updateSource({ "system.ability": "might" });
-        }
-        if (!data.system?.modifier) {
-            document.updateSource({ "system.modifier": 0 });
-        }
-        if (!data.system?.damageDie) {
-            document.updateSource({ "system.damageDie": "1d6" });
-        }
-        if (!data.system?.threshold) {
-            document.updateSource({ "system.threshold": 11 });
-        }
-    }
-    if (itemType === "armor") {
-        if (!data.system?.ability) {
-            document.updateSource({ "system.ability": "grace" });
-        }
-        if (!data.system?.modifier) {
-            document.updateSource({ "system.modifier": 0 });
-        }
-        if (!data.system?.threshold) {
-            document.updateSource({ "system.threshold": 11 });
-        }
-    }
-    const supportedItemTypes = ["action", "feature", "talent", "augment", "weapon", "armor", "gear"];
-    if (!supportedItemTypes.includes(itemType)) {
-        console.log(`Avant | Unsupported item type '${itemType}', defaulting to 'gear'`);
-        document.updateSource({ type: "gear" });
-    }
-});
-
-// Success logging
-Hooks.on('createActor', (actor, options, userId) => {
-    console.log("Avant | Actor created successfully:", actor.name, "Type:", actor.type);
-});
-
-Hooks.on('createItem', (item, options, userId) => {
-    console.log("Avant | Item created successfully:", item.name, "Type:", item.type);
-});
-
-// Export system API
-window['AVANT'] = {
-    version: '0.2.0',
-    AvantActorData,
-    AvantActionData,
-    AvantFeatureData,
-    AvantTalentData,
-    AvantAugmentData,
-    AvantWeaponData,
-    AvantArmorData,
-    AvantGearData,
-    AvantActorSheet,
-    AvantItemSheet,
-    AvantThemeManager,
-    AvantRerollDialog,
-    AvantChatContextMenu
-};
 
 /**
  * Fortune Point Reroll Dialog
@@ -1951,80 +1770,556 @@ class AvantRerollDialog extends Application {
 }
 
 /**
- * Chat Message Context Menu Handler
+ * Chat Message Context Menu Handler - Simplified Single Approach
+ * Uses only getChatLogEntryContext hook for v12/v13 compatibility
  */
 class AvantChatContextMenu {
     static addContextMenuListeners() {
-        // Add context menu to chat messages containing 2d10 rolls
-        $(document).on('contextmenu', '.message .dice-roll', AvantChatContextMenu._onChatRightClick.bind(this));
-    }
-    
-    static async _onChatRightClick(event) {
-        event.preventDefault();
+        console.log('Avant | Initializing context menu system (getChatLogEntryContext approach only)');
         
-        const messageElement = event.currentTarget.closest('.message');
-        if (!messageElement) return;
+        // v13 approach: Directly extend ChatLog's _getEntryContextOptions method
+        console.log('Avant | Attempting to extend ChatLog._getEntryContextOptions...');
         
-        const messageId = messageElement.dataset.messageId;
-        const message = game.messages.get(messageId);
+        // Wait for ChatLog to be available
+        if (ui.chat) {
+            AvantChatContextMenu._extendChatLogContextMenu();
+        } else {
+            // Wait for UI to be ready
+            Hooks.once('ready', () => {
+                AvantChatContextMenu._extendChatLogContextMenu();
+            });
+        }
         
-        if (!message || !message.rolls || message.rolls.length === 0) return;
+        // DEBUGGING: Test if ANY context menu hooks fire
+        console.log('Avant | Adding debug hooks to test what fires...');
         
-        const roll = message.rolls[0];
-        const actor = AvantChatContextMenu._getActorFromMessage(message);
-        
-        // Check if this is a 2d10 roll (eligible for reroll)
-        if (!AvantChatContextMenu._isEligibleRoll(roll) || !actor) return;
-        
-        // Create context menu
-        const menu = $(`
-            <div class="avant-context-menu" style="position: fixed; left: ${event.pageX}px; top: ${event.pageY}px; z-index: 1000;">
-                <ul class="context-menu">
-                    <li class="context-menu-item" data-action="reroll">
-                        <i class="fas fa-dice"></i> Reroll with Fortune Points
-                    </li>
-                </ul>
-            </div>
-        `);
-        
-        // Add to body
-        $('body').append(menu);
-        
-        // Handle menu click
-        menu.find('.context-menu-item[data-action="reroll"]').click(async () => {
-            menu.remove();
-            
-            // Open reroll dialog
-            const dialog = new AvantRerollDialog(roll, actor, message.flavor);
-            dialog.render(true);
+        Hooks.on('getDocumentContextOptions', (...args) => {
+            console.log('Avant | 🔍 getDocumentContextOptions hook fired:', args);
         });
         
-        // Remove menu on click elsewhere
-        const removeMenu = () => {
-            menu.remove();
-            $(document).off('click', removeMenu);
+        Hooks.on('getContextMenuOptions', (...args) => {
+            console.log('Avant | 🔍 getContextMenuOptions hook fired:', args);
+        });
+        
+        Hooks.on('contextMenu', (...args) => {
+            console.log('Avant | 🔍 contextMenu hook fired:', args);
+        });
+        
+        // Listen for ALL hook calls to see what's available
+        const originalCall = Hooks.call;
+        Hooks.call = function(hook, ...args) {
+            if (hook.toLowerCase().includes('context') || hook.toLowerCase().includes('chat')) {
+                console.log(`Avant | 🔍 Hook called: ${hook}`, args);
+            }
+            return originalCall.call(this, hook, ...args);
         };
         
-        setTimeout(() => $(document).on('click', removeMenu), 10);
+        console.log('Avant | Context menu listeners registered successfully');
+    }
+    
+    /**
+     * Extend ChatLog's context menu to add reroll options
+     */
+    static _extendChatLogContextMenu() {
+        console.log('Avant | 🎯 Extending ChatLog context menu...');
+        
+        if (!ui.chat) {
+            console.log('Avant | ERROR: ui.chat not available');
+            return;
+        }
+        
+        console.log('Avant | ChatLog object:', ui.chat);
+        console.log('Avant | ChatLog methods:', Object.getOwnPropertyNames(ui.chat.constructor.prototype));
+        
+        // Store the original method
+        const originalGetEntryContextOptions = ui.chat._getEntryContextOptions;
+        
+        if (!originalGetEntryContextOptions) {
+            console.log('Avant | ERROR: _getEntryContextOptions method not found on ChatLog');
+            return;
+        }
+        
+        console.log('Avant | Found _getEntryContextOptions method, extending...');
+        
+        // Override the method
+        ui.chat._getEntryContextOptions = function() {
+            console.log('Avant | 🎯 EXTENDED _getEntryContextOptions called!');
+            
+            // Get the original options
+            const options = originalGetEntryContextOptions.call(this);
+            console.log('Avant | Original options:', options.map(opt => opt.name));
+            
+            // Add our reroll option
+            options.push({
+                name: "Reroll with Fortune Points",
+                icon: '<i class="fas fa-dice"></i>',
+                condition: (li) => {
+                    console.log('Avant | Condition check - li element:', li);
+                    
+                    // Get the message ID from the li element (v13 uses raw DOM, not jQuery)
+                    const messageId = li.dataset?.messageId || li.getAttribute('data-message-id');
+                    console.log('Avant | Message ID from li:', messageId);
+                    
+                    if (!messageId) return false;
+                    
+                    const message = game.messages.get(messageId);
+                    console.log('Avant | Message object:', message);
+                    
+                    if (!message || !message.rolls || message.rolls.length === 0) {
+                        console.log('Avant | No rolls in message');
+                        return false;
+                    }
+                    
+                    const roll = message.rolls[0];
+                    const actor = AvantChatContextMenu._getActorFromMessage(message);
+                    const isEligible = AvantChatContextMenu._isEligibleRoll(roll);
+                    
+                    console.log('Avant | Condition check result - eligible:', isEligible, 'actor:', !!actor);
+                    return isEligible && actor && actor.system?.fortunePoints > 0;
+                },
+                callback: (li) => {
+                    console.log('Avant | === CONTEXT MENU CALLBACK TRIGGERED ===');
+                    console.log('Avant | Callback li element:', li);
+                    
+                    const messageId = li.dataset?.messageId || li.getAttribute('data-message-id');
+                    const message = game.messages.get(messageId);
+                    const roll = message.rolls[0];
+                    const actor = AvantChatContextMenu._getActorFromMessage(message);
+                    
+                    const dialog = new AvantRerollDialog(roll, actor, message.flavor);
+                    dialog.render(true);
+                    console.log('Avant | Dialog rendered');
+                }
+            });
+            
+            console.log('Avant | Extended options:', options.map(opt => opt.name));
+            return options;
+        };
+        
+        console.log('Avant | ✅ ChatLog context menu extended successfully!');
+    }
+    
+    /**
+     * Add reroll option for document-based context menus (v13 style)
+     * @param {ChatMessage} document - The ChatMessage document
+     * @param {Array} options - Context menu options array
+     */
+    static _addRerollOptionForDocument(document, options) {
+        console.log('Avant | === _addRerollOptionForDocument START ===');
+        console.log('Avant | Document ID:', document?.id);
+        console.log('Avant | Document rolls:', document?.rolls?.length);
+        console.log('Avant | Document flavor:', document?.flavor);
+        
+        if (!document || !document.rolls || document.rolls.length === 0) {
+            console.log('Avant | ERROR: Document has no rolls');
+            console.log('Avant | === _addRerollOptionForDocument END (no rolls) ===');
+            return;
+        }
+        
+        const roll = document.rolls[0];
+        console.log('Avant | First roll object:', roll);
+        console.log('Avant | Roll formula:', roll.formula);
+        console.log('Avant | Roll terms:', roll.terms);
+        
+        const actor = AvantChatContextMenu._getActorFromMessage(document);
+        console.log('Avant | Retrieved actor:', actor);
+        console.log('Avant | Actor fortune points:', actor?.system?.fortunePoints);
+        
+        // Check if this roll is eligible for reroll (2d10 roll)
+        const isEligible = AvantChatContextMenu._isEligibleRoll(roll);
+        console.log('Avant | Roll eligibility check result:', isEligible);
+        
+        if (!isEligible || !actor) {
+            console.log('Avant | ERROR: Roll not eligible or no actor found');
+            console.log('Avant | Eligible:', isEligible, 'Actor:', !!actor);
+            console.log('Avant | === _addRerollOptionForDocument END (not eligible) ===');
+            return;
+        }
+        
+        console.log('Avant | SUCCESS: Adding reroll option for document:', document.id);
+        
+        // Check for duplicate options
+        const existingRerollOption = options.find(opt => opt.name === "Reroll with Fortune Points");
+        if (existingRerollOption) {
+            console.log('Avant | WARNING: Reroll option already exists, skipping duplicate');
+            console.log('Avant | === _addRerollOptionForDocument END (duplicate) ===');
+            return;
+        }
+        
+        options.push({
+            name: "Reroll with Fortune Points",
+            icon: '<i class="fas fa-dice"></i>',
+            condition: true,  // Always show the option, let the dialog handle validation
+            callback: () => {
+                console.log('Avant | === CONTEXT MENU CALLBACK TRIGGERED ===');
+                console.log('Avant | Callback for document:', document.id);
+                const dialog = new AvantRerollDialog(roll, actor, document.flavor);
+                dialog.render(true);
+                console.log('Avant | Dialog rendered');
+            }
+        });
+        
+        console.log('Avant | SUCCESS: Reroll option added to options array');
+        console.log('Avant | Final options count:', options.length);
+        console.log('Avant | === _addRerollOptionForDocument END (success) ===');
+    }
+    
+    static _addRerollOption(html, options) {
+        console.log('Avant | === _addRerollOption START ===');
+        console.log('Avant | Input HTML:', html);
+        console.log('Avant | Input HTML type:', html?.constructor?.name);
+        console.log('Avant | Input options length:', options?.length);
+        
+        // Get the message element - handle both jQuery and HTMLElement
+        let messageElement = html;
+        if (html instanceof jQuery) {
+            console.log('Avant | Converting jQuery object to DOM element');
+            messageElement = html.length > 0 ? html[0] : null;
+        }
+        
+        if (!messageElement) {
+            console.log('Avant | ERROR: No valid message element found');
+            console.log('Avant | === _addRerollOption END (no element) ===');
+            return;
+        }
+        
+        console.log('Avant | Message element:', messageElement);
+        console.log('Avant | Message element tagName:', messageElement.tagName);
+        console.log('Avant | Message element classList:', messageElement.classList?.toString());
+        
+        // Find message ID using various methods
+        let messageId = messageElement.dataset?.messageId || 
+                       messageElement.getAttribute?.('data-message-id');
+        
+        console.log('Avant | Initial messageId search result:', messageId);
+        
+        // If not found directly, try looking for parent message container
+        if (!messageId && messageElement.closest) {
+            console.log('Avant | Searching for parent message container...');
+            const messageContainer = messageElement.closest('.message') || 
+                                   messageElement.closest('li[data-message-id]');
+            if (messageContainer) {
+                console.log('Avant | Found message container:', messageContainer);
+                messageId = messageContainer.dataset?.messageId || 
+                           messageContainer.getAttribute('data-message-id');
+                console.log('Avant | Message ID from container:', messageId);
+            } else {
+                console.log('Avant | No message container found');
+            }
+        }
+        
+        if (!messageId) {
+            console.log('Avant | ERROR: No message ID found after all searches');
+            console.log('Avant | === _addRerollOption END (no messageId) ===');
+            return;
+        }
+        
+        console.log('Avant | Successfully found messageId:', messageId);
+        
+        const message = game.messages.get(messageId);
+        console.log('Avant | Retrieved message object:', message);
+        console.log('Avant | Message has rolls:', message?.rolls?.length);
+        
+        if (!message || !message.rolls || message.rolls.length === 0) {
+            console.log('Avant | ERROR: Message not found or has no rolls');
+            console.log('Avant | === _addRerollOption END (no rolls) ===');
+            return;
+        }
+        
+        const roll = message.rolls[0];
+        console.log('Avant | First roll object:', roll);
+        console.log('Avant | Roll formula:', roll.formula);
+        console.log('Avant | Roll terms:', roll.terms);
+        
+        const actor = AvantChatContextMenu._getActorFromMessage(message);
+        console.log('Avant | Retrieved actor:', actor);
+        console.log('Avant | Actor fortune points:', actor?.system?.fortunePoints);
+        
+        // Check if this roll is eligible for reroll (2d10 roll)
+        const isEligible = AvantChatContextMenu._isEligibleRoll(roll);
+        console.log('Avant | Roll eligibility check result:', isEligible);
+        
+        if (!isEligible || !actor) {
+            console.log('Avant | ERROR: Roll not eligible or no actor found');
+            console.log('Avant | Eligible:', isEligible, 'Actor:', !!actor);
+            console.log('Avant | === _addRerollOption END (not eligible) ===');
+            return;
+        }
+        
+        console.log('Avant | SUCCESS: Adding reroll option for message:', messageId);
+        
+        // Check for duplicate options
+        const existingRerollOption = options.find(opt => opt.name === "Reroll with Fortune Points");
+        if (existingRerollOption) {
+            console.log('Avant | WARNING: Reroll option already exists, skipping duplicate');
+            console.log('Avant | === _addRerollOption END (duplicate) ===');
+            return;
+        }
+        
+        options.push({
+            name: "Reroll with Fortune Points",
+            icon: '<i class="fas fa-dice"></i>',
+            condition: true,  // Always show the option, let the dialog handle validation
+            callback: li => {
+                console.log('Avant | === CONTEXT MENU CALLBACK TRIGGERED ===');
+                console.log('Avant | Callback for message:', messageId);
+                console.log('Avant | Callback li element:', li);
+                const dialog = new AvantRerollDialog(roll, actor, message.flavor);
+                dialog.render(true);
+                console.log('Avant | Dialog rendered');
+            }
+        });
+        
+        console.log('Avant | SUCCESS: Reroll option added to options array');
+        console.log('Avant | Final options count:', options.length);
+        console.log('Avant | === _addRerollOption END (success) ===');
     }
     
     static _getActorFromMessage(message) {
-        if (message.speaker?.actor) {
-            return game.actors.get(message.speaker.actor);
+        console.log('Avant | === _getActorFromMessage START ===');
+        console.log('Avant | Message ID:', message?.id);
+        console.log('Avant | Message speaker:', message?.speaker);
+        console.log('Avant | Speaker actor ID:', message?.speaker?.actor);
+        
+        if (message?.speaker?.actor) {
+            const actorId = message.speaker.actor;
+            const actor = game.actors.get(actorId);
+            console.log('Avant | Found actor by ID:', actorId, '→', actor?.name);
+            console.log('Avant | Actor system data:', actor?.system);
+            console.log('Avant | === _getActorFromMessage END (found) ===');
+            return actor;
         }
+        
+        console.log('Avant | ERROR: No actor ID found in message speaker');
+        console.log('Avant | === _getActorFromMessage END (not found) ===');
         return null;
     }
     
     static _isEligibleRoll(roll) {
+        console.log('Avant | === _isEligibleRoll START ===');
+        console.log('Avant | Roll object:', roll);
+        console.log('Avant | Roll formula:', roll?.formula);
+        console.log('Avant | Roll terms count:', roll?.terms?.length);
+        console.log('Avant | Roll terms:', roll?.terms);
+        
+        if (!roll || !roll.terms || !Array.isArray(roll.terms)) {
+            console.log('Avant | ERROR: Invalid roll object or no terms');
+            console.log('Avant | === _isEligibleRoll END (invalid) ===');
+            return false;
+        }
+        
         // Check if roll contains exactly 2d10
         let d10Count = 0;
         
-        for (const term of roll.terms) {
+        for (let i = 0; i < roll.terms.length; i++) {
+            const term = roll.terms[i];
+            console.log(`Avant | Checking term ${i}:`, term);
+            console.log(`Avant | Term ${i} type:`, term?.constructor?.name);
+            console.log(`Avant | Term ${i} faces:`, term?.faces);
+            console.log(`Avant | Term ${i} number:`, term?.number);
+            
             if (term instanceof foundry.dice.terms.Die && term.faces === 10) {
                 d10Count += term.number;
+                console.log(`Avant | Term ${i} is d10 with ${term.number} dice, total count now:`, d10Count);
+            } else {
+                console.log(`Avant | Term ${i} is not a d10 die`);
             }
         }
         
-        return d10Count === 2;
+        const eligible = d10Count === 2;
+        console.log('Avant | Final analysis: Roll has', d10Count, 'd10 dice');
+        console.log('Avant | Eligible for reroll:', eligible);
+        console.log('Avant | === _isEligibleRoll END ===');
+        return eligible;
     }
 }
+
+// CLEAN ACTOR VALIDATION APPROACH
+// Simple hook to ensure type is always set for actor creation
+Hooks.on('preCreateActor', (document, data, options, userId) => {
+    console.log('Avant | preCreateActor hook fired');
+    console.log('Avant | Actor data:', JSON.stringify(data));
+    
+    // Ensure type is set to a valid value
+    if (!data.type || typeof data.type !== 'string' || data.type.trim() === '') {
+        console.log('Avant | Setting default actor type to character');
+        data.type = 'character';
+    }
+    
+    // Validate type is supported
+    const supportedTypes = ['character', 'npc', 'vehicle'];
+    if (!supportedTypes.includes(data.type)) {
+        console.log(`Avant | Invalid actor type '${data.type}', defaulting to character`);
+        data.type = 'character';
+    }
+    
+    // Ensure system data exists
+    if (!data.system) {
+        console.log('Avant | Creating empty system data object');
+        data.system = {};
+    }
+    
+    console.log(`Avant | Actor validation complete - type: ${data.type}`);
+});
+
+Hooks.once('init', async function() {
+    console.log("Avant | Initializing game system");
+    
+    // Register theme manager settings first
+    AvantThemeManager.registerSettings();
+    
+    // Register system settings
+    game.settings.register('avant', 'systemVersion', {
+        name: 'System Version',
+        hint: 'The current version of the Avant system.',
+        scope: 'world',
+        config: false,
+        type: String,
+        default: '0.2.0'
+    });
+
+    // Configure system
+    CONFIG.Actor.documentClass = Actor;
+    CONFIG.Item.documentClass = Item;
+    
+    // Register data models for ALL actor types
+    CONFIG.Actor.dataModels = {
+        character: AvantActorData,
+        npc: AvantActorData,  // Use same model for NPCs
+        vehicle: AvantActorData  // And vehicles if needed
+    };
+    
+    // Register data models for all item types
+    CONFIG.Item.dataModels = {
+        action: AvantActionData,
+        feature: AvantFeatureData,
+        talent: AvantTalentData,
+        augment: AvantAugmentData,
+        weapon: AvantWeaponData,
+        armor: AvantArmorData,
+        gear: AvantGearData
+    };
+    
+    // Register sheet application classes - v12/v13 compatible
+    const ActorsCollection = foundry.documents?.collections?.Actors || Actors;
+    const ItemsCollection = foundry.documents?.collections?.Items || Items;
+    const ActorSheetClass = foundry.appv1?.sheets?.ActorSheet || ActorSheet;
+    const ItemSheetClass = foundry.appv1?.sheets?.ItemSheet || ItemSheet;
+    
+    ActorsCollection.unregisterSheet("core", ActorSheetClass);
+    ActorsCollection.registerSheet("avant", AvantActorSheet, { 
+        makeDefault: true,
+        types: ["character", "npc", "vehicle"]  // Specify supported types
+    });
+    
+    ItemsCollection.unregisterSheet("core", ItemSheetClass);
+    ItemsCollection.registerSheet("avant", AvantItemSheet, { 
+        makeDefault: true,
+        types: ["action", "feature", "talent", "augment", "weapon", "armor", "gear"]
+    });
+    
+    // Preload templates - v12/v13 compatible
+    const loadTemplatesFunc = foundry.applications?.handlebars?.loadTemplates || loadTemplates;
+    loadTemplatesFunc([
+        "systems/avant/templates/actor-sheet.html",
+        "systems/avant/templates/reroll-dialog.html",
+        "systems/avant/templates/item/item-action-sheet.html",
+        "systems/avant/templates/item/item-feature-sheet.html",
+        "systems/avant/templates/item/item-talent-sheet.html",
+        "systems/avant/templates/item/item-augment-sheet.html",
+        "systems/avant/templates/item/item-weapon-sheet.html",
+        "systems/avant/templates/item/item-armor-sheet.html",
+        "systems/avant/templates/item/item-gear-sheet.html"
+    ]);
+    
+    console.log("Avant | System initialization complete");
+});
+
+// System ready
+Hooks.once('ready', async function() {
+    console.log("Avant | System ready");
+    
+    // Initialize theme manager
+    game.avant = game.avant || {};
+    game.avant.themeManager = new AvantThemeManager();
+    
+    // Initialize chat context menu for Fortune Point rerolls with enhanced debugging
+    console.log("Avant | === INITIALIZING CONTEXT MENU SYSTEM ===");
+    console.log("Avant | Using single getChatLogEntryContext approach for v12/v13 compatibility");
+    AvantChatContextMenu.addContextMenuListeners();
+    console.log("Avant | === CONTEXT MENU SYSTEM INITIALIZED ===");
+    
+    ui.notifications.info("Avant game system loaded successfully!");
+});
+
+// Item validation hook
+Hooks.on('preCreateItem', (document, data, options, userId) => {
+    console.log("Avant | preCreateItem called with data:", data);
+    const itemType = data.type;
+    if (itemType === "action" && !data.system?.ability) {
+        document.updateSource({ "system.ability": "might" });
+    }
+    if (itemType === "feature" && !data.system?.category) {
+        document.updateSource({ "system.category": "general" });
+    }
+    if (itemType === "augment" && !data.system?.augmentType) {
+        document.updateSource({ "system.augmentType": "enhancement" });
+    }
+    if (itemType === "weapon") {
+        if (!data.system?.ability) {
+            document.updateSource({ "system.ability": "might" });
+        }
+        if (!data.system?.modifier) {
+            document.updateSource({ "system.modifier": 0 });
+        }
+        if (!data.system?.damageDie) {
+            document.updateSource({ "system.damageDie": "1d6" });
+        }
+        if (!data.system?.threshold) {
+            document.updateSource({ "system.threshold": 11 });
+        }
+    }
+    if (itemType === "armor") {
+        if (!data.system?.ability) {
+            document.updateSource({ "system.ability": "grace" });
+        }
+        if (!data.system?.modifier) {
+            document.updateSource({ "system.modifier": 0 });
+        }
+        if (!data.system?.threshold) {
+            document.updateSource({ "system.threshold": 11 });
+        }
+    }
+    const supportedItemTypes = ["action", "feature", "talent", "augment", "weapon", "armor", "gear"];
+    if (!supportedItemTypes.includes(itemType)) {
+        console.log(`Avant | Unsupported item type '${itemType}', defaulting to 'gear'`);
+        document.updateSource({ type: "gear" });
+    }
+});
+
+// Success logging
+Hooks.on('createActor', (actor, options, userId) => {
+    console.log("Avant | Actor created successfully:", actor.name, "Type:", actor.type);
+});
+
+Hooks.on('createItem', (item, options, userId) => {
+    console.log("Avant | Item created successfully:", item.name, "Type:", item.type);
+});
+
+// Export system API
+window['AVANT'] = {
+    version: '0.2.0',
+    AvantActorData,
+    AvantActionData,
+    AvantFeatureData,
+    AvantTalentData,
+    AvantAugmentData,
+    AvantWeaponData,
+    AvantArmorData,
+    AvantGearData,
+    AvantActorSheet,
+    AvantItemSheet,
+    AvantThemeManager,
+    AvantRerollDialog,
+    AvantChatContextMenu
+};
