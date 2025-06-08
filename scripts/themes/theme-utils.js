@@ -64,30 +64,34 @@ class AvantThemeUtils {
 🎨 Avant Theme Utilities - Designer-Friendly Theme Management
 
 USAGE:
-  node scripts/themes/theme-utils.js [command] [options]
+  npm run theme:[command] [options]
 
 COMMANDS:
-  help                     Show this help message
+  npm run theme:help                    Show this help message
   
   📋 DOCUMENTATION:
-  docs                     Generate theme variables documentation
-  list-vars               List all available theme variables
+  npm run theme:docs                    Generate theme variables documentation
+  npm run theme:list                    List all available theme variables
   
   🎯 THEME TEMPLATES:
-  template                 Generate a basic theme template (required variables only)
-  template-full           Generate a complete theme template (all variables)
+  npm run theme:template                Generate a basic theme template (required variables only)
+  npm run theme:template:full           Generate a complete theme template (all variables)
   
   ✅ VALIDATION:
-  validate <file>         Validate a theme JSON file
+  npm run theme:validate <file>         Validate a theme JSON file
   
   🔧 DEVELOPER TOOLS:
-  add-var <path>          Add a new theme variable (interactive)
-  generate-mappings       Generate JavaScript mappings from config
+  npm run theme:examples                Create example theme files
+  npm run theme:mappings                Generate JavaScript mappings from config
+  
+  📚 DOCUMENTATION:
+  npm run docs:update                   Update all theme documentation
+  npm run test:themes                   Test theme system end-to-end
   
   💡 EXAMPLES:
-  node scripts/themes/theme-utils.js template > my-theme.json
-  node scripts/themes/theme-utils.js validate my-theme.json
-  node scripts/themes/theme-utils.js docs > THEME-VARIABLES.md
+  npm run theme:template > my-theme.json
+  npm run theme:validate my-theme.json
+  npm run theme:docs > THEME-VARIABLES.md
 
 Made for designers, by developers ❤️
         `);

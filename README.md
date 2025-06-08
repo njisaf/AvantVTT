@@ -76,6 +76,8 @@ The Avant system includes powerful theming tools:
 - **Create examples**: `npm run theme:examples`
 - **Validate theme**: `npm run theme:validate <file>`
 - **Generate docs**: `npm run theme:docs`
+- **Update documentation**: `npm run docs:update`
+- **Test themes**: `npm run test:themes`
 
 ### Documentation
 
