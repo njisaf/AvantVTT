@@ -1,1678 +1,1511 @@
 /* Avant - Futuristic Character Sheet Design */
 /* Neo-Futurist & Minimalist Aesthetic with Cyberpunk Elements */
-
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap');
-
-/* CSS Custom Properties - Color Palette */
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap");
 .avant {
-    /* Core Color Palette */
-    --bg-primary: #1C1C1C;        /* Dark charcoal/graphite background */
-    --text-primary: #FFFFFF;       /* White primary text */
-    --accent-cyan: #00E0DC;        /* Bright cyan for emphasis */
-    --grey-cool: #BFBFBF;          /* Cool grey for structural elements */
-    --aqua-muted: #4CE2E1;         /* Softer cyan variant */
-    --black-pure: #000000;         /* Pure black for contrast */
-    
-    /* Derived Colors */
-    --bg-secondary: #2A2A2A;       /* Slightly lighter background */
-    --bg-tertiary: #333333;        /* Card/section backgrounds */
-    --border-primary: #404040;     /* Primary borders */
-    --border-accent: var(--accent-cyan);
-    --text-secondary: var(--grey-cool);
-    --text-muted: #808080;
-    
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-    --gradient-accent: linear-gradient(135deg, var(--accent-cyan) 0%, var(--aqua-muted) 100%);
-    
-    /* Shadows */
-    --shadow-primary: 0 4px 20px rgba(0, 224, 220, 0.1);
-    --shadow-accent: 0 0 20px rgba(0, 224, 220, 0.3);
-    --shadow-deep: 0 8px 32px rgba(0, 0, 0, 0.6);
-    
-    /* Typography */
-    font-family: 'Exo 2', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-weight: 400;
-    color: var(--text-primary);
-    background: var(--bg-primary);
-    border-radius: 0;
-    box-shadow: var(--shadow-deep);
-    border: 1px solid var(--border-primary);
+  --bg-primary: #1C1C1C;
+  --text-primary: #FFFFFF;
+  --accent-cyan: #00E0DC;
+  --grey-cool: #BFBFBF;
+  --aqua-muted: #4CE2E1;
+  --black-pure: #000000;
+  --bg-secondary: #2A2A2A;
+  --bg-tertiary: #333333;
+  --border-primary: #404040;
+  --border-accent: #00E0DC;
+  --text-secondary: #BFBFBF;
+  --text-muted: #808080;
+  --gradient-primary: linear-gradient(135deg, #1C1C1C 0%, #2A2A2A 100%);
+  --gradient-accent: linear-gradient(135deg, #00E0DC 0%, #4CE2E1 100%);
+  --shadow-primary: 0 4px 20px rgba(0, 224, 220, 0.1);
+  --shadow-accent: 0 0 20px rgba(0, 224, 220, 0.3);
+  --shadow-deep: 0 8px 32px rgba(0, 0, 0, 0.6);
+  font-family: "Exo 2", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: 400;
+  color: #FFFFFF;
+  background: #1C1C1C;
+  border-radius: 0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  border: 1px solid #404040;
 }
-
-/* Global Reset and Base Styling */
 .avant * {
-    box-sizing: border-box !important; /* Force box-sizing for v12 compatibility */
+  box-sizing: border-box !important;
 }
-
 .avant input,
 .avant select,
 .avant textarea {
-    font-family: inherit;
-    box-sizing: border-box !important; /* Ensure form elements use border-box */
+  font-family: inherit;
+  box-sizing: border-box !important;
 }
-
-/* Window Container - Fixed height with proper border visibility */
 .avant .window-app {
-    background: var(--bg-primary);
-    border: 2px solid var(--border-primary);
-    border-radius: 0;
-    box-shadow: var(--shadow-deep);
-    position: relative;
-    height: 630px; /* Fixed height matching the default */
-    max-height: 630px; /* Prevent growing beyond default */
-    overflow: hidden; /* Prevent window-level scrolling */
-    display: flex;
-    flex-direction: column;
+  background: #1C1C1C;
+  border: 2px solid #404040;
+  border-radius: 0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  position: relative;
+  height: 630px;
+  max-height: 630px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
-
-/* FoundryVTT Window Content - Account for 8px padding and fit within window height */
 .avant .window-content {
-    /* FoundryVTT adds 8px padding around window-content by default */
-    /* We need to ensure this fits within the window-app height */
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 0; /* Allow flexbox to shrink */
-    /* The window-content will have its 8px padding visible within the 630px window */
-    /* Total available height = 630px - window-header height - 8px padding */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
-
-/* FoundryVTT Window Header - Keep functional for dragging and controls */
 .avant .window-header {
-    background: var(--gradient-primary);
-    border-bottom: 2px solid var(--accent-cyan);
-    color: var(--text-primary);
-    font-family: 'Orbitron', monospace;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    flex-shrink: 0; /* Prevent header from shrinking */
+  background: linear-gradient(135deg, #1C1C1C 0%, #2A2A2A 100%);
+  border-bottom: 2px solid #00E0DC;
+  color: #FFFFFF;
+  font-family: "Orbitron", monospace;
+  font-size: 700;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  letter-spacing: 2px;
+  flex-shrink: 0;
 }
-
-/* Custom Sheet Header - Compact and controlled height */
 .avant .sheet-header {
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-    padding: 10px 15px; /* Reduced padding */
-    border-bottom: 2px solid var(--accent-cyan);
-    display: flex;
-    align-items: center;
-    gap: 15px; /* Reduced gap */
-    position: relative;
-    height: 60px; /* Reduced from 80px to 60px */
-    max-height: 60px; /* Enforce maximum height */
-    min-height: 60px; /* Enforce minimum height */
-    flex-shrink: 0; /* Prevent header from shrinking */
-    z-index: 10;
-    overflow: hidden; /* Prevent content overflow in v12 */
-    box-sizing: border-box !important; /* Explicit box-sizing for v12 */
+  background: #2A2A2A;
+  color: #FFFFFF;
+  padding: 10px 15px;
+  border-bottom: 2px solid #00E0DC;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  position: relative;
+  height: 60px;
+  max-height: 60px;
+  min-height: 60px;
+  flex-shrink: 0;
+  z-index: 10;
+  overflow: hidden;
+  box-sizing: border-box !important;
 }
-
 .avant .profile-img {
-    border: 2px solid var(--accent-cyan);
-    border-radius: 0;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: var(--shadow-accent);
-    width: 40px; /* Reduced from 60px */
-    height: 40px; /* Reduced from 60px */
-    flex-shrink: 0; /* Prevent shrinking */
-    box-sizing: border-box !important; /* Explicit box-sizing for v12 */
-    object-fit: cover; /* Ensure image fits properly */
+  border: 2px solid #00E0DC;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 20px rgba(0, 224, 220, 0.3);
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  box-sizing: border-box !important;
+  object-fit: cover;
 }
-
 .avant .profile-img:hover {
-    box-shadow: 0 0 20px var(--accent-cyan);
+  box-shadow: 0 0 20px #00E0DC;
 }
-
 .avant .header-fields {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    min-width: 0; /* Allow shrinking */
-    overflow: hidden; /* Prevent overflow in v12 */
-    box-sizing: border-box !important; /* Explicit box-sizing for v12 */
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  box-sizing: border-box !important;
 }
-
-/* Header Stats - New styling for stats moved to header */
 .avant .header-stats {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    flex-shrink: 0;
-    overflow: hidden; /* Prevent overflow in v12 */
-    box-sizing: border-box !important; /* Explicit box-sizing for v12 */
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+  overflow: hidden;
+  box-sizing: border-box !important;
 }
-
 .avant .header-stat {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    flex-shrink: 0; /* Prevent shrinking in v12 */
-    box-sizing: border-box !important; /* Explicit box-sizing for v12 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  box-sizing: border-box !important;
 }
-
 .avant .header-stat-label {
-    font-family: 'Orbitron', monospace;
-    font-size: 8px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--accent-cyan);
+  font-family: "Orbitron", monospace;
+  font-size: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  letter-spacing: 0.5px;
 }
-
 .avant .header-stat-input {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-primary);
-    color: var(--text-primary);
-    font-family: 'Orbitron', monospace;
-    font-size: 12px;
-    font-weight: 700;
-    text-align: center;
-    padding: 4px 8px;
-    border-radius: 0;
-    transition: all 0.3s ease;
-    width: 50px;
-    box-sizing: border-box !important; /* Explicit box-sizing for v12 */
-    flex-shrink: 0; /* Prevent shrinking in v12 */
+  background: #333333;
+  border: 1px solid #404040;
+  color: #FFFFFF;
+  font-family: "Orbitron", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  text-align: center;
+  padding: 4px 8px;
+  border-radius: 0;
+  transition: all 0.3s ease;
+  width: 50px;
+  box-sizing: border-box !important;
+  flex-shrink: 0;
 }
-
 .avant .header-stat-input:focus {
-    background: var(--bg-primary);
-    border-color: var(--accent-cyan);
-    outline: none;
-    box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
+  background: #1C1C1C;
+  border-color: #00E0DC;
+  outline: none;
+  box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
 }
-
 .avant .header-stat-display {
-    background: var(--bg-primary);
-    color: var(--accent-cyan);
-    font-family: 'Orbitron', monospace;
-    font-size: 12px;
-    font-weight: 700;
-    text-align: center;
-    padding: 4px 8px;
-    border: 1px solid var(--accent-cyan);
-    width: 50px;
-    box-sizing: border-box !important; /* Explicit box-sizing for v12 */
-    flex-shrink: 0; /* Prevent shrinking in v12 */
+  background: #1C1C1C;
+  color: #00E0DC;
+  font-family: "Orbitron", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  text-align: center;
+  padding: 4px 8px;
+  border: 1px solid #00E0DC;
+  width: 50px;
+  box-sizing: border-box !important;
+  flex-shrink: 0;
 }
-
-/* Character Name - More compact */
 .avant .charname {
-    margin: 0;
-    font-family: 'Orbitron', monospace;
-    font-size: 18px; /* Reduced from 24px */
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 1px; /* Reduced from 2px */
-    text-shadow: 0 0 5px var(--accent-cyan);
-    flex: 1; /* Take available space but allow shrinking */
-    min-width: 0; /* Allow shrinking in flexbox */
-    overflow: hidden; /* Prevent overflow in v12 */
-    box-sizing: border-box !important; /* Explicit box-sizing for v12 */
+  margin: 0;
+  font-family: "Orbitron", monospace;
+  font-size: 18px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  letter-spacing: 1px;
+  text-shadow: 0 0 5px #00E0DC;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  box-sizing: border-box !important;
 }
-
 .avant .charname input {
-    background: rgba(0, 224, 220, 0.1);
-    border: 1px solid var(--accent-cyan);
-    color: var(--text-primary);
-    font-family: 'Orbitron', monospace;
-    font-size: 18px; /* Reduced from 24px */
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 1px; /* Reduced from 2px */
-    padding: 6px 10px; /* Reduced padding */
-    border-radius: 0;
-    transition: all 0.3s ease;
-    width: 100%;
-    max-width: 300px; /* Limit width */
-    box-sizing: border-box !important; /* Explicit box-sizing for v12 */
-    min-width: 0; /* Allow input to shrink if needed */
+  background: rgba(0, 224, 220, 0.1);
+  border: 1px solid #00E0DC;
+  color: #FFFFFF;
+  font-family: "Orbitron", monospace;
+  font-size: 18px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  letter-spacing: 1px;
+  padding: 6px 10px;
+  border-radius: 0;
+  transition: all 0.3s ease;
+  width: 100%;
+  max-width: 300px;
+  box-sizing: border-box !important;
+  min-width: 0;
 }
-
 .avant .charname input:focus {
-    background: rgba(0, 224, 220, 0.2);
-    border-color: var(--text-primary);
-    outline: none;
-    box-shadow: 0 0 10px rgba(0, 224, 220, 0.3);
+  background: rgba(0, 224, 220, 0.2);
+  border-color: #FFFFFF;
+  outline: none;
+  box-shadow: 0 0 10px rgba(0, 224, 220, 0.3);
 }
-
-/* Main Layout Container - Proper height distribution within window-content */
 .avant .sheet-content {
-    display: flex;
-    flex: 1; /* Take remaining space after header within window-content */
-    min-height: 0; /* Allow flexbox to shrink */
-    overflow: hidden; /* Prevent content-level scrolling */
-    /* This container fits within window-content's available space */
-    /* Available height = window-content height - sheet-header height */
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
-
-/* Left Sidebar for Stats - Fixed width, height constrained */
 .avant .stats-sidebar {
-    width: 240px; /* Reduced from 280px */
-    background: var(--bg-secondary);
-    border-right: 2px solid var(--border-primary);
-    padding: 15px; /* Reduced from 20px */
-    overflow-y: auto; /* Allow sidebar to scroll if needed */
-    overflow-x: hidden; /* Prevent horizontal scrolling */
-    flex-shrink: 0; /* Don't shrink width */
-    /* Height is constrained by sheet-content container */
-    /* If sidebar content exceeds available height, it will scroll */
+  width: 240px;
+  background: #2A2A2A;
+  border-right: 2px solid #404040;
+  padding: 15px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex-shrink: 0;
 }
-
-/* Compact Resource Sections */
 .avant .sidebar-section {
-    margin-bottom: 20px; /* Reduced from 25px */
+  margin-bottom: 20px;
 }
-
 .avant .sidebar-section h4 {
-    margin: 0 0 12px 0; /* Reduced from 15px */
-    font-family: 'Orbitron', monospace;
-    font-size: 11px; /* Reduced from 12px */
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--accent-cyan);
-    border-bottom: 1px solid var(--border-primary);
-    padding-bottom: 4px; /* Reduced from 5px */
+  margin: 0 0 12px 0;
+  font-family: "Orbitron", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  letter-spacing: 1px;
+  border-bottom: 1px solid #404040;
+  padding-bottom: 4px;
 }
-
-/* New Stat Tiles Row Layout */
 .avant .stat-tiles-row {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 10px;
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
 }
-
 .avant .stat-tile {
-    flex: 1;
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-primary);
-    border-bottom: 3px solid var(--accent-cyan);
-    padding: 8px 6px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    transition: all 0.3s ease;
+  flex: 1;
+  background: #333333;
+  border: 1px solid #404040;
+  border-bottom: 3px solid #00E0DC;
+  padding: 8px 6px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: all 0.3s ease;
 }
-
 .avant .stat-tile.readonly {
-    border-bottom-color: var(--aqua-muted);
+  border-bottom-color: #4CE2E1;
 }
-
 .avant .stat-tile.readonly .stat-tile-value {
-    font-family: 'Exo 2', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text-primary);
-    line-height: 1;
-    background: var(--bg-primary);
-    border: 1px solid var(--border-primary);
-    padding: 6px 4px;
-    border-radius: 0;
-    text-align: center;
+  font-family: "Exo 2", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #FFFFFF;
+  line-height: 1;
+  background: #1C1C1C;
+  border: 1px solid #404040;
+  padding: 6px 4px;
+  border-radius: 0;
+  text-align: center;
 }
-
 .avant .stat-tile-input {
-    background: var(--bg-primary);
-    border: 1px solid var(--border-primary);
-    color: var(--text-primary);
-    font-family: 'Exo 2', sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    padding: 3px 4px;
-    border-radius: 0;
-    width: 100%;
-    text-align: center;
-    transition: all 0.3s ease;
+  background: #1C1C1C;
+  border: 1px solid #404040;
+  color: #FFFFFF;
+  font-family: "Exo 2", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #FFFFFF;
+  padding: 3px 4px;
+  border-radius: 0;
+  width: 100%;
+  text-align: center;
+  transition: all 0.3s ease;
 }
-
 .avant .stat-tile-input:focus {
-    border-color: var(--accent-cyan);
-    outline: none;
-    box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
+  border-color: #00E0DC;
+  outline: none;
+  box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
 }
-
 .avant .stat-tile-label {
-    font-family: 'Orbitron', monospace;
-    font-size: 8px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-secondary);
-    line-height: 1;
+  font-family: "Orbitron", monospace;
+  font-size: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  letter-spacing: 0.5px;
+  color: #BFBFBF;
+  line-height: 1;
 }
-
-/* Legacy stat-row styles (keeping for compatibility) */
 .avant .stat-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px; /* Reduced from 12px */
-    padding: 6px 10px; /* Reduced from 8px 12px */
-    background: var(--bg-tertiary);
-    border-left: 3px solid var(--accent-cyan);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  background: #333333;
+  border-left: 3px solid #00E0DC;
 }
-
 .avant .stat-label {
-    font-family: 'Orbitron', monospace;
-    font-size: 9px; /* Reduced from 10px */
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-secondary);
-    flex: 1;
+  font-family: "Orbitron", monospace;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  letter-spacing: 0.5px;
+  color: #BFBFBF;
+  flex: 1;
 }
-
 .avant .stat-input {
-    background: var(--bg-primary);
-    border: 1px solid var(--border-primary);
-    color: var(--text-primary);
-    font-family: 'Exo 2', sans-serif;
-    font-size: 12px; /* Reduced from 14px */
-    font-weight: 600;
-    padding: 3px 6px; /* Reduced from 4px 8px */
-    border-radius: 0;
-    width: 50px; /* Reduced from 60px */
-    text-align: center;
-    transition: all 0.3s ease;
+  background: #1C1C1C;
+  border: 1px solid #404040;
+  color: #FFFFFF;
+  font-family: "Exo 2", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #FFFFFF;
+  padding: 3px 6px;
+  border-radius: 0;
+  width: 50px;
+  text-align: center;
+  transition: all 0.3s ease;
 }
-
 .avant .stat-input:focus {
-    border-color: var(--accent-cyan);
-    outline: none;
-    box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
+  border-color: #00E0DC;
+  outline: none;
+  box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
 }
-
 .avant .stat-display {
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    font-family: 'Exo 2', sans-serif;
-    font-size: 12px; /* Reduced from 14px */
-    font-weight: 600;
-    padding: 3px 6px; /* Reduced from 4px 8px */
-    border: 1px solid var(--border-primary);
-    width: 50px; /* Reduced from 60px */
-    text-align: center;
+  background: #1C1C1C;
+  color: #FFFFFF;
+  font-family: "Exo 2", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #FFFFFF;
+  padding: 3px 6px;
+  border: 1px solid #404040;
+  width: 50px;
+  text-align: center;
 }
-
-/* Abilities in Sidebar - Updated layout */
 .avant .sidebar-abilities {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px; /* Reduced from 10px */
-    margin-bottom: 15px; /* Reduced from 20px */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 15px;
 }
-
 .avant .sidebar-ability {
-    background: var(--bg-tertiary);
-    padding: 8px; /* Reduced from 12px */
-    border: 1px solid var(--border-primary);
-    text-align: center;
-    transition: all 0.3s ease;
-    /* Removed hover effects as requested */
+  background: #333333;
+  padding: 8px;
+  border: 1px solid #404040;
+  text-align: center;
+  transition: all 0.3s ease;
 }
-
 .avant .sidebar-ability label {
-    display: block;
-    font-family: 'Orbitron', monospace;
-    font-size: 10px; /* Increased from 8px as requested */
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-secondary);
-    margin-bottom: 6px; /* Increased from 4px */
+  display: block;
+  font-family: "Orbitron", monospace;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  letter-spacing: 0.5px;
+  color: #BFBFBF;
+  margin-bottom: 6px;
 }
-
-/* New ability input row layout */
-.avant .ability-input-row {
-    display: flex;
-    gap: 4px;
-    align-items: center;
-}
-
 .avant .sidebar-ability input {
-    background: var(--bg-primary);
-    border: 1px solid var(--border-primary);
-    color: var(--text-primary);
-    font-family: 'Exo 2', sans-serif;
-    font-size: 12px; /* Reduced from 14px */
-    font-weight: 600;
-    padding: 3px 6px; /* Reduced from 4px 8px */
-    border-radius: 0;
-    flex: 1;
-    text-align: center;
-    transition: all 0.3s ease;
+  background: #1C1C1C;
+  border: 1px solid #404040;
+  color: #FFFFFF;
+  font-family: "Exo 2", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #FFFFFF;
+  padding: 3px 6px;
+  border-radius: 0;
+  flex: 1;
+  text-align: center;
+  transition: all 0.3s ease;
 }
-
 .avant .sidebar-ability input:focus {
-    border-color: var(--accent-cyan);
-    outline: none;
-    box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
+  border-color: #00E0DC;
+  outline: none;
+  box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
 }
-
+.avant .ability-input-row {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
 .avant .sidebar-ability-mod {
-    background: var(--bg-primary);
-    color: var(--accent-cyan);
-    font-family: 'Orbitron', monospace;
-    font-size: 10px;
-    font-weight: 700;
-    padding: 4px 6px;
-    border: 1px solid var(--accent-cyan);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-align: center;
-    width: 40px; /* Fixed width for consistency */
-    flex-shrink: 0;
+  background: #1C1C1C;
+  color: #00E0DC;
+  font-family: "Orbitron", monospace;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  padding: 4px 6px;
+  border: 1px solid #00E0DC;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  width: 40px;
+  flex-shrink: 0;
 }
-
 .avant .sidebar-ability-mod:hover {
-    background: var(--accent-cyan);
-    color: var(--bg-primary);
+  background: #00E0DC;
+  color: #1C1C1C;
 }
-
-/* Main Content Area - Proper flexbox layout for tab structure */
 .avant .main-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 0; /* Allow flexbox to shrink */
-    overflow: hidden; /* Prevent main content scrolling */
-    /* This takes remaining width after sidebar */
-    /* Height is constrained by sheet-content container */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
 }
-
-/* Navigation Tabs - More compact */
 .avant .sheet-tabs {
-    background: var(--bg-secondary);
-    border-bottom: 2px solid var(--accent-cyan);
-    padding: 0;
-    margin: 0;
-    display: flex;
-    border-radius: 0;
-    flex-shrink: 0; /* Prevent tabs from shrinking */
-    z-index: 40;
+  background: #2A2A2A;
+  border-bottom: 2px solid #00E0DC;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  border-radius: 0;
+  flex-shrink: 0;
+  z-index: 40;
 }
-
 .avant .sheet-tabs .item {
-    background: transparent;
-    border: none;
-    border-bottom: 2px solid transparent;
-    color: var(--text-secondary);
-    font-family: 'Orbitron', monospace;
-    font-weight: 600;
-    font-size: 10px; /* Reduced from 11px */
-    padding: 8px 12px; /* Reduced from 12px 20px */
-    text-decoration: none;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #BFBFBF;
+  font-family: "Orbitron", monospace;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  padding: 8px 12px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  letter-spacing: 1px;
 }
-
 .avant .sheet-tabs .item:hover {
-    background: rgba(0, 224, 220, 0.1);
-    color: var(--accent-cyan);
+  background: rgba(0, 224, 220, 0.1);
+  color: #00E0DC;
 }
-
 .avant .sheet-tabs .item.active {
-    background: var(--bg-primary);
-    border-bottom-color: var(--accent-cyan);
-    color: var(--text-primary);
-    box-shadow: 0 -3px 10px rgba(0, 224, 220, 0.2);
+  background: #1C1C1C;
+  border-bottom-color: #00E0DC;
+  color: #FFFFFF;
+  box-shadow: 0 -3px 10px rgba(0, 224, 220, 0.2);
 }
-
-/* ITEM SHEET SPECIFIC TAB STYLING - More compact for smaller windows */
 .avant.sheet.item .sheet-tabs {
-    background: var(--bg-secondary) !important;
-    border-bottom: 2px solid var(--accent-cyan) !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    display: flex !important;
-    border-radius: 0 !important;
-    flex-shrink: 0 !important; /* Prevent tabs from shrinking */
-    z-index: 40 !important;
-    height: 32px !important; /* Force compact height */
-    max-height: 32px !important;
-    min-height: 32px !important;
-    overflow: hidden !important;
+  background: #2A2A2A !important;
+  border-bottom: 2px solid #00E0DC !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  border-radius: 0 !important;
+  flex-shrink: 0 !important;
+  z-index: 40 !important;
+  height: 32px !important;
+  max-height: 32px !important;
+  min-height: 32px !important;
+  overflow: hidden !important;
 }
-
 .avant.sheet.item .sheet-tabs .item {
-    background: transparent !important;
-    border: none !important;
-    border-bottom: 2px solid transparent !important;
-    color: var(--text-secondary) !important;
-    font-family: 'Orbitron', monospace !important;
-    font-weight: 600 !important;
-    font-size: 9px !important; /* Force smaller font for item sheets */
-    padding: 6px 10px !important; /* More compact padding */
-    text-decoration: none !important;
-    transition: all 0.3s ease !important;
-    cursor: pointer !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.5px !important; /* Reduced letter spacing */
-    line-height: 1 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    height: 32px !important; /* Match tab container height */
-    min-width: 60px !important; /* Minimum width for readability */
-    flex: 1 !important; /* Equal width distribution */
-    box-sizing: border-box !important;
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 2px solid transparent !important;
+  color: #BFBFBF !important;
+  font-family: "Orbitron", monospace;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  letter-spacing: 0.5px !important;
+  padding: 6px 10px !important;
+  text-decoration: none !important;
+  transition: all 0.3s ease;
+  cursor: pointer !important;
+  line-height: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 32px !important;
+  min-width: 60px !important;
+  flex: 1 !important;
+  box-sizing: border-box !important;
 }
-
 .avant.sheet.item .sheet-tabs .item:hover {
-    background: rgba(0, 224, 220, 0.1) !important;
-    color: var(--accent-cyan) !important;
+  background: rgba(0, 224, 220, 0.1) !important;
+  color: #00E0DC !important;
 }
-
 .avant.sheet.item .sheet-tabs .item.active {
-    background: var(--bg-primary) !important;
-    border-bottom-color: var(--accent-cyan) !important;
-    color: var(--text-primary) !important;
-    box-shadow: 0 -2px 8px rgba(0, 224, 220, 0.2) !important; /* Smaller shadow for item sheets */
+  background: #1C1C1C !important;
+  border-bottom-color: #00E0DC !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 -2px 8px rgba(0, 224, 220, 0.2) !important;
 }
-
-/* ITEM SHEET BODY - Adjust for compact tabs */
 .avant.sheet.item .sheet-body {
-    background: var(--bg-primary);
-    padding: 15px; /* Reduced padding for item sheets */
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    min-height: 0;
-    /* Account for the compact 32px tab height */
+  background: #1C1C1C;
+  padding: 15px;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
 }
-
-/* ITEM SHEET TAB CONTENT - Ensure proper visibility */
 .avant.sheet.item .tab {
-    display: none;
+  display: none;
 }
-
 .avant.sheet.item .tab.active {
-    display: block;
+  display: block;
 }
-
-/* ITEM SHEET FORM ELEMENTS - More compact for smaller space */
 .avant.sheet.item .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 4px; /* Reduced gap for item sheets */
-    margin-bottom: 12px; /* Reduced margin */
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
 }
-
 .avant.sheet.item .form-group label {
-    font-family: 'Orbitron', monospace;
-    font-size: 9px; /* Smaller labels for item sheets */
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--accent-cyan);
+  font-family: "Orbitron", monospace;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  letter-spacing: 0.5px;
 }
-
 .avant.sheet.item .form-group input,
 .avant.sheet.item .form-group select,
 .avant.sheet.item .form-group textarea {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-primary);
-    color: var(--text-primary);
-    font-family: 'Exo 2', sans-serif;
-    font-size: 11px; /* Smaller text for item sheets */
-    padding: 6px 10px; /* Reduced padding */
-    border-radius: 0;
-    transition: all 0.3s ease;
+  background: #333333;
+  border: 1px solid #404040;
+  color: #FFFFFF;
+  font-family: "Exo 2", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  border-radius: 0;
+  transition: all 0.3s ease;
+  box-sizing: border-box !important;
+  font-family: "Exo 2", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #FFFFFF;
+  padding: 6px 10px;
 }
-
 .avant.sheet.item .form-group input:focus,
 .avant.sheet.item .form-group select:focus,
 .avant.sheet.item .form-group textarea:focus {
-    background: var(--bg-primary);
-    border-color: var(--accent-cyan);
-    outline: none;
-    box-shadow: inset 0 0 8px rgba(0, 224, 220, 0.2);
+  background: #1C1C1C;
+  border-color: #00E0DC;
+  outline: none;
+  box-shadow: inset 0 0 10px rgba(0, 224, 220, 0.2);
 }
-
-/* ITEM SHEET WINDOW - Ensure proper sizing */
 .avant.sheet.item .window-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    /* Item sheets are smaller (520x480), so content needs to be more compact */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
-
-/* ITEM SHEET HEADER - More compact for smaller windows */
 .avant.sheet.item .sheet-header {
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-    padding: 8px 12px; /* More compact padding */
-    border-bottom: 1px solid var(--accent-cyan); /* Thinner border */
-    display: flex;
-    align-items: center;
-    gap: 10px; /* Reduced gap */
-    position: relative;
-    height: 50px; /* Reduced height for item sheets */
-    max-height: 50px;
-    min-height: 50px;
-    flex-shrink: 0;
-    z-index: 10;
+  background: #2A2A2A;
+  color: #FFFFFF;
+  padding: 8px 12px;
+  border-bottom: 1px solid #00E0DC;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  height: 50px;
+  max-height: 50px;
+  min-height: 50px;
+  flex-shrink: 0;
+  z-index: 10;
 }
-
 .avant.sheet.item .profile-img {
-    border: 1px solid var(--accent-cyan); /* Thinner border */
-    border-radius: 0;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: var(--shadow-accent);
-    width: 32px; /* Smaller for item sheets */
-    height: 32px;
-    flex-shrink: 0;
+  border: 1px solid #00E0DC;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 20px rgba(0, 224, 220, 0.3);
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
 }
-
 .avant.sheet.item .charname {
-    margin: 0;
-    font-family: 'Orbitron', monospace;
-    font-size: 14px; /* Smaller for item sheets */
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    text-shadow: 0 0 5px var(--accent-cyan);
+  margin: 0;
+  font-family: "Orbitron", monospace;
+  font-size: 14px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 5px #00E0DC;
 }
-
 .avant.sheet.item .charname input {
-    background: rgba(0, 224, 220, 0.1);
-    border: 1px solid var(--accent-cyan);
-    color: var(--text-primary);
-    font-family: 'Orbitron', monospace;
-    font-size: 14px;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 4px 8px; /* Reduced padding */
-    border-radius: 0;
-    transition: all 0.3s ease;
-    width: 100%;
-    max-width: 250px; /* Smaller max width for item sheets */
+  background: rgba(0, 224, 220, 0.1);
+  border: 1px solid #00E0DC;
+  color: #FFFFFF;
+  font-family: "Orbitron", monospace;
+  font-size: 14px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  letter-spacing: 0.5px;
+  padding: 4px 8px;
+  border-radius: 0;
+  transition: all 0.3s ease;
+  width: 100%;
+  max-width: 250px;
 }
-
 .avant.sheet.item .charname input:focus {
-    background: rgba(0, 224, 220, 0.2);
-    border-color: var(--text-primary);
-    outline: none;
-    box-shadow: 0 0 8px rgba(0, 224, 220, 0.3);
+  background: rgba(0, 224, 220, 0.2);
+  border-color: #FFFFFF;
+  outline: none;
+  box-shadow: 0 0 8px rgba(0, 224, 220, 0.3);
 }
-
-/* Scrollable Content Area - ONLY this element should scroll */
 .avant .sheet-body {
-    background: var(--bg-primary);
-    padding: 20px; /* Reduced from 30px */
-    flex: 1;
-    overflow-y: auto; /* ONLY the tab content should scroll */
-    overflow-x: hidden; /* Prevent horizontal scrolling */
-    min-height: 0; /* Allow flexbox to shrink */
-    /* This is the ONLY scrollable element in the entire window */
-    /* Available height = main-content height - sheet-tabs height */
-    /* When content exceeds this height, this element will scroll */
+  background: #1C1C1C;
+  padding: 20px;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
 }
-
 .avant .tab {
-    display: none;
+  display: none;
 }
-
 .avant .tab.active {
-    display: block;
+  display: block;
 }
-
-/* Character Information Section - More compact */
 .avant .character-info-section {
-    background: var(--bg-secondary);
-    padding: 15px; /* Reduced from 25px */
-    border: 1px solid var(--border-primary);
-    border-left: 4px solid var(--accent-cyan);
-    margin-bottom: 20px; /* Reduced from 30px */
+  background: #2A2A2A;
+  border: 1px solid #404040;
+  border-left: 4px solid #00E0DC;
+  border-radius: 0;
+  padding: 15px;
+  margin-bottom: 20px;
 }
-
 .avant .character-info-section h3 {
-    margin: 0 0 15px 0; /* Reduced from 25px */
-    font-family: 'Orbitron', monospace;
-    font-size: 14px; /* Reduced from 16px */
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--accent-cyan);
-    position: relative;
-    padding-bottom: 8px; /* Reduced from 10px */
+  margin: 0 0 15px 0;
+  font-family: "Orbitron", monospace;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  letter-spacing: 2px;
+  position: relative;
+  padding-bottom: 8px;
 }
-
 .avant .character-info-section h3::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 50px; /* Reduced from 60px */
-    height: 2px;
-    background: var(--gradient-accent);
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50px;
+  height: 2px;
+  background: linear-gradient(135deg, #00E0DC 0%, #4CE2E1 100%);
 }
-
-/* Form Elements - More compact */
 .avant .form-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Reduced from 250px */
-    gap: 15px; /* Reduced from 20px */
-    margin-bottom: 15px; /* Reduced from 20px */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 15px;
 }
-
 .avant .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px; /* Reduced from 8px */
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
-
 .avant .form-group label {
-    font-family: 'Orbitron', monospace;
-    font-size: 10px; /* Reduced from 11px */
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--accent-cyan);
+  font-family: "Orbitron", monospace;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  letter-spacing: 1px;
 }
-
 .avant .form-group input,
 .avant .form-group select,
 .avant .form-group textarea {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-primary);
-    color: var(--text-primary);
-    font-family: 'Exo 2', sans-serif;
-    font-size: 12px; /* Reduced from 14px */
-    padding: 8px 12px; /* Reduced from 12px 16px */
-    border-radius: 0;
-    transition: all 0.3s ease;
+  background: #333333;
+  border: 1px solid #404040;
+  color: #FFFFFF;
+  font-family: "Exo 2", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  border-radius: 0;
+  transition: all 0.3s ease;
+  box-sizing: border-box !important;
+  font-family: "Exo 2", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #FFFFFF;
+  padding: 8px 12px;
 }
-
 .avant .form-group input:focus,
 .avant .form-group select:focus,
 .avant .form-group textarea:focus {
-    background: var(--bg-primary);
-    border-color: var(--accent-cyan);
-    outline: none;
-    box-shadow: inset 0 0 10px rgba(0, 224, 220, 0.2);
+  background: #1C1C1C;
+  border-color: #00E0DC;
+  outline: none;
+  box-shadow: inset 0 0 10px rgba(0, 224, 220, 0.2);
 }
-
-/* Skills Section - 2x2 Grid Layout (like Attributes) */
 .avant .skills-abilities-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px; /* Reduced from 20px */
-    margin-top: 12px; /* Reduced from 20px */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 12px;
 }
-
 .avant .skills-ability-section {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-primary);
-    border-left: 4px solid var(--accent-cyan);
-    padding: 8px; /* Reduced from 15px */
-    border-radius: 0;
+  background: #333333;
+  border: 1px solid #404040;
+  border-left: 4px solid #00E0DC;
+  padding: 8px;
+  border-radius: 0;
 }
-
 .avant .skills-ability-header {
-    font-family: 'Orbitron', monospace;
-    font-size: 12px; /* Reduced from 14px */
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--accent-cyan);
-    margin: 0 0 8px 0; /* Reduced from 15px */
-    padding-bottom: 4px; /* Reduced from 8px */
-    border-bottom: 1px solid var(--border-primary);
-    position: relative;
+  font-family: "Orbitron", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  letter-spacing: 1px;
+  margin: 0 0 8px 0;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #404040;
+  position: relative;
 }
-
 .avant .skills-ability-header::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 30px; /* Reduced from 40px */
-    height: 2px;
-    background: var(--gradient-accent);
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 30px;
+  height: 2px;
+  background: linear-gradient(135deg, #00E0DC 0%, #4CE2E1 100%);
 }
-
 .avant .skills-ability-list {
-    display: flex;
-    flex-direction: column;
-    gap: 4px; /* Reduced from 8px */
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
-
 .avant .skill-tile {
-    background: var(--bg-primary);
-    border: 1px solid var(--border-primary);
-    padding: 6px; /* Reduced from 10px */
-    display: grid;
-    grid-template-columns: 1fr 45px 45px; /* Reduced from 60px */
-    align-items: center;
-    gap: 6px; /* Reduced from 8px */
-    transition: all 0.3s ease;
-    position: relative;
-    min-height: 32px; /* Reduced for compactness */
+  background: #1C1C1C;
+  border: 1px solid #404040;
+  padding: 6px;
+  display: grid;
+  grid-template-columns: 1fr 45px 45px;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+  position: relative;
+  min-height: 32px;
 }
-
 .avant .skill-tile:hover {
-    background: var(--bg-secondary);
-    border-color: var(--accent-cyan);
+  background: #2A2A2A;
+  border-color: #00E0DC;
 }
-
 .avant .skill-tile::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 3px;
-    background: var(--gradient-accent);
-    transform: scaleX(0);
-    transition: transform 0.3s ease;
-    transform-origin: left;
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: linear-gradient(135deg, #00E0DC 0%, #4CE2E1 100%);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+  transform-origin: left;
 }
-
 .avant .skill-tile:hover::before {
-    transform: scaleX(1);
+  transform: scaleX(1);
 }
-
 .avant .skill-tile label {
-    font-family: 'Orbitron', monospace;
-    font-size: 9px; /* Reduced from 11px */
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px; /* Reduced from 1px */
-    color: var(--text-secondary);
-    margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  font-family: "Orbitron", monospace;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  letter-spacing: 0.5px;
+  color: #BFBFBF;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-
 .avant .skill-tile input {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-primary);
-    color: var(--text-primary);
-    font-family: 'Exo 2', sans-serif;
-    font-size: 12px; /* Reduced from 14px */
-    font-weight: 600;
-    padding: 3px 4px; /* Reduced from 6px 8px */
-    border-radius: 0;
-    width: 100%;
-    text-align: center;
-    transition: all 0.3s ease;
+  background: #333333;
+  border: 1px solid #404040;
+  color: #FFFFFF;
+  font-family: "Exo 2", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #FFFFFF;
+  padding: 3px 4px;
+  border-radius: 0;
+  width: 100%;
+  text-align: center;
+  transition: all 0.3s ease;
 }
-
 .avant .skill-tile input:focus {
-    border-color: var(--accent-cyan);
-    outline: none;
-    box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
+  border-color: #00E0DC;
+  outline: none;
+  box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
 }
-
 .avant .skill-tile .skill-roll {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--accent-cyan);
-    color: var(--accent-cyan);
-    font-family: 'Orbitron', monospace;
-    font-size: 7px; /* Reduced from 9px */
-    font-weight: 700;
-    padding: 3px 4px; /* Reduced from 6px 8px */
-    border-radius: 0;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    white-space: nowrap;
-    width: 100%;
+  background: #333333;
+  border: 1px solid #00E0DC;
+  color: #00E0DC;
+  font-family: "Orbitron", monospace;
+  font-size: 7px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  padding: 3px 4px;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  width: 100%;
 }
-
 .avant .skill-tile .skill-roll:hover {
-    background: var(--accent-cyan);
-    color: var(--bg-primary);
-    box-shadow: 0 0 10px rgba(0, 224, 220, 0.5);
+  background: #00E0DC;
+  color: #1C1C1C;
+  box-shadow: 0 0 10px rgba(0, 224, 220, 0.5);
 }
-
-/* Skills Section - More compact */
 .avant .skills-section {
-    background: var(--bg-secondary);
-    padding: 10px; /* Reduced from 15px */
-    border: 1px solid var(--border-primary);
-    border-left: 4px solid var(--accent-cyan);
-    margin-bottom: 15px; /* Reduced from 20px */
+  background: #2A2A2A;
+  border: 1px solid #404040;
+  border-left: 4px solid #00E0DC;
+  border-radius: 0;
+  padding: 10px;
+  margin-bottom: 15px;
 }
-
 .avant .skills-section h3 {
-    margin: 0 0 10px 0; /* Reduced from 15px */
-    font-family: 'Orbitron', monospace;
-    font-size: 12px; /* Reduced from 14px */
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--accent-cyan);
-    position: relative;
-    padding-bottom: 6px; /* Reduced from 8px */
+  margin: 0 0 10px 0;
+  font-family: "Orbitron", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  letter-spacing: 2px;
+  position: relative;
+  padding-bottom: 6px;
 }
-
 .avant .skills-section h3::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 40px; /* Reduced from 50px */
-    height: 2px;
-    background: var(--gradient-accent);
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(135deg, #00E0DC 0%, #4CE2E1 100%);
 }
-
-/* Skill Groups */
 .avant .skill-group {
-    margin-bottom: 25px;
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-primary);
-    border-radius: 0;
-    overflow: hidden;
+  margin-bottom: 25px;
+  background: #333333;
+  border: 1px solid #404040;
+  border-radius: 0;
+  overflow: hidden;
 }
-
 .avant .skill-group-header {
-    background: var(--bg-primary);
-    color: var(--accent-cyan);
-    font-family: 'Orbitron', monospace;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin: 0;
-    padding: 10px 15px;
-    border-bottom: 1px solid var(--border-primary);
-    position: relative;
+  background: #1C1C1C;
+  color: #00E0DC;
+  font-family: "Orbitron", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  letter-spacing: 1px;
+  margin: 0;
+  padding: 10px 15px;
+  border-bottom: 1px solid #404040;
+  position: relative;
 }
-
 .avant .skill-group-header::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: var(--gradient-accent);
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(135deg, #00E0DC 0%, #4CE2E1 100%);
 }
-
 .avant .skills-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 0;
-    padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0;
+  padding: 0;
 }
-
 .avant .skill {
-    background: var(--bg-tertiary);
-    padding: 12px 15px;
-    border-bottom: 1px solid var(--border-primary);
-    border-right: 1px solid var(--border-primary);
-    display: grid;
-    grid-template-columns: 1fr 60px 60px;
-    align-items: center;
-    gap: 10px;
-    transition: all 0.3s ease;
-    position: relative;
-    min-height: 50px;
+  background: #333333;
+  padding: 12px 15px;
+  border-bottom: 1px solid #404040;
+  border-right: 1px solid #404040;
+  display: grid;
+  grid-template-columns: 1fr 60px 60px;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  position: relative;
+  min-height: 50px;
 }
-
 .avant .skill:last-child {
-    border-bottom: none;
+  border-bottom: none;
 }
-
 .avant .skill::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: var(--gradient-accent);
-    transform: scaleY(0);
-    transition: transform 0.3s ease;
-    transform-origin: bottom;
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(135deg, #00E0DC 0%, #4CE2E1 100%);
+  transform: scaleY(0);
+  transition: transform 0.3s ease;
+  transform-origin: bottom;
 }
-
 .avant .skill:hover {
-    background: var(--bg-primary);
+  background: #1C1C1C;
 }
-
 .avant .skill:hover::before {
-    transform: scaleY(1);
+  transform: scaleY(1);
 }
-
 .avant .skill label {
-    font-family: 'Orbitron', monospace;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--text-secondary);
-    margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  font-family: "Orbitron", monospace;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  letter-spacing: 1px;
+  color: #BFBFBF;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-
 .avant .skill input {
-    background: var(--bg-primary);
-    border: 1px solid var(--border-primary);
-    color: var(--text-primary);
-    font-family: 'Exo 2', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    padding: 6px 8px;
-    border-radius: 0;
-    width: 100%;
-    text-align: center;
-    transition: all 0.3s ease;
+  background: #1C1C1C;
+  border: 1px solid #404040;
+  color: #FFFFFF;
+  font-family: "Exo 2", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #FFFFFF;
+  padding: 6px 8px;
+  border-radius: 0;
+  width: 100%;
+  text-align: center;
+  transition: all 0.3s ease;
 }
-
 .avant .skill input:focus {
-    border-color: var(--accent-cyan);
-    outline: none;
-    box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
+  border-color: #00E0DC;
+  outline: none;
+  box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
 }
-
 .avant .skill-roll {
-    background: var(--bg-primary);
-    border: 1px solid var(--accent-cyan);
-    color: var(--accent-cyan);
-    font-family: 'Orbitron', monospace;
-    font-size: 9px;
-    font-weight: 700;
-    padding: 6px 8px;
-    border-radius: 0;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    white-space: nowrap;
-    width: 100%;
+  background: #1C1C1C;
+  border: 1px solid #00E0DC;
+  color: #00E0DC;
+  font-family: "Orbitron", monospace;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  padding: 6px 8px;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  width: 100%;
 }
-
 .avant .skill-roll:hover {
-    background: var(--accent-cyan);
-    color: var(--bg-primary);
-    box-shadow: 0 0 10px rgba(0, 224, 220, 0.5);
+  background: #00E0DC;
+  color: #1C1C1C;
+  box-shadow: 0 0 10px rgba(0, 224, 220, 0.5);
 }
-
-/* Items and Lists - Compact styling */
 .avant .items-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px; /* Reduced from 20px */
-    padding-bottom: 8px; /* Reduced from 15px */
-    border-bottom: 1px solid var(--border-primary); /* Thinner border */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #404040;
 }
-
 .avant .items-header h3 {
-    margin: 0;
-    font-family: 'Orbitron', monospace;
-    font-size: 13px; /* Reduced from 16px */
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px; /* Reduced from 2px */
-    color: var(--accent-cyan);
+  margin: 0;
+  font-family: "Orbitron", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  letter-spacing: 1px;
 }
-
 .avant .item-create {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--accent-cyan);
-    color: var(--accent-cyan);
-    font-family: 'Orbitron', monospace;
-    font-size: 9px; /* Reduced from 10px */
-    font-weight: 600;
-    padding: 3px 6px; /* Reduced from 4px 8px */
-    border-radius: 0;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    width: auto;
-    min-width: 60px; /* Reduced from 100px */
-    max-width: 80px; /* Reduced from 140px */
-    text-align: center;
+  background: #333333;
+  border: 1px solid #00E0DC;
+  color: #00E0DC;
+  font-family: "Orbitron", monospace;
+  font-weight: 600;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: "Orbitron", monospace;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  padding: 3px 6px;
+  letter-spacing: 0.5px;
+  width: auto;
+  min-width: 60px;
+  max-width: 80px;
+  text-align: center;
 }
-
 .avant .item-create:hover {
-    background: var(--accent-cyan);
-    color: var(--bg-primary);
-    box-shadow: 0 0 10px rgba(0, 224, 220, 0.3); /* Reduced glow */
+  background: #00E0DC;
+  color: #1C1C1C;
+  box-shadow: 0 0 15px rgba(0, 224, 220, 0.5);
 }
-
+.avant .item-create:hover {
+  box-shadow: 0 0 10px rgba(0, 224, 220, 0.3);
+}
 .avant .items-list {
-    display: flex;
-    flex-direction: column;
-    gap: 4px; /* Reduced from 10px */
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
-
 .avant .item {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-primary);
-    border-left: 2px solid var(--accent-cyan); /* Thinner accent border */
-    padding: 8px 12px; /* Reduced from 15px */
-    display: flex;
-    align-items: center;
-    gap: 12px; /* Reduced from 15px */
-    transition: all 0.3s ease;
-    min-height: 36px; /* Reduced from default */
+  background: #333333;
+  border: 1px solid #404040;
+  border-left: 2px solid #00E0DC;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+  min-height: 36px;
 }
-
 .avant .item:hover {
-    background: var(--bg-secondary);
-    box-shadow: var(--shadow-primary);
+  background: #2A2A2A;
+  box-shadow: 0 4px 20px rgba(0, 224, 220, 0.1);
 }
-
 .avant .item-name {
-    flex: 1;
-    font-family: 'Exo 2', sans-serif;
-    font-size: 13px; /* Reduced from 14px */
-    font-weight: 600;
-    color: var(--text-primary);
-    cursor: pointer;
-    transition: color 0.3s ease;
+  flex: 1;
+  font-family: "Exo 2", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
-
 .avant .item-name:hover {
-    color: var(--accent-cyan);
+  color: #00E0DC;
 }
-
 .avant .item-controls {
-    display: flex;
-    gap: 4px; /* Reduced from 8px */
-    align-items: center;
-    flex-direction: column; /* Stack vertically as requested */
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  flex-direction: column;
 }
-
-/* Compact icon-only edit/delete buttons */
-.avant .item-control.item-edit,
-.avant .item-control.item-delete {
-    background: transparent;
-    border: none;
-    color: var(--text-secondary);
-    font-size: 12px; /* Small icon size */
-    padding: 2px; /* Minimal padding */
-    border-radius: 0;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    width: 16px; /* Fixed small width */
-    height: 16px; /* Fixed small height */
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.avant .item-control.item-edit, .avant .item-control.item-delete {
+  background: transparent;
+  border: none;
+  color: #BFBFBF;
+  font-size: 12px;
+  padding: 2px;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-
 .avant .item-control.item-edit:hover {
-    color: var(--aqua-muted);
-    background: rgba(76, 226, 225, 0.1); /* Subtle background highlight */
+  color: #4CE2E1;
+  background: rgba(76, 226, 225, 0.1);
 }
-
 .avant .item-control.item-delete:hover {
-    color: #ff4757;
-    background: rgba(255, 71, 87, 0.1); /* Subtle background highlight */
+  color: #ff4757;
+  background: rgba(255, 71, 87, 0.1);
 }
-
-/* Keep other item controls (attack, damage, etc.) as buttons */
 .avant .item-control:not(.item-edit):not(.item-delete) {
-    background: var(--bg-primary);
-    border: 1px solid var(--border-primary);
-    color: var(--text-secondary);
-    font-size: 10px; /* Reduced from 12px */
-    padding: 4px 6px; /* Reduced from 6px 10px */
-    border-radius: 0;
-    cursor: pointer;
-    transition: all 0.3s ease;
+  background: #1C1C1C;
+  border: 1px solid #404040;
+  color: #BFBFBF;
+  font-size: 10px;
+  padding: 4px 6px;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
-
 .avant .attack-roll:hover,
 .avant .damage-roll:hover {
-    border-color: var(--accent-cyan);
-    color: var(--accent-cyan);
+  border-color: #00E0DC;
+  color: #00E0DC;
 }
-
-/* Item details - more compact */
 .avant .item-details {
-    display: flex;
-    gap: 8px; /* Reduced from 15px */
-    margin: 4px 0; /* Reduced from 8px 0 */
-    font-size: 10px; /* Reduced from 11px */
-    color: var(--text-secondary);
+  display: flex;
+  gap: 8px;
+  margin: 4px 0;
+  font-size: 10px;
+  color: #BFBFBF;
 }
-
 .avant .item-threshold,
 .avant .item-damage,
 .avant .item-armor-class,
 .avant .item-property {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--accent-cyan);
-    color: var(--accent-cyan);
-    padding: 2px 4px; /* Reduced from 4px 8px */
-    border-radius: 0;
-    font-family: 'Orbitron', monospace;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-size: 8px; /* Reduced font size */
+  background: #333333;
+  border: 1px solid #00E0DC;
+  color: #00E0DC;
+  padding: 2px 4px;
+  border-radius: 0;
+  font-family: "Orbitron", monospace;
+  font-size: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  letter-spacing: 0.5px;
 }
-
-.avant .item-damage,
-.avant .item-armor-class {
-    border-color: var(--aqua-muted);
-    color: var(--aqua-muted);
-}
-
 .avant .item-threshold:hover,
 .avant .item-damage:hover,
 .avant .item-armor-class:hover,
 .avant .item-property:hover {
-    background: var(--bg-primary);
-    box-shadow: 0 0 5px rgba(0, 224, 220, 0.2); /* Reduced glow */
+  background: #1C1C1C;
+  box-shadow: 0 0 5px rgba(0, 224, 220, 0.2);
 }
-
-/* Buttons and Interactive Elements */
+.avant .item-damage,
+.avant .item-armor-class {
+  border-color: #4CE2E1;
+  color: #4CE2E1;
+}
 .avant button,
 .avant .rollable {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--accent-cyan);
-    color: var(--accent-cyan);
-    font-family: 'Orbitron', monospace;
-    font-size: 10px;
-    font-weight: 600;
-    padding: 6px 12px;
-    border-radius: 0;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+  background: #333333;
+  border: 1px solid #00E0DC;
+  color: #00E0DC;
+  font-family: "Orbitron", monospace;
+  font-weight: 600;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 10px;
+  padding: 6px 12px;
+  letter-spacing: 0.5px;
 }
-
 .avant button:hover,
 .avant .rollable:hover {
-    background: var(--accent-cyan);
-    color: var(--bg-primary);
-    box-shadow: 0 0 15px rgba(0, 224, 220, 0.5);
+  background: #00E0DC;
+  color: #1C1C1C;
+  box-shadow: 0 0 15px rgba(0, 224, 220, 0.5);
 }
-
 .avant .power-point-use {
-    background: var(--bg-primary);
-    border: 1px solid var(--aqua-muted);
-    color: var(--aqua-muted);
-    font-family: 'Orbitron', monospace;
-    font-size: 9px;
-    font-weight: 600;
-    padding: 4px 8px;
-    border-radius: 0;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
+  background: #1C1C1C;
+  border: 1px solid #4CE2E1;
+  color: #4CE2E1;
+  font-family: "Orbitron", monospace;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  padding: 4px 8px;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
-
 .avant .power-point-use:hover {
-    background: var(--aqua-muted);
-    color: var(--bg-primary);
-    box-shadow: 0 0 10px rgba(76, 226, 225, 0.5);
+  background: #4CE2E1;
+  color: #1C1C1C;
+  box-shadow: 0 0 10px rgba(76, 226, 225, 0.5);
 }
-
-/* Focus States */
 .avant *:focus {
-    outline: 2px solid var(--accent-cyan);
-    outline-offset: 2px;
+  outline: 2px solid #00E0DC;
+  outline-offset: 2px;
 }
-
-/* Responsive Design */
-@media (max-width: 1024px) {
-    .avant .window-app {
-        width: 100% !important;
-        height: 100% !important;
-    }
-    
-    .avant .stats-sidebar {
-        width: 240px;
-    }
-    
-    .avant .main-content {
-        margin-left: 240px;
-    }
-    
-    .avant .sheet-tabs .item {
-        padding: 10px 16px;
-        font-size: 10px;
-    }
-}
-
-@media (max-width: 768px) {
-    .avant .stats-sidebar {
-        width: 200px;
-    }
-    
-    .avant .main-content {
-        margin-left: 200px;
-    }
-    
-    .avant .sidebar-abilities {
-        grid-template-columns: 1fr;
-    }
-    
-    .avant .sheet-tabs {
-        flex-wrap: wrap;
-    }
-    
-    .avant .sheet-tabs .item {
-        flex: 1;
-        min-width: 100px;
-        padding: 8px 12px;
-        font-size: 9px;
-    }
-}
-
-/* Print Styles */
-@media print {
-    .avant {
-        background: white;
-        color: black;
-        box-shadow: none;
-    }
-    
-    .avant .sheet-header {
-        background: white;
-        color: black;
-        border-bottom: 2px solid black;
-    }
-    
-    .avant .sheet-tabs {
-        display: none;
-    }
-    
-    .avant .tab {
-        display: block !important;
-    }
-    
-    .avant .item-controls {
-        display: none;
-    }
-}
-
-/* Additional Sections - More compact */
 .avant .features-container,
 .avant .talents-container,
 .avant .gear-section {
-    background: var(--bg-secondary);
-    padding: 15px; /* Reduced from 25px */
-    border: 1px solid var(--border-primary);
-    border-left: 4px solid var(--accent-cyan);
-    margin-bottom: 20px; /* Reduced from 30px */
+  background: #2A2A2A;
+  border: 1px solid #404040;
+  border-left: 4px solid #00E0DC;
+  border-radius: 0;
+  padding: 15px;
+  margin-bottom: 20px;
 }
-
-/* Gear Subsection Spacing */
 .avant .gear-subsection {
-    margin-bottom: 30px; /* Add spacing between subsections */
-    padding: 15px;
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-primary);
-    border-radius: 0;
+  margin-bottom: 30px;
+  padding: 15px;
+  background: #333333;
+  border: 1px solid #404040;
+  border-radius: 0;
 }
-
 .avant .gear-subsection:last-child {
-    margin-bottom: 0; /* Remove margin from last subsection */
+  margin-bottom: 0;
 }
-
 .avant .expertise-section {
-    background: var(--bg-tertiary);
-    padding: 15px; /* Reduced from 20px */
-    border: 1px solid var(--border-primary);
-    border-top: 3px solid var(--aqua-muted);
-    margin-bottom: 15px; /* Reduced from 20px */
+  background: #333333;
+  padding: 15px;
+  border: 1px solid #404040;
+  border-top: 3px solid #4CE2E1;
+  margin-bottom: 15px;
 }
-
 .avant .expertise-section h3 {
-    margin: 0 0 15px 0; /* Reduced from 20px */
-    font-family: 'Orbitron', monospace;
-    font-size: 13px; /* Reduced from 14px */
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--aqua-muted);
+  margin: 0 0 15px 0;
+  font-family: "Orbitron", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  letter-spacing: 2px;
+  color: #4CE2E1;
 }
-
-/* Biography and Notes */
 .avant .form-group textarea {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-primary);
-    color: var(--text-primary);
-    font-family: 'Exo 2', sans-serif;
-    font-size: 14px;
-    padding: 16px;
-    border-radius: 0;
-    min-height: 120px;
-    resize: vertical;
-    transition: all 0.3s ease;
+  background: #333333;
+  border: 1px solid #404040;
+  color: #FFFFFF;
+  font-family: "Exo 2", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  border-radius: 0;
+  transition: all 0.3s ease;
+  box-sizing: border-box !important;
+  font-family: "Exo 2", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #FFFFFF;
+  padding: 16px;
+  min-height: 120px;
+  resize: vertical;
 }
-
 .avant .form-group textarea:focus {
-    background: var(--bg-primary);
-    border-color: var(--accent-cyan);
-    outline: none;
-    box-shadow: inset 0 0 10px rgba(0, 224, 220, 0.2);
+  background: #1C1C1C;
+  border-color: #00E0DC;
+  outline: none;
+  box-shadow: inset 0 0 10px rgba(0, 224, 220, 0.2);
 }
-
-/* Hide original resource sections that are now in sidebar */
 .avant .resource-row,
 .avant .defense-hp-section,
 .avant .power-points-section,
 .avant .abilities-section {
-    display: none;
+  display: none;
 }
-
-/* Combat Section Redesign */
 .avant .combat-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 12px;
-    margin-bottom: 8px;
-    background: var(--bg-primary);
-    border: 1px solid var(--border-primary);
-    transition: all 0.3s ease;
-    min-height: 60px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: #1C1C1C;
+  border: 1px solid #404040;
+  transition: all 0.3s ease;
+  min-height: 60px;
 }
-
 .avant .combat-item:hover {
-    background: var(--bg-secondary);
-    box-shadow: var(--shadow-primary);
+  background: #2A2A2A;
+  box-shadow: 0 4px 20px rgba(0, 224, 220, 0.1);
 }
-
-/* Combat Action Buttons - Text and icon only, no boxes */
 .avant .combat-item-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    min-width: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 80px;
 }
-
 .avant .combat-action-btn {
-    background: transparent;
-    border: none;
-    color: var(--accent-cyan);
-    font-family: 'Orbitron', monospace;
-    font-size: 12px;
-    font-weight: 700;
-    padding: 8px 24px 8px 4px; /* Added 20px padding-right */
-    border-radius: 0;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 6px;
-    min-height: 36px;
-    width: 100px; /* Increased from 80px to accommodate padding */
-    justify-content: flex-start;
+  background: transparent;
+  border: none;
+  color: #00E0DC;
+  font-family: "Orbitron", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  padding: 8px 24px 8px 4px;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  width: 100px;
+  justify-content: flex-start;
 }
-
 .avant .combat-action-btn i {
-    font-size: 14px;
+  font-size: 14px;
 }
-
 .avant .combat-action-btn:hover {
-    color: var(--text-primary);
-    text-shadow: 0 0 8px var(--accent-cyan);
-    /* Removed transform: translateX(2px); */
+  color: #FFFFFF;
+  text-shadow: 0 0 8px #00E0DC;
 }
-
 .avant .combat-action-btn.armor-roll {
-    color: var(--aqua-muted);
+  color: #4CE2E1;
 }
-
 .avant .combat-action-btn.armor-roll:hover {
-    color: var(--text-primary);
-    text-shadow: 0 0 8px var(--aqua-muted);
+  color: #FFFFFF;
+  text-shadow: 0 0 8px #4CE2E1;
 }
-
-/* Combat Item Content - Full width for proper layout */
 .avant .combat-item-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
-
-/* Combat Item Header - Name in top left */
 .avant .combat-item-header {
-    display: flex;
-    justify-content: flex-start;
-    margin-bottom: 4px;
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 4px;
 }
-
 .avant .combat-item-name {
-    font-family: 'Exo 2', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text-primary);
-    text-align: left;
+  font-family: "Exo 2", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #FFFFFF;
+  text-align: left;
 }
-
-/* Combat Stats Layout - Threshold left, grid right */
 .avant .combat-stats-layout {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
 }
-
-/* Special Threshold Tile - Larger and prominent, no hover */
 .avant .combat-threshold-tile {
-    background: var(--bg-tertiary);
-    border: 2px solid var(--accent-cyan);
-    padding: 12px 16px;
-    border-radius: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    min-height: 60px;
-    justify-content: center;
-    min-width: 80px;
-    flex-shrink: 0;
+  background: #333333;
+  border: 2px solid #00E0DC;
+  padding: 12px 16px;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-height: 60px;
+  justify-content: center;
+  min-width: 80px;
+  flex-shrink: 0;
 }
-
 .avant .combat-threshold-value {
-    font-family: 'Orbitron', monospace;
-    font-size: 18px;
-    font-weight: 900;
-    color: var(--accent-cyan);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    line-height: 1;
+  font-family: "Orbitron", monospace;
+  font-size: 18px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  color: #00E0DC;
+  letter-spacing: 0.5px;
+  line-height: 1;
 }
-
 .avant .combat-threshold-label {
-    font-family: 'Exo 2', sans-serif;
-    font-size: 9px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    margin-top: 4px;
+  font-family: "Exo 2", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  color: #FFFFFF;
+  color: #BFBFBF;
+  letter-spacing: 0.3px;
+  margin-top: 4px;
 }
-
-/* Combat Stats Grid - Fixed width tiles for consistency, no hover */
 .avant .combat-stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, 80px);
-    gap: 6px;
-    flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 80px);
+  gap: 6px;
+  flex: 1;
 }
-
 .avant .combat-stat-tile {
-    background: var(--bg-tertiary);
-    border: 1px solid var(--accent-cyan);
-    padding: 8px 6px;
-    border-radius: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    min-height: 40px;
-    justify-content: center;
-    width: 80px;
+  background: #333333;
+  border: 1px solid #00E0DC;
+  padding: 8px 6px;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-height: 40px;
+  justify-content: center;
+  width: 80px;
 }
-
 .avant .combat-stat-value {
-    font-family: 'Orbitron', monospace;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--accent-cyan);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    line-height: 1.2;
+  font-family: "Orbitron", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #00E0DC;
+  color: #00E0DC;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
 }
-
 .avant .combat-stat-label {
-    font-family: 'Exo 2', sans-serif;
-    font-size: 8px;
-    font-weight: 500;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    margin-top: 2px;
+  font-family: "Exo 2", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 8px;
+  font-weight: 500;
+  color: #FFFFFF;
+  color: #BFBFBF;
+  letter-spacing: 0.3px;
+  margin-top: 2px;
 }
 
-/* Remove combat item controls styling since they're not used in combat tab */
-
-/* Legacy item styles - keep for other sections */
-
-/* Responsive adjustments for compressed skills grid */
 @media (max-width: 1024px) {
-    .avant .skills-abilities-grid {
-        grid-template-columns: 1fr;
-        gap: 10px; /* Reduced from 15px */
-    }
-    
-    .avant .skill-tile {
-        grid-template-columns: 1fr 40px 40px; /* Reduced from 50px */
-        gap: 4px; /* Reduced from 6px */
-    }
+  .avant .window-app {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .avant .stats-sidebar {
+    width: 240px;
+  }
+  .avant .main-content {
+    margin-left: 240px;
+  }
+  .avant .sheet-tabs .item {
+    padding: 10px 16px;
+    font-size: 10px;
+  }
+  .avant .skills-abilities-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .avant .skill-tile {
+    grid-template-columns: 1fr 40px 40px;
+    gap: 4px;
+  }
+}
+@media (max-width: 768px) {
+  .avant .stats-sidebar {
+    width: 200px;
+  }
+  .avant .main-content {
+    margin-left: 200px;
+  }
+  .avant .sidebar-abilities {
+    grid-template-columns: 1fr;
+  }
+  .avant .sheet-tabs {
+    flex-wrap: wrap;
+  }
+  .avant .sheet-tabs .item {
+    flex: 1;
+    min-width: 100px;
+    padding: 8px 12px;
+    font-size: 9px;
+  }
+  .avant .skill-tile {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    text-align: center;
+  }
+  .avant .skill-tile input,
+  .avant .skill-tile .skill-roll {
+    width: 100%;
+  }
+}
+@media print {
+  .avant {
+    background: white;
+    color: black;
+    box-shadow: none;
+  }
+  .avant .sheet-header {
+    background: white;
+    color: black;
+    border-bottom: 2px solid black;
+  }
+  .avant .sheet-tabs {
+    display: none;
+  }
+  .avant .tab {
+    display: block !important;
+  }
+  .avant .item-controls {
+    display: none;
+  }
 }
 
-@media (max-width: 768px) {
-    .avant .skill-tile {
-        grid-template-columns: 1fr;
-        gap: 6px; /* Reduced from 8px */
-        text-align: center;
-    }
-    
-    .avant .skill-tile input,
-    .avant .skill-tile .skill-roll {
-        width: 100%;
-    }
-}
+/*# sourceMappingURL=avant.css.map */

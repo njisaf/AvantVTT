@@ -1,0 +1,1559 @@
+/* Avant - Futuristic Character Sheet Design */
+/* Neo-Futurist & Minimalist Aesthetic with Cyberpunk Elements */
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap');
+
+// SCSS Variables - Color Palette
+$bg-primary: #1C1C1C;        // Dark charcoal/graphite background
+$text-primary: #FFFFFF;       // White primary text
+$accent-cyan: #00E0DC;        // Bright cyan for emphasis
+$grey-cool: #BFBFBF;          // Cool grey for structural elements
+$aqua-muted: #4CE2E1;         // Softer cyan variant
+$black-pure: #000000;         // Pure black for contrast
+
+// Derived Colors
+$bg-secondary: #2A2A2A;       // Slightly lighter background
+$bg-tertiary: #333333;        // Card/section backgrounds
+$border-primary: #404040;     // Primary borders
+$border-accent: $accent-cyan;
+$text-secondary: $grey-cool;
+$text-muted: #808080;
+
+// Gradients
+$gradient-primary: linear-gradient(135deg, $bg-primary 0%, $bg-secondary 100%);
+$gradient-accent: linear-gradient(135deg, $accent-cyan 0%, $aqua-muted 100%);
+
+// Shadows
+$shadow-primary: 0 4px 20px rgba(0, 224, 220, 0.1);
+$shadow-accent: 0 0 20px rgba(0, 224, 220, 0.3);
+$shadow-deep: 0 8px 32px rgba(0, 0, 0, 0.6);
+
+// Typography
+$font-primary: 'Exo 2', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+$font-display: 'Orbitron', monospace;
+
+// Spacing
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 12px;
+$spacing-lg: 15px;
+$spacing-xl: 20px;
+$spacing-xxl: 30px;
+
+// Mixins
+@mixin box-sizing-border-box {
+  box-sizing: border-box !important; // Force box-sizing for v12 compatibility
+}
+
+@mixin transition-standard {
+  transition: all 0.3s ease;
+}
+
+@mixin orbitron-header($size: 12px, $weight: 700) {
+  font-family: $font-display;
+  font-size: $size;
+  font-weight: $weight;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: $accent-cyan;
+}
+
+@mixin exo-body($size: 12px, $weight: 400) {
+  font-family: $font-primary;
+  font-size: $size;
+  font-weight: $weight;
+  color: $text-primary;
+}
+
+@mixin form-input-base {
+  background: $bg-tertiary;
+  border: 1px solid $border-primary;
+  color: $text-primary;
+  font-family: $font-primary;
+  border-radius: 0;
+  @include transition-standard;
+  @include box-sizing-border-box;
+
+  &:focus {
+    background: $bg-primary;
+    border-color: $accent-cyan;
+    outline: none;
+    box-shadow: inset 0 0 10px rgba(0, 224, 220, 0.2);
+  }
+}
+
+@mixin button-base {
+  background: $bg-tertiary;
+  border: 1px solid $accent-cyan;
+  color: $accent-cyan;
+  font-family: $font-display;
+  font-weight: 600;
+  border-radius: 0;
+  cursor: pointer;
+  @include transition-standard;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &:hover {
+    background: $accent-cyan;
+    color: $bg-primary;
+    box-shadow: 0 0 15px rgba(0, 224, 220, 0.5);
+  }
+}
+
+@mixin section-base {
+  background: $bg-secondary;
+  border: 1px solid $border-primary;
+  border-left: 4px solid $accent-cyan;
+  border-radius: 0;
+}
+
+// Main Avant Class with CSS Custom Properties for v12 compatibility
+.avant {
+  // CSS Custom Properties - Maintain for backwards compatibility
+  --bg-primary: #{$bg-primary};
+  --text-primary: #{$text-primary};
+  --accent-cyan: #{$accent-cyan};
+  --grey-cool: #{$grey-cool};
+  --aqua-muted: #{$aqua-muted};
+  --black-pure: #{$black-pure};
+  --bg-secondary: #{$bg-secondary};
+  --bg-tertiary: #{$bg-tertiary};
+  --border-primary: #{$border-primary};
+  --border-accent: #{$border-accent};
+  --text-secondary: #{$text-secondary};
+  --text-muted: #{$text-muted};
+  --gradient-primary: #{$gradient-primary};
+  --gradient-accent: #{$gradient-accent};
+  --shadow-primary: #{$shadow-primary};
+  --shadow-accent: #{$shadow-accent};
+  --shadow-deep: #{$shadow-deep};
+
+  // Base Styling
+  font-family: $font-primary;
+  font-weight: 400;
+  color: $text-primary;
+  background: $bg-primary;
+  border-radius: 0;
+  box-shadow: $shadow-deep;
+  border: 1px solid $border-primary;
+
+  // Global Reset and Base Styling
+  * {
+    @include box-sizing-border-box;
+  }
+
+  input,
+  select,
+  textarea {
+    font-family: inherit;
+    @include box-sizing-border-box;
+  }
+
+  // Window Container - Fixed height with proper border visibility
+  .window-app {
+    background: $bg-primary;
+    border: 2px solid $border-primary;
+    border-radius: 0;
+    box-shadow: $shadow-deep;
+    position: relative;
+    height: 630px; // Fixed height matching the default
+    max-height: 630px; // Prevent growing beyond default
+    overflow: hidden; // Prevent window-level scrolling
+    display: flex;
+    flex-direction: column;
+  }
+
+  // FoundryVTT Window Content - Account for 8px padding and fit within window height
+  .window-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; // Allow flexbox to shrink
+  }
+
+  // FoundryVTT Window Header - Keep functional for dragging and controls
+  .window-header {
+    background: $gradient-primary;
+    border-bottom: 2px solid $accent-cyan;
+    color: $text-primary;
+    @include orbitron-header(700);
+    letter-spacing: 2px;
+    flex-shrink: 0; // Prevent header from shrinking
+  }
+
+  // Custom Sheet Header - Compact and controlled height
+  .sheet-header {
+    background: $bg-secondary;
+    color: $text-primary;
+    padding: 10px $spacing-lg; // Reduced padding
+    border-bottom: 2px solid $accent-cyan;
+    display: flex;
+    align-items: center;
+    gap: $spacing-lg; // Reduced gap
+    position: relative;
+    height: 60px; // Reduced from 80px to 60px
+    max-height: 60px; // Enforce maximum height
+    min-height: 60px; // Enforce minimum height
+    flex-shrink: 0; // Prevent header from shrinking
+    z-index: 10;
+    overflow: hidden; // Prevent content overflow in v12
+    @include box-sizing-border-box;
+  }
+
+  .profile-img {
+    border: 2px solid $accent-cyan;
+    border-radius: 0;
+    cursor: pointer;
+    @include transition-standard;
+    box-shadow: $shadow-accent;
+    width: 40px; // Reduced from 60px
+    height: 40px; // Reduced from 60px
+    flex-shrink: 0; // Prevent shrinking
+    @include box-sizing-border-box;
+    object-fit: cover; // Ensure image fits properly
+
+    &:hover {
+      box-shadow: 0 0 20px $accent-cyan;
+    }
+  }
+
+  .header-fields {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    min-width: 0; // Allow shrinking
+    overflow: hidden; // Prevent overflow in v12
+    @include box-sizing-border-box;
+  }
+
+  // Header Stats - New styling for stats moved to header
+  .header-stats {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xl;
+    flex-shrink: 0;
+    overflow: hidden; // Prevent overflow in v12
+    @include box-sizing-border-box;
+  }
+
+  .header-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0; // Prevent shrinking in v12
+    @include box-sizing-border-box;
+  }
+
+  .header-stat-label {
+    @include orbitron-header(8px, 600);
+    letter-spacing: 0.5px;
+  }
+
+  .header-stat-input {
+    background: $bg-tertiary;
+    border: 1px solid $border-primary;
+    color: $text-primary;
+    @include orbitron-header(12px, 700);
+    text-align: center;
+    padding: $spacing-xs $spacing-sm;
+    border-radius: 0;
+    @include transition-standard;
+    width: 50px;
+    @include box-sizing-border-box;
+    flex-shrink: 0; // Prevent shrinking in v12
+
+    &:focus {
+      background: $bg-primary;
+      border-color: $accent-cyan;
+      outline: none;
+      box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
+    }
+  }
+
+  .header-stat-display {
+    background: $bg-primary;
+    color: $accent-cyan;
+    @include orbitron-header(12px, 700);
+    text-align: center;
+    padding: $spacing-xs $spacing-sm;
+    border: 1px solid $accent-cyan;
+    width: 50px;
+    @include box-sizing-border-box;
+    flex-shrink: 0; // Prevent shrinking in v12
+  }
+
+  // Character Name - More compact
+  .charname {
+    margin: 0;
+    @include orbitron-header(18px, 900); // Reduced from 24px
+    letter-spacing: 1px; // Reduced from 2px
+    text-shadow: 0 0 5px $accent-cyan;
+    flex: 1; // Take available space but allow shrinking
+    min-width: 0; // Allow shrinking in flexbox
+    overflow: hidden; // Prevent overflow in v12
+    @include box-sizing-border-box;
+
+    input {
+      background: rgba(0, 224, 220, 0.1);
+      border: 1px solid $accent-cyan;
+      color: $text-primary;
+      @include orbitron-header(18px, 900); // Reduced from 24px
+      letter-spacing: 1px; // Reduced from 2px
+      padding: 6px 10px; // Reduced padding
+      border-radius: 0;
+      @include transition-standard;
+      width: 100%;
+      max-width: 300px; // Limit width
+      @include box-sizing-border-box;
+      min-width: 0; // Allow input to shrink if needed
+
+      &:focus {
+        background: rgba(0, 224, 220, 0.2);
+        border-color: $text-primary;
+        outline: none;
+        box-shadow: 0 0 10px rgba(0, 224, 220, 0.3);
+      }
+    }
+  }
+
+  // Main Layout Container - Proper height distribution within window-content
+  .sheet-content {
+    display: flex;
+    flex: 1; // Take remaining space after header within window-content
+    min-height: 0; // Allow flexbox to shrink
+    overflow: hidden; // Prevent content-level scrolling
+  }
+
+  // Left Sidebar for Stats - Fixed width, height constrained
+  .stats-sidebar {
+    width: 240px; // Reduced from 280px
+    background: $bg-secondary;
+    border-right: 2px solid $border-primary;
+    padding: $spacing-lg; // Reduced from 20px
+    overflow-y: auto; // Allow sidebar to scroll if needed
+    overflow-x: hidden; // Prevent horizontal scrolling
+    flex-shrink: 0; // Don't shrink width
+  }
+
+  // Compact Resource Sections
+  .sidebar-section {
+    margin-bottom: $spacing-xl; // Reduced from 25px
+
+    h4 {
+      margin: 0 0 $spacing-md 0; // Reduced from 15px
+      @include orbitron-header(11px, 700); // Reduced from 12px
+      letter-spacing: 1px;
+      border-bottom: 1px solid $border-primary;
+      padding-bottom: $spacing-xs; // Reduced from 5px
+    }
+  }
+
+  // New Stat Tiles Row Layout
+  .stat-tiles-row {
+    display: flex;
+    gap: $spacing-sm;
+    margin-bottom: 10px;
+  }
+
+  .stat-tile {
+    flex: 1;
+    background: $bg-tertiary;
+    border: 1px solid $border-primary;
+    border-bottom: 3px solid $accent-cyan;
+    padding: $spacing-sm 6px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+    @include transition-standard;
+
+    &.readonly {
+      border-bottom-color: $aqua-muted;
+
+      .stat-tile-value {
+        @include exo-body(14px, 700);
+        line-height: 1;
+        background: $bg-primary;
+        border: 1px solid $border-primary;
+        padding: 6px $spacing-xs;
+        border-radius: 0;
+        text-align: center;
+      }
+    }
+  }
+
+  .stat-tile-input {
+    background: $bg-primary;
+    border: 1px solid $border-primary;
+    color: $text-primary;
+    @include exo-body(12px, 600);
+    padding: 3px $spacing-xs;
+    border-radius: 0;
+    width: 100%;
+    text-align: center;
+    @include transition-standard;
+
+    &:focus {
+      border-color: $accent-cyan;
+      outline: none;
+      box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
+    }
+  }
+
+  .stat-tile-label {
+    @include orbitron-header(8px, 600);
+    letter-spacing: 0.5px;
+    color: $text-secondary;
+    line-height: 1;
+  }
+
+  // Legacy stat-row styles (keeping for compatibility)
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px; // Reduced from 12px
+    padding: 6px 10px; // Reduced from 8px 12px
+    background: $bg-tertiary;
+    border-left: 3px solid $accent-cyan;
+  }
+
+  .stat-label {
+    @include orbitron-header(9px, 600); // Reduced from 10px
+    letter-spacing: 0.5px;
+    color: $text-secondary;
+    flex: 1;
+  }
+
+  .stat-input {
+    background: $bg-primary;
+    border: 1px solid $border-primary;
+    color: $text-primary;
+    @include exo-body(12px, 600); // Reduced from 14px
+    padding: 3px 6px; // Reduced from 4px 8px
+    border-radius: 0;
+    width: 50px; // Reduced from 60px
+    text-align: center;
+    @include transition-standard;
+
+    &:focus {
+      border-color: $accent-cyan;
+      outline: none;
+      box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
+    }
+  }
+
+  .stat-display {
+    background: $bg-primary;
+    color: $text-primary;
+    @include exo-body(12px, 600); // Reduced from 14px
+    padding: 3px 6px; // Reduced from 4px 8px
+    border: 1px solid $border-primary;
+    width: 50px; // Reduced from 60px
+    text-align: center;
+  }
+
+  // Abilities in Sidebar - Updated layout
+  .sidebar-abilities {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-sm; // Reduced from 10px
+    margin-bottom: $spacing-lg; // Reduced from 20px
+  }
+
+  .sidebar-ability {
+    background: $bg-tertiary;
+    padding: $spacing-sm; // Reduced from 12px
+    border: 1px solid $border-primary;
+    text-align: center;
+    @include transition-standard;
+
+    label {
+      display: block;
+      @include orbitron-header(10px, 600); // Increased from 8px as requested
+      letter-spacing: 0.5px;
+      color: $text-secondary;
+      margin-bottom: 6px; // Increased from 4px
+    }
+
+    input {
+      background: $bg-primary;
+      border: 1px solid $border-primary;
+      color: $text-primary;
+      @include exo-body(12px, 600); // Reduced from 14px
+      padding: 3px 6px; // Reduced from 4px 8px
+      border-radius: 0;
+      flex: 1;
+      text-align: center;
+      @include transition-standard;
+
+      &:focus {
+        border-color: $accent-cyan;
+        outline: none;
+        box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
+      }
+    }
+  }
+
+  // New ability input row layout
+  .ability-input-row {
+    display: flex;
+    gap: $spacing-xs;
+    align-items: center;
+  }
+
+  .sidebar-ability-mod {
+    background: $bg-primary;
+    color: $accent-cyan;
+    @include orbitron-header(10px, 700);
+    padding: $spacing-xs 6px;
+    border: 1px solid $accent-cyan;
+    cursor: pointer;
+    @include transition-standard;
+    text-align: center;
+    width: 40px; // Fixed width for consistency
+    flex-shrink: 0;
+
+    &:hover {
+      background: $accent-cyan;
+      color: $bg-primary;
+    }
+  }
+
+  // Main Content Area - Proper flexbox layout for tab structure
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; // Allow flexbox to shrink
+    overflow: hidden; // Prevent main content scrolling
+  }
+
+  // Navigation Tabs - More compact
+  .sheet-tabs {
+    background: $bg-secondary;
+    border-bottom: 2px solid $accent-cyan;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    border-radius: 0;
+    flex-shrink: 0; // Prevent tabs from shrinking
+    z-index: 40;
+
+    .item {
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: $text-secondary;
+      @include orbitron-header(10px, 600); // Reduced from 11px
+      padding: $spacing-sm $spacing-md; // Reduced from 12px 20px
+      text-decoration: none;
+      @include transition-standard;
+      cursor: pointer;
+      letter-spacing: 1px;
+
+      &:hover {
+        background: rgba(0, 224, 220, 0.1);
+        color: $accent-cyan;
+      }
+
+      &.active {
+        background: $bg-primary;
+        border-bottom-color: $accent-cyan;
+        color: $text-primary;
+        box-shadow: 0 -3px 10px rgba(0, 224, 220, 0.2);
+      }
+    }
+  }
+
+  // ITEM SHEET SPECIFIC TAB STYLING - More compact for smaller windows
+  &.sheet.item .sheet-tabs {
+    background: $bg-secondary !important;
+    border-bottom: 2px solid $accent-cyan !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    border-radius: 0 !important;
+    flex-shrink: 0 !important; // Prevent tabs from shrinking
+    z-index: 40 !important;
+    height: 32px !important; // Force compact height
+    max-height: 32px !important;
+    min-height: 32px !important;
+    overflow: hidden !important;
+
+    .item {
+      background: transparent !important;
+      border: none !important;
+      border-bottom: 2px solid transparent !important;
+      color: $text-secondary !important;
+      @include orbitron-header(9px, 600); // Force smaller font for item sheets
+      letter-spacing: 0.5px !important; // Reduced letter spacing
+      padding: 6px 10px !important; // More compact padding
+      text-decoration: none !important;
+      @include transition-standard;
+      cursor: pointer !important;
+      line-height: 1 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      height: 32px !important; // Match tab container height
+      min-width: 60px !important; // Minimum width for readability
+      flex: 1 !important; // Equal width distribution
+      @include box-sizing-border-box;
+
+      &:hover {
+        background: rgba(0, 224, 220, 0.1) !important;
+        color: $accent-cyan !important;
+      }
+
+      &.active {
+        background: $bg-primary !important;
+        border-bottom-color: $accent-cyan !important;
+        color: $text-primary !important;
+        box-shadow: 0 -2px 8px rgba(0, 224, 220, 0.2) !important; // Smaller shadow for item sheets
+      }
+    }
+  }
+
+  // ITEM SHEET BODY - Adjust for compact tabs
+  &.sheet.item .sheet-body {
+    background: $bg-primary;
+    padding: $spacing-lg; // Reduced padding for item sheets
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+  }
+
+  // ITEM SHEET TAB CONTENT - Ensure proper visibility
+  &.sheet.item .tab {
+    display: none;
+
+    &.active {
+      display: block;
+    }
+  }
+
+  // ITEM SHEET FORM ELEMENTS - More compact for smaller space
+  &.sheet.item .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs; // Reduced gap for item sheets
+    margin-bottom: $spacing-md; // Reduced margin
+
+    label {
+      @include orbitron-header(9px, 600); // Smaller labels for item sheets
+      letter-spacing: 0.5px;
+    }
+
+    input,
+    select,
+    textarea {
+      @include form-input-base;
+      @include exo-body(11px); // Smaller text for item sheets
+      padding: 6px 10px; // Reduced padding
+    }
+  }
+
+  // ITEM SHEET WINDOW - Ensure proper sizing
+  &.sheet.item .window-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  // ITEM SHEET HEADER - More compact for smaller windows
+  &.sheet.item .sheet-header {
+    background: $bg-secondary;
+    color: $text-primary;
+    padding: $spacing-sm $spacing-md; // More compact padding
+    border-bottom: 1px solid $accent-cyan; // Thinner border
+    display: flex;
+    align-items: center;
+    gap: 10px; // Reduced gap
+    position: relative;
+    height: 50px; // Reduced height for item sheets
+    max-height: 50px;
+    min-height: 50px;
+    flex-shrink: 0;
+    z-index: 10;
+  }
+
+  &.sheet.item .profile-img {
+    border: 1px solid $accent-cyan; // Thinner border
+    border-radius: 0;
+    cursor: pointer;
+    @include transition-standard;
+    box-shadow: $shadow-accent;
+    width: 32px; // Smaller for item sheets
+    height: 32px;
+    flex-shrink: 0;
+  }
+
+  &.sheet.item .charname {
+    margin: 0;
+    @include orbitron-header(14px, 900); // Smaller for item sheets
+    letter-spacing: 0.5px;
+    text-shadow: 0 0 5px $accent-cyan;
+
+    input {
+      background: rgba(0, 224, 220, 0.1);
+      border: 1px solid $accent-cyan;
+      color: $text-primary;
+      @include orbitron-header(14px, 900);
+      letter-spacing: 0.5px;
+      padding: $spacing-xs $spacing-sm; // Reduced padding
+      border-radius: 0;
+      @include transition-standard;
+      width: 100%;
+      max-width: 250px; // Smaller max width for item sheets
+
+      &:focus {
+        background: rgba(0, 224, 220, 0.2);
+        border-color: $text-primary;
+        outline: none;
+        box-shadow: 0 0 8px rgba(0, 224, 220, 0.3);
+      }
+    }
+  }
+
+  // Scrollable Content Area - ONLY this element should scroll
+  .sheet-body {
+    background: $bg-primary;
+    padding: $spacing-xl; // Reduced from 30px
+    flex: 1;
+    overflow-y: auto; // ONLY the tab content should scroll
+    overflow-x: hidden; // Prevent horizontal scrolling
+    min-height: 0; // Allow flexbox to shrink
+  }
+
+  .tab {
+    display: none;
+
+    &.active {
+      display: block;
+    }
+  }
+
+  // Character Information Section - More compact
+  .character-info-section {
+    @include section-base;
+    padding: $spacing-lg; // Reduced from 25px
+    margin-bottom: $spacing-xl; // Reduced from 30px
+
+    h3 {
+      margin: 0 0 $spacing-lg 0; // Reduced from 25px
+      @include orbitron-header(14px, 700); // Reduced from 16px
+      letter-spacing: 2px;
+      position: relative;
+      padding-bottom: $spacing-sm; // Reduced from 10px
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px; // Reduced from 60px
+        height: 2px;
+        background: $gradient-accent;
+      }
+    }
+  }
+
+  // Form Elements - More compact
+  .form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); // Reduced from 250px
+    gap: $spacing-lg; // Reduced from 20px
+    margin-bottom: $spacing-lg; // Reduced from 20px
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px; // Reduced from 8px
+
+    label {
+      @include orbitron-header(10px, 600); // Reduced from 11px
+      letter-spacing: 1px;
+    }
+
+    input,
+    select,
+    textarea {
+      @include form-input-base;
+      @include exo-body(12px); // Reduced from 14px
+      padding: $spacing-sm $spacing-md; // Reduced from 12px 16px
+    }
+  }
+
+  // Skills Section - 2x2 Grid Layout (like Attributes)
+  .skills-abilities-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-md; // Reduced from 20px
+    margin-top: $spacing-md; // Reduced from 20px
+  }
+
+  .skills-ability-section {
+    background: $bg-tertiary;
+    border: 1px solid $border-primary;
+    border-left: 4px solid $accent-cyan;
+    padding: $spacing-sm; // Reduced from 15px
+    border-radius: 0;
+  }
+
+  .skills-ability-header {
+    @include orbitron-header(12px, 700); // Reduced from 14px
+    letter-spacing: 1px;
+    margin: 0 0 $spacing-sm 0; // Reduced from 15px
+    padding-bottom: $spacing-xs; // Reduced from 8px
+    border-bottom: 1px solid $border-primary;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 30px; // Reduced from 40px
+      height: 2px;
+      background: $gradient-accent;
+    }
+  }
+
+  .skills-ability-list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs; // Reduced from 8px
+  }
+
+  .skill-tile {
+    background: $bg-primary;
+    border: 1px solid $border-primary;
+    padding: 6px; // Reduced from 10px
+    display: grid;
+    grid-template-columns: 1fr 45px 45px; // Reduced from 60px
+    align-items: center;
+    gap: 6px; // Reduced from 8px
+    @include transition-standard;
+    position: relative;
+    min-height: 32px; // Reduced for compactness
+
+    &:hover {
+      background: $bg-secondary;
+      border-color: $accent-cyan;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 3px;
+      background: $gradient-accent;
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+      transform-origin: left;
+    }
+
+    &:hover::before {
+      transform: scaleX(1);
+    }
+
+    label {
+      @include orbitron-header(9px, 600); // Reduced from 11px
+      letter-spacing: 0.5px; // Reduced from 1px
+      color: $text-secondary;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    input {
+      background: $bg-tertiary;
+      border: 1px solid $border-primary;
+      color: $text-primary;
+      @include exo-body(12px, 600); // Reduced from 14px
+      padding: 3px $spacing-xs; // Reduced from 6px 8px
+      border-radius: 0;
+      width: 100%;
+      text-align: center;
+      @include transition-standard;
+
+      &:focus {
+        border-color: $accent-cyan;
+        outline: none;
+        box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
+      }
+    }
+
+    .skill-roll {
+      background: $bg-tertiary;
+      border: 1px solid $accent-cyan;
+      color: $accent-cyan;
+      @include orbitron-header(7px, 700); // Reduced from 9px
+      padding: 3px $spacing-xs; // Reduced from 6px 8px
+      border-radius: 0;
+      cursor: pointer;
+      @include transition-standard;
+      white-space: nowrap;
+      width: 100%;
+
+      &:hover {
+        background: $accent-cyan;
+        color: $bg-primary;
+        box-shadow: 0 0 10px rgba(0, 224, 220, 0.5);
+      }
+    }
+  }
+
+  // Skills Section - More compact
+  .skills-section {
+    @include section-base;
+    padding: 10px; // Reduced from 15px
+    margin-bottom: $spacing-lg; // Reduced from 20px
+
+    h3 {
+      margin: 0 0 10px 0; // Reduced from 15px
+      @include orbitron-header(12px, 700); // Reduced from 14px
+      letter-spacing: 2px;
+      position: relative;
+      padding-bottom: 6px; // Reduced from 8px
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 40px; // Reduced from 50px
+        height: 2px;
+        background: $gradient-accent;
+      }
+    }
+  }
+
+  // Skill Groups
+  .skill-group {
+    margin-bottom: 25px;
+    background: $bg-tertiary;
+    border: 1px solid $border-primary;
+    border-radius: 0;
+    overflow: hidden;
+  }
+
+  .skill-group-header {
+    background: $bg-primary;
+    color: $accent-cyan;
+    @include orbitron-header(12px, 700);
+    letter-spacing: 1px;
+    margin: 0;
+    padding: 10px $spacing-lg;
+    border-bottom: 1px solid $border-primary;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: $gradient-accent;
+    }
+  }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0;
+    padding: 0;
+  }
+
+  .skill {
+    background: $bg-tertiary;
+    padding: $spacing-md $spacing-lg;
+    border-bottom: 1px solid $border-primary;
+    border-right: 1px solid $border-primary;
+    display: grid;
+    grid-template-columns: 1fr 60px 60px;
+    align-items: center;
+    gap: 10px;
+    @include transition-standard;
+    position: relative;
+    min-height: 50px;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: $gradient-accent;
+      transform: scaleY(0);
+      transition: transform 0.3s ease;
+      transform-origin: bottom;
+    }
+
+    &:hover {
+      background: $bg-primary;
+
+      &::before {
+        transform: scaleY(1);
+      }
+    }
+
+    label {
+      @include orbitron-header(11px, 600);
+      letter-spacing: 1px;
+      color: $text-secondary;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    input {
+      background: $bg-primary;
+      border: 1px solid $border-primary;
+      color: $text-primary;
+      @include exo-body(14px, 600);
+      padding: 6px $spacing-sm;
+      border-radius: 0;
+      width: 100%;
+      text-align: center;
+      @include transition-standard;
+
+      &:focus {
+        border-color: $accent-cyan;
+        outline: none;
+        box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
+      }
+    }
+  }
+
+  .skill-roll {
+    background: $bg-primary;
+    border: 1px solid $accent-cyan;
+    color: $accent-cyan;
+    @include orbitron-header(9px, 700);
+    padding: 6px $spacing-sm;
+    border-radius: 0;
+    cursor: pointer;
+    @include transition-standard;
+    white-space: nowrap;
+    width: 100%;
+
+    &:hover {
+      background: $accent-cyan;
+      color: $bg-primary;
+      box-shadow: 0 0 10px rgba(0, 224, 220, 0.5);
+    }
+  }
+
+  // Items and Lists - Compact styling
+  .items-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-md; // Reduced from 20px
+    padding-bottom: $spacing-sm; // Reduced from 15px
+    border-bottom: 1px solid $border-primary; // Thinner border
+
+    h3 {
+      margin: 0;
+      @include orbitron-header(13px, 700); // Reduced from 16px
+      letter-spacing: 1px; // Reduced from 2px
+    }
+  }
+
+  .item-create {
+    @include button-base;
+    @include orbitron-header(9px, 600); // Reduced from 10px
+    padding: 3px 6px; // Reduced from 4px 8px
+    letter-spacing: 0.5px;
+    width: auto;
+    min-width: 60px; // Reduced from 100px
+    max-width: 80px; // Reduced from 140px
+    text-align: center;
+
+    &:hover {
+      box-shadow: 0 0 10px rgba(0, 224, 220, 0.3); // Reduced glow
+    }
+  }
+
+  .items-list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs; // Reduced from 10px
+  }
+
+  .item {
+    background: $bg-tertiary;
+    border: 1px solid $border-primary;
+    border-left: 2px solid $accent-cyan; // Thinner accent border
+    padding: $spacing-sm $spacing-md; // Reduced from 15px
+    display: flex;
+    align-items: center;
+    gap: $spacing-md; // Reduced from 15px
+    @include transition-standard;
+    min-height: 36px; // Reduced from default
+
+    &:hover {
+      background: $bg-secondary;
+      box-shadow: $shadow-primary;
+    }
+  }
+
+  .item-name {
+    flex: 1;
+    @include exo-body(13px, 600); // Reduced from 14px
+    cursor: pointer;
+    @include transition-standard;
+
+    &:hover {
+      color: $accent-cyan;
+    }
+  }
+
+  .item-controls {
+    display: flex;
+    gap: $spacing-xs; // Reduced from 8px
+    align-items: center;
+    flex-direction: column; // Stack vertically as requested
+  }
+
+  // Compact icon-only edit/delete buttons
+  .item-control {
+    &.item-edit,
+    &.item-delete {
+      background: transparent;
+      border: none;
+      color: $text-secondary;
+      font-size: 12px; // Small icon size
+      padding: 2px; // Minimal padding
+      border-radius: 0;
+      cursor: pointer;
+      @include transition-standard;
+      width: 16px; // Fixed small width
+      height: 16px; // Fixed small height
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &.item-edit:hover {
+      color: $aqua-muted;
+      background: rgba(76, 226, 225, 0.1); // Subtle background highlight
+    }
+
+    &.item-delete:hover {
+      color: #ff4757;
+      background: rgba(255, 71, 87, 0.1); // Subtle background highlight
+    }
+
+    // Keep other item controls (attack, damage, etc.) as buttons
+    &:not(.item-edit):not(.item-delete) {
+      background: $bg-primary;
+      border: 1px solid $border-primary;
+      color: $text-secondary;
+      font-size: 10px; // Reduced from 12px
+      padding: $spacing-xs 6px; // Reduced from 6px 10px
+      border-radius: 0;
+      cursor: pointer;
+      @include transition-standard;
+    }
+  }
+
+  .attack-roll,
+  .damage-roll {
+    &:hover {
+      border-color: $accent-cyan;
+      color: $accent-cyan;
+    }
+  }
+
+  // Item details - more compact
+  .item-details {
+    display: flex;
+    gap: $spacing-sm; // Reduced from 15px
+    margin: $spacing-xs 0; // Reduced from 8px 0
+    font-size: 10px; // Reduced from 11px
+    color: $text-secondary;
+  }
+
+  .item-threshold,
+  .item-damage,
+  .item-armor-class,
+  .item-property {
+    background: $bg-tertiary;
+    border: 1px solid $accent-cyan;
+    color: $accent-cyan;
+    padding: 2px $spacing-xs; // Reduced from 4px 8px
+    border-radius: 0;
+    @include orbitron-header(8px, 600); // Reduced font size
+    letter-spacing: 0.5px;
+
+    &:hover {
+      background: $bg-primary;
+      box-shadow: 0 0 5px rgba(0, 224, 220, 0.2); // Reduced glow
+    }
+  }
+
+  .item-damage,
+  .item-armor-class {
+    border-color: $aqua-muted;
+    color: $aqua-muted;
+  }
+
+  // Buttons and Interactive Elements
+  button,
+  .rollable {
+    @include button-base;
+    font-size: 10px;
+    padding: 6px $spacing-md;
+    letter-spacing: 0.5px;
+  }
+
+  .power-point-use {
+    background: $bg-primary;
+    border: 1px solid $aqua-muted;
+    color: $aqua-muted;
+    @include orbitron-header(9px, 600);
+    padding: $spacing-xs $spacing-sm;
+    border-radius: 0;
+    cursor: pointer;
+    @include transition-standard;
+
+    &:hover {
+      background: $aqua-muted;
+      color: $bg-primary;
+      box-shadow: 0 0 10px rgba(76, 226, 225, 0.5);
+    }
+  }
+
+  // Focus States
+  *:focus {
+    outline: 2px solid $accent-cyan;
+    outline-offset: 2px;
+  }
+
+  // Additional Sections - More compact
+  .features-container,
+  .talents-container,
+  .gear-section {
+    @include section-base;
+    padding: $spacing-lg; // Reduced from 25px
+    margin-bottom: $spacing-xl; // Reduced from 30px
+  }
+
+  // Gear Subsection Spacing
+  .gear-subsection {
+    margin-bottom: $spacing-xxl; // Add spacing between subsections
+    padding: $spacing-lg;
+    background: $bg-tertiary;
+    border: 1px solid $border-primary;
+    border-radius: 0;
+
+    &:last-child {
+      margin-bottom: 0; // Remove margin from last subsection
+    }
+  }
+
+  .expertise-section {
+    background: $bg-tertiary;
+    padding: $spacing-lg; // Reduced from 20px
+    border: 1px solid $border-primary;
+    border-top: 3px solid $aqua-muted;
+    margin-bottom: $spacing-lg; // Reduced from 20px
+
+    h3 {
+      margin: 0 0 $spacing-lg 0; // Reduced from 20px
+      @include orbitron-header(13px, 700); // Reduced from 14px
+      letter-spacing: 2px;
+      color: $aqua-muted;
+    }
+  }
+
+  // Biography and Notes
+  .form-group textarea {
+    @include form-input-base;
+    @include exo-body(14px);
+    padding: 16px;
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  // Hide original resource sections that are now in sidebar
+  .resource-row,
+  .defense-hp-section,
+  .power-points-section,
+  .abilities-section {
+    display: none;
+  }
+
+  // Combat Section Redesign
+  .combat-item {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-md;
+    padding: $spacing-md;
+    margin-bottom: $spacing-sm;
+    background: $bg-primary;
+    border: 1px solid $border-primary;
+    @include transition-standard;
+    min-height: 60px;
+
+    &:hover {
+      background: $bg-secondary;
+      box-shadow: $shadow-primary;
+    }
+  }
+
+  // Combat Action Buttons - Text and icon only, no boxes
+  .combat-item-actions {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    min-width: 80px;
+  }
+
+  .combat-action-btn {
+    background: transparent;
+    border: none;
+    color: $accent-cyan;
+    @include orbitron-header(12px, 700);
+    padding: $spacing-sm 24px $spacing-sm $spacing-xs; // Added 20px padding-right
+    border-radius: 0;
+    cursor: pointer;
+    @include transition-standard;
+    letter-spacing: 0.5px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    min-height: 36px;
+    width: 100px; // Increased from 80px to accommodate padding
+    justify-content: flex-start;
+
+    i {
+      font-size: 14px;
+    }
+
+    &:hover {
+      color: $text-primary;
+      text-shadow: 0 0 8px $accent-cyan;
+    }
+
+    &.armor-roll {
+      color: $aqua-muted;
+
+      &:hover {
+        color: $text-primary;
+        text-shadow: 0 0 8px $aqua-muted;
+      }
+    }
+  }
+
+  // Combat Item Content - Full width for proper layout
+  .combat-item-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  // Combat Item Header - Name in top left
+  .combat-item-header {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: $spacing-xs;
+  }
+
+  .combat-item-name {
+    @include exo-body(16px, 700);
+    text-align: left;
+  }
+
+  // Combat Stats Layout - Threshold left, grid right
+  .combat-stats-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-md;
+  }
+
+  // Special Threshold Tile - Larger and prominent, no hover
+  .combat-threshold-tile {
+    background: $bg-tertiary;
+    border: 2px solid $accent-cyan;
+    padding: $spacing-md 16px;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-height: 60px;
+    justify-content: center;
+    min-width: 80px;
+    flex-shrink: 0;
+  }
+
+  .combat-threshold-value {
+    @include orbitron-header(18px, 900);
+    color: $accent-cyan;
+    letter-spacing: 0.5px;
+    line-height: 1;
+  }
+
+  .combat-threshold-label {
+    @include exo-body(9px, 600);
+    color: $text-secondary;
+    letter-spacing: 0.3px;
+    margin-top: $spacing-xs;
+  }
+
+  // Combat Stats Grid - Fixed width tiles for consistency, no hover
+  .combat-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 80px);
+    gap: 6px;
+    flex: 1;
+  }
+
+  .combat-stat-tile {
+    background: $bg-tertiary;
+    border: 1px solid $accent-cyan;
+    padding: $spacing-sm 6px;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-height: 40px;
+    justify-content: center;
+    width: 80px;
+  }
+
+  .combat-stat-value {
+    @include orbitron-header(11px, 700);
+    color: $accent-cyan;
+    letter-spacing: 0.5px;
+    line-height: 1.2;
+  }
+
+  .combat-stat-label {
+    @include exo-body(8px, 500);
+    color: $text-secondary;
+    letter-spacing: 0.3px;
+    margin-top: 2px;
+  }
+}
+
+// Responsive Design
+@media (max-width: 1024px) {
+  .avant {
+    .window-app {
+      width: 100% !important;
+      height: 100% !important;
+    }
+    
+    .stats-sidebar {
+      width: 240px;
+    }
+    
+    .main-content {
+      margin-left: 240px;
+    }
+    
+    .sheet-tabs .item {
+      padding: 10px 16px;
+      font-size: 10px;
+    }
+
+    // Responsive adjustments for compressed skills grid
+    .skills-abilities-grid {
+      grid-template-columns: 1fr;
+      gap: 10px; // Reduced from 15px
+    }
+    
+    .skill-tile {
+      grid-template-columns: 1fr 40px 40px; // Reduced from 50px
+      gap: $spacing-xs; // Reduced from 6px
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .avant {
+    .stats-sidebar {
+      width: 200px;
+    }
+    
+    .main-content {
+      margin-left: 200px;
+    }
+    
+    .sidebar-abilities {
+      grid-template-columns: 1fr;
+    }
+    
+    .sheet-tabs {
+      flex-wrap: wrap;
+
+      .item {
+        flex: 1;
+        min-width: 100px;
+        padding: $spacing-sm $spacing-md;
+        font-size: 9px;
+      }
+    }
+
+    .skill-tile {
+      grid-template-columns: 1fr;
+      gap: 6px; // Reduced from 8px
+      text-align: center;
+
+      input,
+      .skill-roll {
+        width: 100%;
+      }
+    }
+  }
+}
+
+// Print Styles
+@media print {
+  .avant {
+    background: white;
+    color: black;
+    box-shadow: none;
+    
+    .sheet-header {
+      background: white;
+      color: black;
+      border-bottom: 2px solid black;
+    }
+    
+    .sheet-tabs {
+      display: none;
+    }
+    
+    .tab {
+      display: block !important;
+    }
+    
+    .item-controls {
+      display: none;
+    }
+  }
+} 
