@@ -1881,13 +1881,9 @@
     display: none;
   }
 }
-
-/*# sourceMappingURL=avant.css.map */
-
 /* ============================================================================
  * Fortune Point Reroll Dialog
  * ============================================================================ */
-
 .avant .reroll-dialog {
   background: var(--theme-bg-secondary, #1E1E1E);
   border: 2px solid var(--theme-accent-primary, #00E0DC);
@@ -1908,18 +1904,17 @@
 }
 
 /* Removed h3 header - redundant with dialog title bar */
-
 .avant .reroll-dialog .original-roll {
   font-family: var(--theme-font-primary, "Exo 2", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
   font-size: 12px;
+  font-weight: 400;
+  color: var(--theme-text-primary, #FFFFFF);
   color: var(--theme-text-secondary, #BFBFBF);
   margin: 0;
 }
 
 /* FP count moved to dedicated status area between dice and buttons */
-
 /* Removed "Select dice to reroll" h4 to save space for longer roll descriptions */
-
 .avant .reroll-dialog .dice-container {
   display: flex;
   justify-content: center;
@@ -1932,20 +1927,35 @@
   transition: all 0.3s ease;
   position: relative;
 }
-
 .avant .reroll-dialog .reroll-die:hover {
   transform: scale(1.1);
 }
-
 .avant .reroll-dialog .reroll-die.selected .die-face {
   border-color: var(--theme-accent-secondary, #4CE2E1);
   background: var(--theme-accent-secondary, #4CE2E1);
   box-shadow: 0 0 16px var(--theme-accent-secondary, #4CE2E1);
   transform: scale(1.05);
 }
-
 .avant .reroll-dialog .reroll-die.selected .die-face.d10::before {
   background: var(--theme-accent-secondary, #4CE2E1);
+}
+.avant .reroll-dialog .reroll-die.already-rerolled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.avant .reroll-dialog .reroll-die.already-rerolled:hover {
+  transform: none; /* Disable hover scale effect */
+}
+.avant .reroll-dialog .reroll-die.already-rerolled .die-face {
+  border-color: var(--theme-text-secondary, #BFBFBF);
+  background: var(--theme-text-secondary, #BFBFBF);
+}
+.avant .reroll-dialog .reroll-die.already-rerolled .die-face.d10::before {
+  background: var(--theme-bg-primary, #1C1C1C);
+}
+.avant .reroll-dialog .reroll-die.already-rerolled .die-value {
+  color: var(--theme-text-secondary, #BFBFBF);
+  text-shadow: none;
 }
 
 .avant .reroll-dialog .die-face {
@@ -1960,13 +1970,12 @@
   transition: all 0.3s ease;
   /* Use solid border instead of box-shadow for cleaner appearance */
 }
-
 .avant .reroll-dialog .die-face.d10 {
   /* Create border effect before clipping */
   background: var(--theme-accent-primary, #00E0DC);
   padding: 3px;
+  clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
 }
-
 .avant .reroll-dialog .die-face.d10::before {
   content: "";
   position: absolute;
@@ -1979,14 +1988,13 @@
   z-index: 1;
 }
 
-.avant .reroll-dialog .die-face.d10 {
-  clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
-}
-
 .avant .reroll-dialog .die-value {
   font-family: var(--theme-font-display, "Orbitron", monospace);
   font-size: 20px;
   font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--theme-accent-primary, #00E0DC);
   color: var(--theme-accent-primary, #00E0DC);
   text-shadow: 0 0 4px var(--theme-accent-primary, #00E0DC);
   position: relative;
@@ -1997,30 +2005,6 @@
   color: var(--theme-bg-primary, #000000);
   text-shadow: 0 0 6px var(--theme-bg-primary, #000000);
   font-weight: 900;
-}
-
-/* Already rerolled dice styling - greyed out and disabled */
-.avant .reroll-dialog .reroll-die.already-rerolled {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-.avant .reroll-dialog .reroll-die.already-rerolled:hover {
-  transform: none; /* Disable hover scale effect */
-}
-
-.avant .reroll-dialog .reroll-die.already-rerolled .die-face {
-  border-color: var(--theme-text-secondary, #BFBFBF);
-  background: var(--theme-text-secondary, #BFBFBF);
-}
-
-.avant .reroll-dialog .reroll-die.already-rerolled .die-face.d10::before {
-  background: var(--theme-bg-primary, #1C1C1C);
-}
-
-.avant .reroll-dialog .reroll-die.already-rerolled .die-value {
-  color: var(--theme-text-secondary, #BFBFBF);
-  text-shadow: none;
 }
 
 .avant .reroll-dialog .reroll-indicator {
@@ -2048,21 +2032,19 @@
   padding: 6px 12px;
   font-family: var(--theme-font-primary, "Exo 2", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
   font-size: 12px;
+  font-weight: 400;
   color: var(--theme-text-primary, #FFFFFF);
   margin: 2px 0;
 }
-
 .avant .reroll-dialog .fp-status i {
   color: var(--theme-accent-secondary, #4CE2E1);
   font-size: 14px;
 }
-
 .avant .reroll-dialog .fp-status .fp-count {
   color: var(--theme-accent-primary, #00E0DC);
   font-weight: 700;
   font-size: 14px;
 }
-
 .avant .reroll-dialog .fp-status .fp-label {
   color: var(--theme-text-secondary, #BFBFBF);
   font-weight: 500;
@@ -2076,7 +2058,6 @@
   padding-top: 4px;
   flex-shrink: 0;
 }
-
 .avant .reroll-dialog .dialog-buttons button {
   background: var(--theme-bg-tertiary, #333333);
   border: 2px solid var(--theme-accent-primary, #00E0DC);
@@ -2085,6 +2066,7 @@
   font-family: var(--theme-font-primary, "Exo 2", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
   font-size: 10px;
   font-weight: 600;
+  color: var(--theme-text-primary, #FFFFFF);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   cursor: pointer;
@@ -2098,14 +2080,12 @@
   max-width: 140px;
   flex: 1;
 }
-
 .avant .reroll-dialog .dialog-buttons button:hover:not(:disabled) {
   background: var(--theme-accent-primary, #00E0DC);
   color: var(--theme-bg-primary, #000000);
   text-shadow: none;
   box-shadow: 0 0 8px var(--theme-accent-primary, #00E0DC);
 }
-
 .avant .reroll-dialog .dialog-buttons button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -2115,7 +2095,6 @@
 .avant .reroll-dialog .reroll-cancel {
   border-color: var(--theme-text-secondary, #BFBFBF) !important;
 }
-
 .avant .reroll-dialog .reroll-cancel:hover:not(:disabled) {
   background: var(--theme-text-secondary, #BFBFBF) !important;
   color: var(--theme-bg-primary, #000000) !important;
@@ -2125,7 +2104,6 @@
 /* ============================================================================
  * Chat Context Menu
  * ============================================================================ */
-
 .avant-context-menu {
   background: var(--theme-bg-secondary, #1E1E1E);
   border: 2px solid var(--theme-accent-primary, #00E0DC);
@@ -2133,13 +2111,11 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
   min-width: 200px;
 }
-
 .avant-context-menu .context-menu {
   list-style: none;
   margin: 0;
   padding: 0;
 }
-
 .avant-context-menu .context-menu-item {
   padding: 12px 16px;
   font-family: var(--theme-font-primary, "Exo 2", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
@@ -2153,18 +2129,17 @@
   gap: 8px;
   border-bottom: 1px solid var(--theme-bg-tertiary, #333333);
 }
-
 .avant-context-menu .context-menu-item:last-child {
   border-bottom: none;
 }
-
 .avant-context-menu .context-menu-item:hover {
   background: var(--theme-accent-primary, #00E0DC);
   color: var(--theme-bg-primary, #000000);
 }
-
 .avant-context-menu .context-menu-item i {
   font-size: 14px;
   width: 16px;
   text-align: center;
 }
+
+/*# sourceMappingURL=avant.css.map */

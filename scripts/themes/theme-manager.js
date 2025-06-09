@@ -35,17 +35,18 @@ export class AvantThemeManager {
             }
         };
         
-        this.init();
+        // Initialize non-async parts only in constructor
+        console.log('Avant Theme Manager | Constructor initialized for Foundry v' + this.foundryVersion);
     }
     
     /**
-     * Initialize the theme manager
+     * Initialize the theme manager (must be called manually after game is ready)
      */
     async init() {
         console.log('Avant Theme Manager | Initializing for Foundry v' + this.foundryVersion);
         
-        // Load saved theme preference
-        this.currentTheme = game.settings.get('avant', 'selectedTheme') || 'dark';
+        // Load saved theme preference (safely check if game.settings exists)
+        this.currentTheme = (game.settings && game.settings.get('avant', 'selectedTheme')) || 'dark';
         console.log('Avant Theme Manager | Loaded theme preference:', this.currentTheme);
         
         // Load custom themes from settings
