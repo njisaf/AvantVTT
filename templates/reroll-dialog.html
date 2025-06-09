@@ -7,10 +7,17 @@
         <div class="dice-selection">
             <div class="dice-container">
                 {{#each d10Results}}
-                <div class="reroll-die {{#if selected}}selected{{/if}}" data-index="{{index}}" title="Click to select/deselect">
+                <div class="reroll-die {{#if selected}}selected{{/if}} {{#if wasRerolled}}already-rerolled{{/if}}" 
+                     data-index="{{index}}" 
+                     title="{{#if wasRerolled}}Already rerolled - cannot reroll again{{else}}Click to select/deselect{{/if}}">
                     <div class="die-face d10">
                         <span class="die-value">{{value}}</span>
                     </div>
+                    {{#if wasRerolled}}
+                    <div class="reroll-indicator">
+                        <i class="fas fa-redo"></i>
+                    </div>
+                    {{/if}}
                 </div>
                 {{/each}}
             </div>

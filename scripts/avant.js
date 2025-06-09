@@ -1566,8 +1566,10 @@ class AvantRerollDialog extends Application {
         return {
             d10Results: this.d10Results.map((result, index) => ({
                 index: index,
-                value: result,
-                selected: this.selectedDice.has(index)
+                value: result.value,
+                selected: this.selectedDice.has(index),
+                wasRerolled: result.wasRerolled,
+                canReroll: !result.wasRerolled // Cannot reroll if already rerolled
             })),
             selectedCount: this.selectedDice.size,
             fortunePoints: fortunePoints,
@@ -1595,6 +1597,13 @@ class AvantRerollDialog extends Application {
     async _onDieClick(event) {
         const dieIndex = parseInt(event.currentTarget.dataset.index);
         const fortunePoints = this.actor.system.fortunePoints || 0;
+        const dieData = this.d10Results[dieIndex];
+        
+        // Prevent selection of already rerolled dice
+        if (dieData.wasRerolled) {
+            ui.notifications.warn("This die has already been rerolled and cannot be rerolled again!");
+            return;
+        }
         
         if (this.selectedDice.has(dieIndex)) {
             // Deselect die
@@ -1659,7 +1668,7 @@ class AvantRerollDialog extends Application {
     /**
      * Extract d10 results from the original roll
      * @param {Roll} roll - The original roll
-     * @returns {Array} Array of d10 die values
+     * @returns {Array} Array of d10 die data with values and reroll status
      */
     _extractD10Results(roll) {
         const d10Results = [];
@@ -1667,10 +1676,13 @@ class AvantRerollDialog extends Application {
         // Navigate through the roll terms to find d10 dice
         for (const term of roll.terms) {
             if (term instanceof foundry.dice.terms.Die && term.faces === 10) {
-                // Extract individual die results
+                // Extract individual die results with reroll status
                 for (const result of term.results) {
                     if (result.active) {
-                        d10Results.push(result.result);
+                        d10Results.push({
+                            value: result.result,
+                            wasRerolled: result.rerolled || false
+                        });
                     }
                 }
             }
@@ -1706,16 +1718,19 @@ class AvantRerollDialog extends Application {
         // Reroll selected dice
         for (const dieIndex of this.selectedDice) {
             const newRoll = await new Roll("1d10").evaluate();
-            newD10Results[dieIndex] = newRoll.total;
+            newD10Results[dieIndex] = {
+                value: newRoll.total,
+                wasRerolled: true // Mark this die as rerolled
+            };
         }
         
         // Calculate new total
-        const diceTotal = newD10Results.reduce((sum, die) => sum + die, 0);
+        const diceTotal = newD10Results.reduce((sum, die) => sum + die.value, 0);
         const newTotal = diceTotal + this.staticModifiers;
         
         // Create a new Roll object with the new results
         // We'll create a simple roll that represents the final result
-        const rollFormula = `${newD10Results.join(' + ')} + ${this.staticModifiers}`;
+        const rollFormula = `${newD10Results.map(die => die.value).join(' + ')} + ${this.staticModifiers}`;
         const roll = new Roll(rollFormula);
         
         // Manually set the evaluated state and total
@@ -1732,9 +1747,9 @@ class AvantRerollDialog extends Application {
                 faces: 10 
             });
             dieTerm.results = [{
-                result: newD10Results[i],
+                result: newD10Results[i].value,
                 active: true,
-                rerolled: this.selectedDice.has(i)
+                rerolled: newD10Results[i].wasRerolled
             }];
             dieTerm._evaluated = true;
             diceTerms.push(dieTerm);
@@ -1893,7 +1908,7 @@ class AvantChatContextMenu {
                     const isEligible = AvantChatContextMenu._isEligibleRoll(roll);
                     
                     console.log('Avant | Condition check result (v13) - eligible:', isEligible, 'actor:', !!actor);
-                    return isEligible && actor && actor.system?.fortunePoints > 0;
+                    return isEligible && actor;
                 },
                 callback: (li) => {
                     console.log('Avant | === CONTEXT MENU CALLBACK TRIGGERED (v13) ===');
@@ -1955,7 +1970,7 @@ class AvantChatContextMenu {
                 const isEligible = AvantChatContextMenu._isEligibleRoll(roll);
                 
                 console.log('Avant | Condition check result (v12) - eligible:', isEligible, 'actor:', !!actor);
-                return isEligible && actor && actor.system?.fortunePoints > 0;
+                return isEligible && actor;
             },
             callback: (li) => {
                 console.log('Avant | === CONTEXT MENU CALLBACK TRIGGERED (v12) ===');
@@ -2003,7 +2018,7 @@ class AvantChatContextMenu {
         const actor = AvantChatContextMenu._getActorFromMessage(message);
         const isEligible = AvantChatContextMenu._isEligibleRoll(roll);
         
-        if (!isEligible || !actor || actor.system?.fortunePoints <= 0) {
+        if (!isEligible || !actor) {
             console.log('Avant | Message not eligible for reroll (document approach)');
             return;
         }

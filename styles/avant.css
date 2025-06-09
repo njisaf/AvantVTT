@@ -1999,6 +1999,46 @@
   font-weight: 900;
 }
 
+/* Already rerolled dice styling - greyed out and disabled */
+.avant .reroll-dialog .reroll-die.already-rerolled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.avant .reroll-dialog .reroll-die.already-rerolled:hover {
+  transform: none; /* Disable hover scale effect */
+}
+
+.avant .reroll-dialog .reroll-die.already-rerolled .die-face {
+  border-color: var(--theme-text-secondary, #BFBFBF);
+  background: var(--theme-text-secondary, #BFBFBF);
+}
+
+.avant .reroll-dialog .reroll-die.already-rerolled .die-face.d10::before {
+  background: var(--theme-bg-primary, #1C1C1C);
+}
+
+.avant .reroll-dialog .reroll-die.already-rerolled .die-value {
+  color: var(--theme-text-secondary, #BFBFBF);
+  text-shadow: none;
+}
+
+.avant .reroll-dialog .reroll-indicator {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 16px;
+  height: 16px;
+  background: var(--theme-text-secondary, #BFBFBF);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  color: var(--theme-bg-primary, #1C1C1C);
+  z-index: 3;
+}
+
 /* Fortune points status - compact display between dice and buttons */
 .avant .reroll-dialog .fp-status {
   display: flex;
