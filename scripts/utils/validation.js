@@ -383,7 +383,7 @@ export class ValidationUtils {
     }
 
     /**
-     * Validate ability score values
+     * Validate ability modifier values
      * @static
      * @param {Object} abilities - Abilities object to validate
      * @returns {Object} Validated abilities
@@ -395,18 +395,19 @@ export class ValidationUtils {
         for (const abilityName of defaultAbilities) {
             if (abilities[abilityName]) {
                 validatedAbilities[abilityName] = {
-                    value: this.normalizeNumber(abilities[abilityName].value, 10, true),
-                    mod: this.normalizeNumber(abilities[abilityName].mod, 0, true)
+                    modifier: this.normalizeNumber(abilities[abilityName].modifier, 0, true)
                 };
                 
-                // Ensure minimum ability score of 1
-                if (validatedAbilities[abilityName].value < 1) {
-                    validatedAbilities[abilityName].value = 1;
+                // Ensure ability modifier is within reasonable bounds (-10 to +10)
+                if (validatedAbilities[abilityName].modifier < -10) {
+                    validatedAbilities[abilityName].modifier = -10;
+                }
+                if (validatedAbilities[abilityName].modifier > 10) {
+                    validatedAbilities[abilityName].modifier = 10;
                 }
             } else {
                 validatedAbilities[abilityName] = {
-                    value: 10,
-                    mod: 0
+                    modifier: 0
                 };
             }
         }

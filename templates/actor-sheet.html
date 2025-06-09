@@ -16,10 +16,6 @@
                 <span class="header-stat-label">Fortune</span>
                 <input type="text" name="system.fortunePoints" value="{{system.fortunePoints}}" data-dtype="Number" min="0" max="5" class="header-stat-input"/>
             </div>
-            <div class="header-stat">
-                <span class="header-stat-label">Defense</span>
-                <span class="header-stat-display">{{system.defenseThreshold}}</span>
-            </div>
         </div>
     </header>
 
@@ -27,6 +23,17 @@
     <div class="sheet-content">
         <!-- Left Sidebar for Stats -->
         <aside class="stats-sidebar">
+            <!-- Defense Threshold -->
+            <div class="sidebar-section">
+                <h4>Defense Threshold</h4>
+                <div class="stat-tiles-row">
+                    <div class="stat-tile readonly">
+                        <span class="stat-tile-value">{{system.defenseThreshold}}</span>
+                        <span class="stat-tile-label">Defense</span>
+                    </div>
+                </div>
+            </div>
+
             <!-- Hit Points -->
             <div class="sidebar-section">
                 <h4>Hit Points</h4>
@@ -46,24 +53,6 @@
                 </div>
             </div>
 
-            <!-- Power Points -->
-            <div class="sidebar-section">
-                <h4>Power Points</h4>
-                <div class="stat-tiles-row">
-                    <div class="stat-tile">
-                        <input type="text" name="system.powerPoints.value" value="{{system.powerPoints.value}}" data-dtype="Number" class="stat-tile-input"/>
-                        <span class="stat-tile-label">Current</span>
-                    </div>
-                    <div class="stat-tile">
-                        <input type="text" name="system.powerPoints.max" value="{{system.powerPoints.max}}" data-dtype="Number" class="stat-tile-input"/>
-                        <span class="stat-tile-label">Max</span>
-                    </div>
-                    <div class="stat-tile">
-                        <input type="text" name="system.powerPoints.limit" value="{{system.powerPoints.limit}}" data-dtype="Number" class="stat-tile-input"/>
-                        <span class="stat-tile-label">Limit</span>
-                    </div>
-                </div>
-            </div>
 
             <!-- Expertise Points -->
             <div class="sidebar-section">
@@ -91,53 +80,37 @@
                     <div class="sidebar-ability">
                         <label>Might</label>
                         <div class="ability-input-row">
-                            <input type="text" name="system.abilities.might.value" value="{{system.abilities.might.value}}" data-dtype="Number"/>
-                            <span class="sidebar-ability-mod rollable" data-roll-type="ability" data-ability="might" title="Click: Might Check (2d10+Level+Mod) | Shift+Click: Generate New Score (4d6kh3)">
-                                {{#if system.abilities.might.mod}}
-                                    {{#if (gt system.abilities.might.mod 0)}}+{{/if}}{{system.abilities.might.mod}}
-                                {{else}}
-                                    +0
-                                {{/if}}
-                            </span>
+                            <input type="text" name="system.abilities.might.modifier" value="{{system.abilities.might.modifier}}" data-dtype="Number" class="ability-modifier-input"/>
+                            <button type="button" class="ability-roll-btn rollable" data-roll-type="ability" data-ability="might" title="Click: Might Check (2d10+Level+Modifier)">
+                                {{#if (gt abilityTotalModifiers.might 0)}}+{{/if}}{{abilityTotalModifiers.might}}
+                            </button>
                         </div>
                     </div>
                     <div class="sidebar-ability">
                         <label>Grace</label>
                         <div class="ability-input-row">
-                            <input type="text" name="system.abilities.grace.value" value="{{system.abilities.grace.value}}" data-dtype="Number"/>
-                            <span class="sidebar-ability-mod rollable" data-roll-type="ability" data-ability="grace" title="Click: Grace Check (2d10+Level+Mod) | Shift+Click: Generate New Score (4d6kh3)">
-                                {{#if system.abilities.grace.mod}}
-                                    {{#if (gt system.abilities.grace.mod 0)}}+{{/if}}{{system.abilities.grace.mod}}
-                                {{else}}
-                                    +0
-                                {{/if}}
-                            </span>
+                            <input type="text" name="system.abilities.grace.modifier" value="{{system.abilities.grace.modifier}}" data-dtype="Number" class="ability-modifier-input"/>
+                            <button type="button" class="ability-roll-btn rollable" data-roll-type="ability" data-ability="grace" title="Click: Grace Check (2d10+Level+Modifier)">
+                                {{#if (gt abilityTotalModifiers.grace 0)}}+{{/if}}{{abilityTotalModifiers.grace}}
+                            </button>
                         </div>
                     </div>
                     <div class="sidebar-ability">
                         <label>Intellect</label>
                         <div class="ability-input-row">
-                            <input type="text" name="system.abilities.intellect.value" value="{{system.abilities.intellect.value}}" data-dtype="Number"/>
-                            <span class="sidebar-ability-mod rollable" data-roll-type="ability" data-ability="intellect" title="Click: Intellect Check (2d10+Level+Mod) | Shift+Click: Generate New Score (4d6kh3)">
-                                {{#if system.abilities.intellect.mod}}
-                                    {{#if (gt system.abilities.intellect.mod 0)}}+{{/if}}{{system.abilities.intellect.mod}}
-                                {{else}}
-                                    +0
-                                {{/if}}
-                            </span>
+                            <input type="text" name="system.abilities.intellect.modifier" value="{{system.abilities.intellect.modifier}}" data-dtype="Number" class="ability-modifier-input"/>
+                            <button type="button" class="ability-roll-btn rollable" data-roll-type="ability" data-ability="intellect" title="Click: Intellect Check (2d10+Level+Modifier)">
+                                {{#if (gt abilityTotalModifiers.intellect 0)}}+{{/if}}{{abilityTotalModifiers.intellect}}
+                            </button>
                         </div>
                     </div>
                     <div class="sidebar-ability">
                         <label>Focus</label>
                         <div class="ability-input-row">
-                            <input type="text" name="system.abilities.focus.value" value="{{system.abilities.focus.value}}" data-dtype="Number"/>
-                            <span class="sidebar-ability-mod rollable" data-roll-type="ability" data-ability="focus" title="Click: Focus Check (2d10+Level+Mod) | Shift+Click: Generate New Score (4d6kh3)">
-                                {{#if system.abilities.focus.mod}}
-                                    {{#if (gt system.abilities.focus.mod 0)}}+{{/if}}{{system.abilities.focus.mod}}
-                                {{else}}
-                                    +0
-                                {{/if}}
-                            </span>
+                            <input type="text" name="system.abilities.focus.modifier" value="{{system.abilities.focus.modifier}}" data-dtype="Number" class="ability-modifier-input"/>
+                            <button type="button" class="ability-roll-btn rollable" data-roll-type="ability" data-ability="focus" title="Click: Focus Check (2d10+Level+Modifier)">
+                                {{#if (gt abilityTotalModifiers.focus 0)}}+{{/if}}{{abilityTotalModifiers.focus}}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -226,10 +199,7 @@
                                 <input type="text" name="system.vocation" value="{{system.vocation}}" placeholder="Character Vocation"/>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label>Background</label>
-                            <input type="text" name="system.background" value="{{system.background}}" placeholder="Character Background"/>
-                        </div>
+
                         <div class="form-group">
                             <label>Languages</label>
                             <input type="text" name="system.languages" value="{{system.languages}}" placeholder="Known Languages"/>
@@ -451,7 +421,9 @@
                                     <div class="skill-tile">
                                         <label>{{skill.label}}</label>
                                         <input type="text" name="system.skills.{{skill.name}}" value="{{skill.value}}" data-dtype="Number"/>
-                                        <button type="button" class="skill-roll" data-skill="{{skill.name}}" title="Roll {{skill.label}}">Roll</button>
+                                        <button type="button" class="skill-roll rollable" data-skill="{{skill.name}}" title="Roll {{skill.label}} (2d10+Level+Ability+Skill)">
+                                            {{#if (gt skill.totalModifier 0)}}+{{/if}}{{skill.totalModifier}}
+                                        </button>
                                     </div>
                                     {{/each}}
                                 </div>
@@ -465,7 +437,9 @@
                                     <div class="skill-tile">
                                         <label>{{skill.label}}</label>
                                         <input type="text" name="system.skills.{{skill.name}}" value="{{skill.value}}" data-dtype="Number"/>
-                                        <button type="button" class="skill-roll" data-skill="{{skill.name}}" title="Roll {{skill.label}}">Roll</button>
+                                        <button type="button" class="skill-roll rollable" data-skill="{{skill.name}}" title="Roll {{skill.label}} (2d10+Level+Ability+Skill)">
+                                            {{#if (gt skill.totalModifier 0)}}+{{/if}}{{skill.totalModifier}}
+                                        </button>
                                     </div>
                                     {{/each}}
                                 </div>
@@ -479,7 +453,9 @@
                                     <div class="skill-tile">
                                         <label>{{skill.label}}</label>
                                         <input type="text" name="system.skills.{{skill.name}}" value="{{skill.value}}" data-dtype="Number"/>
-                                        <button type="button" class="skill-roll" data-skill="{{skill.name}}" title="Roll {{skill.label}}">Roll</button>
+                                        <button type="button" class="skill-roll rollable" data-skill="{{skill.name}}" title="Roll {{skill.label}} (2d10+Level+Ability+Skill)">
+                                            {{#if (gt skill.totalModifier 0)}}+{{/if}}{{skill.totalModifier}}
+                                        </button>
                                     </div>
                                     {{/each}}
                                 </div>
@@ -493,7 +469,9 @@
                                     <div class="skill-tile">
                                         <label>{{skill.label}}</label>
                                         <input type="text" name="system.skills.{{skill.name}}" value="{{skill.value}}" data-dtype="Number"/>
-                                        <button type="button" class="skill-roll" data-skill="{{skill.name}}" title="Roll {{skill.label}}">Roll</button>
+                                        <button type="button" class="skill-roll rollable" data-skill="{{skill.name}}" title="Roll {{skill.label}} (2d10+Level+Ability+Skill)">
+                                            {{#if (gt skill.totalModifier 0)}}+{{/if}}{{skill.totalModifier}}
+                                        </button>
                                     </div>
                                     {{/each}}
                                 </div>
@@ -556,6 +534,25 @@
 
                 <!-- Talents & Powers Tab -->
                 <div class="tab" data-group="primary" data-tab="talents">
+                    <!-- Power Points Resource Section -->
+                    <div class="power-points-section">
+                        <h3>Power Points</h3>
+                        <div class="power-points-tiles">
+                            <div class="power-point-tile">
+                                <label>Current</label>
+                                <input type="text" name="system.powerPoints.value" value="{{system.powerPoints.value}}" data-dtype="Number" class="power-point-input"/>
+                            </div>
+                            <div class="power-point-tile">
+                                <label>Maximum</label>
+                                <input type="text" name="system.powerPoints.max" value="{{system.powerPoints.max}}" data-dtype="Number" class="power-point-input"/>
+                            </div>
+                            <div class="power-point-tile">
+                                <label>Usage Limit</label>
+                                <input type="text" name="system.powerPoints.limit" value="{{system.powerPoints.limit}}" data-dtype="Number" class="power-point-input"/>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="talents-container">
                         <div class="items-header">
                             <h3>Talents</h3>
