@@ -32,21 +32,41 @@ A narrative RPG system for FoundryVTT.
 avantVtt/
 ├── package.json         # Node.js package configuration
 ├── system.json          # System manifest and configuration
+├── template.json        # System data template definitions
+├── RULES.md             # System development rules and patterns
 ├── scripts/
 │   ├── avant.js         # Core system JavaScript
-│   ├── theme-config.js  # Theme configuration definitions
-│   ├── theme-manager.js # Theme management system
-│   └── theme-utils.js   # Theme development utilities
+│   ├── sheets/          # Sheet classes
+│   │   ├── actor-sheet.js  # Actor sheet implementation
+│   │   └── item-sheet.js   # Item sheet implementation
+│   ├── data/            # Data structure definitions
+│   │   ├── actor-data.js   # Actor data models
+│   │   └── item-data.js    # Item data models
+│   ├── dialogs/         # Dialog implementations
+│   ├── chat/            # Chat message handlers
+│   ├── themes/          # Theme management system
+│   └── utils/           # Utility functions
 ├── templates/
-│   ├── actor-sheet.html # Character sheet template
-│   └── item/            # Item sheet templates
+│   ├── actor-sheet.html    # Character sheet template
+│   ├── item-sheet.html     # General item sheet template
+│   ├── theme-manager.html  # Theme management interface
+│   ├── reroll-dialog.html  # Fortune point reroll dialog
+│   └── item/               # Specific item sheet templates
+│       ├── item-action-sheet.html
+│       ├── item-armor-sheet.html
+│       ├── item-augment-sheet.html
+│       ├── item-feature-sheet.html
+│       ├── item-gear-sheet.html
+│       ├── item-talent-sheet.html
+│       └── item-weapon-sheet.html
 ├── styles/
 │   ├── avant.scss       # SCSS source file (edit this)
 │   ├── avant.css        # Compiled CSS (generated from SCSS)
+│   ├── avant.css.map    # Source map for debugging
 │   └── themes/          # Theming system files
 ├── lang/
 │   └── en.json          # English localization
-└── assets/              # System assets
+└── assets/              # System assets (currently empty)
 ```
 
 ## Development
@@ -115,7 +135,7 @@ This includes:
 
 ## Requirements
 
-- FoundryVTT v13+ (v12 compatible)
+- FoundryVTT v12+
 - Node.js 16+ (for development)
 
 ## Support
