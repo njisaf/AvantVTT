@@ -1593,4 +1593,278 @@ $spacing-xxl: 30px;
       display: none;
     }
   }
+}
+
+/* ============================================================================
+ * Fortune Point Reroll Dialog
+ * ============================================================================ */
+
+.avant .reroll-dialog {
+  background: var(--theme-bg-secondary, #1E1E1E);
+  border: 2px solid var(--theme-accent-primary, $accent-cyan);
+  border-radius: 0;
+  color: var(--theme-text-primary, $text-primary);
+  min-height: 250px;
+  max-height: 300px;
+  overflow: hidden;
+}
+
+.avant .reroll-dialog .dialog-content {
+  padding: 12px 12px 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* Removed h3 header - redundant with dialog title bar */
+
+.avant .reroll-dialog .original-roll {
+  @include exo-body(12px);
+  color: var(--theme-text-secondary, $text-secondary);
+  margin: 0;
+}
+
+/* FP count moved to dedicated status area between dice and buttons */
+
+/* Removed "Select dice to reroll" h4 to save space for longer roll descriptions */
+
+.avant .reroll-dialog .dice-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 4px;
+}
+
+.avant .reroll-dialog .reroll-die {
+  cursor: pointer;
+  @include transition-standard;
+  position: relative;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  &.selected .die-face {
+    border-color: var(--theme-accent-secondary, $aqua-muted);
+    background: var(--theme-accent-secondary, $aqua-muted);
+    box-shadow: 0 0 16px var(--theme-accent-secondary, $aqua-muted);
+    transform: scale(1.05);
+    transition: all 0.15s ease; // Faster transition to reduce flicker
+
+    &.d10::before {
+      background: var(--theme-accent-secondary, $aqua-muted);
+      transition: all 0.15s ease; // Match the parent transition
+    }
+  }
+
+  // Already rerolled dice styling - greyed out and disabled
+  &.already-rerolled {
+    cursor: not-allowed;
+    opacity: 0.5;
+
+    &:hover {
+      transform: none; /* Disable hover scale effect */
+    }
+
+    .die-face {
+      border-color: var(--theme-text-secondary, $text-secondary);
+      background: var(--theme-text-secondary, $text-secondary);
+
+      &.d10::before {
+        background: var(--theme-bg-primary, $bg-primary);
+      }
+    }
+
+    .die-value {
+      color: var(--theme-text-secondary, $text-secondary);
+      text-shadow: none;
+    }
+  }
+}
+
+.avant .reroll-dialog .die-face {
+  width: 60px;
+  height: 60px;
+  border: 3px solid var(--theme-accent-primary, $accent-cyan);
+  background: var(--theme-bg-tertiary, $bg-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  @include transition-standard;
+  /* Use solid border instead of box-shadow for cleaner appearance */
+
+  &.d10 {
+    /* Create border effect before clipping */
+    background: var(--theme-accent-primary, $accent-cyan);
+    padding: 3px;
+    clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      right: 3px;
+      bottom: 3px;
+      background: var(--theme-bg-tertiary, $bg-tertiary);
+      clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+      z-index: 1;
+    }
+  }
+}
+
+.avant .reroll-dialog .die-value {
+  @include orbitron-header(20px, 900);
+  color: var(--theme-accent-primary, $accent-cyan);
+  text-shadow: 0 0 4px var(--theme-accent-primary, $accent-cyan);
+  position: relative;
+  z-index: 2;
+}
+
+.avant .reroll-dialog .reroll-die.selected .die-value {
+  color: var(--theme-bg-primary, $black-pure);
+  text-shadow: 0 0 6px var(--theme-bg-primary, $black-pure);
+  font-weight: 900;
+}
+
+.avant .reroll-dialog .reroll-indicator {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 16px;
+  height: 16px;
+  background: var(--theme-text-secondary, $text-secondary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  color: var(--theme-bg-primary, $bg-primary);
+  z-index: 3;
+}
+
+/* Fortune points status - compact display between dice and buttons */
+.avant .reroll-dialog .fp-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  @include exo-body(12px);
+  margin: 2px 0;
+
+  i {
+    color: var(--theme-accent-secondary, $aqua-muted);
+    font-size: 14px;
+  }
+
+  .fp-count {
+    color: var(--theme-accent-primary, $accent-cyan);
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  .fp-label {
+    color: var(--theme-text-secondary, $text-secondary);
+    font-weight: 500;
+  }
+}
+
+.avant .reroll-dialog .dialog-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 4px;
+  flex-shrink: 0;
+
+  button {
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    border: 2px solid var(--theme-accent-primary, $accent-cyan);
+    color: var(--theme-text-primary, $text-primary);
+    padding: 4px 8px;
+    @include exo-body(10px, 600);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    @include transition-standard;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border-radius: 0;
+    /* Ensure buttons maintain theming compatibility */
+    box-shadow: 0 0 0 1px transparent;
+    max-width: 140px;
+    flex: 1;
+
+    &:hover:not(:disabled) {
+      background: var(--theme-accent-primary, $accent-cyan);
+      color: var(--theme-bg-primary, $black-pure);
+      text-shadow: none;
+      box-shadow: 0 0 8px var(--theme-accent-primary, $accent-cyan);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      border-color: var(--theme-text-secondary, $text-secondary);
+    }
+  }
+}
+
+.avant .reroll-dialog .reroll-cancel {
+  border-color: var(--theme-text-secondary, $text-secondary) !important;
+
+  &:hover:not(:disabled) {
+    background: var(--theme-text-secondary, $text-secondary) !important;
+    color: var(--theme-bg-primary, $black-pure) !important;
+    box-shadow: 0 0 8px var(--theme-text-secondary, $text-secondary) !important;
+  }
+}
+
+/* ============================================================================
+ * Chat Context Menu
+ * ============================================================================ */
+
+.avant-context-menu {
+  background: var(--theme-bg-secondary, #1E1E1E);
+  border: 2px solid var(--theme-accent-primary, $accent-cyan);
+  border-radius: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  min-width: 200px;
+
+  .context-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .context-menu-item {
+    padding: 12px 16px;
+    @include exo-body(14px, 500);
+    cursor: pointer;
+    @include transition-standard;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--theme-bg-tertiary, $bg-tertiary);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background: var(--theme-accent-primary, $accent-cyan);
+      color: var(--theme-bg-primary, $black-pure);
+    }
+
+    i {
+      font-size: 14px;
+      width: 16px;
+      text-align: center;
+    }
+  }
 } 

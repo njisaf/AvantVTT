@@ -1,0 +1,43 @@
+<form class="avant reroll-dialog">
+    <div class="dialog-content">
+        <div class="reroll-header">
+            <p class="original-roll">Original Roll: {{originalFlavor}} = {{originalTotal}}</p>
+        </div>
+        
+        <div class="dice-selection">
+            <div class="dice-container">
+                {{#each d10Results}}
+                <div class="reroll-die {{#if selected}}selected{{/if}} {{#if wasRerolled}}already-rerolled{{/if}}" 
+                     data-index="{{index}}" 
+                     title="{{#if wasRerolled}}Already rerolled - cannot reroll again{{else}}Click to select/deselect{{/if}}">
+                    <div class="die-face d10">
+                        <span class="die-value">{{value}}</span>
+                    </div>
+                    {{#if wasRerolled}}
+                    <div class="reroll-indicator">
+                        <i class="fas fa-redo"></i>
+                    </div>
+                    {{/if}}
+                </div>
+                {{/each}}
+            </div>
+        </div>
+        
+        <div class="fp-status">
+            <i class="fas fa-star"></i>
+            <span class="fp-count">{{fortunePoints}}</span>
+            <span class="fp-label">Fortune Point{{#unless (eq fortunePoints 1)}}s{{/unless}} Available</span>
+        </div>
+        
+        <div class="dialog-buttons">
+            <button type="button" class="reroll-confirm" {{#unless canReroll}}disabled{{/unless}}>
+                <i class="fas fa-dice"></i>
+                {{#if selectedCount}}Reroll {{selectedCount}} ({{selectedCount}} FP){{else}}Select Dice{{/if}}
+            </button>
+            <button type="button" class="reroll-cancel">
+                <i class="fas fa-times"></i>
+                Cancel
+            </button>
+        </div>
+    </div>
+</form> 
