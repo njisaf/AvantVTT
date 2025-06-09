@@ -376,22 +376,22 @@ $spacing-xxl: 30px;
 
   // Compact Resource Sections
   .sidebar-section {
-    margin-bottom: $spacing-xl; // Reduced from 25px
+    margin-bottom: $spacing-lg; // Further reduced from 20px to 15px
 
     h4 {
-      margin: 0 0 $spacing-md 0; // Reduced from 15px
+      margin: 0 0 $spacing-sm 0; // Further reduced from 12px to 8px
       @include orbitron-header(11px, 700); // Reduced from 12px
       letter-spacing: 1px;
       border-bottom: 1px solid var(--theme-border-primary, $border-primary);
-      padding-bottom: $spacing-xs; // Reduced from 5px
+      padding-bottom: 2px; // Further reduced from 4px to 2px
     }
   }
 
   // New Stat Tiles Row Layout
   .stat-tiles-row {
     display: flex;
-    gap: $spacing-sm;
-    margin-bottom: 10px;
+    gap: 6px; // Reduced from 8px to 6px
+    margin-bottom: 8px; // Reduced from 10px to 8px
   }
 
   .stat-tile {
@@ -399,11 +399,11 @@ $spacing-xxl: 30px;
     background: var(--theme-bg-tertiary, $bg-tertiary);
     border: 1px solid var(--theme-border-primary, $border-primary);
     border-bottom: 3px solid var(--theme-accent-primary, $accent-cyan);
-    padding: $spacing-sm 6px;
+    padding: 6px 6px; // Reduced from 8px to 6px
     text-align: center;
     display: flex;
     flex-direction: column;
-    gap: $spacing-xs;
+    gap: 2px; // Reduced from 4px to 2px
     @include transition-standard;
 
     &.readonly {
@@ -496,13 +496,13 @@ $spacing-xxl: 30px;
   .sidebar-abilities {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: $spacing-sm; // Reduced from 10px
-    margin-bottom: $spacing-lg; // Reduced from 20px
+    gap: 6px; // Further reduced from 8px to 6px
+    margin-bottom: 8px; // Further reduced from 15px to 8px
   }
 
   .sidebar-ability {
     background: var(--theme-bg-tertiary, $bg-tertiary);
-    padding: $spacing-sm; // Reduced from 12px
+    padding: 6px; // Further reduced from 8px to 6px
     border: 1px solid var(--theme-border-primary, $border-primary);
     text-align: center;
     @include transition-standard;
@@ -512,10 +512,10 @@ $spacing-xxl: 30px;
       @include orbitron-header(10px, 600); // Increased from 8px as requested
       letter-spacing: 0.5px;
       color: var(--theme-text-secondary, $text-secondary);
-      margin-bottom: 6px; // Increased from 4px
+      margin-bottom: 4px; // Reduced back from 6px to 4px
     }
 
-    input {
+    input:not(.ability-modifier-input) {
       background: var(--theme-bg-primary, $bg-primary);
       border: 1px solid var(--theme-border-primary, $border-primary);
       color: var(--theme-text-primary, $text-primary);
@@ -537,25 +537,54 @@ $spacing-xxl: 30px;
   // New ability input row layout
   .ability-input-row {
     display: flex;
-    gap: $spacing-xs;
+    gap: 2px; // Reduced from 4px to 2px
     align-items: center;
+    justify-content: space-between;
   }
 
-  .sidebar-ability-mod {
+  .ability-modifier-input {
     background: var(--theme-bg-primary, $bg-primary);
+    border: 1px solid var(--theme-border-primary, $border-primary);
+    color: var(--theme-text-primary, $text-primary);
+    @include exo-body(14px, 600);
+    padding: 4px 6px;
+    border-radius: 0;
+    text-align: center;
+    width: 40px; // Fixed small width for 1-2 digits
+    flex-shrink: 0;
+    @include transition-standard;
+
+    &:focus {
+      border-color: var(--theme-accent-primary, $accent-cyan);
+      outline: none;
+      box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
+    }
+  }
+
+  .ability-roll-btn {
+    background: transparent !important;
     color: var(--theme-accent-primary, $accent-cyan);
-    @include orbitron-header(10px, 700);
-    padding: $spacing-xs 6px;
-    border: 1px solid var(--theme-accent-primary, $accent-cyan);
+    padding: 4px 2px !important;
+    border: none !important;
+    margin: 0;
     cursor: pointer;
     @include transition-standard;
-    text-align: center;
-    width: 40px; // Fixed width for consistency
+    width: 40px; // Match the input width exactly
+    height: 28px;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: none !important;
+    @include orbitron-header(13px, 700); // Increased from 11px for better visibility
+    letter-spacing: 0.5px;
 
     &:hover {
-      background: var(--theme-accent-primary, $accent-cyan);
       color: var(--theme-bg-primary, $bg-primary);
+      background: var(--theme-accent-primary, $accent-cyan) !important;
+      border: none !important;
+      border-radius: 2px;
+      box-shadow: var(--theme-shadow-accent, 0 0 8px rgba(0, 224, 220, 0.4));
     }
   }
 
@@ -931,21 +960,24 @@ $spacing-xxl: 30px;
     }
 
     .skill-roll {
-      background: var(--theme-bg-tertiary, $bg-tertiary);
-      border: 1px solid var(--theme-accent-primary, $accent-cyan);
+      background: transparent !important;
+      border: none !important;
       color: var(--theme-accent-primary, $accent-cyan);
-      @include orbitron-header(7px, 700); // Reduced from 9px
-      padding: 3px $spacing-xs; // Reduced from 6px 8px
+      @include orbitron-header(11px, 700); // Increased from 9px for better visibility
+      padding: 3px 6px !important;
       border-radius: 0;
       cursor: pointer;
       @include transition-standard;
       white-space: nowrap;
       width: 100%;
+      text-transform: none !important;
+      letter-spacing: 0.5px;
 
       &:hover {
-        background: var(--theme-accent-primary, $accent-cyan);
+        background: var(--theme-accent-primary, $accent-cyan) !important;
         color: var(--theme-bg-primary, $bg-primary);
-        box-shadow: 0 0 10px rgba(0, 224, 220, 0.5);
+        box-shadow: 0 0 8px rgba(0, 224, 220, 0.4);
+        border-radius: 2px;
       }
     }
   }
@@ -1080,21 +1112,25 @@ $spacing-xxl: 30px;
   }
 
   .skill-roll {
-    background: var(--theme-bg-primary, $bg-primary);
-    border: 1px solid var(--theme-accent-primary, $accent-cyan);
+    background: transparent !important;
+    border: none !important;
     color: var(--theme-accent-primary, $accent-cyan);
-    @include orbitron-header(9px, 700);
-    padding: 6px $spacing-sm;
+    @include orbitron-header(12px, 700); // Increased from 10px for better visibility
+    padding: 4px 8px !important;
     border-radius: 0;
     cursor: pointer;
     @include transition-standard;
     white-space: nowrap;
     width: 100%;
+    text-transform: none !important;
+    letter-spacing: 0.5px;
+    min-width: 40px;
 
     &:hover {
-      background: var(--theme-accent-primary, $accent-cyan);
+      background: var(--theme-accent-primary, $accent-cyan) !important;
       color: var(--theme-bg-primary, $bg-primary);
-      box-shadow: 0 0 10px rgba(0, 224, 220, 0.5);
+      box-shadow: 0 0 8px rgba(0, 224, 220, 0.4);
+      border-radius: 2px;
     }
   }
 
@@ -1331,10 +1367,76 @@ $spacing-xxl: 30px;
     resize: vertical;
   }
 
-  // Hide original resource sections that are now in sidebar
+  // Power Points Section in Talents Tab
+  .power-points-section {
+    background: var(--theme-bg-secondary, $bg-secondary);
+    border: 2px solid var(--theme-accent-primary, $accent-cyan);
+    border-radius: 0;
+    padding: $spacing-xl;
+    margin-bottom: $spacing-xxl;
+    
+    h3 {
+      margin: 0 0 $spacing-lg 0;
+      @include orbitron-header(16px, 700);
+      color: var(--theme-accent-primary, $accent-cyan);
+      letter-spacing: 2px;
+      text-align: center;
+      border-bottom: 1px solid var(--theme-accent-primary, $accent-cyan);
+      padding-bottom: $spacing-sm;
+    }
+  }
+
+  .power-points-tiles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: $spacing-lg;
+    justify-items: center;
+  }
+
+  .power-point-tile {
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    border: 2px solid var(--theme-border-primary, $border-primary);
+    border-bottom: 4px solid var(--theme-accent-primary, $accent-cyan);
+    padding: $spacing-lg;
+    text-align: center;
+    @include transition-standard;
+    min-width: 120px;
+    
+    &:hover {
+      border-color: var(--theme-accent-primary, $accent-cyan);
+      box-shadow: var(--theme-shadow-primary, $shadow-primary);
+    }
+
+    label {
+      display: block;
+      @include orbitron-header(12px, 600);
+      color: var(--theme-text-secondary, $text-secondary);
+      margin-bottom: $spacing-sm;
+      letter-spacing: 1px;
+    }
+  }
+
+  .power-point-input {
+    background: var(--theme-bg-primary, $bg-primary);
+    border: 2px solid var(--theme-border-primary, $border-primary);
+    color: var(--theme-text-primary, $text-primary);
+    @include exo-body(18px, 700);
+    padding: $spacing-sm;
+    border-radius: 0;
+    width: 100%;
+    text-align: center;
+    @include transition-standard;
+
+    &:focus {
+      border-color: var(--theme-accent-primary, $accent-cyan);
+      outline: none;
+      box-shadow: inset 0 0 10px rgba(0, 224, 220, 0.3);
+    }
+  }
+
+  // Hide original resource sections that are now in sidebar or moved
   .resource-row,
   .defense-hp-section,
-  .power-points-section,
   .abilities-section {
     display: none;
   }

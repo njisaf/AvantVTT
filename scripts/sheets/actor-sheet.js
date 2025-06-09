@@ -47,13 +47,26 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
         context.system = actorData.system;
         context.flags = actorData.flags;
         
-        // Ensure derived data is calculated (may have been done already by actor.prepareData)
-        // But we'll do it here to be safe since templates need the calculated values
+        // Calculate total modifiers for display (level + ability modifier)
+        context.abilityTotalModifiers = {};
+        const level = context.system.level || 1;
+        
         if (context.system.abilities) {
             for (const [abilityName, abilityData] of Object.entries(context.system.abilities)) {
-                if (abilityData && typeof abilityData.value === 'number') {
-                    context.system.abilities[abilityName].mod = Math.floor((abilityData.value - 10) / 2);
-                }
+                const abilityMod = abilityData.modifier || 0;
+                context.abilityTotalModifiers[abilityName] = level + abilityMod;
+            }
+        }
+        
+        // Calculate skill total modifiers (level + ability modifier + skill value)
+        context.skillTotalModifiers = {};
+        const skillToAbilityMap = AvantActorData.getSkillAbilities();
+        
+        if (context.system.skills) {
+            for (const [skillName, abilityName] of Object.entries(skillToAbilityMap)) {
+                const skillValue = context.system.skills[skillName] || 0;
+                const abilityMod = context.system.abilities?.[abilityName]?.modifier || 0;
+                context.skillTotalModifiers[skillName] = level + abilityMod + skillValue;
             }
         }
         
@@ -61,7 +74,7 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
         // Calculate defense values (base 11 + tier + ability modifier)
         if (context.system.defense && context.system.abilities) {
             for (const [abilityName, abilityData] of Object.entries(context.system.abilities)) {
-                context.system.defense[abilityName] = 11 + (context.system.tier || 1) + (abilityData.mod || 0);
+                context.system.defense[abilityName] = 11 + (context.system.tier || 1) + (abilityData.modifier || 0);
             }
         }
         
@@ -116,7 +129,8 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
                 context.skillsByAbility[abilityName].push({
                     name: skillName,
                     label: skillName.charAt(0).toUpperCase() + skillName.slice(1),
-                    value: actorData.system.skills[skillName] || 0
+                    value: actorData.system.skills[skillName] || 0,
+                    totalModifier: context.skillTotalModifiers[skillName] || 0
                 });
             }
         }
@@ -349,7 +363,7 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
     }
 
     /**
-     * Handle ability rolls (checks and score generation)
+     * Handle ability rolls (checks only - no more score generation)
      * @param {Event} event - The triggering event
      * @returns {Promise<Roll|void>} The executed roll or void
      * @private
@@ -373,39 +387,18 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
             return;
         }
 
-        // Check if this is a generation roll (Shift+Click) or a check roll (normal click)
-        const isGenerationRoll = event.shiftKey;
-        
         try {
-            let roll, flavorText;
+            // Ability Check: 2d10 + Level + Ability Modifier (Avant system)
+            // Use the direct ability modifier (no calculation needed)
+            const abilityMod = abilityData.modifier || 0;
             
-            if (isGenerationRoll) {
-                // Ability Score Generation: 4d6 drop lowest
-                roll = new Roll("4d6kh3");
-                await roll.evaluate();
-                
-                // Update the actor's ability score with the new value
-                const newValue = roll.total;
-                const updatePath = `system.abilities.${ability}.value`;
-                await actor.update({
-                    [updatePath]: newValue
-                });
-                
-                flavorText = `${ability.charAt(0).toUpperCase() + ability.slice(1)} Score Generation`;
-                ui.notifications.info(`Generated ${ability} score: ${newValue}`);
-            } else {
-                // Ability Check: 2d10 + Level + Ability Modifier (Avant system)
-                // Calculate ability modifier from ability score (standard D&D-style: (score-10)/2)
-                const abilityMod = Math.floor((abilityData.value - 10) / 2);
-                
-                roll = new Roll("2d10 + @level + @abilityMod", { 
-                    level: actor.system.level,
-                    abilityMod: abilityMod
-                });
-                await roll.evaluate();
-                
-                flavorText = `${ability.charAt(0).toUpperCase() + ability.slice(1)} Check`;
-            }
+            const roll = new Roll("2d10 + @level + @abilityMod", { 
+                level: actor.system.level,
+                abilityMod: abilityMod
+            });
+            await roll.evaluate();
+            
+            const flavorText = `${ability.charAt(0).toUpperCase() + ability.slice(1)} Check`;
             
             await roll.toMessage({
                 speaker: ChatMessage.getSpeaker({ actor: actor }),
@@ -443,8 +436,8 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
         const abilityKey = skillAbilities[skill];
         const abilityData = actor.system.abilities[abilityKey];
         
-        // Calculate ability modifier dynamically from ability score (standard D&D-style: (score-10)/2)
-        const abilityMod = abilityData ? Math.floor((abilityData.value - 10) / 2) : 0;
+        // Use the direct ability modifier (no calculation needed)
+        const abilityMod = abilityData ? (abilityData.modifier || 0) : 0;
         
         if (skillValue === undefined) {
             console.warn(`Avant | Skill '${skill}' not found on actor`);

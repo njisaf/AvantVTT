@@ -33,23 +33,19 @@ export class AvantActorData extends foundry.abstract.DataModel {
             background: new fields.StringField({ required: true, initial: "", blank: true }),
             languages: new fields.StringField({ required: true, initial: "", blank: true }),
             
-            // Core Abilities
+            // Core Abilities - Direct modifiers (not D&D-style scores)
             abilities: new fields.SchemaField({
                 might: new fields.SchemaField({
-                    value: new fields.NumberField({ required: true, initial: 10, integer: true, min: 1, max: 30 }),
-                    mod: new fields.NumberField({ required: true, initial: 0, integer: true })
+                    modifier: new fields.NumberField({ required: true, initial: 0, integer: true, min: -10, max: 10 })
                 }),
                 grace: new fields.SchemaField({
-                    value: new fields.NumberField({ required: true, initial: 10, integer: true, min: 1, max: 30 }),
-                    mod: new fields.NumberField({ required: true, initial: 0, integer: true })
+                    modifier: new fields.NumberField({ required: true, initial: 0, integer: true, min: -10, max: 10 })
                 }),
                 intellect: new fields.SchemaField({
-                    value: new fields.NumberField({ required: true, initial: 10, integer: true, min: 1, max: 30 }),
-                    mod: new fields.NumberField({ required: true, initial: 0, integer: true })
+                    modifier: new fields.NumberField({ required: true, initial: 0, integer: true, min: -10, max: 10 })
                 }),
                 focus: new fields.SchemaField({
-                    value: new fields.NumberField({ required: true, initial: 10, integer: true, min: 1, max: 30 }),
-                    mod: new fields.NumberField({ required: true, initial: 0, integer: true })
+                    modifier: new fields.NumberField({ required: true, initial: 0, integer: true, min: -10, max: 10 })
                 })
             }),
             
@@ -155,25 +151,18 @@ export class AvantActorData extends foundry.abstract.DataModel {
      */
     static getSkillAbilities() {
         return {
-            // Might-based
-            'debate': 'might',
-            'force': 'might',
-            
-            // Grace-based
-            'finesse': 'grace',
-            'hide': 'grace',
-            
-            // Intellect-based
-            'command': 'intellect',
-            'inspect': 'intellect',
-            'recall': 'intellect',
-            
-            // Focus-based
-            'charm': 'focus',
+            'debate': 'intellect',
             'discern': 'focus',
             'endure': 'focus',
+            'finesse': 'grace',
+            'force': 'might',
+            'command': 'might',
+            'charm': 'grace',
+            'hide': 'grace',
+            'inspect': 'intellect',
             'intuit': 'focus',
-            'surge': 'focus'
+            'recall': 'intellect',
+            'surge': 'might'
         };
     }
     
@@ -214,22 +203,17 @@ export class AvantActorData extends foundry.abstract.DataModel {
     prepareDerivedData() {
         // Note: DataModel doesn't have prepareDerivedData, so no super call needed
         
-        // Calculate ability modifiers (D&D style: (score-10)/2)
-        for (const [abilityName, abilityData] of Object.entries(this.abilities)) {
-            if (abilityData && typeof abilityData.value === 'number') {
-                abilityData.mod = Math.floor((abilityData.value - 10) / 2);
-            }
-        }
+        // No need to calculate ability modifiers - they are direct values now
         
         // Calculate defense values (base 11 + tier + ability modifier)
         for (const [abilityName, abilityData] of Object.entries(this.abilities)) {
-            this.defense[abilityName] = 11 + this.tier + (abilityData.mod || 0);
+            this.defense[abilityName] = 11 + this.tier + (abilityData.modifier || 0);
         }
         
         // Calculate max health based on tier and might modifier
         const baseHealth = 20;
         const tierBonus = (this.tier - 1) * 5;
-        const mightBonus = this.abilities.might.mod || 0;
+        const mightBonus = this.abilities.might.modifier || 0;
         this.health.max = Math.max(1, baseHealth + tierBonus + mightBonus);
         
         // Ensure current health doesn't exceed max
@@ -240,7 +224,7 @@ export class AvantActorData extends foundry.abstract.DataModel {
         // Calculate max power points based on tier and intellect modifier
         const basePP = 10;
         const tierPPBonus = (this.tier - 1) * 5;
-        const intellectBonus = this.abilities.intellect.mod || 0;
+        const intellectBonus = this.abilities.intellect.modifier || 0;
         this.powerPoints.max = Math.max(0, basePP + tierPPBonus + intellectBonus);
         
         // Calculate power point limit (can be spent at once) - typically 1/3 of max
@@ -262,8 +246,9 @@ export class AvantActorData extends foundry.abstract.DataModel {
             this.defense.focus
         );
         
-        // Calculate encumbrance max based on might score
-        const mightScore = this.abilities.might.value || 10;
-        this.physical.encumbrance.max = mightScore * 10; // Simple encumbrance calculation
+        // Calculate encumbrance max based on might modifier + base value
+        const mightModifier = this.abilities.might.modifier || 0;
+        const baseEncumbrance = 100; // Base carrying capacity
+        this.physical.encumbrance.max = baseEncumbrance + (mightModifier * 10); // Simple encumbrance calculation
     }
 } 

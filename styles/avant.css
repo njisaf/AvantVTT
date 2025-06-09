@@ -602,10 +602,10 @@
   flex-shrink: 0;
 }
 .avant .sidebar-section {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 .avant .sidebar-section h4 {
-  margin: 0 0 12px 0;
+  margin: 0 0 8px 0;
   font-family: var(--theme-font-display, "Orbitron", monospace);
   font-size: 11px;
   font-weight: 700;
@@ -614,23 +614,23 @@
   color: var(--theme-accent-primary, #00E0DC);
   letter-spacing: 1px;
   border-bottom: 1px solid var(--theme-border-primary, #404040);
-  padding-bottom: 4px;
+  padding-bottom: 2px;
 }
 .avant .stat-tiles-row {
   display: flex;
-  gap: 8px;
-  margin-bottom: 10px;
+  gap: 6px;
+  margin-bottom: 8px;
 }
 .avant .stat-tile {
   flex: 1;
   background: var(--theme-bg-tertiary, #333333);
   border: 1px solid var(--theme-border-primary, #404040);
   border-bottom: 3px solid var(--theme-accent-primary, #00E0DC);
-  padding: 8px 6px;
+  padding: 6px 6px;
   text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   transition: all 0.3s ease;
 }
 .avant .stat-tile.readonly {
@@ -732,12 +732,12 @@
 .avant .sidebar-abilities {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 15px;
+  gap: 6px;
+  margin-bottom: 8px;
 }
 .avant .sidebar-ability {
   background: var(--theme-bg-tertiary, #333333);
-  padding: 8px;
+  padding: 6px;
   border: 1px solid var(--theme-border-primary, #404040);
   text-align: center;
   transition: all 0.3s ease;
@@ -752,9 +752,9 @@
   color: var(--theme-accent-primary, #00E0DC);
   letter-spacing: 0.5px;
   color: var(--theme-text-secondary, #BFBFBF);
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
-.avant .sidebar-ability input {
+.avant .sidebar-ability input:not(.ability-modifier-input) {
   background: var(--theme-bg-primary, #1C1C1C);
   border: 1px solid var(--theme-border-primary, #404040);
   color: var(--theme-text-primary, #FFFFFF);
@@ -768,36 +768,66 @@
   text-align: center;
   transition: all 0.3s ease;
 }
-.avant .sidebar-ability input:focus {
+.avant .sidebar-ability input:not(.ability-modifier-input):focus {
   border-color: var(--theme-accent-primary, #00E0DC);
   outline: none;
   box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
 }
 .avant .ability-input-row {
   display: flex;
-  gap: 4px;
+  gap: 2px;
   align-items: center;
+  justify-content: space-between;
 }
-.avant .sidebar-ability-mod {
+.avant .ability-modifier-input {
   background: var(--theme-bg-primary, #1C1C1C);
+  border: 1px solid var(--theme-border-primary, #404040);
+  color: var(--theme-text-primary, #FFFFFF);
+  font-family: var(--theme-font-primary, "Exo 2", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--theme-text-primary, #FFFFFF);
+  padding: 4px 6px;
+  border-radius: 0;
+  text-align: center;
+  width: 40px;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+.avant .ability-modifier-input:focus {
+  border-color: var(--theme-accent-primary, #00E0DC);
+  outline: none;
+  box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
+}
+.avant .ability-roll-btn {
+  background: transparent !important;
   color: var(--theme-accent-primary, #00E0DC);
+  padding: 4px 2px !important;
+  border: none !important;
+  margin: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 40px;
+  height: 28px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: none !important;
   font-family: var(--theme-font-display, "Orbitron", monospace);
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
   color: var(--theme-accent-primary, #00E0DC);
-  padding: 4px 6px;
-  border: 1px solid var(--theme-accent-primary, #00E0DC);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-align: center;
-  width: 40px;
-  flex-shrink: 0;
+  letter-spacing: 0.5px;
 }
-.avant .sidebar-ability-mod:hover {
-  background: var(--theme-accent-primary, #00E0DC);
+.avant .ability-roll-btn:hover {
   color: var(--theme-bg-primary, #1C1C1C);
+  background: var(--theme-accent-primary, #00E0DC) !important;
+  border: none !important;
+  border-radius: 2px;
+  box-shadow: var(--theme-shadow-accent, 0 0 8px rgba(0, 224, 220, 0.4));
 }
 .avant .main-content {
   flex: 1;
@@ -1202,26 +1232,29 @@
   box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
 }
 .avant .skill-tile .skill-roll {
-  background: var(--theme-bg-tertiary, #333333);
-  border: 1px solid var(--theme-accent-primary, #00E0DC);
+  background: transparent !important;
+  border: none !important;
   color: var(--theme-accent-primary, #00E0DC);
   font-family: var(--theme-font-display, "Orbitron", monospace);
-  font-size: 7px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
   color: var(--theme-accent-primary, #00E0DC);
-  padding: 3px 4px;
+  padding: 3px 6px !important;
   border-radius: 0;
   cursor: pointer;
   transition: all 0.3s ease;
   white-space: nowrap;
   width: 100%;
+  text-transform: none !important;
+  letter-spacing: 0.5px;
 }
 .avant .skill-tile .skill-roll:hover {
-  background: var(--theme-accent-primary, #00E0DC);
+  background: var(--theme-accent-primary, #00E0DC) !important;
   color: var(--theme-bg-primary, #1C1C1C);
-  box-shadow: 0 0 10px rgba(0, 224, 220, 0.5);
+  box-shadow: 0 0 8px rgba(0, 224, 220, 0.4);
+  border-radius: 2px;
 }
 .avant .skills-section {
   background: var(--theme-bg-secondary, #2A2A2A);
@@ -1357,26 +1390,30 @@
   box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
 }
 .avant .skill-roll {
-  background: var(--theme-bg-primary, #1C1C1C);
-  border: 1px solid var(--theme-accent-primary, #00E0DC);
+  background: transparent !important;
+  border: none !important;
   color: var(--theme-accent-primary, #00E0DC);
   font-family: var(--theme-font-display, "Orbitron", monospace);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
   color: var(--theme-accent-primary, #00E0DC);
-  padding: 6px 8px;
+  padding: 4px 8px !important;
   border-radius: 0;
   cursor: pointer;
   transition: all 0.3s ease;
   white-space: nowrap;
   width: 100%;
+  text-transform: none !important;
+  letter-spacing: 0.5px;
+  min-width: 40px;
 }
 .avant .skill-roll:hover {
-  background: var(--theme-accent-primary, #00E0DC);
+  background: var(--theme-accent-primary, #00E0DC) !important;
   color: var(--theme-bg-primary, #1C1C1C);
-  box-shadow: 0 0 10px rgba(0, 224, 220, 0.5);
+  box-shadow: 0 0 8px rgba(0, 224, 220, 0.4);
+  border-radius: 2px;
 }
 .avant .items-header {
   display: flex;
@@ -1646,9 +1683,79 @@
   outline: none;
   box-shadow: inset 0 0 10px var(--theme-shadow-primary, rgba(0, 224, 220, 0.2));
 }
+.avant .power-points-section {
+  background: var(--theme-bg-secondary, #2A2A2A);
+  border: 2px solid var(--theme-accent-primary, #00E0DC);
+  border-radius: 0;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+.avant .power-points-section h3 {
+  margin: 0 0 15px 0;
+  font-family: var(--theme-font-display, "Orbitron", monospace);
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--theme-accent-primary, #00E0DC);
+  color: var(--theme-accent-primary, #00E0DC);
+  letter-spacing: 2px;
+  text-align: center;
+  border-bottom: 1px solid var(--theme-accent-primary, #00E0DC);
+  padding-bottom: 8px;
+}
+.avant .power-points-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  justify-items: center;
+}
+.avant .power-point-tile {
+  background: var(--theme-bg-tertiary, #333333);
+  border: 2px solid var(--theme-border-primary, #404040);
+  border-bottom: 4px solid var(--theme-accent-primary, #00E0DC);
+  padding: 15px;
+  text-align: center;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+.avant .power-point-tile:hover {
+  border-color: var(--theme-accent-primary, #00E0DC);
+  box-shadow: var(--theme-shadow-primary, 0 4px 20px rgba(0, 224, 220, 0.1));
+}
+.avant .power-point-tile label {
+  display: block;
+  font-family: var(--theme-font-display, "Orbitron", monospace);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--theme-accent-primary, #00E0DC);
+  color: var(--theme-text-secondary, #BFBFBF);
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+.avant .power-point-input {
+  background: var(--theme-bg-primary, #1C1C1C);
+  border: 2px solid var(--theme-border-primary, #404040);
+  color: var(--theme-text-primary, #FFFFFF);
+  font-family: var(--theme-font-primary, "Exo 2", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--theme-text-primary, #FFFFFF);
+  padding: 8px;
+  border-radius: 0;
+  width: 100%;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+.avant .power-point-input:focus {
+  border-color: var(--theme-accent-primary, #00E0DC);
+  outline: none;
+  box-shadow: inset 0 0 10px rgba(0, 224, 220, 0.3);
+}
 .avant .resource-row,
 .avant .defense-hp-section,
-.avant .power-points-section,
 .avant .abilities-section {
   display: none;
 }

@@ -8,17 +8,12 @@ This document summarizes the core mechanics, rolling rules, and data conventions
 
 ### **Ability Checks**
 - **Formula:** `2d10 + Level + Ability Modifier`
-- **How to Roll:** Click the modifier (e.g., `+2`) next to an ability in the character sheet sidebar.
-- **Ability Modifier Calculation:**
-  - `modifier = floor((ability score - 10) / 2)`
-  - Example: Ability score 14 → modifier +2
+- **How to Roll:** Click the "Roll" button next to an ability in the character sheet sidebar.
+- **Ability Modifier System:** Direct modifiers (not D&D-style scores)
+  - Abilities are entered as direct modifiers (e.g., Might 5 means +5 to rolls)
+  - No calculation needed - the number you enter IS the modifier
+  - Example: Might 3 → rolls get +3, Grace -1 → rolls get -1
 - **Chat Output:** The result is posted to chat as "[Ability] Check" (e.g., "Might Check").
-
-### **Ability Score Generation**
-- **Formula:** `4d6kh3` (roll 4d6, keep the highest 3)
-- **How to Roll:** Shift+Click the modifier next to an ability in the sidebar.
-- **Effect:** The ability score is updated to the new value, and the modifier recalculates automatically.
-- **Chat Output:** The result is posted to chat as "[Ability] Score Generation" (e.g., "Grace Score Generation").
 
 ### **Skill Checks**
 - **Formula:** `2d10 + Level + Ability Modifier + Skill Value`
@@ -59,8 +54,7 @@ This document summarizes the core mechanics, rolling rules, and data conventions
   - Intellect
   - Focus
 - **Each ability has:**
-  - `value` (the score, e.g., 14)
-  - `mod` (the calculated modifier, e.g., +2)
+  - `modifier` (the direct modifier, e.g., 3 for +3, -1 for -1)
 
 ### **Skills**
 - **Skill List:**
@@ -98,8 +92,8 @@ This document summarizes the core mechanics, rolling rules, and data conventions
 - **Version Compatibility:**
   - System is compatible with both FoundryVTT v12 and v13.
   - Uses only APIs and patterns supported in both versions.
-- **Modifier Calculation:**
-  - Modifiers are always recalculated from the current ability score.
+- **Direct Modifiers:**
+  - Ability values are direct modifiers - no calculation needed.
 - **Roll API:**
   - Uses FoundryVTT's `Roll` class for all dice rolls (see [FoundryVTT Roll API](https://foundryvtt.com/api/classes/foundry.dice.Roll.html)).
 
@@ -115,16 +109,9 @@ This document summarizes the core mechanics, rolling rules, and data conventions
 
 ## 📚 Example: Ability Check Flow
 
-1. User clicks the `+2` next to "Might" in the sidebar.
-2. System calculates: `2d10 + Level + Might Modifier`.
+1. User clicks the "Roll" button next to "Might" in the sidebar.
+2. System calculates: `2d10 + Level + Might Modifier` (where Might Modifier is the direct value entered).
 3. Result is posted to chat as "Might Check".
-
-## 📚 Example: Ability Score Generation Flow
-
-1. User shift+clicks the `+2` next to "Grace" in the sidebar.
-2. System rolls `4d6kh3` and updates the Grace score.
-3. Modifier recalculates and UI updates.
-4. Result is posted to chat as "Grace Score Generation".
 
 ## 📚 Example: Fortune Point Reroll Flow
 

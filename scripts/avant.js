@@ -166,8 +166,8 @@ class AvantActor extends Actor {
         // Add commonly used roll data
         if (this.system.abilities) {
             for (const [abilityName, abilityData] of Object.entries(this.system.abilities)) {
-                data[abilityName] = abilityData.value;
-                data[`${abilityName}Mod`] = abilityData.mod;
+                data[abilityName] = abilityData.modifier;
+                data[`${abilityName}Mod`] = abilityData.modifier;
             }
         }
         
