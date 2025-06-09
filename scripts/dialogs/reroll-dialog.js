@@ -85,6 +85,9 @@ export class AvantRerollDialog extends Application {
     activateListeners(html) {
         super.activateListeners(html);
         
+        // Apply theme immediately after render to prevent flickering
+        this._applyThemeToDialog();
+        
         // Dice selection
         html.find('.reroll-die').click(this._onDieClick.bind(this));
         
@@ -125,7 +128,9 @@ export class AvantRerollDialog extends Application {
             }
         }
         
-        this.render(false);
+        // Use partial refresh to prevent theming flicker
+        this._updateDiceSelection();
+        this._updateButtonStates();
     }
     
     /**
@@ -303,5 +308,73 @@ export class AvantRerollDialog extends Application {
         }
         
         return `Reroll for ${selectedCount} Fortune Point${selectedCount > 1 ? 's' : ''}`;
+    }
+    
+    /**
+     * Apply theme to dialog immediately to prevent flickering
+     * @private
+     */
+    _applyThemeToDialog() {
+        // Get the dialog element
+        const dialogElement = this.element?.[0] || this.element;
+        
+        if (dialogElement && game.avant?.themeManager) {
+            console.log('Avant | Applying theme to reroll dialog');
+            
+            // Ensure the dialog has the avant class for theming
+            if (!dialogElement.classList.contains('avant')) {
+                dialogElement.classList.add('avant');
+            }
+            
+            // Apply current theme directly to this dialog
+            game.avant.themeManager.applyThemeToElement(dialogElement, game.avant.themeManager.currentTheme);
+        }
+    }
+    
+    /**
+     * Update dice selection visual states without full re-render
+     * @private
+     */
+    _updateDiceSelection() {
+        const dialogElement = this.element?.[0] || this.element;
+        if (!dialogElement) return;
+        
+        const diceElements = dialogElement.querySelectorAll('.reroll-die');
+        
+        diceElements.forEach((dieElement, index) => {
+            const isSelected = this.selectedDice.has(index);
+            
+            if (isSelected) {
+                dieElement.classList.add('selected');
+            } else {
+                dieElement.classList.remove('selected');
+            }
+        });
+    }
+    
+    /**
+     * Update button states without full re-render
+     * @private
+     */
+    _updateButtonStates() {
+        const dialogElement = this.element?.[0] || this.element;
+        if (!dialogElement) return;
+        
+        const confirmButton = dialogElement.querySelector('.reroll-confirm');
+        const fortunePoints = this.actor.system.fortunePoints || 0;
+        const selectedCount = this.selectedDice.size;
+        const canReroll = fortunePoints > 0 && selectedCount > 0;
+        
+        if (confirmButton) {
+            confirmButton.disabled = !canReroll;
+            
+            // Update button text
+            const buttonIcon = '<i class="fas fa-dice"></i>';
+            if (selectedCount > 0) {
+                confirmButton.innerHTML = `${buttonIcon} Reroll ${selectedCount} (${selectedCount} FP)`;
+            } else {
+                confirmButton.innerHTML = `${buttonIcon} Select Dice`;
+            }
+        }
     }
 } 

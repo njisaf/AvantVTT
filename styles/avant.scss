@@ -1651,9 +1651,11 @@ $spacing-xxl: 30px;
     background: var(--theme-accent-secondary, $aqua-muted);
     box-shadow: 0 0 16px var(--theme-accent-secondary, $aqua-muted);
     transform: scale(1.05);
+    transition: all 0.15s ease; // Faster transition to reduce flicker
 
     &.d10::before {
       background: var(--theme-accent-secondary, $aqua-muted);
+      transition: all 0.15s ease; // Match the parent transition
     }
   }
 

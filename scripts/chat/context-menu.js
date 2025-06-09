@@ -43,15 +43,44 @@ export class AvantChatContextMenu {
      * @private
      */
     static _initializeV13Approach() {
-        // Wait for ChatLog to be available
-        if (ui.chat) {
-            AvantChatContextMenu._extendChatLogContextMenuV13();
-        } else {
-            // Wait for UI to be ready
-            Hooks.once('ready', () => {
+        console.log('Avant | Initializing v13 context menu approach...');
+        
+        // Improved initialization with multiple timing checks
+        const initializeV13Menu = () => {
+            if (ui.chat && ui.chat._getEntryContextOptions) {
+                console.log('Avant | ui.chat available, extending context menu...');
                 AvantChatContextMenu._extendChatLogContextMenuV13();
-            });
-        }
+            } else {
+                console.log('Avant | ui.chat not ready, scheduling retry...');
+                // Try again after a short delay
+                setTimeout(initializeV13Menu, 100);
+            }
+        };
+        
+        // Try immediate initialization
+        initializeV13Menu();
+        
+        // Also hook into 'ready' as a backup
+        Hooks.once('ready', () => {
+            console.log('Avant | Ready hook - ensuring v13 context menu is initialized...');
+            setTimeout(() => {
+                if (ui.chat && !ui.chat._avantExtended) {
+                    console.log('Avant | Context menu not yet extended, doing it now...');
+                    AvantChatContextMenu._extendChatLogContextMenuV13();
+                }
+            }, 200);
+        });
+        
+        // Additional safety - try again when chat renders
+        Hooks.once('renderChatLog', () => {
+            console.log('Avant | ChatLog rendered - final context menu check...');
+            setTimeout(() => {
+                if (ui.chat && !ui.chat._avantExtended) {
+                    console.log('Avant | Final attempt at context menu extension...');
+                    AvantChatContextMenu._extendChatLogContextMenuV13();
+                }
+            }, 300);
+        });
     }
     
     /**
@@ -63,7 +92,7 @@ export class AvantChatContextMenu {
     static _initializeV12Approach() {
         console.log('Avant | Setting up v12 hook-based context menu...');
         
-        // Try getChatLogEntryContext hook first (most common in v12)
+        // Immediate hook registration
         Hooks.on('getChatLogEntryContext', (html, options) => {
             console.log('Avant | 🎯 getChatLogEntryContext hook fired (v12)');
             AvantChatContextMenu._addRerollOptionV12(html, options);
@@ -77,7 +106,12 @@ export class AvantChatContextMenu {
             }
         });
         
-        console.log('Avant | v12 hooks registered');
+        // Additional v12 hook for immediate availability
+        Hooks.once('renderChatLog', () => {
+            console.log('Avant | v12 ChatLog rendered - context menu should be available');
+        });
+        
+        console.log('Avant | v12 hooks registered successfully');
     }
     
     /**
@@ -102,6 +136,9 @@ export class AvantChatContextMenu {
         }
         
         console.log('Avant | Found _getEntryContextOptions method, extending...');
+        
+        // Mark as extended to prevent duplicate extensions
+        ui.chat._avantExtended = true;
         
         // Override the method
         ui.chat._getEntryContextOptions = function() {

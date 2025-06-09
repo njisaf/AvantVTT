@@ -1935,9 +1935,11 @@
   background: var(--theme-accent-secondary, #4CE2E1);
   box-shadow: 0 0 16px var(--theme-accent-secondary, #4CE2E1);
   transform: scale(1.05);
+  transition: all 0.15s ease;
 }
 .avant .reroll-dialog .reroll-die.selected .die-face.d10::before {
   background: var(--theme-accent-secondary, #4CE2E1);
+  transition: all 0.15s ease;
 }
 .avant .reroll-dialog .reroll-die.already-rerolled {
   cursor: not-allowed;

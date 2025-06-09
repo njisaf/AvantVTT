@@ -73,6 +73,22 @@ export class AvantThemeManager {
             }
         });
         
+        // Listen for reroll dialog renders to apply theming immediately
+        Hooks.on('renderApplication', (app, html, data) => {
+            if (app?.constructor?.name === 'AvantRerollDialog') {
+                console.log('Avant Theme Manager | AvantRerollDialog detected, applying theme');
+                setTimeout(() => {
+                    const appElement = app?.element?.[0] || app?.element;
+                    if (appElement) {
+                        if (!appElement.classList.contains('avant')) {
+                            appElement.classList.add('avant');
+                        }
+                        this.applyThemeToElement(appElement, this.currentTheme);
+                    }
+                }, 10); // Very short delay to prevent flicker
+            }
+        });
+        
         // Force theme application when the DOM is ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
