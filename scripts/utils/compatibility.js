@@ -17,6 +17,7 @@ export class CompatibilityUtils {
      * @returns {string} The current FoundryVTT version
      */
     static getFoundryVersion() {
+        if (!game) return '12.0.0';
         return game.version || game.data?.version || '12.0.0';
     }
 
@@ -27,6 +28,10 @@ export class CompatibilityUtils {
      */
     static isV13OrLater() {
         const version = this.getFoundryVersion();
+        if (!foundry?.utils?.isNewerVersion) {
+            // Fallback version comparison for testing
+            return version.startsWith('13') || parseInt(version.split('.')[0]) >= 13;
+        }
         return foundry.utils.isNewerVersion(version, '12.999.999');
     }
 
@@ -46,7 +51,7 @@ export class CompatibilityUtils {
      * @returns {Class} ActorSheet class
      */
     static getActorSheetClass() {
-        return foundry.appv1?.sheets?.ActorSheet || ActorSheet;
+        return foundry?.appv1?.sheets?.ActorSheet || global.ActorSheet;
     }
 
     /**
@@ -55,7 +60,7 @@ export class CompatibilityUtils {
      * @returns {Class} ItemSheet class
      */
     static getItemSheetClass() {
-        return foundry.appv1?.sheets?.ItemSheet || ItemSheet;
+        return foundry?.appv1?.sheets?.ItemSheet || global.ItemSheet;
     }
 
     /**

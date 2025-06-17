@@ -7,6 +7,18 @@
 
 import { CompatibilityUtils } from '../utils/compatibility.js';
 import { AvantActorData } from '../data/actor-data.js';
+import {
+    calculateAbilityTotalModifiers,
+    calculateSkillTotalModifiers,
+    calculateDefenseValues,
+    calculateDefenseThreshold,
+    calculateRemainingExpertisePoints,
+    calculatePowerPointLimit,
+    organizeSkillsByAbility,
+    organizeItemsByType,
+    validateAbilityRollData,
+    validateSkillRollData
+} from '../logic/actor-sheet.js';
 
 /**
  * Actor Sheet for Avant Native System - v12/v13 Compatible
@@ -22,7 +34,8 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
      * @override
      */
     static get defaultOptions() {
-        return foundry.utils.mergeObject(super.defaultOptions, {
+        const mergeFunction = foundry?.utils?.mergeObject || ((a, b) => ({ ...a, ...b }));
+        return mergeFunction(super.defaultOptions, {
             classes: ["avant", "sheet", "actor"],
             template: "systems/avant/templates/actor-sheet.html",
             width: 900,
@@ -44,101 +57,59 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
         const context = super.getData();
         const actorData = this.actor.toObject(false);
         
-        context.system = actorData.system;
+        // Deep copy system data to avoid modifying original with null safety
+        try {
+            context.system = actorData.system ? JSON.parse(JSON.stringify(actorData.system)) : {};
+        } catch (e) {
+            context.system = {};
+        }
         context.flags = actorData.flags;
         
-        // Calculate total modifiers for display (level + ability modifier)
-        context.abilityTotalModifiers = {};
-        const level = context.system.level || 1;
-        
-        if (context.system.abilities) {
-            for (const [abilityName, abilityData] of Object.entries(context.system.abilities)) {
-                const abilityMod = abilityData.modifier || 0;
-                context.abilityTotalModifiers[abilityName] = level + abilityMod;
-            }
+        // Ensure system exists
+        if (!context.system) {
+            context.system = {};
         }
         
-        // Calculate skill total modifiers (level + ability modifier + skill value)
-        context.skillTotalModifiers = {};
-        const skillToAbilityMap = AvantActorData.getSkillAbilities();
+        // Extract basic character data
+        const level = (context.system && context.system.level) || 1;
+        const tier = (context.system && context.system.tier) || 1;
+        const abilities = context.system.abilities || {};
+        const skills = context.system.skills || {};
+        const skillAbilities = AvantActorData.getSkillAbilities() || {};
         
-        if (context.system.skills) {
-            for (const [skillName, abilityName] of Object.entries(skillToAbilityMap)) {
-                const skillValue = context.system.skills[skillName] || 0;
-                const abilityMod = context.system.abilities?.[abilityName]?.modifier || 0;
-                context.skillTotalModifiers[skillName] = level + abilityMod + skillValue;
-            }
+        // Calculate total modifiers using pure functions
+        context.abilityTotalModifiers = calculateAbilityTotalModifiers(abilities, level);
+        context.skillTotalModifiers = calculateSkillTotalModifiers(skills, abilities, skillAbilities, level);
+        
+        // Calculate defense values using pure functions
+        const defenseValues = calculateDefenseValues(abilities, tier);
+        if (!context.system.defense) {
+            context.system.defense = {};
+        }
+        Object.assign(context.system.defense, defenseValues);
+        
+        // Calculate defense threshold using pure function
+        context.system.defenseThreshold = calculateDefenseThreshold(defenseValues);
+        
+        // Calculate remaining expertise points using pure function
+        if (context.system && context.system.expertisePoints) {
+            const total = context.system.expertisePoints.total || 0;
+            const spent = context.system.expertisePoints.spent || 0;
+            context.system.expertisePoints.remaining = calculateRemainingExpertisePoints(total, spent);
         }
         
-        // Ensure derived values are calculated for display
-        // Calculate defense values (base 11 + tier + ability modifier)
-        if (context.system.defense && context.system.abilities) {
-            for (const [abilityName, abilityData] of Object.entries(context.system.abilities)) {
-                context.system.defense[abilityName] = 11 + (context.system.tier || 1) + (abilityData.modifier || 0);
-            }
+        // Calculate power point limit using pure function
+        if (context.system && context.system.powerPoints) {
+            const maxPower = context.system.powerPoints.max || 10;
+            context.system.powerPoints.limit = calculatePowerPointLimit(maxPower);
         }
         
-        // Calculate defenseThreshold as the highest defense value
-        if (context.system.defense) {
-            context.system.defenseThreshold = Math.max(
-                context.system.defense.might || 11,
-                context.system.defense.grace || 11,
-                context.system.defense.intellect || 11,
-                context.system.defense.focus || 11
-            );
-        }
+        // Organize skills by abilities using pure function
+        context.skillsByAbility = organizeSkillsByAbility(skills, abilities, skillAbilities, level);
         
-        // Calculate expertise points remaining
-        if (context.system.expertisePoints) {
-            context.system.expertisePoints.remaining = Math.max(0, 
-                (context.system.expertisePoints.total || 0) - (context.system.expertisePoints.spent || 0)
-            );
-        }
-        
-        // Calculate power point limit
-        if (context.system.powerPoints) {
-            context.system.powerPoints.limit = Math.max(1, Math.floor((context.system.powerPoints.max || 10) / 3));
-        }
-        
-        // Prepare items by type for organized tabs
-        context.items = {};
-        for (let item of this.actor.items) {
-            const itemType = item.type;
-            if (!context.items[itemType]) context.items[itemType] = [];
-            context.items[itemType].push(item);
-        }
-        
-        // Ensure all item types exist even if empty
-        const itemTypes = ['action', 'feature', 'talent', 'augment', 'weapon', 'armor', 'gear'];
-        itemTypes.forEach(type => {
-            if (!context.items[type]) context.items[type] = [];
-        });
-        
-        // Dynamically organize skills by ability for template rendering
-        const skillAbilities = AvantActorData.getSkillAbilities();
-        context.skillsByAbility = {
-            might: [],
-            grace: [],
-            intellect: [],
-            focus: []
-        };
-        
-        // Group skills by their abilities
-        for (const [skillName, abilityName] of Object.entries(skillAbilities)) {
-            if (context.skillsByAbility[abilityName]) {
-                context.skillsByAbility[abilityName].push({
-                    name: skillName,
-                    label: skillName.charAt(0).toUpperCase() + skillName.slice(1),
-                    value: actorData.system.skills[skillName] || 0,
-                    totalModifier: context.skillTotalModifiers[skillName] || 0
-                });
-            }
-        }
-        
-        // Sort skills within each ability group alphabetically
-        Object.keys(context.skillsByAbility).forEach(ability => {
-            context.skillsByAbility[ability].sort((a, b) => a.label.localeCompare(b.label));
-        });
+        // Organize items by type using pure function
+        const itemsArray = this.actor.items ? Array.from(this.actor.items) : [];
+        context.items = organizeItemsByType(itemsArray);
         
         return context;
     }
@@ -381,20 +352,20 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
         
         const actor = this.actor;
         const abilityData = actor.system.abilities[ability];
+        const level = actor.system.level;
         
-        if (!abilityData) {
-            console.warn(`Avant | Ability '${ability}' not found on actor`);
+        // Validate roll data using pure function
+        const validation = validateAbilityRollData(ability, abilityData, level);
+        if (!validation.valid) {
+            console.warn(`Avant | ${validation.error}`);
             return;
         }
 
         try {
             // Ability Check: 2d10 + Level + Ability Modifier (Avant system)
-            // Use the direct ability modifier (no calculation needed)
-            const abilityMod = abilityData.modifier || 0;
-            
             const roll = new Roll("2d10 + @level + @abilityMod", { 
-                level: actor.system.level,
-                abilityMod: abilityMod
+                level: validation.level,
+                abilityMod: validation.abilityMod
             });
             await roll.evaluate();
             
@@ -435,21 +406,21 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
         const skillAbilities = AvantActorData.getSkillAbilities();
         const abilityKey = skillAbilities[skill];
         const abilityData = actor.system.abilities[abilityKey];
+        const level = actor.system.level;
         
-        // Use the direct ability modifier (no calculation needed)
-        const abilityMod = abilityData ? (abilityData.modifier || 0) : 0;
-        
-        if (skillValue === undefined) {
-            console.warn(`Avant | Skill '${skill}' not found on actor`);
+        // Validate roll data using pure function
+        const validation = validateSkillRollData(skill, skillValue, abilityData, level);
+        if (!validation.valid) {
+            console.warn(`Avant | ${validation.error}`);
             return;
         }
         
         try {
             // Avant uses 2d10 + Level + Ability Modifier + Skill Modifier
             const roll = new Roll("2d10 + @level + @abilityMod + @skillMod", {
-                level: actor.system.level,
-                abilityMod: abilityMod,
-                skillMod: skillValue
+                level: validation.level,
+                abilityMod: validation.abilityMod,
+                skillMod: validation.skillMod
             });
             await roll.evaluate();
             

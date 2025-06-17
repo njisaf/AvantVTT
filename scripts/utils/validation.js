@@ -18,6 +18,9 @@ export class ValidationUtils {
      * @returns {Object} Validated and normalized actor data
      */
     static validateActorData(data) {
+        if (!data || typeof data !== 'object') {
+            data = {};
+        }
         console.log('ValidationUtils | validateActorData called with:', JSON.stringify(data));
         
         // Ensure type is set to a valid value
@@ -113,6 +116,9 @@ export class ValidationUtils {
      * @returns {Object} Validated and normalized item data
      */
     static validateItemData(data) {
+        if (!data || typeof data !== 'object') {
+            data = {};
+        }
         console.log('ValidationUtils | validateItemData called with:', JSON.stringify(data));
         
         // Ensure type exists and is supported

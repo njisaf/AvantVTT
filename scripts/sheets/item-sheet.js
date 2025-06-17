@@ -7,6 +7,7 @@
 
 import { CompatibilityUtils } from '../utils/compatibility.js';
 import { ValidationUtils } from '../utils/validation.js';
+import { executeRoll, processFormData } from '../logic/item-sheet.js';
 
 /**
  * Item Sheet for Avant Native System - v12/v13 Compatible
@@ -22,7 +23,8 @@ export class AvantItemSheet extends CompatibilityUtils.getItemSheetClass() {
      * @override
      */
     static get defaultOptions() {
-        return foundry.utils.mergeObject(super.defaultOptions, {
+        const mergeFunction = foundry?.utils?.mergeObject || ((a, b) => ({ ...a, ...b }));
+        return mergeFunction(super.defaultOptions, {
             classes: ["avant", "sheet", "item"],
             width: 520,
             height: 480,
@@ -98,23 +100,38 @@ export class AvantItemSheet extends CompatibilityUtils.getItemSheetClass() {
         const element = event.currentTarget;
         const dataset = element.dataset;
 
-        if (dataset.roll) {
+        // Use pure function to prepare roll configuration
+        const rollMode = game?.settings?.get?.('core', 'rollMode') || 'publicroll';
+        const rollConfig = executeRoll(
+            dataset,
+            { name: this.item.name },
+            rollMode
+        );
+
+        if (rollConfig) {
             try {
-                const roll = new Roll(dataset.roll, this.item.getRollData());
+                const roll = new Roll(rollConfig.rollExpression, this.item.getRollData());
                 await roll.evaluate();
                 
-                const label = dataset.label ? `${dataset.label}` : this.item.name;
+                const speaker = ChatMessage.getSpeaker({ actor: this.item.actor });
+                
                 await roll.toMessage({
-                    speaker: ChatMessage.getSpeaker({ actor: this.item.actor }),
-                    flavor: label,
-                    rollMode: game.settings.get('core', 'rollMode'),
+                    speaker: speaker,
+                    flavor: rollConfig.message.flavor,
+                    rollMode: rollConfig.message.rollMode,
                 });
+                
                 return roll;
             } catch (error) {
                 console.error('Avant | Error in item sheet roll:', error);
-                ui.notifications.error(`Roll failed: ${error.message}`);
+                if (ui?.notifications?.error) {
+                    ui.notifications.error(`Roll failed: ${error.message}`);
+                }
+                return null;
             }
         }
+        
+        return undefined;
     }
 
     /**
@@ -125,11 +142,12 @@ export class AvantItemSheet extends CompatibilityUtils.getItemSheetClass() {
      * @override
      */
     async _updateObject(event, formData) {
-        // Use ValidationUtils to process the form data
-        const processedData = ValidationUtils.processFormData(formData, this.item.type);
+        // Use pure function to process the form data
+        const processedData = processFormData(formData, this.item.type);
         
         // Convert back to flat object for FoundryVTT
-        const flatData = foundry.utils.flattenObject(processedData);
+        const flattenFunction = foundry?.utils?.flattenObject || ((obj) => obj);
+        const flatData = flattenFunction(processedData);
         
         // Call parent method with processed data
         return super._updateObject(event, flatData);
