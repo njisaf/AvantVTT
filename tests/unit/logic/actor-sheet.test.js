@@ -251,39 +251,96 @@ describe('Actor Sheet Logic - Pure Functions', () => {
     describe('validateAbilityRollData', () => {
         test('validates correct ability roll data', () => {
             const result = validateAbilityRollData('might', { modifier: 2 }, 3);
-            expect(result).toBe(true);
+            expect(result.valid).toBe(true);
+            expect(result.level).toBe(3);
+            expect(result.abilityMod).toBe(2);
         });
 
         test('rejects invalid ability name', () => {
-            expect(validateAbilityRollData('', { modifier: 2 }, 3)).toBe(false);
-            expect(validateAbilityRollData(null, { modifier: 2 }, 3)).toBe(false);
+            const result1 = validateAbilityRollData('', { modifier: 2 }, 3);
+            expect(result1.valid).toBe(false);
+            expect(result1.error).toBe("No ability name specified");
+            
+            const result2 = validateAbilityRollData(null, { modifier: 2 }, 3);
+            expect(result2.valid).toBe(false);
+            expect(result2.error).toBe("No ability name specified");
         });
 
         test('rejects invalid ability data', () => {
-            expect(validateAbilityRollData('might', null, 3)).toBe(false);
-            expect(validateAbilityRollData('might', undefined, 3)).toBe(false);
+            const result1 = validateAbilityRollData('might', null, 3);
+            expect(result1.valid).toBe(false);
+            expect(result1.error).toBe("Invalid ability data");
+            
+            const result2 = validateAbilityRollData('might', undefined, 3);
+            expect(result2.valid).toBe(false);
+            expect(result2.error).toBe("Invalid ability data");
         });
 
         test('rejects invalid level', () => {
-            expect(validateAbilityRollData('might', { modifier: 2 }, 0)).toBe(false);
-            expect(validateAbilityRollData('might', { modifier: 2 }, null)).toBe(false);
+            const result1 = validateAbilityRollData('might', { modifier: 2 }, 0);
+            expect(result1.valid).toBe(false);
+            expect(result1.error).toBe("Invalid character level");
+            
+            const result2 = validateAbilityRollData('might', { modifier: 2 }, null);
+            expect(result2.valid).toBe(false);
+            expect(result2.error).toBe("Invalid character level");
+        });
+
+        test('handles missing ability modifier', () => {
+            const result = validateAbilityRollData('might', {}, 3);
+            expect(result.valid).toBe(true);
+            expect(result.level).toBe(3);
+            expect(result.abilityMod).toBe(0); // defaults to 0
         });
     });
 
     describe('validateSkillRollData', () => {
         test('validates correct skill roll data', () => {
             const result = validateSkillRollData('athletics', 3, { modifier: 1 }, 2);
-            expect(result).toBe(true);
+            expect(result.valid).toBe(true);
+            expect(result.level).toBe(2);
+            expect(result.abilityMod).toBe(1);
+            expect(result.skillMod).toBe(3);
         });
 
         test('rejects invalid skill name', () => {
-            expect(validateSkillRollData('', 3, { modifier: 1 }, 2)).toBe(false);
-            expect(validateSkillRollData(null, 3, { modifier: 1 }, 2)).toBe(false);
+            const result1 = validateSkillRollData('', 3, { modifier: 1 }, 2);
+            expect(result1.valid).toBe(false);
+            expect(result1.error).toBe("No skill name specified");
+            
+            const result2 = validateSkillRollData(null, 3, { modifier: 1 }, 2);
+            expect(result2.valid).toBe(false);
+            expect(result2.error).toBe("No skill name specified");
         });
 
         test('rejects invalid skill value', () => {
-            expect(validateSkillRollData('athletics', undefined, { modifier: 1 }, 2)).toBe(false);
-            expect(validateSkillRollData('athletics', 'invalid', { modifier: 1 }, 2)).toBe(false);
+            const result1 = validateSkillRollData('athletics', undefined, { modifier: 1 }, 2);
+            expect(result1.valid).toBe(false);
+            expect(result1.error).toBe("Invalid skill value");
+            
+            const result2 = validateSkillRollData('athletics', 'invalid', { modifier: 1 }, 2);
+            expect(result2.valid).toBe(false);
+            expect(result2.error).toBe("Invalid skill value");
+        });
+
+        test('rejects invalid ability data', () => {
+            const result = validateSkillRollData('athletics', 3, null, 2);
+            expect(result.valid).toBe(false);
+            expect(result.error).toBe("Invalid ability data for skill");
+        });
+
+        test('rejects invalid level', () => {
+            const result = validateSkillRollData('athletics', 3, { modifier: 1 }, 0);
+            expect(result.valid).toBe(false);
+            expect(result.error).toBe("Invalid character level");
+        });
+
+        test('handles missing ability modifier', () => {
+            const result = validateSkillRollData('athletics', 3, {}, 2);
+            expect(result.valid).toBe(true);
+            expect(result.level).toBe(2);
+            expect(result.abilityMod).toBe(0); // defaults to 0
+            expect(result.skillMod).toBe(3);
         });
     });
 }); 

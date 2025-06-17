@@ -310,31 +310,38 @@ export function organizeItemsByType(items) {
  * @param {string} abilityName - Name of the ability to roll
  * @param {Object} abilityData - The ability's data object
  * @param {number} level - Character level
- * @returns {boolean} True if roll data is valid, false otherwise
+ * @returns {Object} Object with valid boolean and error message, plus roll data if valid
  * 
  * @example
  * // Valid ability roll
- * const valid = validateAbilityRollData('might', { modifier: 2 }, 3);
- * // Result: true
+ * const result = validateAbilityRollData('might', { modifier: 2 }, 3);
+ * // Result: { valid: true, level: 3, abilityMod: 2 }
  * 
  * // Invalid ability roll (missing data)
  * const invalid = validateAbilityRollData('missing', null, 3);
- * // Result: false
+ * // Result: { valid: false, error: "Invalid ability data" }
  */
 export function validateAbilityRollData(abilityName, abilityData, level) {
     if (!abilityName || typeof abilityName !== 'string') {
-        return false;
+        return { valid: false, error: "No ability name specified" };
     }
     
     if (!abilityData || typeof abilityData !== 'object') {
-        return false;
+        return { valid: false, error: "Invalid ability data" };
     }
     
-    if (!level || typeof level !== 'number' || level < 1) {
-        return false;
+    const characterLevel = Number(level);
+    if (!characterLevel || characterLevel < 1) {
+        return { valid: false, error: "Invalid character level" };
     }
     
-    return true;
+    const abilityMod = Number(abilityData.modifier) || 0;
+    
+    return { 
+        valid: true, 
+        level: characterLevel,
+        abilityMod: abilityMod
+    };
 }
 
 /**
@@ -347,29 +354,38 @@ export function validateAbilityRollData(abilityName, abilityData, level) {
  * @param {number} skillValue - The skill's value
  * @param {Object} abilityData - The governing ability's data object
  * @param {number} level - Character level
- * @returns {boolean} True if roll data is valid, false otherwise
+ * @returns {Object} Object with valid boolean and error message, plus roll data if valid
  * 
  * @example
  * // Valid skill roll
- * const valid = validateSkillRollData('athletics', 3, { modifier: 1 }, 2);
- * // Result: true
+ * const result = validateSkillRollData('athletics', 3, { modifier: 1 }, 2);
+ * // Result: { valid: true, level: 2, abilityMod: 1, skillMod: 3 }
  */
 export function validateSkillRollData(skillName, skillValue, abilityData, level) {
     if (!skillName || typeof skillName !== 'string') {
-        return false;
+        return { valid: false, error: "No skill name specified" };
     }
     
-    if (skillValue === undefined || isNaN(Number(skillValue))) {
-        return false;
+    const skillMod = Number(skillValue);
+    if (skillValue === undefined || isNaN(skillMod)) {
+        return { valid: false, error: "Invalid skill value" };
     }
     
     if (!abilityData || typeof abilityData !== 'object') {
-        return false;
+        return { valid: false, error: "Invalid ability data for skill" };
     }
     
-    if (!level || typeof level !== 'number' || level < 1) {
-        return false;
+    const characterLevel = Number(level);
+    if (!characterLevel || characterLevel < 1) {
+        return { valid: false, error: "Invalid character level" };
     }
     
-    return true;
+    const abilityMod = Number(abilityData.modifier) || 0;
+    
+    return { 
+        valid: true, 
+        level: characterLevel,
+        abilityMod: abilityMod,
+        skillMod: skillMod
+    };
 } 
