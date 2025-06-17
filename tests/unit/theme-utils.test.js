@@ -8,6 +8,8 @@
 // Note: Node.js modules like fs and path are not available in browser environment
 // We'll use mock implementations instead
 
+import { logger } from '../../scripts/utils/logger.js';
+
 describe('Theme Utils', () => {
     let mockFs, mockPath;
     let ThemeConfigUtil, AvantThemeUtils;
@@ -26,9 +28,17 @@ describe('Theme Utils', () => {
             join: jest.fn((...args) => args.join('/'))
         };
         
-        // Mock console methods
-        console.log = jest.fn();
-        console.error = jest.fn();
+        // Reset all logger mocks if they exist
+        if (typeof jest.clearAllMocks === 'function') {
+            jest.clearAllMocks();
+        }
+        
+        // Mock logger methods instead of console
+        jest.spyOn(logger, 'log').mockImplementation(() => {});
+        jest.spyOn(logger, 'error').mockImplementation(() => {});
+        jest.spyOn(logger, 'warn').mockImplementation(() => {});
+        jest.spyOn(logger, 'info').mockImplementation(() => {});
+        jest.spyOn(logger, 'debug').mockImplementation(() => {});
         
         // Mock THEME_CONFIG
         global.THEME_CONFIG = {
@@ -58,10 +68,14 @@ describe('Theme Utils', () => {
                 }
             }
         };
-        
-        // Clear console mocks - make sure they're jest mocks first
-        console.log = jest.fn();
-        console.error = jest.fn();
+
+    });
+
+    afterEach(() => {
+        // Clean up all mocks after each test
+        if (typeof jest.clearAllMocks === 'function') {
+            jest.clearAllMocks();
+        }
     });
 
     describe('ThemeConfigUtil Class Extension', () => {
@@ -118,20 +132,20 @@ describe('Theme Utils', () => {
                 }
 
                 showHelp() {
-                    console.log('Mock help message');
+                    logger.log('Mock help message');
                 }
 
                 generateDocs() {
                     const mockDoc = `# Theme Variables\n\n## Colors\n- --theme-primary: Primary theme color\n`;
-                    console.log(mockDoc);
+                    logger.log(mockDoc);
                 }
 
                 listVariables() {
-                    console.log('🎨 Available Theme Variables\n');
-                    console.log('🔴 REQUIRED --theme-primary');
-                    console.log('   JSON Path: colors.primary');
-                    console.log('🔵 OPTIONAL --theme-secondary');
-                    console.log('   JSON Path: colors.secondary');
+                    logger.log('🎨 Available Theme Variables\n');
+                    logger.log('🔴 REQUIRED --theme-primary');
+                    logger.log('   JSON Path: colors.primary');
+                    logger.log('🔵 OPTIONAL --theme-secondary');
+                    logger.log('   JSON Path: colors.secondary');
                 }
 
                 generateTemplate(includeOptional = false) {
@@ -154,12 +168,12 @@ describe('Theme Utils', () => {
                         });
                     }
                     
-                    console.log(JSON.stringify(template, null, 2));
+                    logger.log(JSON.stringify(template, null, 2));
                 }
 
                 validateTheme(filePath) {
                     if (!mockFs.existsSync(filePath)) {
-                        console.error(`❌ File not found: ${filePath}`);
+                        logger.error(`❌ File not found: ${filePath}`);
                         return false;
                     }
 
@@ -169,37 +183,37 @@ describe('Theme Utils', () => {
                         
                         // Mock validation logic
                         if (theme.name && theme.version && theme.author) {
-                            console.log('✅ Theme is valid!');
-                            console.log(`📄 Theme: ${theme.name} by ${theme.author} (v${theme.version})`);
+                            logger.log('✅ Theme is valid!');
+                            logger.log(`📄 Theme: ${theme.name} by ${theme.author} (v${theme.version})`);
                             return true;
                         } else {
-                            console.log('❌ Theme validation failed:');
-                            console.log('   • Missing required fields');
+                            logger.log('❌ Theme validation failed:');
+                            logger.log('   • Missing required fields');
                             return false;
                         }
                     } catch (error) {
-                        console.error(`❌ Error validating theme: ${error.message}`);
+                        logger.error(`❌ Error validating theme: ${error.message}`);
                         return false;
                     }
                 }
 
                 async addVariable(varPath) {
-                    console.log(`🔧 Adding new theme variable at path: ${varPath}`);
-                    console.log('This is a developer feature. For safety, edit theme-config.js directly.');
+                    logger.log(`🔧 Adding new theme variable at path: ${varPath}`);
+                    logger.log('This is a developer feature. For safety, edit theme-config.js directly.');
                 }
 
                 generateMappings() {
-                    console.log('🔧 Generating JavaScript mappings...\n');
-                    console.log('// Auto-generated CSS variable list:');
-                    console.log('const themeVariables = [');
-                    console.log("    '--theme-primary',");
-                    console.log("    '--theme-secondary',");
-                    console.log("    '--font-display',");
-                    console.log('];\n');
+                    logger.log('🔧 Generating JavaScript mappings...\n');
+                    logger.log('// Auto-generated CSS variable list:');
+                    logger.log('const themeVariables = [');
+                    logger.log("    '--theme-primary',");
+                    logger.log("    '--theme-secondary',");
+                    logger.log("    '--font-display',");
+                    logger.log('];\n');
                 }
 
                 createExamples() {
-                    console.log('📚 Creating example theme files...');
+                    logger.log('📚 Creating example theme files...');
                     
                     const exampleThemes = [
                         { name: 'Dark Cyberpunk', primary: '#00E0DC' },
@@ -208,7 +222,7 @@ describe('Theme Utils', () => {
                     ];
                     
                     exampleThemes.forEach(theme => {
-                        console.log(`   Creating: ${theme.name.toLowerCase().replace(' ', '-')}.json`);
+                        logger.log(`   Creating: ${theme.name.toLowerCase().replace(' ', '-')}.json`);
                     });
                 }
 
@@ -256,23 +270,29 @@ describe('Theme Utils', () => {
         });
 
         test('should display help information', () => {
+            // Create fresh spy for this test
+            const logSpy = jest.spyOn(logger, 'log').mockImplementation(() => {});
+            
             themeUtils.showHelp();
             
-            expect(console.log).toHaveBeenCalledWith('Mock help message');
+            expect(logSpy).toHaveBeenCalledWith('Mock help message');
         });
 
         test('should generate theme documentation', () => {
+            // Create fresh spy for this test
+            const logSpy = jest.spyOn(logger, 'log').mockImplementation(() => {});
+            
             themeUtils.generateDocs();
             
-            expect(console.log).toHaveBeenCalledWith(expect.stringContaining('# Theme Variables'));
+            expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('# Theme Variables'));
         });
 
         test('should list all theme variables with required/optional badges', () => {
             themeUtils.listVariables();
             
-            expect(console.log).toHaveBeenCalledWith('🎨 Available Theme Variables\n');
-            expect(console.log).toHaveBeenCalledWith('🔴 REQUIRED --theme-primary');
-            expect(console.log).toHaveBeenCalledWith('🔵 OPTIONAL --theme-secondary');
+            expect(logger.log).toHaveBeenCalledWith('🎨 Available Theme Variables\n');
+            expect(logger.log).toHaveBeenCalledWith('🔴 REQUIRED --theme-primary');
+            expect(logger.log).toHaveBeenCalledWith('🔵 OPTIONAL --theme-secondary');
         });
 
         test('should generate basic theme template', () => {
@@ -303,7 +323,7 @@ describe('Theme Utils', () => {
             class MockAvantThemeUtils {
                 validateTheme(filePath) {
                     if (!mockFs.existsSync(filePath)) {
-                        console.error(`❌ File not found: ${filePath}`);
+                        logger.error(`❌ File not found: ${filePath}`);
                         return false;
                     }
 
@@ -312,16 +332,16 @@ describe('Theme Utils', () => {
                         const theme = JSON.parse(fileContent);
                         
                         if (theme.name && theme.version && theme.author) {
-                            console.log('✅ Theme is valid!');
-                            console.log(`📄 Theme: ${theme.name} by ${theme.author} (v${theme.version})`);
+                            logger.log('✅ Theme is valid!');
+                            logger.log(`📄 Theme: ${theme.name} by ${theme.author} (v${theme.version})`);
                             return true;
                         } else {
-                            console.log('❌ Theme validation failed:');
-                            console.log('   • Missing required fields');
+                            logger.log('❌ Theme validation failed:');
+                            logger.log('   • Missing required fields');
                             return false;
                         }
                     } catch (error) {
-                        console.error(`❌ Error validating theme: ${error.message}`);
+                        logger.error(`❌ Error validating theme: ${error.message}`);
                         return false;
                     }
                 }
@@ -346,8 +366,8 @@ describe('Theme Utils', () => {
             const result = themeUtils.validateTheme('test-theme.json');
             
             expect(result).toBe(true);
-            expect(console.log).toHaveBeenCalledWith('✅ Theme is valid!');
-            expect(console.log).toHaveBeenCalledWith('📄 Theme: Test Theme by Test Author (v1.0.0)');
+            expect(logger.log).toHaveBeenCalledWith('✅ Theme is valid!');
+            expect(logger.log).toHaveBeenCalledWith('📄 Theme: Test Theme by Test Author (v1.0.0)');
         });
 
         test('should handle missing theme file', () => {
@@ -356,7 +376,7 @@ describe('Theme Utils', () => {
             const result = themeUtils.validateTheme('missing-theme.json');
             
             expect(result).toBe(false);
-            expect(console.error).toHaveBeenCalledWith('❌ File not found: missing-theme.json');
+            expect(logger.error).toHaveBeenCalledWith('❌ File not found: missing-theme.json');
         });
 
         test('should handle invalid JSON in theme file', () => {
@@ -366,7 +386,7 @@ describe('Theme Utils', () => {
             const result = themeUtils.validateTheme('invalid-theme.json');
             
             expect(result).toBe(false);
-            expect(console.error).toHaveBeenCalledWith(expect.stringContaining('❌ Error validating theme:'));
+            expect(logger.error).toHaveBeenCalledWith(expect.stringContaining('❌ Error validating theme:'));
         });
 
         test('should handle theme with missing required fields', () => {
@@ -381,8 +401,8 @@ describe('Theme Utils', () => {
             const result = themeUtils.validateTheme('incomplete-theme.json');
             
             expect(result).toBe(false);
-            expect(console.log).toHaveBeenCalledWith('❌ Theme validation failed:');
-            expect(console.log).toHaveBeenCalledWith('   • Missing required fields');
+            expect(logger.log).toHaveBeenCalledWith('❌ Theme validation failed:');
+            expect(logger.log).toHaveBeenCalledWith('   • Missing required fields');
         });
     });
 
@@ -392,11 +412,11 @@ describe('Theme Utils', () => {
         beforeEach(() => {
             class MockAvantThemeUtils {
                 async addVariable(varPath) {
-                    console.log(`🔧 Adding new theme variable at path: ${varPath}`);
-                    console.log('This is a developer feature. For safety, edit theme-config.js directly.');
-                    console.log('');
-                    console.log('Example addition:');
-                    console.log(`
+                    logger.log(`🔧 Adding new theme variable at path: ${varPath}`);
+                    logger.log('This is a developer feature. For safety, edit theme-config.js directly.');
+                    logger.log('');
+                    logger.log('Example addition:');
+                    logger.log(`
 // In theme-config.js, add to the appropriate section:
 ${varPath}: {
     cssVar: '--theme-your-variable',
@@ -409,16 +429,16 @@ ${varPath}: {
                 }
 
                 generateMappings() {
-                    console.log('🔧 Generating JavaScript mappings...\n');
+                    logger.log('🔧 Generating JavaScript mappings...\n');
                     
                     const allVars = ['--theme-primary', '--theme-secondary', '--font-display'];
                     
-                    console.log('// Auto-generated CSS variable list:');
-                    console.log('const themeVariables = [');
+                    logger.log('// Auto-generated CSS variable list:');
+                    logger.log('const themeVariables = [');
                     allVars.forEach(varName => {
-                        console.log(`    '${varName}',`);
+                        logger.log(`    '${varName}',`);
                     });
-                    console.log('];\n');
+                    logger.log('];\n');
                 }
             }
             
@@ -428,16 +448,16 @@ ${varPath}: {
         test('should provide guidance for adding new variables', async () => {
             await themeUtils.addVariable('colors.accent');
             
-            expect(console.log).toHaveBeenCalledWith('🔧 Adding new theme variable at path: colors.accent');
-            expect(console.log).toHaveBeenCalledWith('This is a developer feature. For safety, edit theme-config.js directly.');
+            expect(logger.log).toHaveBeenCalledWith('🔧 Adding new theme variable at path: colors.accent');
+            expect(logger.log).toHaveBeenCalledWith('This is a developer feature. For safety, edit theme-config.js directly.');
         });
 
         test('should generate JavaScript variable mappings', () => {
             themeUtils.generateMappings();
             
-            expect(console.log).toHaveBeenCalledWith('🔧 Generating JavaScript mappings...\n');
-            expect(console.log).toHaveBeenCalledWith('// Auto-generated CSS variable list:');
-            expect(console.log).toHaveBeenCalledWith('const themeVariables = [');
+            expect(logger.log).toHaveBeenCalledWith('🔧 Generating JavaScript mappings...\n');
+            expect(logger.log).toHaveBeenCalledWith('// Auto-generated CSS variable list:');
+            expect(logger.log).toHaveBeenCalledWith('const themeVariables = [');
         });
     });
 
@@ -446,18 +466,18 @@ ${varPath}: {
         
         beforeEach(() => {
             class MockAvantThemeUtils {
-                showHelp() { console.log('Help displayed'); }
-                generateDocs() { console.log('Docs generated'); }
-                listVariables() { console.log('Variables listed'); }
+                showHelp() { logger.log('Help displayed'); }
+                generateDocs() { logger.log('Docs generated'); }
+                listVariables() { logger.log('Variables listed'); }
                 generateTemplate(includeOptional = false) { 
-                    console.log(`Template generated (optional: ${includeOptional})`); 
+                    logger.log(`Template generated (optional: ${includeOptional})`); 
                 }
                 validateTheme(filePath) { 
-                    console.log(`Validated: ${filePath}`);
+                    logger.log(`Validated: ${filePath}`);
                     return true;
                 }
-                generateMappings() { console.log('Mappings generated'); }
-                createExamples() { console.log('Examples created'); }
+                generateMappings() { logger.log('Mappings generated'); }
+                createExamples() { logger.log('Examples created'); }
 
                 run() {
                     const args = process.argv.slice(2);
@@ -505,7 +525,7 @@ ${varPath}: {
             
             themeUtils.run();
             
-            expect(console.log).toHaveBeenCalledWith('Help displayed');
+            expect(logger.log).toHaveBeenCalledWith('Help displayed');
             
             // Restore process.argv
             process.argv = originalArgv;
@@ -517,7 +537,7 @@ ${varPath}: {
             
             themeUtils.run();
             
-            expect(console.log).toHaveBeenCalledWith('Docs generated');
+            expect(logger.log).toHaveBeenCalledWith('Docs generated');
             
             process.argv = originalArgv;
         });
@@ -528,7 +548,7 @@ ${varPath}: {
             // Test basic template
             process.argv = ['node', 'script.js', 'template'];
             themeUtils.run();
-            expect(console.log).toHaveBeenCalledWith('Template generated (optional: false)');
+            expect(logger.log).toHaveBeenCalledWith('Template generated (optional: false)');
             
             // Reset console mock
             console.log.mockClear();
@@ -536,7 +556,7 @@ ${varPath}: {
             // Test full template
             process.argv = ['node', 'script.js', 'template:full'];
             themeUtils.run();
-            expect(console.log).toHaveBeenCalledWith('Template generated (optional: true)');
+            expect(logger.log).toHaveBeenCalledWith('Template generated (optional: true)');
             
             process.argv = originalArgv;
         });
@@ -547,7 +567,7 @@ ${varPath}: {
             
             themeUtils.run();
             
-            expect(console.log).toHaveBeenCalledWith('Validated: test-theme.json');
+            expect(logger.log).toHaveBeenCalledWith('Validated: test-theme.json');
             
             process.argv = originalArgv;
         });
@@ -558,7 +578,7 @@ ${varPath}: {
             
             themeUtils.run();
             
-            expect(console.log).toHaveBeenCalledWith('Help displayed');
+            expect(logger.log).toHaveBeenCalledWith('Help displayed');
             
             process.argv = originalArgv;
         });
@@ -570,7 +590,7 @@ ${varPath}: {
         beforeEach(() => {
             class MockAvantThemeUtils {
                 createExamples() {
-                    console.log('📚 Creating example theme files...');
+                    logger.log('📚 Creating example theme files...');
                     
                     const exampleThemes = [
                         { name: 'Dark Cyberpunk', primary: '#00E0DC' },
@@ -580,7 +600,7 @@ ${varPath}: {
                     
                     exampleThemes.forEach(theme => {
                         const fileName = theme.name.toLowerCase().replace(' ', '-') + '.json';
-                        console.log(`   Creating: ${fileName}`);
+                        logger.log(`   Creating: ${fileName}`);
                         
                         // Mock file creation
                         const themeData = {
@@ -596,7 +616,7 @@ ${varPath}: {
                         // mockFs.writeFileSync(fileName, JSON.stringify(themeData, null, 2));
                     });
                     
-                    console.log('✅ Example themes created successfully!');
+                    logger.log('✅ Example themes created successfully!');
                 }
             }
             
@@ -606,11 +626,11 @@ ${varPath}: {
         test('should create multiple example theme files', () => {
             themeUtils.createExamples();
             
-            expect(console.log).toHaveBeenCalledWith('📚 Creating example theme files...');
-            expect(console.log).toHaveBeenCalledWith('   Creating: dark-cyberpunk.json');
-            expect(console.log).toHaveBeenCalledWith('   Creating: light-modern.json');
-            expect(console.log).toHaveBeenCalledWith('   Creating: warm-sunset.json');
-            expect(console.log).toHaveBeenCalledWith('✅ Example themes created successfully!');
+            expect(logger.log).toHaveBeenCalledWith('📚 Creating example theme files...');
+            expect(logger.log).toHaveBeenCalledWith('   Creating: dark-cyberpunk.json');
+            expect(logger.log).toHaveBeenCalledWith('   Creating: light-modern.json');
+            expect(logger.log).toHaveBeenCalledWith('   Creating: warm-sunset.json');
+            expect(logger.log).toHaveBeenCalledWith('✅ Example themes created successfully!');
         });
     });
 
@@ -704,7 +724,7 @@ ${varPath}: {
                         const fileContent = mockFs.readFileSync(filePath, 'utf8');
                         return true;
                     } catch (error) {
-                        console.error(`❌ Error validating theme: ${error.message}`);
+                        logger.error(`❌ Error validating theme: ${error.message}`);
                         return false;
                     }
                 }
@@ -714,7 +734,7 @@ ${varPath}: {
             const result = utils.validateTheme('error-theme.json');
             
             expect(result).toBe(false);
-            expect(console.error).toHaveBeenCalledWith('❌ Error validating theme: File system error');
+            expect(logger.error).toHaveBeenCalledWith('❌ Error validating theme: File system error');
         });
     });
 }); 

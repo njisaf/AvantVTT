@@ -4,8 +4,15 @@
  * @author Avant VTT Team
  */
 
+import { logger } from '../../scripts/utils/logger.js';
+
 describe('AvantThemeManager Working Tests', () => {
     beforeEach(() => {
+        // Reset all mocks before each test
+        if (typeof jest.clearAllMocks === 'function') {
+            jest.clearAllMocks();
+        }
+        
         // Mock comprehensive FoundryVTT environment for theme manager
         global.game = {
             version: '13.0.0',
@@ -60,8 +67,19 @@ describe('AvantThemeManager Working Tests', () => {
             }))
         };
         
-        console.log = jest.fn();
-        console.error = jest.fn();
+        // Mock logger methods instead of console
+        jest.spyOn(logger, 'log').mockImplementation(() => {});
+        jest.spyOn(logger, 'error').mockImplementation(() => {});
+        jest.spyOn(logger, 'warn').mockImplementation(() => {});
+        jest.spyOn(logger, 'info').mockImplementation(() => {});
+        jest.spyOn(logger, 'debug').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+        // Clean up all mocks after each test
+        if (typeof jest.clearAllMocks === 'function') {
+            jest.clearAllMocks();
+        }
     });
 
     test('should import AvantThemeManager class', async () => {
@@ -180,7 +198,7 @@ describe('AvantThemeManager Working Tests', () => {
             themeManager.applyTheme('dark');
             
             expect(global.document.querySelectorAll).toHaveBeenCalledWith('.avant');
-            expect(console.log).toHaveBeenCalledWith('Avant Theme Manager | Applying theme: dark');
+            expect(logger.log).toHaveBeenCalledWith('Avant Theme Manager | Applying theme: dark');
         } catch (error) {
             // Expected in test environment
             expect(true).toBe(true);
@@ -316,7 +334,7 @@ describe('AvantThemeManager Working Tests', () => {
             
             themeManager.onRenderApplication(mockApp, mockHtml);
             
-            expect(console.log).toHaveBeenCalled();
+            expect(logger.log).toHaveBeenCalled();
         } catch (error) {
             // Expected in test environment
             expect(true).toBe(true);

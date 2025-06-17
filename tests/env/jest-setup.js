@@ -6,9 +6,16 @@
 
 // Import the foundry shim to set up the global environment
 import './foundry-shim.js';
+import { logger } from '../../scripts/utils/logger.js';
 
 // Additional setup for integration tests
 beforeEach(() => {
+    // Mock logger methods to prevent console spam in tests
+    Object.keys(logger).forEach(key => {
+        if (typeof logger[key] === 'function') {
+            jest.spyOn(logger, key).mockImplementation(() => {});
+        }
+    });
     // Reset global state before each test
     global.game = {
         settings: {
