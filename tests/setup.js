@@ -5,7 +5,7 @@
  * - jest-extended for additional matchers
  * - jest-chain for fluent assertion chaining
  * - Basic FoundryVTT environment shimming
- * - Proper Jest mocks for console functions
+ * - Logger wrapper mocking for testability
  * 
  * @author Avant VTT Team
  * @version 1.0.0
@@ -24,6 +24,9 @@ import './env/foundry-shim.js';
 // Import Jest for mock creation
 import { jest } from '@jest/globals';
 
+// Import logger for global mocking
+import { logger } from '../scripts/utils/logger.js';
+
 // Configure console settings for tests with proper Jest mocks
 global.console = {
   ...console,
@@ -33,4 +36,14 @@ global.console = {
   info: jest.fn(),
   warn: jest.fn(),
   error: jest.fn()
-}; 
+};
+
+// Global setup for logger mocking
+beforeEach(() => {
+  // Mock all logger methods for clean test slate
+  Object.keys(logger).forEach(methodName => {
+    if (typeof logger[methodName] === 'function') {
+      jest.spyOn(logger, methodName).mockImplementation(() => {});
+    }
+  });
+}); 

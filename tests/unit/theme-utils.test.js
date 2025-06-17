@@ -28,18 +28,6 @@ describe('Theme Utils', () => {
             join: jest.fn((...args) => args.join('/'))
         };
         
-        // Reset all logger mocks if they exist
-        if (typeof jest.clearAllMocks === 'function') {
-            jest.clearAllMocks();
-        }
-        
-        // Mock logger methods instead of console
-        jest.spyOn(logger, 'log').mockImplementation(() => {});
-        jest.spyOn(logger, 'error').mockImplementation(() => {});
-        jest.spyOn(logger, 'warn').mockImplementation(() => {});
-        jest.spyOn(logger, 'info').mockImplementation(() => {});
-        jest.spyOn(logger, 'debug').mockImplementation(() => {});
-        
         // Mock THEME_CONFIG
         global.THEME_CONFIG = {
             colors: {
@@ -68,14 +56,6 @@ describe('Theme Utils', () => {
                 }
             }
         };
-
-    });
-
-    afterEach(() => {
-        // Clean up all mocks after each test
-        if (typeof jest.clearAllMocks === 'function') {
-            jest.clearAllMocks();
-        }
     });
 
     describe('ThemeConfigUtil Class Extension', () => {
@@ -270,21 +250,15 @@ describe('Theme Utils', () => {
         });
 
         test('should display help information', () => {
-            // Create fresh spy for this test
-            const logSpy = jest.spyOn(logger, 'log').mockImplementation(() => {});
-            
             themeUtils.showHelp();
             
-            expect(logSpy).toHaveBeenCalledWith('Mock help message');
+            expect(logger.log).toHaveBeenCalledWith('Mock help message');
         });
 
         test('should generate theme documentation', () => {
-            // Create fresh spy for this test
-            const logSpy = jest.spyOn(logger, 'log').mockImplementation(() => {});
-            
             themeUtils.generateDocs();
             
-            expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('# Theme Variables'));
+            expect(logger.log).toHaveBeenCalledWith(expect.stringContaining('# Theme Variables'));
         });
 
         test('should list all theme variables with required/optional badges', () => {
@@ -299,7 +273,7 @@ describe('Theme Utils', () => {
             themeUtils.generateTemplate(false);
             
             // Verify JSON output was logged
-            const jsonOutput = console.log.mock.calls.find(call => 
+            const jsonOutput = logger.log.mock.calls.find(call => 
                 call[0].includes('Custom Theme')
             );
             expect(jsonOutput).toBeTruthy();
@@ -309,7 +283,7 @@ describe('Theme Utils', () => {
             themeUtils.generateTemplate(true);
             
             // Verify JSON output includes optional variables
-            const jsonOutput = console.log.mock.calls.find(call => 
+            const jsonOutput = logger.log.mock.calls.find(call => 
                 call[0].includes('Custom Theme')
             );
             expect(jsonOutput).toBeTruthy();
@@ -550,8 +524,8 @@ ${varPath}: {
             themeUtils.run();
             expect(logger.log).toHaveBeenCalledWith('Template generated (optional: false)');
             
-            // Reset console mock
-            console.log.mockClear();
+            // Reset logger mock
+            logger.log.mockClear();
             
             // Test full template
             process.argv = ['node', 'script.js', 'template:full'];
@@ -699,7 +673,7 @@ ${varPath}: {
                 validateTheme(filePath) {
                     const fileContent = mockFs.readFileSync(filePath, 'utf8');
                     const theme = JSON.parse(fileContent);
-                    return theme.name && theme.version && theme.author;
+                    return !!(theme.name && theme.version && theme.author);
                 }
             }
             
