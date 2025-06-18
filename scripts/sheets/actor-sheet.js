@@ -20,6 +20,16 @@ import {
     validateAbilityRollData,
     validateSkillRollData
 } from '../logic/actor-sheet.js';
+import {
+    prepareItemData,
+    validatePowerPointUsage,
+    prepareWeaponAttackRoll,
+    prepareWeaponDamageRoll,
+    prepareArmorRoll,
+    prepareGenericRoll,
+    extractItemIdFromElement,
+    formatFlavorText
+} from '../logic/actor-sheet-utils.js';
 
 /**
  * Actor Sheet for Avant Native System - v12/v13 Compatible
@@ -201,23 +211,13 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
         const header = event.currentTarget;
         const type = header.dataset.type;
         const data = foundry.utils.duplicate(header.dataset);
-        const name = `New ${type.capitalize()}`;
-        const itemData = {
-            name: name,
-            type: type,
-            system: data
-        };
-        delete itemData.system["type"];
         
-        // Handle specific item type defaults
-        if (type === "feature" && data.category) {
-            itemData.system.category = data.category;
-        }
-        if (type === "action" && !itemData.system.ability) {
-            itemData.system.ability = "might";
-        }
-        if (type === "augment" && !itemData.system.augmentType) {
-            itemData.system.augmentType = "enhancement";
+        // Use pure function to prepare item data
+        const itemData = prepareItemData(type, data);
+        if (!itemData) {
+            logger.warn('Avant | Invalid item type for creation');
+            ui.notifications.warn('Invalid item type');
+            return;
         }
         
         try {
@@ -236,14 +236,15 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
     _onItemEdit(event) {
         event.preventDefault();
         const li = event.currentTarget.closest(".item");
-        if (!li) {
+        
+        // Use pure function to extract item ID
+        const itemId = extractItemIdFromElement(li);
+        if (!itemId) {
             logger.warn('Avant | No item element found for edit');
             return;
         }
         
-        const itemId = li.dataset.itemId;
         const item = this.actor.items.get(itemId);
-        
         if (!item) {
             logger.warn(`Avant | Item with ID '${itemId}' not found`);
             ui.notifications.warn('Item not found');
@@ -262,15 +263,16 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
     async _onItemDelete(event) {
         event.preventDefault();
         const li = event.currentTarget.closest(".item");
-        if (!li) {
+        
+        // Use pure function to extract item ID
+        const itemId = extractItemIdFromElement(li);
+        if (!itemId) {
             logger.warn('Avant | No item element found for delete');
             return;
         }
         
-        const itemId = li.dataset.itemId;
         const item = this.actor.items.get(itemId);
-        
-                if (!item) {
+        if (!item) {
             logger.warn(`Avant | Item with ID '${itemId}' not found`);
             ui.notifications.warn('Item not found');
             return;
@@ -317,13 +319,19 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
         // Handle generic rolls
         if (dataset.roll) {
             try {
-                const roll = new Roll(dataset.roll, this.actor.getRollData());
+                // Use pure function to prepare generic roll
+                const rollConfig = prepareGenericRoll(dataset);
+                if (!rollConfig) {
+                    logger.warn('Avant | Invalid roll data for generic roll');
+                    return;
+                }
+                
+                const roll = new Roll(rollConfig.rollExpression, this.actor.getRollData());
                 await roll.evaluate();
                 
-                const label = dataset.label ? `${dataset.label}` : '';
                 await roll.toMessage({
                     speaker: ChatMessage.getSpeaker({ actor: this.actor }),
-                    flavor: label,
+                    flavor: rollConfig.flavor,
                     rollMode: game.settings.get('core', 'rollMode'),
                 });
                 return roll;
@@ -456,17 +464,19 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
         const actor = this.actor;
         const currentPP = actor.system.powerPoints.value;
         
-        if (currentPP < cost) {
-            ui.notifications.warn(`Not enough Power Points! Need ${cost}, have ${currentPP}`);
+        // Use pure function to validate power point usage
+        const validation = validatePowerPointUsage(currentPP, cost);
+        if (!validation.valid) {
+            ui.notifications.warn(validation.error);
             return;
         }
         
         // Deduct power points
         await actor.update({
-            "system.powerPoints.value": Math.max(0, currentPP - cost)
+            "system.powerPoints.value": validation.remaining
         });
         
-        ui.notifications.info(`Spent ${cost} Power Point${cost > 1 ? 's' : ''}. Remaining: ${currentPP - cost}`);
+        ui.notifications.info(`Spent ${cost} Power Point${cost > 1 ? 's' : ''}. Remaining: ${validation.remaining}`);
     }
 
     /**
@@ -486,8 +496,7 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
             return;
         }
         
-                const weapon = this.actor.items.get(itemId);
-        
+        const weapon = this.actor.items.get(itemId);
         if (!weapon) {
             logger.warn(`Avant | Weapon with ID '${itemId}' not found`);
             ui.notifications.warn('Weapon not found');
@@ -495,21 +504,19 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
         }
 
         try {
-            // Use weapon's ability and modifier for attack rolls
-            const weaponAbility = weapon.system.ability || 'might';
-            const abilityMod = this.actor.system.abilities[weaponAbility]?.mod || 0;
-            const weaponModifier = weapon.system.modifier || 0;
+            // Use pure function to prepare weapon attack roll
+            const rollConfig = prepareWeaponAttackRoll(weapon, this.actor);
+            if (!rollConfig) {
+                logger.warn('Avant | Invalid weapon or actor data for attack roll');
+                return;
+            }
             
-            const roll = new Roll("2d10 + @level + @abilityMod + @weaponMod", {
-                level: this.actor.system.level,
-                abilityMod: abilityMod,
-                weaponMod: weaponModifier
-            });
+            const roll = new Roll(rollConfig.rollExpression, rollConfig.rollData);
             await roll.evaluate();
             
             await roll.toMessage({
                 speaker: ChatMessage.getSpeaker({ actor: this.actor }),
-                flavor: `${weapon.name} Attack`,
+                flavor: rollConfig.flavor,
                 rollMode: game.settings.get('core', 'rollMode'),
             });
             return roll;
@@ -536,8 +543,7 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
             return;
         }
         
-                const weapon = this.actor.items.get(itemId);
-        
+        const weapon = this.actor.items.get(itemId);
         if (!weapon) {
             logger.warn(`Avant | Weapon with ID '${itemId}' not found`);
             ui.notifications.warn('Weapon not found');
@@ -545,24 +551,19 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
         }
 
         try {
-            // Use the weapon's damage dice and ability modifier
-            const damageRoll = weapon.system.damageDie || "1d6";
-            const weaponAbility = weapon.system.ability || 'might';
-            const abilityMod = this.actor.system.abilities[weaponAbility]?.mod || 0;
-            const damageType = weapon.system.damageType || "";
+            // Use pure function to prepare weapon damage roll
+            const rollConfig = prepareWeaponDamageRoll(weapon, this.actor);
+            if (!rollConfig) {
+                logger.warn('Avant | Invalid weapon or actor data for damage roll');
+                return;
+            }
             
-            const roll = new Roll(`${damageRoll} + @abilityMod`, {
-                abilityMod: abilityMod
-            });
+            const roll = new Roll(rollConfig.rollExpression, rollConfig.rollData);
             await roll.evaluate();
-            
-            const flavorText = damageType ? 
-                `${weapon.name} Damage (${damageType})` : 
-                `${weapon.name} Damage`;
             
             await roll.toMessage({
                 speaker: ChatMessage.getSpeaker({ actor: this.actor }),
-                flavor: flavorText,
+                flavor: rollConfig.flavor,
                 rollMode: game.settings.get('core', 'rollMode'),
             });
             return roll;
@@ -598,21 +599,19 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
         }
         
         try {
-            // Use armor's ability and modifier for armor rolls
-            const armorAbility = armor.system.ability || 'grace';
-            const abilityMod = this.actor.system.abilities[armorAbility]?.mod || 0;
-            const armorModifier = armor.system.modifier || 0;
+            // Use pure function to prepare armor roll
+            const rollConfig = prepareArmorRoll(armor, this.actor);
+            if (!rollConfig) {
+                logger.warn('Avant | Invalid armor or actor data for armor roll');
+                return;
+            }
             
-            const roll = new Roll("2d10 + @level + @abilityMod + @armorMod", {
-                level: this.actor.system.level,
-                abilityMod: abilityMod,
-                armorMod: armorModifier
-            });
+            const roll = new Roll(rollConfig.rollExpression, rollConfig.rollData);
             await roll.evaluate();
             
             await roll.toMessage({
                 speaker: ChatMessage.getSpeaker({ actor: this.actor }),
-                flavor: `${armor.name} Armor Check`,
+                flavor: rollConfig.flavor,
                 rollMode: game.settings.get('core', 'rollMode'),
             });
             return roll;

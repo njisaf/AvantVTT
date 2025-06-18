@@ -76,7 +76,7 @@ describe('AvantItemSheet Integration Tests', () => {
             mockItem.toObject.mockReturnValue({ flags: {} });
             
             const context = itemSheet.getData();
-            expect(context.system).toBeUndefined();
+            expect(context.system).toEqual({}); // Pure function now returns empty object instead of undefined
             expect(context.flags).toEqual({});
         });
     });

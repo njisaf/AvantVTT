@@ -8,6 +8,7 @@
 import { CompatibilityUtils } from '../utils/compatibility.js';
 import { ValidationUtils } from '../utils/validation.js';
 import { executeRoll, processFormData } from '../logic/item-sheet.js';
+import { prepareTemplateData, extractItemFormData } from '../logic/item-sheet-utils.js';
 import { logger } from '../utils/logger.js';
 
 /**
@@ -51,8 +52,18 @@ export class AvantItemSheet extends CompatibilityUtils.getItemSheetClass() {
     getData() {
         const context = super.getData();
         const itemData = this.item.toObject(false);
-        context.system = itemData.system;
-        context.flags = itemData.flags;
+        
+        // Use pure function to prepare template data
+        const templateData = prepareTemplateData(itemData);
+        if (templateData) {
+            // Merge with existing context
+            Object.assign(context, templateData);
+        } else {
+            // Fallback to basic data structure
+            context.system = itemData.system || {};
+            context.flags = itemData.flags || {};
+        }
+        
         return context;
     }
 
@@ -143,8 +154,8 @@ export class AvantItemSheet extends CompatibilityUtils.getItemSheetClass() {
      * @override
      */
     async _updateObject(event, formData) {
-        // Use pure function to process the form data
-        const processedData = processFormData(formData, this.item.type);
+        // Use pure function to extract and process the form data
+        const processedData = extractItemFormData(formData);
         
         // Convert back to flat object for FoundryVTT
         const flattenFunction = foundry?.utils?.flattenObject || ((obj) => obj);
