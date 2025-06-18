@@ -8,6 +8,7 @@
 import { CompatibilityUtils } from '../utils/compatibility.js';
 import { ValidationUtils } from '../utils/validation.js';
 import { executeRoll, processFormData } from '../logic/item-sheet.js';
+import { logger } from '../utils/logger.js';
 
 /**
  * Item Sheet for Avant Native System - v12/v13 Compatible
@@ -123,7 +124,7 @@ export class AvantItemSheet extends CompatibilityUtils.getItemSheetClass() {
                 
                 return roll;
             } catch (error) {
-                console.error('Avant | Error in item sheet roll:', error);
+                logger.error('Avant | Error in item sheet roll:', error);
                 if (ui?.notifications?.error) {
                     ui.notifications.error(`Roll failed: ${error.message}`);
                 }

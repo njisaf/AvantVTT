@@ -5,6 +5,18 @@
  * @description Dialog for rerolling individual d10s using Fortune Points
  */
 
+import { logger } from '../utils/logger.js';
+import {
+    extractD10Results,
+    extractStaticModifiers,
+    buildDialogData,
+    getCostMessage,
+    validateRerollRequest,
+    buildRerollFormula,
+    formatOutcomeString,
+    hasAvailableFortunePoints
+} from '../logic/dialog-utils.js';
+
 /**
  * Fortune Point Reroll Dialog
  * Allows players to reroll individual d10s from their previous roll
@@ -27,9 +39,9 @@ export class AvantRerollDialog extends Application {
         this.originalFlavor = originalFlavor;
         this.selectedDice = new Set();
         
-        // Extract d10 dice results from the original roll
-        this.d10Results = this._extractD10Results(originalRoll);
-        this.staticModifiers = this._extractStaticModifiers(originalRoll);
+        // Extract d10 dice results using pure functions
+        this.d10Results = extractD10Results(originalRoll);
+        this.staticModifiers = extractStaticModifiers(originalRoll);
     }
     
     /**
@@ -56,25 +68,26 @@ export class AvantRerollDialog extends Application {
      * @override
      */
     getData() {
-        const fortunePoints = this.actor.system.fortunePoints || 0;
-        const maxRerolls = Math.min(this.d10Results.length, fortunePoints);
+        // Use pure functions to build dialog data
+        const dialogData = buildDialogData(
+            this.originalRoll,
+            this.actor,
+            this.d10Results,
+            this.staticModifiers,
+            this.originalFlavor
+        );
         
-        return {
-            d10Results: this.d10Results.map((result, index) => ({
-                index: index,
-                value: result.value,
-                selected: this.selectedDice.has(index),
-                wasRerolled: result.wasRerolled,
-                canReroll: !result.wasRerolled // Cannot reroll if already rerolled
-            })),
-            selectedCount: this.selectedDice.size,
-            fortunePoints: fortunePoints,
-            maxRerolls: maxRerolls,
-            canReroll: fortunePoints > 0 && this.selectedDice.size > 0,
-            costMessage: this._getCostMessage(fortunePoints),
-            originalTotal: this.originalRoll.total,
-            originalFlavor: this.originalFlavor
-        };
+        // Update with current selection state
+        dialogData.d10Results = dialogData.d10Results.map(result => ({
+            ...result,
+            selected: this.selectedDice.has(result.index)
+        }));
+        
+        dialogData.selectedCount = this.selectedDice.size;
+        dialogData.canReroll = dialogData.fortunePoints > 0 && this.selectedDice.size > 0;
+        dialogData.costMessage = getCostMessage(dialogData.fortunePoints, this.selectedDice.size);
+        
+        return dialogData;
     }
     
     /**
@@ -140,27 +153,40 @@ export class AvantRerollDialog extends Application {
      * @private
      */
     async _onRerollConfirm(event) {
-        const fortunePoints = this.actor.system.fortunePoints || 0;
-        const selectedCount = this.selectedDice.size;
+        const selectedDiceArray = Array.from(this.selectedDice);
         
-        if (selectedCount === 0) {
-            ui.notifications.warn("Please select at least one die to reroll.");
-            return;
-        }
+        // Use pure function to validate the reroll request
+        const validation = validateRerollRequest(
+            { rolls: [this.originalRoll] }, // Mock message structure for validation
+            this.actor,
+            selectedDiceArray
+        );
         
-        if (selectedCount > fortunePoints) {
-            ui.notifications.warn("Not enough Fortune Points!");
+        if (!validation.isValid) {
+            ui.notifications.warn(validation.error);
             return;
         }
         
         try {
+            const selectedCount = selectedDiceArray.length;
+            const fortunePoints = this.actor.system.fortunePoints || 0;
+            
             // Create new roll with rerolled dice
             const newRoll = await this._createReroll();
             
-            // Deduct Fortune Points
+            // Calculate new fortune points
             const newFortunePoints = Math.max(0, fortunePoints - selectedCount);
+            
+            // Deduct Fortune Points
             await this.actor.update({
                 "system.fortunePoints": newFortunePoints
+            });
+            
+            // Use pure function to format outcome message
+            const outcomeMessage = formatOutcomeString({
+                diceCount: selectedCount,
+                fortunePointsUsed: selectedCount,
+                remainingPoints: newFortunePoints
             });
             
             // Post new roll to chat
@@ -170,11 +196,11 @@ export class AvantRerollDialog extends Application {
                 rollMode: game.settings.get('core', 'rollMode'),
             });
             
-            ui.notifications.info(`Rerolled ${selectedCount} die with Fortune Points. Remaining: ${newFortunePoints}`);
+            ui.notifications.info(outcomeMessage);
             this.close();
             
         } catch (error) {
-            console.error('Avant | Error in reroll:', error);
+            logger.error('Avant | Error in reroll:', error);
             ui.notifications.error(`Reroll failed: ${error.message}`);
         }
     }
@@ -250,14 +276,13 @@ export class AvantRerollDialog extends Application {
             };
         }
         
+        // Use pure function to build the formula
+        const rollFormula = buildRerollFormula(newD10Results, this.staticModifiers);
+        const roll = new Roll(rollFormula);
+        
         // Calculate new total
         const diceTotal = newD10Results.reduce((sum, die) => sum + die.value, 0);
         const newTotal = diceTotal + this.staticModifiers;
-        
-        // Create a new Roll object with the new results
-        // We'll create a simple roll that represents the final result
-        const rollFormula = `${newD10Results.map(die => die.value).join(' + ')} + ${this.staticModifiers}`;
-        const roll = new Roll(rollFormula);
         
         // Manually set the evaluated state and total
         roll._evaluated = true;
@@ -319,7 +344,7 @@ export class AvantRerollDialog extends Application {
         const dialogElement = this.element?.[0] || this.element;
         
         if (dialogElement && game.avant?.themeManager) {
-            console.log('Avant | Applying theme to reroll dialog');
+            logger.log('Avant | Applying theme to reroll dialog');
             
             // Ensure the dialog has the avant class for theming
             if (!dialogElement.classList.contains('avant')) {

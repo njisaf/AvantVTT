@@ -7,6 +7,12 @@
 import { THEME_CONFIG } from './theme-config.js';
 import { ThemeConfigUtil } from './theme-config-utils.js';
 import { logger } from '../utils/logger.js';
+import { 
+    clearThemeVariables, 
+    applyThemeVariables, 
+    validateThemeStructure,
+    getNestedProperty
+} from '../logic/theme-utils.js';
 
 export class AvantThemeManager {
     constructor() {
@@ -218,44 +224,37 @@ export class AvantThemeManager {
     
     /**
      * Clear all custom theme CSS variables from an element
-     * Now uses the centralized configuration for automatic variable discovery
+     * Uses pure function logic with DOM manipulation wrapper
      */
     clearCustomThemeVariables(element) {
-        // Get all CSS variables from the configuration automatically
-        const customVars = ThemeConfigUtil.getAllCSSVariables();
+        // Get variables to clear using pure function
+        const variablesToClear = clearThemeVariables();
         
-        customVars.forEach(varName => {
+        // Apply DOM manipulation
+        variablesToClear.forEach(varName => {
             element.style.removeProperty(varName);
         });
         
-        logger.log(`Avant Theme Manager | Cleared ${customVars.length} custom variables from element`);
+        logger.log(`Avant Theme Manager | Cleared ${variablesToClear.length} custom variables from element`);
     }
     
     /**
      * Apply custom theme CSS variables
-     * Now uses the centralized configuration for automatic mapping
+     * Uses pure function logic with DOM manipulation wrapper
      */
     applyCustomTheme(element, themeId) {
         const theme = this.customThemes.get(themeId);
         if (!theme) return;
         
-        // Get the automatic JSON-to-CSS mapping from configuration
-        const mapping = ThemeConfigUtil.getJSONToCSSMapping();
+        // Generate CSS variables using pure function
+        const variableMap = applyThemeVariables(theme);
         
-        // Apply variables automatically based on configuration
-        for (const [jsonPath, cssVar] of Object.entries(mapping)) {
-            const value = ThemeConfigUtil.getNestedProperty(theme, jsonPath);
-            if (value !== undefined && value !== null) {
-                // Handle special cases for metadata that need quotes
-                if (cssVar.includes('name') || cssVar.includes('author') || cssVar.includes('version')) {
-                    element.style.setProperty(cssVar, `"${value}"`);
-                } else {
-                    element.style.setProperty(cssVar, value);
-                }
-            }
+        // Apply DOM manipulation
+        for (const [cssVar, value] of Object.entries(variableMap)) {
+            element.style.setProperty(cssVar, value);
         }
         
-        logger.log(`Avant Theme Manager | Applied custom theme "${theme.name}" using configuration-based mapping`);
+        logger.log(`Avant Theme Manager | Applied custom theme "${theme.name}" using pure function logic`);
     }
     
     /**
@@ -322,10 +321,10 @@ export class AvantThemeManager {
     
     /**
      * Validate theme JSON structure
-     * Now uses the centralized configuration for validation
+     * Uses pure function logic with logging wrapper
      */
     validateTheme(theme) {
-        const validation = ThemeConfigUtil.validateTheme(theme);
+        const validation = validateThemeStructure(theme);
         
         if (!validation.isValid) {
             logger.error('Avant Theme Manager | Theme validation failed:');
@@ -337,12 +336,7 @@ export class AvantThemeManager {
         return validation.isValid;
     }
     
-    /**
-     * Helper to get nested object properties
-     */
-    getNestedProperty(obj, path) {
-        return path.split('.').reduce((current, key) => current?.[key], obj);
-    }
+    // Note: getNestedProperty is now imported from logic/theme-utils.js
     
     /**
      * Load custom themes from game settings

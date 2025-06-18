@@ -7,6 +7,7 @@
 
 import { CompatibilityUtils } from '../utils/compatibility.js';
 import { AvantActorData } from '../data/actor-data.js';
+import { logger } from '../utils/logger.js';
 import {
     calculateAbilityTotalModifiers,
     calculateSkillTotalModifiers,
@@ -222,7 +223,7 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
         try {
             return await Item.create(itemData, {parent: this.actor});
         } catch (error) {
-            console.error('Avant | Error creating item:', error);
+            logger.error('Avant | Error creating item:', error);
             ui.notifications.error(`Failed to create ${type}: ${error.message}`);
         }
     }
@@ -236,7 +237,7 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
         event.preventDefault();
         const li = event.currentTarget.closest(".item");
         if (!li) {
-            console.warn('Avant | No item element found for edit');
+            logger.warn('Avant | No item element found for edit');
             return;
         }
         
@@ -244,7 +245,7 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
         const item = this.actor.items.get(itemId);
         
         if (!item) {
-            console.warn(`Avant | Item with ID '${itemId}' not found`);
+            logger.warn(`Avant | Item with ID '${itemId}' not found`);
             ui.notifications.warn('Item not found');
             return;
         }
@@ -262,19 +263,19 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
         event.preventDefault();
         const li = event.currentTarget.closest(".item");
         if (!li) {
-            console.warn('Avant | No item element found for delete');
+            logger.warn('Avant | No item element found for delete');
             return;
         }
         
         const itemId = li.dataset.itemId;
         const item = this.actor.items.get(itemId);
         
-        if (!item) {
-            console.warn(`Avant | Item with ID '${itemId}' not found`);
+                if (!item) {
+            logger.warn(`Avant | Item with ID '${itemId}' not found`);
             ui.notifications.warn('Item not found');
             return;
         }
-        
+
         try {
             await item.delete();
             // FoundryVTT v13 compatibility: Convert DOM element to jQuery object for slideUp
@@ -287,7 +288,7 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
                 this.render(false);
             }
         } catch (error) {
-            console.error('Avant | Error deleting item:', error);
+            logger.error('Avant | Error deleting item:', error);
             ui.notifications.error(`Failed to delete item: ${error.message}`);
         }
     }
@@ -327,7 +328,7 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
                 });
                 return roll;
             } catch (error) {
-                console.error('Avant | Error in generic roll:', error);
+                logger.error('Avant | Error in generic roll:', error);
                 ui.notifications.error(`Roll failed: ${error.message}`);
             }
         }
@@ -346,7 +347,7 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
         const ability = dataset.ability;
         
         if (!ability) {
-            console.warn('Avant | No ability specified for roll');
+            logger.warn('Avant | No ability specified for roll');
             return;
         }
         
@@ -357,7 +358,7 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
         // Validate roll data using pure function
         const validation = validateAbilityRollData(ability, abilityData, level);
         if (!validation.valid) {
-            console.warn(`Avant | ${validation.error}`);
+            logger.warn(`Avant | ${validation.error}`);
             return;
         }
 
@@ -379,7 +380,7 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
             
             return roll;
         } catch (error) {
-            console.error('Avant | Error in ability roll:', error);
+            logger.error('Avant | Error in ability roll:', error);
             ui.notifications.error(`Failed to roll ${ability} check: ${error.message}`);
         }
     }
@@ -397,7 +398,7 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
         const skill = dataset.skill;
         
         if (!skill) {
-            console.warn('Avant | No skill specified for roll');
+            logger.warn('Avant | No skill specified for roll');
             return;
         }
         
@@ -411,7 +412,7 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
         // Validate roll data using pure function
         const validation = validateSkillRollData(skill, skillValue, abilityData, level);
         if (!validation.valid) {
-            console.warn(`Avant | ${validation.error}`);
+            logger.warn(`Avant | ${validation.error}`);
             return;
         }
         
@@ -435,7 +436,7 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
             
             return roll;
         } catch (error) {
-            console.error('Avant | Error in skill roll:', error);
+            logger.error('Avant | Error in skill roll:', error);
             ui.notifications.error(`Failed to roll ${skill} check: ${error.message}`);
         }
     }
@@ -481,18 +482,18 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
         const itemId = dataset.itemId;
         
         if (!itemId) {
-            console.warn('Avant | No item ID found for attack roll');
+            logger.warn('Avant | No item ID found for attack roll');
             return;
         }
         
-        const weapon = this.actor.items.get(itemId);
+                const weapon = this.actor.items.get(itemId);
         
         if (!weapon) {
-            console.warn(`Avant | Weapon with ID '${itemId}' not found`);
+            logger.warn(`Avant | Weapon with ID '${itemId}' not found`);
             ui.notifications.warn('Weapon not found');
             return;
         }
-        
+
         try {
             // Use weapon's ability and modifier for attack rolls
             const weaponAbility = weapon.system.ability || 'might';
@@ -513,7 +514,7 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
             });
             return roll;
         } catch (error) {
-            console.error('Avant | Error in weapon attack roll:', error);
+            logger.error('Avant | Error in weapon attack roll:', error);
             ui.notifications.error(`Failed to roll weapon attack: ${error.message}`);
         }
     }
@@ -531,18 +532,18 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
         const itemId = dataset.itemId;
         
         if (!itemId) {
-            console.warn('Avant | No item ID found for damage roll');
+            logger.warn('Avant | No item ID found for damage roll');
             return;
         }
         
-        const weapon = this.actor.items.get(itemId);
+                const weapon = this.actor.items.get(itemId);
         
         if (!weapon) {
-            console.warn(`Avant | Weapon with ID '${itemId}' not found`);
+            logger.warn(`Avant | Weapon with ID '${itemId}' not found`);
             ui.notifications.warn('Weapon not found');
             return;
         }
-        
+
         try {
             // Use the weapon's damage dice and ability modifier
             const damageRoll = weapon.system.damageDie || "1d6";
@@ -566,7 +567,7 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
             });
             return roll;
         } catch (error) {
-            console.error('Avant | Error in weapon damage roll:', error);
+            logger.error('Avant | Error in weapon damage roll:', error);
             ui.notifications.error(`Failed to roll weapon damage: ${error.message}`);
         }
     }
@@ -584,14 +585,14 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
         const itemId = dataset.itemId;
         
         if (!itemId) {
-            console.warn('Avant | No item ID found for armor roll');
+            logger.warn('Avant | No item ID found for armor roll');
             return;
         }
         
         const armor = this.actor.items.get(itemId);
         
         if (!armor) {
-            console.warn(`Avant | Armor with ID '${itemId}' not found`);
+            logger.warn(`Avant | Armor with ID '${itemId}' not found`);
             ui.notifications.warn('Armor not found');
             return;
         }
@@ -616,7 +617,7 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
             });
             return roll;
         } catch (error) {
-            console.error('Avant | Error in armor roll:', error);
+            logger.error('Avant | Error in armor roll:', error);
             ui.notifications.error(`Failed to roll armor check: ${error.message}`);
         }
     }
