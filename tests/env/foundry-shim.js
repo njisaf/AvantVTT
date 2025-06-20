@@ -56,6 +56,134 @@ global.foundry = {
       }
     }
   },
+  // v13 namespaced APIs
+  applications: {
+    handlebars: {
+      loadTemplates: async (templates) => {
+        // Mock template loading
+        return Promise.resolve(templates);
+      }
+    }
+  },
+  documents: {
+    collections: {
+      Actors: {
+        unregisterSheet: () => {},
+        registerSheet: () => {}
+      },
+      Items: {
+        unregisterSheet: () => {},
+        registerSheet: () => {}
+      }
+    }
+  },
+  appv1: {
+    sheets: {
+      ActorSheet: class MockActorSheetV13 {
+        constructor(actor, options = {}) {
+          this.actor = actor;
+          this.options = options;
+          this._isEditable = true;
+        }
+        
+        static get defaultOptions() {
+          return {
+            classes: ["sheet", "actor"],
+            template: "systems/test/templates/actor-sheet.html",
+            width: 600,
+            height: 600,
+            tabs: []
+          };
+        }
+        
+        getData() {
+          return {
+            actor: this.actor,
+            system: this.actor?.system || {},
+            data: this.actor?.system || {},
+            editable: true,
+            owner: true,
+            limited: false,
+            options: this.options,
+            cssClass: "editable"
+          };
+        }
+        
+        get isEditable() {
+          return this._isEditable;
+        }
+        
+        set isEditable(value) {
+          this._isEditable = value;
+        }
+        
+        activateListeners(html) {
+          // Mock implementation for testing
+        }
+      },
+      ItemSheet: class MockItemSheetV13 {
+        constructor(item, options = {}) {
+          this.item = item;
+          this.options = options;
+        }
+        
+        static get defaultOptions() {
+          return {
+            classes: ["sheet", "item"],
+            template: "systems/test/templates/item-sheet.html",
+            width: 520,
+            height: 480,
+            tabs: []
+          };
+        }
+        
+        getData() {
+          return {
+            item: this.item,
+            system: this.item?.system || {},
+            data: this.item?.system || {},
+            editable: true,
+            owner: true,
+            limited: false,
+            options: this.options,
+            cssClass: "editable"
+          };
+        }
+        
+        get isEditable() {
+          return true;
+        }
+        
+        activateListeners(html) {
+          // Mock implementation for testing
+        }
+        
+        _updateObject(event, formData) {
+          if (this.item && formData) {
+            const expanded = {};
+            for (const [key, value] of Object.entries(formData)) {
+              if (key.includes('.')) {
+                const keys = key.split('.');
+                let current = expanded;
+                for (let i = 0; i < keys.length - 1; i++) {
+                  if (!current[keys[i]]) current[keys[i]] = {};
+                  current = current[keys[i]];
+                }
+                current[keys[keys.length - 1]] = value;
+              } else {
+                expanded[key] = value;
+              }
+            }
+            
+            if (expanded.system) {
+              Object.assign(this.item.system, expanded.system);
+            }
+          }
+          return Promise.resolve();
+        }
+      }
+    }
+  },
   utils: {
     mergeObject: (original, other = {}, options = {}) => ({ ...original, ...other }),
     getProperty: (object, key) => key.split('.').reduce((o, k) => o?.[k], object),
@@ -423,13 +551,234 @@ global.Node = {
   NOTATION_NODE: 12
 };
 
-// Mock jQuery for testing (simplified)
+// Mock jQuery for testing (v13 compatible)
 global.jQuery = function(selector) {
-  return {
-    length: 1,
-    0: selector
-  };
+  // If selector is already a jQuery object, return it
+  if (selector && selector.constructor === global.jQuery) {
+    return selector;
+  }
+  
+  // If it's a DOM element, wrap it
+  if (selector && selector.nodeType) {
+    const jqObject = Object.create(global.jQuery.prototype);
+    jqObject.length = 1;
+    jqObject[0] = selector;
+    jqObject.selector = selector.tagName || 'element';
+    return jqObject;
+  }
+  
+  // Otherwise create a mock jQuery object
+  const jqObject = Object.create(global.jQuery.prototype);
+  jqObject.length = 1;
+  jqObject[0] = selector;
+  jqObject.selector = selector;
+  
+  return jqObject;
 };
+
+// Add methods to jQuery prototype
+global.jQuery.prototype = {
+  length: 1,
+  
+  find: function(sel) {
+    // Create a new jQuery object for the found elements
+    const newObj = Object.create(global.jQuery.prototype);
+    newObj.length = 1;
+    newObj[0] = `${this.selector || this[0]} ${sel}`;
+    newObj.selector = sel;
+    return newObj;
+  },
+  
+  click: function(handler) {
+    // Mock click handler registration
+    if (this[0] && this[0].addEventListener) {
+      this[0].addEventListener('click', handler);
+    }
+    return this;
+  },
+  
+  on: function(event, handler) {
+    // Mock event handler registration
+    if (this[0] && this[0].addEventListener) {
+      this[0].addEventListener(event, handler);
+    }
+    return this;
+  },
+  
+  change: function(handler) {
+    // Mock change handler registration
+    if (this[0] && this[0].addEventListener) {
+      this[0].addEventListener('change', handler);
+    }
+    return this;
+  },
+  
+  addClass: function(className) {
+    if (this[0] && this[0].classList) {
+      this[0].classList.add(className);
+    }
+    return this;
+  },
+  
+  removeClass: function(className) {
+    if (this[0] && this[0].classList) {
+      this[0].classList.remove(className);
+    }
+    return this;
+  },
+  
+  hasClass: function(className) {
+    if (this[0] && this[0].classList) {
+      return this[0].classList.contains(className);
+    }
+    return false;
+  },
+  
+  attr: function(name, value) {
+    if (value === undefined) {
+      if (this[0] && this[0].getAttribute) {
+        return this[0].getAttribute(name);
+      }
+      return '';
+    }
+    if (this[0] && this[0].setAttribute) {
+      this[0].setAttribute(name, value);
+    }
+    return this;
+  },
+  
+  prop: function(name, value) {
+    if (value === undefined) {
+      if (this[0]) {
+        return this[0][name];
+      }
+      return false;
+    }
+    if (this[0]) {
+      this[0][name] = value;
+    }
+    return this;
+  },
+  
+  val: function(value) {
+    if (value === undefined) {
+      if (this[0]) {
+        return this[0].value || '';
+      }
+      return '';
+    }
+    if (this[0]) {
+      this[0].value = value;
+    }
+    return this;
+  },
+  
+  text: function(value) {
+    if (value === undefined) {
+      if (this[0]) {
+        return this[0].textContent || 'mock text';
+      }
+      return 'mock text';
+    }
+    if (this[0]) {
+      this[0].textContent = value;
+    }
+    return this;
+  },
+  
+  html: function(value) {
+    if (value === undefined) {
+      if (this[0]) {
+        return this[0].innerHTML || '<div>mock html</div>';
+      }
+      return '<div>mock html</div>';
+    }
+    if (this[0]) {
+      this[0].innerHTML = value;
+    }
+    return this;
+  },
+  
+  css: function(prop, value) {
+    if (value === undefined && typeof prop === 'string') {
+      if (this[0] && this[0].style) {
+        return this[0].style[prop] || '';
+      }
+      return '';
+    }
+    if (this[0] && this[0].style) {
+      if (typeof prop === 'object') {
+        Object.assign(this[0].style, prop);
+      } else {
+        this[0].style[prop] = value;
+      }
+    }
+    return this;
+  },
+  
+  show: function() {
+    if (this[0] && this[0].style) {
+      this[0].style.display = '';
+    }
+    return this;
+  },
+  
+  hide: function() {
+    if (this[0] && this[0].style) {
+      this[0].style.display = 'none';
+    }
+    return this;
+  },
+  
+  slideUp: function(duration, callback) {
+    if (typeof callback === 'function') {
+      setTimeout(callback, 10);
+    }
+    return this;
+  },
+  
+  slideDown: function(duration, callback) {
+    if (typeof callback === 'function') {
+      setTimeout(callback, 10);
+    }
+    return this;
+  },
+  
+  fadeIn: function(duration, callback) {
+    if (typeof callback === 'function') {
+      setTimeout(callback, 10);
+    }
+    return this;
+  },
+  
+  fadeOut: function(duration, callback) {
+    if (typeof callback === 'function') {
+      setTimeout(callback, 10);
+    }
+    return this;
+  },
+  
+  each: function(callback) {
+    if (typeof callback === 'function') {
+      callback.call(this[0], 0, this[0]);
+    }
+    return this;
+  },
+  
+  get: function(index) {
+    return this[index || 0];
+  },
+  
+  eq: function(index) {
+    const newObj = Object.create(global.jQuery.prototype);
+    newObj.length = 1;
+    newObj[0] = this[index || 0];
+    return newObj;
+  }
+};
+
+// Alias for jQuery
+global.$ = global.jQuery;
 
 // Basic Collections stub for v12 compatibility
 global.Actors = {
@@ -553,4 +902,13 @@ global.jest = {
     object[method] = spy;
     return spy;
   }
-}; 
+};
+
+// Add $ alias for jQuery
+global.$ = global.jQuery;
+
+// Make jQuery global for FoundryVTT v13 compatibility
+if (typeof window !== 'undefined') {
+  window.jQuery = global.jQuery;
+  window.$ = global.jQuery;
+} 

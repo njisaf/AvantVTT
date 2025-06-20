@@ -28,14 +28,13 @@ describe('Minimal Coverage Boost', () => {
         global.Hooks.callAll('test');
     });
 
-    test('should exercise compatibility utils', async () => {
-        const { CompatibilityUtils } = await import('../../scripts/utils/compatibility.js');
+    test('should exercise v13 foundry utils', async () => {
+        // Test that foundry.utils is available in v13-only environment
+        expect(foundry?.utils?.mergeObject).toBeDefined();
+        expect(foundry?.utils?.flattenObject).toBeDefined();
         
-        // Exercise some compatibility utility methods
-        expect(CompatibilityUtils.isV13OrLater()).toBeDefined();
-        expect(CompatibilityUtils.log).toBeDefined();
-        
-        // Exercise logging
-        CompatibilityUtils.log('Test log message');
+        // Exercise foundry utils
+        const merged = foundry.utils.mergeObject({a: 1}, {b: 2});
+        expect(merged).toMatchObject({a: 1, b: 2});
     });
 }); 

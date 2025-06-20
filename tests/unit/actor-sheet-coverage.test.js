@@ -4,6 +4,7 @@
  */
 
 import { createMockActor } from '../mocks/actor-factory.js';
+import { AvantActorSheet } from '../../scripts/sheets/actor-sheet.js';
 import '../env/foundry-shim.js';
 
 describe('Actor Sheet Coverage Tests', () => {
@@ -35,12 +36,21 @@ describe('Actor Sheet Coverage Tests', () => {
         expect(options.height).toBe(630);
     });
 
-    test('should exercise _activateCoreListeners method', () => {
-        // Mock html element
-        const mockHtml = document.createElement('div');
+    test('should exercise activateListeners method for v13 compatibility', () => {
+        const mockActor = {
+            toObject: jest.fn(() => ({
+                system: { level: 1 },
+                flags: {}
+            })),
+            items: []
+        };
         
-        // Call _activateCoreListeners to exercise it
-        expect(() => actorSheet._activateCoreListeners(mockHtml)).not.toThrow();
+        const mockHtml = global.jQuery(document.createElement('div'));
+        const actorSheet = new AvantActorSheet(mockActor, {});
+        
+        // In v13-only implementation, activateListeners handles everything
+        // No separate _activateCoreListeners method needed
+        expect(() => actorSheet.activateListeners(mockHtml)).not.toThrow();
     });
 
     test('should exercise various roll methods', async () => {

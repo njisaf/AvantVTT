@@ -133,8 +133,8 @@ describe('AvantThemeManager', () => {
             global.game = { version: undefined };
             
             const manager = new AvantThemeManager();
-            expect(manager.foundryVersion).toBe(12); // Default fallback
-            expect(manager.isV13).toBe(false);
+            expect(manager.foundryVersion).toBe(13); // v13-only now
+            expect(manager.isV13).toBe(true);
             
             global.game = originalGame;
         });

@@ -267,13 +267,20 @@ export function organizeSkillsByAbility(skills, abilities, skillAbilityMap, leve
  * // Organizing mixed items
  * const organized = organizeItemsByType([
  *     { type: 'weapon', name: 'Sword' },
- *     { type: 'action', name: 'Fireball' },
- *     { type: 'weapon', name: 'Bow' }
+ *     { type: 'armor', name: 'Leather Armor' },
+ *     { type: 'gear', name: 'Rope' },
+ *     { type: 'talent', name: 'Fireball' },
+ *     { type: 'augment', name: 'Enhanced Vision' },
+ *     { type: 'feature', name: 'Natural Armor' }
  * ]);
  * // Result: {
- * //   weapon: [{ type: 'weapon', name: 'Sword' }, { type: 'weapon', name: 'Bow' }],
- * //   action: [{ type: 'action', name: 'Fireball' }],
- * //   talent: [],
+ * //   weapon: [{ type: 'weapon', name: 'Sword' }],
+ * //   armor: [{ type: 'armor', name: 'Leather Armor' }],
+ * //   gear: [{ type: 'gear', name: 'Rope' }],
+ * //   talent: [{ type: 'talent', name: 'Fireball' }],
+ * //   augment: [{ type: 'augment', name: 'Enhanced Vision' }],
+ * //   feature: [{ type: 'feature', name: 'Natural Armor' }],
+ * //   action: [],
  * //   other: []
  * // }
  */
@@ -281,7 +288,11 @@ export function organizeItemsByType(items) {
     const result = {
         action: [],
         weapon: [],
+        armor: [],
+        gear: [],
         talent: [],
+        augment: [],
+        feature: [],
         other: []
     };
     

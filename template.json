@@ -197,47 +197,65 @@
     },
     "talent": {
       "description": "",
-      "source": "",
       "tier": 1,
-      "category": "general",
       "prerequisites": "",
       "uses": {
         "value": 0,
         "max": 0
-      }
+      },
+      "powerPointCost": 1,
+      "isActive": false
     },
     "augment": {
       "description": "",
-      "source": "",
-      "tier": 1,
-      "category": "general",
-      "prerequisites": "",
+      "uses": {
+        "value": 0,
+        "max": 0
+      },
+      "augmentType": "enhancement",
+      "powerPointCost": 0,
+      "isActive": false,
+      "rarity": "common"
+    },
+    "weapon": {
+      "description": "",
+      "damageType": "",
+      "range": "Melee",
+      "weight": 1,
+      "cost": 0,
+      "ability": "might",
+      "modifier": 0,
+      "damageDie": "1d6",
+      "properties": "",
+      "threshold": 11,
+      "quantity": 1,
+      "equipped": false
+    },
+    "armor": {
+      "description": "",
+      "weight": 5,
+      "cost": 0,
+      "ability": "grace",
+      "modifier": 0,
+      "threshold": 11,
+      "damageReduction": 0,
+      "armorType": "light",
+      "quantity": 1,
+      "equipped": false,
+      "properties": ""
+    },
+    "gear": {
+      "description": "",
+      "weight": 1,
+      "cost": 0,
+      "quantity": 1,
+      "rarity": "common",
+      "category": "miscellaneous",
+      "isConsumable": false,
       "uses": {
         "value": 0,
         "max": 0
       }
-    },
-    "weapon": {
-      "description": "",
-      "damage": "1d6",
-      "damageType": "physical",
-      "range": "melee",
-      "weight": 0,
-      "cost": 0,
-      "qualities": ""
-    },
-    "armor": {
-      "description": "",
-      "defense": 0,
-      "weight": 0,
-      "cost": 0,
-      "qualities": ""
-    },
-    "gear": {
-      "description": "",
-      "weight": 0,
-      "cost": 0,
-      "quantity": 1
     }
   }
 } 

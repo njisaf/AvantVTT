@@ -9,15 +9,8 @@ import { describe, test, expect, beforeEach, beforeAll, jest } from '@jest/globa
 
 // Import functions to test
 import { registerSheets, setupConfigDebug, setupDataModels } from '../../../scripts/logic/avant-init-utils.js';
-import { CompatibilityUtils } from '../../../scripts/utils/compatibility.js';
 
 describe('Avant Initialization Utils', () => {
-    
-    beforeEach(() => {
-        // Patch CompatibilityUtils methods to return strings instead of functions
-        jest.spyOn(CompatibilityUtils, 'getActorSheetClass').mockReturnValue('MockActorSheet');
-        jest.spyOn(CompatibilityUtils, 'getItemSheetClass').mockReturnValue('MockItemSheet');
-    });
     
     describe('registerSheets', () => {
         let mockActorCollection, mockItemCollection;
@@ -54,14 +47,14 @@ describe('Avant Initialization Utils', () => {
             expect(result.registeredSheets).toBe(2);
             expect(result.message).toBe('Successfully registered 2 sheet types');
             
-            // Verify actor sheet registration (CompatibilityUtils returns string)
-            expect(mockActorCollection.unregisterSheet).toHaveBeenCalledWith('core', 'MockActorSheet');
+            // Verify actor sheet registration (v13 namespaced classes)
+            expect(mockActorCollection.unregisterSheet).toHaveBeenCalledWith('core', global.foundry.appv1.sheets.ActorSheet);
             expect(mockActorCollection.registerSheet).toHaveBeenCalledWith(
                 'avant', mockActorSheetClass, { makeDefault: true }
             );
             
-            // Verify item sheet registration (CompatibilityUtils returns string)
-            expect(mockItemCollection.unregisterSheet).toHaveBeenCalledWith('core', 'MockItemSheet');
+            // Verify item sheet registration (v13 namespaced classes)
+            expect(mockItemCollection.unregisterSheet).toHaveBeenCalledWith('core', global.foundry.appv1.sheets.ItemSheet);
             expect(mockItemCollection.registerSheet).toHaveBeenCalledWith(
                 'avant', mockItemSheetClass, { makeDefault: true }
             );

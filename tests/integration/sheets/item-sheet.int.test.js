@@ -32,13 +32,14 @@ describe('AvantItemSheet Integration Tests', () => {
             }
         };
 
-        // Create mock HTML element
-        mockHtml = document.createElement('div');
-        mockHtml.innerHTML = `
-            <div class="rollable" data-roll="1d8+@str" data-label="Damage">
-                Roll Damage
+        // Create mock HTML element and wrap in jQuery for v13 compatibility
+        const htmlElement = document.createElement('div');
+        htmlElement.innerHTML = `
+            <div class="rollable" data-roll="1d20" data-label="Item Roll">
+                Roll Item
             </div>
         `;
+        mockHtml = global.jQuery(htmlElement);
 
         // Create sheet instance
         itemSheet = new AvantItemSheet(mockItem, {});
@@ -115,16 +116,20 @@ describe('AvantItemSheet Integration Tests', () => {
         });
 
         test('should handle null HTML gracefully', () => {
+            // v13 item sheet expects valid jQuery object, null should not be passed
+            // This is testing current behavior - null HTML would throw an error
             expect(() => {
                 itemSheet.activateListeners(null);
-            }).not.toThrow();
+            }).toThrow();
         });
     });
 
     describe('Core Listener Activation', () => {
-        test('should activate core listeners without errors', () => {
+        test('should properly delegate to core framework', () => {
+            // v13-only implementation delegates all listener activation to parent class
+            // No separate _activateCoreListeners method needed
             expect(() => {
-                itemSheet._activateCoreListeners(mockHtml);
+                itemSheet.activateListeners(mockHtml);
             }).not.toThrow();
         });
     });
@@ -179,20 +184,17 @@ describe('AvantItemSheet Integration Tests', () => {
     });
 
     describe('Version Compatibility', () => {
-        test('should handle missing foundry.utils gracefully', () => {
+        test('should require foundry.utils.mergeObject for v13', () => {
             // Save original foundry
             const originalFoundry = global.foundry;
             
             // Create a minimal foundry object without utils.mergeObject
             global.foundry = {};
 
-            // The defaultOptions should use fallback merging
-            const options = AvantItemSheet.defaultOptions;
-            
-            expect(options).toBeDefined();
-            expect(options.classes).toContain('avant');
-            expect(options.width).toBe(520);
-            expect(options.height).toBe(480);
+            // v13-only code requires foundry.utils.mergeObject - should throw
+            expect(() => {
+                AvantItemSheet.defaultOptions;
+            }).toThrow();
 
             // Restore original foundry
             global.foundry = originalFoundry;

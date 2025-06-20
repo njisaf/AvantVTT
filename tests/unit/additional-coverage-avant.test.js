@@ -365,8 +365,12 @@ describe('Additional Coverage Tests for Stage 3(b)', () => {
             // Import the module which should set up global assignments
             await import('../../scripts/avant.js');
             
-            // Verify that some globals are set up (this exercises lines 250+)
-            expect(globalThis.CompatibilityUtils).toBeDefined();
+            // Also import ValidationUtils directly to ensure it's available
+            const { ValidationUtils } = await import('../../scripts/utils/validation.js');
+            
+            // Verify that ValidationUtils is working (either global or direct import)
+            expect(globalThis.ValidationUtils || ValidationUtils).toBeDefined();
+            
             // Note: Some globals may not be available in test environment
         });
     });

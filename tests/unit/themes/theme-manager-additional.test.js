@@ -324,17 +324,15 @@ describe('AvantThemeManager Additional Coverage', () => {
 
     describe('Theme Detection and Management', () => {
         test('should detect FoundryVTT version correctly', () => {
-            global.game.version = '12.5.0';
             const newManager = new global.AvantThemeManager();
             
-            expect(newManager.foundryVersion).toBe(12);
+            expect(newManager.foundryVersion).toBe(13);
         });
 
         test('should handle missing game version', () => {
-            global.game.version = undefined;
             const newManager = new global.AvantThemeManager();
             
-            expect(newManager.foundryVersion).toBe(12); // Default
+            expect(newManager.foundryVersion).toBe(13); // v13-only now
         });
 
         test('should set theme and trigger callbacks', async () => {

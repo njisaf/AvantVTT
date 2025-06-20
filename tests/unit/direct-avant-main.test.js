@@ -166,9 +166,8 @@ describe('Direct Avant Main System Test', () => {
         const moduleTests = [
             async () => {
                 try {
-                    const { CompatibilityUtils } = await import('../../scripts/utils/compatibility.js');
-                    CompatibilityUtils.log('Test message');
-                    expect(CompatibilityUtils.getFoundryVersion()).toBeDefined();
+                    // CompatibilityUtils removed in v13-only migration
+                    expect(true).toBe(true);
                 } catch (e) { /* ignore */ }
             },
             async () => {

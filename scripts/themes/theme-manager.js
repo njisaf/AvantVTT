@@ -1,7 +1,7 @@
 /**
  * Avant VTT Theme Manager
  * Handles theme switching, loading, and user theme uploads
- * Compatible with FoundryVTT v12 and v13
+ * FoundryVTT v13+ Only
  */
 
 import { THEME_CONFIG } from './theme-config.js';
@@ -20,9 +20,9 @@ export class AvantThemeManager {
         this.customThemes = new Map();
         this.themeChangeCallbacks = new Set();
         
-        // Check Foundry version for compatibility
-        this.foundryVersion = parseInt(game.version?.split('.')[0] || '12');
-        this.isV13 = this.foundryVersion >= 13;
+        // v13-only version properties - fixed values since we only support v13 now
+        this.foundryVersion = 13;
+        this.isV13 = true;
         
         // Built-in themes
         this.builtInThemes = {
@@ -43,14 +43,14 @@ export class AvantThemeManager {
         };
         
         // Initialize non-async parts only in constructor
-        logger.log('Avant Theme Manager | Constructor initialized for Foundry v' + this.foundryVersion);
+        logger.log('Avant Theme Manager | Constructor initialized');
     }
     
     /**
      * Initialize the theme manager (must be called manually after game is ready)
      */
     async init() {
-        logger.log('Avant Theme Manager | Initializing for Foundry v' + this.foundryVersion);
+        logger.log('Avant Theme Manager | Initializing');
         
         // Load saved theme preference (safely check if game.settings exists)
         this.currentTheme = (game.settings && game.settings.get('avant', 'selectedTheme')) || 'dark';
@@ -77,6 +77,24 @@ export class AvantThemeManager {
                         this.applyThemeToElement(appElement, this.currentTheme);
                     }
                 }, 100);
+            }
+        });
+
+        // Listen specifically for item sheet renders to apply theming
+        Hooks.on('renderItemSheet', (app, html, data) => {
+            logger.log('Avant Theme Manager | renderItemSheet hook triggered');
+            if (app?.constructor?.name?.includes('Avant')) {
+                logger.log('Avant Theme Manager | Applying theme to Avant item sheet');
+                setTimeout(() => {
+                    const appElement = app?.element?.[0] || app?.element;
+                    if (appElement) {
+                        // Ensure the element has the avant class for theming
+                        if (!appElement.classList.contains('avant')) {
+                            appElement.classList.add('avant');
+                        }
+                        this.applyThemeToElement(appElement, this.currentTheme);
+                    }
+                }, 50);
             }
         });
         
@@ -112,11 +130,9 @@ export class AvantThemeManager {
     }
     
     /**
-     * Register game settings for themes - v12/v13 compatible
+     * Register game settings for themes
      */
     static registerSettings() {
-        // Use appropriate merge function based on version
-        const mergeFunction = foundry?.utils?.mergeObject || mergeObject;
         
         game.settings.register('avant', 'selectedTheme', {
             name: game.i18n?.localize('AVANT.settings.selectedTheme.name') || 'Selected Theme',
@@ -126,7 +142,6 @@ export class AvantThemeManager {
             type: String,
             default: 'dark',
             onChange: value => {
-                // Safe navigation for v12
                 const themeManager = game.avant?.themeManager;
                 if (themeManager) {
                     themeManager.setTheme(value);
@@ -173,7 +188,7 @@ export class AvantThemeManager {
     }
     
     /**
-     * Apply a theme to all Avant elements - v12/v13 compatible
+     * Apply a theme to all Avant elements
      */
     applyTheme(themeId) {
         logger.log(`Avant Theme Manager | Applying theme: ${themeId}`);
@@ -193,7 +208,7 @@ export class AvantThemeManager {
                 }
             });
             
-            // V12 compatible attribute handling
+            // Remove existing theme attribute
             if (element.removeAttribute) {
                 element.removeAttribute('data-theme');
             }
@@ -266,7 +281,7 @@ export class AvantThemeManager {
     }
     
     /**
-     * Upload and install a custom theme - v12/v13 compatible
+     * Upload and install a custom theme
      */
     async uploadCustomTheme(file) {
         try {
@@ -302,21 +317,10 @@ export class AvantThemeManager {
     }
     
     /**
-     * V12 compatible file reading
+     * Read file content
      */
     async readFileCompat(file) {
-        // Modern browsers (including v12/v13 electron)
-        if (file.text) {
-            return await file.text();
-        }
-        
-        // Fallback for older environments
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = () => reject(reader.error);
-            reader.readAsText(file);
-        });
+        return await file.text();
     }
     
     /**
@@ -436,7 +440,7 @@ export class AvantThemeManager {
             }
         });
         
-        // V12 compatible attribute handling
+        // Remove existing theme attribute
         if (element.removeAttribute) {
             element.removeAttribute('data-theme');
         }
@@ -459,7 +463,7 @@ export class AvantThemeManager {
     }
     
     /**
-     * V12 compatible callback notification
+     * Notify callbacks of theme change
      */
     notifyThemeChange(themeId) {
         if (this.themeChangeCallbacks.forEach) {
@@ -536,14 +540,11 @@ export class AvantThemeManager {
 }
 
 /**
- * Theme Manager Application UI - v12/v13 Compatible
+ * Theme Manager Application UI
  */
 class AvantThemeManagerApp extends FormApplication {
     static get defaultOptions() {
-        // V12/V13 compatible mergeObject
-        const mergeFunction = foundry?.utils?.mergeObject || mergeObject;
-        
-        return mergeFunction(super.defaultOptions, {
+        return foundry.utils.mergeObject(super.defaultOptions, {
             id: 'avant-theme-manager',
             title: game.i18n?.localize('AVANT.themeManager.title') || 'Avant Theme Manager',
             template: 'systems/avant/templates/theme-manager.html',
@@ -576,18 +577,15 @@ class AvantThemeManagerApp extends FormApplication {
     }
     
     /**
-     * V12 compatible event handling
+     * Activate event listeners
      */
     activateListeners(html) {
         super.activateListeners(html);
         
-        // V12 compatible jQuery usage
-        const jq = html.find ? html : $(html);
-        
-        jq.find('.theme-select').click(this._onThemeSelect.bind(this));
-        jq.find('.theme-upload').change(this._onThemeUpload.bind(this));
-        jq.find('.theme-export').click(this._onThemeExport.bind(this));
-        jq.find('.theme-delete').click(this._onThemeDelete.bind(this));
+        html.find('.theme-select').click(this._onThemeSelect.bind(this));
+        html.find('.theme-upload').change(this._onThemeUpload.bind(this));
+        html.find('.theme-export').click(this._onThemeExport.bind(this));
+        html.find('.theme-delete').click(this._onThemeDelete.bind(this));
     }
     
     async _onThemeSelect(event) {
@@ -619,15 +617,13 @@ class AvantThemeManagerApp extends FormApplication {
     }
     
     /**
-     * V12 compatible dialog confirmation
+     * Handle theme deletion with confirmation
      */
     async _onThemeDelete(event) {
         event.preventDefault();
         const themeId = event.currentTarget.dataset.themeId;
         
-        // V12/V13 compatible dialog
-        const DialogClass = Dialog;
-        const confirmed = await DialogClass.confirm({
+        const confirmed = await Dialog.confirm({
             title: game.i18n?.localize('AVANT.themeManager.deleteTitle') || 'Delete Theme',
             content: `<p>${game.i18n?.localize('AVANT.themeManager.deleteConfirm') || 'Are you sure you want to delete this theme? This action cannot be undone.'}</p>`,
             defaultYes: false

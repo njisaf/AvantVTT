@@ -1,11 +1,10 @@
 /**
  * @fileoverview Actor Sheet for Avant Native System
- * @version 2.0.0
+ * @version 2.0.0 - FoundryVTT v13+ Only
  * @author Avant Development Team
- * @description Actor sheet handling for character management with v12/v13 compatibility
+ * @description Actor sheet handling for character management with v13-only implementation
  */
 
-import { CompatibilityUtils } from '../utils/compatibility.js';
 import { AvantActorData } from '../data/actor-data.js';
 import { logger } from '../utils/logger.js';
 import {
@@ -32,12 +31,12 @@ import {
 } from '../logic/actor-sheet-utils.js';
 
 /**
- * Actor Sheet for Avant Native System - v12/v13 Compatible
+ * Actor Sheet for Avant Native System - FoundryVTT v13+
  * @class AvantActorSheet
- * @extends {ActorSheet}
+ * @extends {foundry.appv1.sheets.ActorSheet}
  * @description Handles actor sheet functionality including tabs, rolls, and item management
  */
-export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
+export class AvantActorSheet extends foundry.appv1.sheets.ActorSheet {
     /**
      * Define default options for the actor sheet
      * @static
@@ -45,8 +44,7 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
      * @override
      */
     static get defaultOptions() {
-        const mergeFunction = foundry?.utils?.mergeObject || ((a, b) => ({ ...a, ...b }));
-        return mergeFunction(super.defaultOptions, {
+        return foundry.utils.mergeObject(super.defaultOptions, {
             classes: ["avant", "sheet", "actor"],
             template: "systems/avant/templates/actor-sheet.html",
             width: 900,
@@ -126,78 +124,90 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
     }
 
     /**
-     * Activate core listeners with v12/v13 compatibility
-     * @param {jQuery|HTMLElement|DocumentFragment} html - The rendered HTML
+     * Handle core listener activation for v13 compatibility
+     * @param {jQuery} html - The rendered HTML
      * @override
-     * @private
      */
     _activateCoreListeners(html) {
-        CompatibilityUtils.safeActivateListeners(this, html, super._activateCoreListeners);
+        // FoundryVTT v13 compatibility fix for core listeners
+        // Handle various types of HTML input that FoundryVTT might pass
+        let element = html;
+        
+        // Handle jQuery objects by extracting the DOM element
+        if (html instanceof jQuery) {
+            if (html.length > 0) {
+                element = html[0];
+            } else {
+                console.error('AvantActorSheet._activateCoreListeners: Empty jQuery object received', html);
+                return;
+            }
+        }
+        
+        // Handle comment nodes or other non-element nodes
+        if (element && element.nodeType === Node.COMMENT_NODE) {
+            console.warn('AvantActorSheet._activateCoreListeners: Received comment node, looking for next element');
+            // Try to find the next element sibling
+            element = element.nextElementSibling;
+        }
+        
+        // Handle document fragments or other container types
+        if (element && element.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+            // Look for the first element child
+            element = element.querySelector('form') || element.firstElementChild;
+        }
+        
+        // Final validation - ensure we have a valid DOM element
+        if (!element || !element.querySelectorAll || typeof element.querySelectorAll !== 'function') {
+            console.error('AvantActorSheet._activateCoreListeners: Could not find valid DOM element', html);
+            return;
+        }
+        
+        // FoundryVTT core expects jQuery objects, so wrap the DOM element back into jQuery
+        const jQueryElement = $(element);
+        
+        // Call parent with jQuery-wrapped element
+        super._activateCoreListeners(jQueryElement);
     }
 
     /**
      * Activate event listeners for the actor sheet
-     * @param {jQuery|HTMLElement|DocumentFragment} html - The rendered HTML
+     * @param {jQuery} html - The rendered HTML
      * @override
      */
     activateListeners(html) {
-        CompatibilityUtils.safeActivateListeners(this, html, super.activateListeners);
+        super.activateListeners(html);
 
         // Everything below here is only needed if the sheet is editable
         if (!this.isEditable) return;
 
-        // Get normalized DOM element for event handling
-        const element = CompatibilityUtils.normalizeHtmlForListeners(html);
-        if (!element) {
-            CompatibilityUtils.log('Failed to normalize HTML for listeners', 'error');
-            return;
-        }
 
-        // Use pure DOM methods instead of jQuery for v13 compatibility
+
         // Add Inventory Item
-        element.querySelectorAll('.item-create').forEach(el => {
-            el.addEventListener('click', this._onItemCreate.bind(this));
-        });
+        html.find('.item-create').click(this._onItemCreate.bind(this));
 
         // Update Inventory Item
-        element.querySelectorAll('.item-edit').forEach(el => {
-            el.addEventListener('click', this._onItemEdit.bind(this));
-        });
+        html.find('.item-edit').click(this._onItemEdit.bind(this));
 
         // Delete Inventory Item
-        element.querySelectorAll('.item-delete').forEach(el => {
-            el.addEventListener('click', this._onItemDelete.bind(this));
-        });
+        html.find('.item-delete').click(this._onItemDelete.bind(this));
 
         // Rollable abilities
-        element.querySelectorAll('.rollable').forEach(el => {
-            el.addEventListener('click', this._onRoll.bind(this));
-        });
+        html.find('.rollable').click(this._onRoll.bind(this));
 
         // Skill rolls
-        element.querySelectorAll('.skill-roll').forEach(el => {
-            el.addEventListener('click', this._onSkillRoll.bind(this));
-        });
+        html.find('.skill-roll').click(this._onSkillRoll.bind(this));
 
         // Power point usage
-        element.querySelectorAll('.power-point-use').forEach(el => {
-            el.addEventListener('click', this._onPowerPointsRoll.bind(this));
-        });
+        html.find('.power-point-use').click(this._onPowerPointsRoll.bind(this));
 
         // Weapon attack rolls
-        element.querySelectorAll('.attack-roll').forEach(el => {
-            el.addEventListener('click', this._onAttackRoll.bind(this));
-        });
+        html.find('.attack-roll').click(this._onAttackRoll.bind(this));
 
         // Weapon damage rolls
-        element.querySelectorAll('.damage-roll').forEach(el => {
-            el.addEventListener('click', this._onDamageRoll.bind(this));
-        });
+        html.find('.damage-roll').click(this._onDamageRoll.bind(this));
 
         // Armor rolls
-        element.querySelectorAll('.armor-roll').forEach(el => {
-            el.addEventListener('click', this._onArmorRoll.bind(this));
-        });
+        html.find('.armor-roll').click(this._onArmorRoll.bind(this));
     }
 
     /**
@@ -221,7 +231,9 @@ export class AvantActorSheet extends CompatibilityUtils.getActorSheetClass() {
         }
         
         try {
-            return await Item.create(itemData, {parent: this.actor});
+            const createdItem = await Item.create(itemData, {parent: this.actor});
+            logger.log(`Avant | Created ${type} item: ${createdItem.name}`);
+            return createdItem;
         } catch (error) {
             logger.error('Avant | Error creating item:', error);
             ui.notifications.error(`Failed to create ${type}: ${error.message}`);
