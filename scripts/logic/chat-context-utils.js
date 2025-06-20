@@ -24,12 +24,12 @@ export function getActorFromMessage(message) {
     }
     
     // Check if game.actors is available
-    if (!global.game || !global.game.actors || !global.game.actors.get) {
+    if (!game || !game.actors || !game.actors.get) {
         return null;
     }
     
     const actorId = message.speaker.actor;
-    const actor = global.game.actors.get(actorId);
+    const actor = game.actors.get(actorId);
     
     return actor || null;
 }
@@ -53,7 +53,7 @@ export function isEligibleRoll(roll) {
     }
     
     // Check if foundry.dice.terms.Die is available
-    if (!global.foundry || !global.foundry.dice || !global.foundry.dice.terms || !global.foundry.dice.terms.Die) {
+    if (!foundry || !foundry.dice || !foundry.dice.terms || !foundry.dice.terms.Die) {
         return false;
     }
     
@@ -62,7 +62,7 @@ export function isEligibleRoll(roll) {
     // Count all d10 dice across all terms
     for (const term of roll.terms) {
         // Check if this term is a Die with 10 faces
-        if (term instanceof global.foundry.dice.terms.Die && term.faces === 10) {
+        if (term instanceof foundry.dice.terms.Die && term.faces === 10) {
             d10Count += term.number;
         }
     }

@@ -51,7 +51,7 @@ export class CompatibilityUtils {
      * @returns {Class} ActorSheet class
      */
     static getActorSheetClass() {
-        return foundry?.appv1?.sheets?.ActorSheet || global.ActorSheet;
+        return foundry?.appv1?.sheets?.ActorSheet || ActorSheet;
     }
 
     /**
@@ -60,7 +60,7 @@ export class CompatibilityUtils {
      * @returns {Class} ItemSheet class
      */
     static getItemSheetClass() {
-        return foundry?.appv1?.sheets?.ItemSheet || global.ItemSheet;
+        return foundry?.appv1?.sheets?.ItemSheet || ItemSheet;
     }
 
     /**

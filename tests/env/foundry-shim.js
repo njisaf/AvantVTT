@@ -12,6 +12,11 @@
  * @since 0.1.2
  */
 
+// Add TextEncoder/TextDecoder for jsdom compatibility
+import { TextEncoder, TextDecoder } from 'util';
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
+
 // Basic foundry namespace
 global.foundry = {
   abstract: {
@@ -151,6 +156,14 @@ global.CONFIG = {
   AVANT: {
     systemName: 'avant-native',
     version: '0.1.2'
+  },
+  Actor: {
+    documentClass: undefined,
+    dataModels: {}
+  },
+  Item: {
+    documentClass: undefined,
+    dataModels: {}
   }
 };
 

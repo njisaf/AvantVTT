@@ -486,6 +486,53 @@ export class AvantThemeManager {
     offThemeChange(callback) {
         this.themeChangeCallbacks.delete(callback);
     }
+    
+    /**
+     * Get current theme (alias for currentTheme property)
+     */
+    getCurrentTheme() {
+        return this.currentTheme;
+    }
+    
+    /**
+     * Import theme (alias for uploadCustomTheme)
+     */
+    async importTheme(file) {
+        return await this.uploadCustomTheme(file);
+    }
+    
+    /**
+     * Apply custom theme variables to an element
+     */
+    applyCustomThemeVariables(theme) {
+        const elements = document.querySelectorAll('.avant, [data-theme]');
+        for (const element of elements) {
+            if (theme.colors) {
+                for (const [key, value] of Object.entries(theme.colors)) {
+                    element.style.setProperty(`--color-${key}`, value);
+                }
+            }
+            if (theme.fonts) {
+                for (const [key, value] of Object.entries(theme.fonts)) {
+                    element.style.setProperty(`--font-${key}`, value);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Load custom themes from settings (alias for loadCustomThemes)
+     */
+    async loadCustomThemesFromSettings() {
+        return await this.loadCustomThemes();
+    }
+    
+    /**
+     * Save custom themes to settings (alias for saveCustomThemes)
+     */
+    async saveCustomThemesToSettings() {
+        return await this.saveCustomThemes();
+    }
 }
 
 /**

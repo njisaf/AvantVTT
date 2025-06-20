@@ -215,51 +215,6 @@ export class AvantRerollDialog extends Application {
     }
     
     /**
-     * Extract d10 results from the original roll
-     * @param {Roll} roll - The original roll
-     * @returns {Array} Array of d10 die data with values and reroll status
-     * @private
-     */
-    _extractD10Results(roll) {
-        const d10Results = [];
-        
-        // Navigate through the roll terms to find d10 dice
-        for (const term of roll.terms) {
-            if (term instanceof foundry.dice.terms.Die && term.faces === 10) {
-                // Extract individual die results with reroll status
-                for (const result of term.results) {
-                    if (result.active) {
-                        d10Results.push({
-                            value: result.result,
-                            wasRerolled: result.rerolled || false
-                        });
-                    }
-                }
-            }
-        }
-        
-        return d10Results;
-    }
-    
-    /**
-     * Extract static modifiers from the original roll (level, ability mod, etc.)
-     * @param {Roll} roll - The original roll
-     * @returns {number} Total static modifiers
-     * @private
-     */
-    _extractStaticModifiers(roll) {
-        let staticModifiers = 0;
-        
-        for (const term of roll.terms) {
-            if (term instanceof foundry.dice.terms.NumericTerm) {
-                staticModifiers += term.number;
-            }
-        }
-        
-        return staticModifiers;
-    }
-    
-    /**
      * Create a new roll with rerolled dice
      * @returns {Promise<Roll>} New roll with rerolled dice
      * @private
@@ -314,25 +269,6 @@ export class AvantRerollDialog extends Application {
         roll.terms = diceTerms;
         
         return roll;
-    }
-    
-    /**
-     * Generate cost message based on current Fortune Points
-     * @param {number} fortunePoints - Current Fortune Points
-     * @returns {string} Cost message
-     * @private
-     */
-    _getCostMessage(fortunePoints) {
-        if (fortunePoints === 0) {
-            return "No Fortune Points available!";
-        }
-        
-        const selectedCount = this.selectedDice.size;
-        if (selectedCount === 0) {
-            return `Select dice to reroll (${fortunePoints} Fortune Point${fortunePoints > 1 ? 's' : ''} available)`;
-        }
-        
-        return `Reroll for ${selectedCount} Fortune Point${selectedCount > 1 ? 's' : ''}`;
     }
     
     /**
@@ -393,7 +329,7 @@ export class AvantRerollDialog extends Application {
         if (confirmButton) {
             confirmButton.disabled = !canReroll;
             
-            // Update button text
+            // Update button text  
             const buttonIcon = '<i class="fas fa-dice"></i>';
             if (selectedCount > 0) {
                 confirmButton.innerHTML = `${buttonIcon} Reroll ${selectedCount} (${selectedCount} FP)`;
