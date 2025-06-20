@@ -9,6 +9,9 @@
 import { CompatibilityUtils } from './utils/compatibility.js';
 import { ValidationUtils } from './utils/validation.js';
 
+// Logic utilities
+import { registerSheets, setupConfigDebug, setupDataModels } from './logic/avant-init-utils.js';
+
 // Data models
 import { AvantActorData } from './data/actor-data.js';
 import { AvantActionData, AvantFeatureData, AvantTalentData, AvantAugmentData, AvantWeaponData, AvantArmorData, AvantGearData } from './data/item-data.js';
@@ -45,32 +48,37 @@ Hooks.once('init', async function() {
         const actors = CompatibilityUtils.getActorsCollection();
         const items = CompatibilityUtils.getItemsCollection();
         
-        // Register Actor data models
-        CONFIG.Actor.documentClass = AvantActor;
-        CONFIG.Actor.dataModels = {
-            character: AvantActorData,
-            npc: AvantActorData,
-            vehicle: AvantActorData
-        };
+        // Setup data models using extracted utility
+        const dataModelResult = setupDataModels(
+            CONFIG,
+            AvantActor,
+            AvantItem,
+            {
+                character: AvantActorData,
+                npc: AvantActorData,
+                vehicle: AvantActorData
+            },
+            {
+                action: AvantActionData,
+                feature: AvantFeatureData,
+                talent: AvantTalentData,
+                augment: AvantAugmentData,
+                weapon: AvantWeaponData,
+                armor: AvantArmorData,
+                gear: AvantGearData
+            }
+        );
         
-        // Register Item data models
-        CONFIG.Item.documentClass = AvantItem;
-        CONFIG.Item.dataModels = {
-            action: AvantActionData,
-            feature: AvantFeatureData,
-            talent: AvantTalentData,
-            augment: AvantAugmentData,
-            weapon: AvantWeaponData,
-            armor: AvantArmorData,
-            gear: AvantGearData
-        };
+        if (!dataModelResult.success) {
+            throw new Error(`Data model setup failed: ${dataModelResult.error}`);
+        }
         
-        // Register sheet application classes
-        actors.unregisterSheet("core", CompatibilityUtils.getActorSheetClass());
-        actors.registerSheet("avant", AvantActorSheet, { makeDefault: true });
+        // Register sheet application classes using extracted utility
+        const sheetResult = registerSheets(actors, items, AvantActorSheet, AvantItemSheet);
         
-        items.unregisterSheet("core", CompatibilityUtils.getItemSheetClass());
-        items.registerSheet("avant", AvantItemSheet, { makeDefault: true });
+        if (!sheetResult.success) {
+            throw new Error(`Sheet registration failed: ${sheetResult.error}`);
+        }
         
         CompatibilityUtils.log("Data models and sheets registered");
         
