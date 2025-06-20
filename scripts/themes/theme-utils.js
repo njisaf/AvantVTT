@@ -11,6 +11,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { THEME_CONFIG } from './theme-config.js';
 import { ThemeConfigUtil as BrowserThemeConfigUtil } from './theme-config-utils.js';
+import { logger } from '../utils/logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -47,7 +48,7 @@ class ThemeConfigUtil extends BrowserThemeConfigUtil {
             example: config.example
         };
         
-        console.log(`Added theme variable: ${config.cssVar} at path ${path}`);
+        logger.log(`Added theme variable: ${config.cssVar} at path ${path}`);
     }
 }
 
@@ -60,7 +61,7 @@ class AvantThemeUtils {
      * Display help information
      */
     showHelp() {
-        console.log(`
+        logger.log(`
 🎨 Avant Theme Utilities - Designer-Friendly Theme Management
 
 USAGE:
@@ -102,14 +103,14 @@ Made for designers, by developers ❤️
      */
     generateDocs() {
         const doc = ThemeConfigUtil.generateDocumentation();
-        console.log(doc);
+        logger.log(doc);
     }
 
     /**
      * List all theme variables in a readable format
      */
     listVariables() {
-        console.log('🎨 Available Theme Variables\n');
+        logger.log('🎨 Available Theme Variables\n');
         
         const mapping = ThemeConfigUtil.getJSONToCSSMapping();
         const required = ThemeConfigUtil.getRequiredVariables().map(r => r.path);
@@ -117,9 +118,9 @@ Made for designers, by developers ❤️
         for (const [jsonPath, cssVar] of Object.entries(mapping)) {
             const isRequired = required.includes(jsonPath);
             const badge = isRequired ? '🔴 REQUIRED' : '🔵 OPTIONAL';
-            console.log(`${badge} ${cssVar}`);
-            console.log(`   JSON Path: ${jsonPath}`);
-            console.log('');
+            logger.log(`${badge} ${cssVar}`);
+            logger.log(`   JSON Path: ${jsonPath}`);
+            logger.log('');
         }
     }
 
@@ -128,7 +129,7 @@ Made for designers, by developers ❤️
      */
     generateTemplate(includeOptional = false) {
         const template = ThemeConfigUtil.generateThemeTemplate(includeOptional);
-        console.log(JSON.stringify(template, null, 2));
+        logger.log(JSON.stringify(template, null, 2));
     }
 
     /**
@@ -137,7 +138,7 @@ Made for designers, by developers ❤️
     validateTheme(filePath) {
         try {
             if (!fs.existsSync(filePath)) {
-                console.error(`❌ File not found: ${filePath}`);
+                logger.error(`❌ File not found: ${filePath}`);
                 return false;
             }
 
@@ -147,18 +148,18 @@ Made for designers, by developers ❤️
             const validation = ThemeConfigUtil.validateTheme(theme);
             
             if (validation.isValid) {
-                console.log('✅ Theme is valid!');
-                console.log(`📄 Theme: ${theme.name} by ${theme.author} (v${theme.version})`);
+                logger.log('✅ Theme is valid!');
+                logger.log(`📄 Theme: ${theme.name} by ${theme.author} (v${theme.version})`);
                 return true;
             } else {
-                console.log('❌ Theme validation failed:');
+                logger.log('❌ Theme validation failed:');
                 validation.errors.forEach(error => {
-                    console.log(`   • ${error}`);
+                    logger.log(`   • ${error}`);
                 });
                 return false;
             }
         } catch (error) {
-            console.error(`❌ Error validating theme: ${error.message}`);
+            logger.error(`❌ Error validating theme: ${error.message}`);
             return false;
         }
     }
@@ -167,11 +168,11 @@ Made for designers, by developers ❤️
      * Interactive variable addition (for developers)
      */
     async addVariable(varPath) {
-        console.log(`🔧 Adding new theme variable at path: ${varPath}`);
-        console.log('This is a developer feature. For safety, edit theme-config.js directly.');
-        console.log('');
-        console.log('Example addition:');
-        console.log(`
+        logger.log(`🔧 Adding new theme variable at path: ${varPath}`);
+        logger.log('This is a developer feature. For safety, edit theme-config.js directly.');
+        logger.log('');
+        logger.log('Example addition:');
+        logger.log(`
 // In theme-config.js, add to the appropriate section:
 ${varPath}: {
     cssVar: '--theme-your-variable',
@@ -187,26 +188,26 @@ ${varPath}: {
      * Generate JavaScript mappings for theme manager
      */
     generateMappings() {
-        console.log('🔧 Generating JavaScript mappings...\n');
+        logger.log('🔧 Generating JavaScript mappings...\n');
         
         const allVars = ThemeConfigUtil.getAllCSSVariables();
         const mapping = ThemeConfigUtil.getJSONToCSSMapping();
         
-        console.log('// Auto-generated CSS variable list:');
-        console.log('const themeVariables = [');
+        logger.log('// Auto-generated CSS variable list:');
+        logger.log('const themeVariables = [');
         allVars.forEach(varName => {
-            console.log(`    '${varName}',`);
+            logger.log(`    '${varName}',`);
         });
-        console.log('];\n');
+        logger.log('];\n');
         
-        console.log('// Auto-generated JSON to CSS mapping:');
-        console.log('const jsonToCSSMapping = {');
+        logger.log('// Auto-generated JSON to CSS mapping:');
+        logger.log('const jsonToCSSMapping = {');
         for (const [jsonPath, cssVar] of Object.entries(mapping)) {
-            console.log(`    '${jsonPath}': '${cssVar}',`);
+            logger.log(`    '${jsonPath}': '${cssVar}',`);
         }
-        console.log('};\n');
+        logger.log('};\n');
         
-        console.log('// Copy the above code into theme-manager.js to update mappings');
+        logger.log('// Copy the above code into theme-manager.js to update mappings');
     }
 
     /**
@@ -240,7 +241,7 @@ ${varPath}: {
             JSON.stringify(completeTheme, null, 2)
         );
 
-        console.log('✅ Example themes created in styles/themes/examples/');
+        logger.log('✅ Example themes created in styles/themes/examples/');
     }
 
     /**
@@ -275,8 +276,8 @@ ${varPath}: {
             case 'validate':
                 const filePath = args[1];
                 if (!filePath) {
-                    console.error('❌ Please specify a file to validate');
-                    console.log('Usage: node scripts/theme-utils.js validate <file>');
+                    logger.error('❌ Please specify a file to validate');
+                    logger.log('Usage: node scripts/theme-utils.js validate <file>');
                 } else {
                     this.validateTheme(filePath);
                 }
@@ -285,8 +286,8 @@ ${varPath}: {
             case 'add-var':
                 const varPath = args[1];
                 if (!varPath) {
-                    console.error('❌ Please specify a variable path');
-                    console.log('Usage: node scripts/theme-utils.js add-var <path>');
+                    logger.error('❌ Please specify a variable path');
+                    logger.log('Usage: node scripts/theme-utils.js add-var <path>');
                 } else {
                     this.addVariable(varPath);
                 }
@@ -301,7 +302,7 @@ ${varPath}: {
                 break;
             
             default:
-                console.error(`❌ Unknown command: ${command}`);
+                logger.error(`❌ Unknown command: ${command}`);
                 this.showHelp();
                 break;
         }
