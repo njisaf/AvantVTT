@@ -5,7 +5,6 @@
  * @description Additional tests for various system utilities to increase coverage
  */
 
-import { CompatibilityUtils } from '../../scripts/utils/compatibility.js';
 import { ValidationUtils } from '../../scripts/utils/validation.js';
 import { AvantActorData } from '../../scripts/data/actor-data.js';
 import { AvantActionData, AvantFeatureData, AvantTalentData, AvantAugmentData, AvantWeaponData, AvantArmorData, AvantGearData } from '../../scripts/data/item-data.js';
@@ -37,9 +36,7 @@ describe('System Integration and Constants', () => {
     });
 
     test('should export utility classes', () => {
-      expect(CompatibilityUtils).toBeDefined();
       expect(ValidationUtils).toBeDefined();
-      expect(typeof CompatibilityUtils).toBe('function');
       expect(typeof ValidationUtils).toBe('function');
     });
   });
@@ -154,11 +151,9 @@ describe('System Integration and Constants', () => {
       expect(validated.system.threshold).toBe(15);
     });
 
-    test('should handle compatibility detection', () => {
-      // These should not throw errors
-      expect(() => CompatibilityUtils.getFoundryVersion()).not.toThrow();
-      expect(() => CompatibilityUtils.getActorSheetClass()).not.toThrow();
-      expect(() => CompatibilityUtils.getItemSheetClass()).not.toThrow();
+    test('should handle v13 foundry utils', () => {
+      // Test that foundry.utils is available in v13
+      expect(foundry?.utils?.mergeObject).toBeDefined();
     });
   });
 

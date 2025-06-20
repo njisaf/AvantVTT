@@ -2,12 +2,11 @@
  * @fileoverview Chat Context Menu Integration Tests
  * @version 1.0.0
  * @author Avant VTT Team
- * @description Integration tests for chat context menu functionality with FoundryVTT
+ * @description Integration tests for chat context menu functionality with FoundryVTT v13+
  */
 
 import { describe, test, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { AvantChatContextMenu } from '../../../scripts/chat/context-menu.js';
-import { CompatibilityUtils } from '../../../scripts/utils/compatibility.js';
 
 // Mock FoundryVTT environment for chat context menu testing
 describe('AvantChatContextMenu Integration Tests', () => {
@@ -115,9 +114,6 @@ describe('AvantChatContextMenu Integration Tests', () => {
             }
         };
         
-        // Mock CompatibilityUtils
-        jest.spyOn(CompatibilityUtils, 'getChatContextMenuApproach').mockReturnValue('v13');
-        
         // Mock AvantRerollDialog for callback testing
         global.mockAvantRerollDialog = jest.fn().mockImplementation(() => ({
             render: jest.fn()
@@ -145,15 +141,6 @@ describe('AvantChatContextMenu Integration Tests', () => {
             
             expect(mockUi.chat._avantExtended).toBe(true);
             expect(typeof mockUi.chat._getEntryContextOptions).toBe('function');
-        });
-        
-        test('should register hooks for v12 approach', () => {
-            jest.spyOn(CompatibilityUtils, 'getChatContextMenuApproach').mockReturnValue('v12');
-            
-            AvantChatContextMenu.addContextMenuListeners();
-            
-            expect(mockHooks.on).toHaveBeenCalledWith('getChatLogEntryContext', expect.any(Function));
-            expect(mockHooks.on).toHaveBeenCalledWith('getDocumentContextOptions', expect.any(Function));
         });
     });
     
@@ -337,20 +324,8 @@ describe('AvantChatContextMenu Integration Tests', () => {
         });
     });
     
-    describe('Version Compatibility', () => {
-        test('should work with v12 approach', () => {
-            jest.spyOn(CompatibilityUtils, 'getChatContextMenuApproach').mockReturnValue('v12');
-            
-            expect(() => {
-                AvantChatContextMenu.addContextMenuListeners();
-            }).not.toThrow();
-            
-            expect(mockHooks.on).toHaveBeenCalledWith('getChatLogEntryContext', expect.any(Function));
-        });
-        
+    describe('v13-Only Compatibility', () => {
         test('should work with v13 approach', () => {
-            jest.spyOn(CompatibilityUtils, 'getChatContextMenuApproach').mockReturnValue('v13');
-            
             expect(() => {
                 AvantChatContextMenu.addContextMenuListeners();
             }).not.toThrow();

@@ -4,7 +4,7 @@
   "description": "A cutting-edge narrative RPG system focused on experimental storytelling, collaborative worldbuilding, and innovative narrative mechanics",
   "version": "0.1.6",
   "compatibility": {
-    "minimum": "12.324",
+    "minimum": "13.324",
     "verified": "13.341",
     "maximum": "13"
   },

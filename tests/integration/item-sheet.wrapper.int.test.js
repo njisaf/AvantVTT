@@ -45,17 +45,9 @@ describe('Item Sheet Wrapper Integration', () => {
         // Create item sheet instance
         itemSheet = new AvantItemSheet(mockItem);
         
-        // Mock HTML element for event testing
-        mockHtml = {
-            find: jest.fn().mockReturnThis(),
-            on: jest.fn().mockReturnThis(),
-            click: jest.fn(),
-            val: jest.fn(),
-            prop: jest.fn(),
-            attr: jest.fn(),
-            data: jest.fn(),
-            trigger: jest.fn()
-        };
+        // Create jQuery-wrapped HTML element for v13 compatibility
+        const htmlElement = document.createElement('div');
+        mockHtml = global.jQuery(htmlElement);
         
         // Reset all mocks
         jest.clearAllMocks();
@@ -224,8 +216,8 @@ describe('Item Sheet Wrapper Integration', () => {
     
     describe('Integration with FoundryVTT', () => {
         test('sheet extends base ItemSheet class', () => {
-            // ASSERT: Proper inheritance
-            expect(itemSheet).toBeInstanceOf(global.ItemSheet);
+            // ASSERT: Proper inheritance from v13 namespaced class
+            expect(itemSheet).toBeInstanceOf(global.foundry.appv1.sheets.ItemSheet);
         });
         
         test('sheet implements required FoundryVTT methods', () => {

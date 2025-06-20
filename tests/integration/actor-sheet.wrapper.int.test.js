@@ -50,10 +50,9 @@ describe('Actor Sheet Wrapper Integration', () => {
     });
 
     test('should handle activateListeners method', () => {
-        // Mock minimal DOM-like object that won't cause errors
-        const mockHtml = {
-            querySelectorAll: () => []
-        };
+        // Create mock HTML wrapped in jQuery for v13 compatibility
+        const htmlElement = document.createElement('div');
+        const mockHtml = global.jQuery(htmlElement);
         
         // Mock isEditable to exercise listener setup
         actorSheet.isEditable = true;

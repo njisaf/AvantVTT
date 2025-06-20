@@ -1,11 +1,9 @@
 /**
  * @fileoverview Avant System Initialization Utilities - Pure Functions
- * @version 2.0.0
+ * @version 2.0.0 - FoundryVTT v13+ Only
  * @author Avant Development Team
  * @description Pure functions for system initialization without FoundryVTT dependencies
  */
-
-import { CompatibilityUtils } from '../utils/compatibility.js';
 
 /**
  * Registers actor and item sheet classes with the FoundryVTT system.
@@ -30,15 +28,13 @@ export function registerSheets(actorCollection, itemCollection, actorSheetClass,
     let registeredSheets = 0;
     
     try {
-        // Unregister core actor sheet and register custom one
-        const coreActorSheet = CompatibilityUtils.getActorSheetClass();
-        actorCollection.unregisterSheet("core", coreActorSheet);
+        // Unregister core actor sheet and register custom one (v13 namespaced)
+        actorCollection.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);
         actorCollection.registerSheet("avant", actorSheetClass, { makeDefault: true });
         registeredSheets++;
         
-        // Unregister core item sheet and register custom one  
-        const coreItemSheet = CompatibilityUtils.getItemSheetClass();
-        itemCollection.unregisterSheet("core", coreItemSheet);
+        // Unregister core item sheet and register custom one (v13 namespaced)  
+        itemCollection.unregisterSheet("core", foundry.appv1.sheets.ItemSheet);
         itemCollection.registerSheet("avant", itemSheetClass, { makeDefault: true });
         registeredSheets++;
         

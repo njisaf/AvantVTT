@@ -1,12 +1,11 @@
 /**
  * @fileoverview Avant Native System - Main System File
- * @version 2.0.0
+ * @version 2.0.0 - FoundryVTT v13+ Only
  * @author Avant Development Team
- * @description Main entry point for the Avant Native FoundryVTT system with v12/v13 compatibility
+ * @description Main entry point for the Avant Native FoundryVTT system for v13-only implementation
  */
 
 // Core imports - Component-based architecture
-import { CompatibilityUtils } from './utils/compatibility.js';
 import { ValidationUtils } from './utils/validation.js';
 
 // Logic utilities
@@ -30,7 +29,6 @@ import { AvantChatContextMenu } from './chat/context-menu.js';
 import { AvantThemeManager } from './themes/theme-manager.js';
 
 console.log("Avant | Loading Avant Native System...");
-CompatibilityUtils.log("System initialization started");
 
 /**
  * Initialize the Avant Native system
@@ -42,11 +40,11 @@ Hooks.once('init', async function() {
     try {
         // Initialize theme manager - register settings first
         AvantThemeManager.registerSettings();
-        CompatibilityUtils.log("Theme manager settings registered");
+        console.log("Avant | Theme manager settings registered");
         
         // Configure data models for the system
-        const actors = CompatibilityUtils.getActorsCollection();
-        const items = CompatibilityUtils.getItemsCollection();
+        const actors = foundry.documents.collections.Actors;
+        const items = foundry.documents.collections.Items;
         
         // Setup data models using extracted utility
         const dataModelResult = setupDataModels(
@@ -80,11 +78,10 @@ Hooks.once('init', async function() {
             throw new Error(`Sheet registration failed: ${sheetResult.error}`);
         }
         
-        CompatibilityUtils.log("Data models and sheets registered");
+        console.log("Avant | Data models and sheets registered");
         
         // Preload Handlebars templates
-        const loadTemplates = CompatibilityUtils.getLoadTemplatesFunction();
-        await loadTemplates([
+        await foundry.applications.handlebars.loadTemplates([
             "systems/avant/templates/actor-sheet.html",
             "systems/avant/templates/item-sheet.html",
             "systems/avant/templates/reroll-dialog.html",
@@ -97,13 +94,12 @@ Hooks.once('init', async function() {
             "systems/avant/templates/item/item-gear-sheet.html"
         ]);
         
-        CompatibilityUtils.log("Templates preloaded");
+        console.log("Avant | Templates preloaded");
         
         console.log('Avant | System initialization complete');
         
     } catch (error) {
         console.error('Avant | Error during system initialization:', error);
-        CompatibilityUtils.log(`System initialization failed: ${error.message}`, 'error');
     }
 });
 
@@ -116,19 +112,18 @@ Hooks.once('ready', async function() {
     try {
         // Initialize chat context menu for Fortune Point rerolls
         AvantChatContextMenu.addContextMenuListeners();
-        CompatibilityUtils.log("Chat context menu initialized");
+        console.log("Avant | Chat context menu initialized");
         
         // Create and initialize theme manager instance
         if (!game.avant) game.avant = {};
         game.avant.themeManager = new AvantThemeManager();
         await game.avant.themeManager.init();
-        CompatibilityUtils.log("Theme manager instance created and initialized");
+        console.log("Avant | Theme manager instance created and initialized");
         
         console.log('Avant | System ready and fully configured');
         
     } catch (error) {
         console.error('Avant | Error during ready setup:', error);
-        CompatibilityUtils.log(`Ready setup failed: ${error.message}`, 'error');
     }
 });
 
@@ -206,8 +201,14 @@ class AvantItem extends Item {
     prepareData() {
         super.prepareData();
         
-        // Validate item data
-        this.system = ValidationUtils.validateItemData(this.system);
+        // Validate item data - pass the whole item data including type
+        const validatedData = ValidationUtils.validateItemData({
+            type: this.type,
+            system: this.system
+        });
+        
+        // Update system data with validated version
+        this.system = validatedData.system || this.system;
     }
     
     /**
@@ -260,8 +261,6 @@ globalThis.AvantItemSheet = AvantItemSheet;
 globalThis.AvantRerollDialog = AvantRerollDialog;
 globalThis.AvantChatContextMenu = AvantChatContextMenu;
 globalThis.AvantThemeManager = AvantThemeManager;
-globalThis.CompatibilityUtils = CompatibilityUtils;
 globalThis.ValidationUtils = ValidationUtils;
 
 console.log("Avant | System loaded successfully - all components imported and configured");
-CompatibilityUtils.log("System load complete - ready for use");

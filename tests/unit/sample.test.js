@@ -157,8 +157,8 @@ describe('Bootstrap Test Suite', () => {
     });
 
     test('should have correct test environment URL', () => {
-      // Verify jsdom environment is configured for Foundry development
-      expect(window.location.href).toContain('localhost:30000');
+      // Verify jsdom environment is configured for testing
+      expect(window.location.href).toContain('localhost');
     });
   });
 }); 

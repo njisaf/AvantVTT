@@ -1,23 +1,22 @@
 /**
  * @fileoverview Item Sheet for Avant Native System
- * @version 2.0.0
+ * @version 2.0.0 - FoundryVTT v13+ Only
  * @author Avant Development Team
- * @description Item sheet handling with form validation and v12/v13 compatibility
+ * @description Item sheet handling with form validation for v13-only implementation
  */
 
-import { CompatibilityUtils } from '../utils/compatibility.js';
 import { ValidationUtils } from '../utils/validation.js';
 import { executeRoll, processFormData } from '../logic/item-sheet.js';
 import { prepareTemplateData, extractItemFormData } from '../logic/item-sheet-utils.js';
 import { logger } from '../utils/logger.js';
 
 /**
- * Item Sheet for Avant Native System - v12/v13 Compatible
+ * Item Sheet for Avant Native System - FoundryVTT v13+
  * @class AvantItemSheet
- * @extends {ItemSheet}
+ * @extends {foundry.appv1.sheets.ItemSheet}
  * @description Handles item sheet functionality with validation and roll handling
  */
-export class AvantItemSheet extends CompatibilityUtils.getItemSheetClass() {
+export class AvantItemSheet extends foundry.appv1.sheets.ItemSheet {
     /**
      * Define default options for the item sheet
      * @static
@@ -25,8 +24,7 @@ export class AvantItemSheet extends CompatibilityUtils.getItemSheetClass() {
      * @override
      */
     static get defaultOptions() {
-        const mergeFunction = foundry?.utils?.mergeObject || ((a, b) => ({ ...a, ...b }));
-        return mergeFunction(super.defaultOptions, {
+        return foundry.utils.mergeObject(super.defaultOptions, {
             classes: ["avant", "sheet", "item"],
             width: 520,
             height: 480,
@@ -68,37 +66,63 @@ export class AvantItemSheet extends CompatibilityUtils.getItemSheetClass() {
     }
 
     /**
-     * Activate core listeners with v12/v13 compatibility
-     * @param {jQuery|HTMLElement|DocumentFragment} html - The rendered HTML
+     * Handle core listener activation for v13 compatibility
+     * @param {jQuery} html - The rendered HTML
      * @override
-     * @private
      */
     _activateCoreListeners(html) {
-        CompatibilityUtils.safeActivateListeners(this, html, super._activateCoreListeners);
+        // FoundryVTT v13 compatibility fix for core listeners
+        // Handle various types of HTML input that FoundryVTT might pass
+        let element = html;
+        
+        // Handle jQuery objects by extracting the DOM element
+        if (html instanceof jQuery) {
+            if (html.length > 0) {
+                element = html[0];
+            } else {
+                console.error('AvantItemSheet._activateCoreListeners: Empty jQuery object received', html);
+                return;
+            }
+        }
+        
+        // Handle comment nodes or other non-element nodes
+        if (element && element.nodeType === Node.COMMENT_NODE) {
+            console.warn('AvantItemSheet._activateCoreListeners: Received comment node, looking for next element');
+            // Try to find the next element sibling
+            element = element.nextElementSibling;
+        }
+        
+        // Handle document fragments or other container types
+        if (element && element.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+            // Look for the first element child
+            element = element.querySelector('form') || element.firstElementChild;
+        }
+        
+        // Final validation - ensure we have a valid DOM element
+        if (!element || !element.querySelectorAll || typeof element.querySelectorAll !== 'function') {
+            console.error('AvantItemSheet._activateCoreListeners: Could not find valid DOM element', html);
+            return;
+        }
+        
+        // FoundryVTT core expects jQuery objects, so wrap the DOM element back into jQuery
+        const jQueryElement = $(element);
+        
+        // Call parent with jQuery-wrapped element
+        super._activateCoreListeners(jQueryElement);
     }
 
     /**
      * Activate event listeners for the item sheet
-     * @param {jQuery|HTMLElement|DocumentFragment} html - The rendered HTML
+     * @param {jQuery} html - The rendered HTML
      * @override
      */
     activateListeners(html) {
-        CompatibilityUtils.safeActivateListeners(this, html, super.activateListeners);
+        super.activateListeners(html);
 
         if (!this.isEditable) return;
 
-        // Get normalized DOM element for event handling
-        const element = CompatibilityUtils.normalizeHtmlForListeners(html);
-        if (!element) {
-            CompatibilityUtils.log('Failed to normalize HTML for listeners', 'error');
-            return;
-        }
-
-        // Use pure DOM methods instead of jQuery for v13 compatibility
         // Rollable abilities
-        element.querySelectorAll('.rollable').forEach(el => {
-            el.addEventListener('click', this._onRoll.bind(this));
-        });
+        html.find('.rollable').click(this._onRoll.bind(this));
     }
 
     /**
@@ -158,8 +182,7 @@ export class AvantItemSheet extends CompatibilityUtils.getItemSheetClass() {
         const processedData = extractItemFormData(formData);
         
         // Convert back to flat object for FoundryVTT
-        const flattenFunction = foundry?.utils?.flattenObject || ((obj) => obj);
-        const flatData = flattenFunction(processedData);
+        const flatData = foundry.utils.flattenObject(processedData);
         
         // Call parent method with processed data
         return super._updateObject(event, flatData);

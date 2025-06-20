@@ -5,12 +5,18 @@
             <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Augment Name"/></h1>
             <div class="resource-row">
                 <div class="resource">
-                    <label for="system.powerPointCost">Power Point Cost</label>
-                    <input type="number" name="system.powerPointCost" value="{{system.powerPointCost}}" data-dtype="Number" min="0"/>
+                    <label for="system.rarity">Rarity</label>
+                    <select name="system.rarity">
+                        <option value="common" {{#if (eq system.rarity "common")}}selected{{/if}}>Common</option>
+                        <option value="uncommon" {{#if (eq system.rarity "uncommon")}}selected{{/if}}>Uncommon</option>
+                        <option value="rare" {{#if (eq system.rarity "rare")}}selected{{/if}}>Rare</option>
+                        <option value="epic" {{#if (eq system.rarity "epic")}}selected{{/if}}>Epic</option>
+                        <option value="legendary" {{#if (eq system.rarity "legendary")}}selected{{/if}}>Legendary</option>
+                    </select>
                 </div>
                 <div class="resource">
-                    <label for="system.uses.max">Max Uses</label>
-                    <input type="number" name="system.uses.max" value="{{system.uses.max}}" data-dtype="Number" min="0"/>
+                    <label for="system.isActive">Is Active</label>
+                    <input type="checkbox" name="system.isActive" {{#if system.isActive}}checked{{/if}}/>
                 </div>
             </div>
         </div>
