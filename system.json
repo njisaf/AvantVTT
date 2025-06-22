@@ -19,7 +19,7 @@
     }
   ],
   "esmodules": [
-    "scripts/avant.js"
+    "scripts/avant-vtt.js"
   ],
   "styles": [
     "styles/avant.css"

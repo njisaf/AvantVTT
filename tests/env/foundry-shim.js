@@ -282,7 +282,7 @@ global.foundry = {
 // Basic CONFIG object
 global.CONFIG = {
   AVANT: {
-    systemName: 'avant-native',
+    systemName: 'avant',
     version: '0.1.2'
   },
   Actor: {
@@ -298,7 +298,7 @@ global.CONFIG = {
 // Basic game object stub
 global.game = {
   system: {
-    id: 'avant-native',
+    id: 'avant',
     version: '0.1.2'
   },
   settings: {

@@ -30,21 +30,52 @@ import {
     formatFlavorText
 } from '../logic/actor-sheet-utils.js';
 
+// Import local foundry UI adapter for safe notifications
+import { FoundryUI } from '../types/adapters/foundry-ui.ts';
+
+// Access FoundryVTT ActorSheet class - prioritize v13 namespaced class
+const ActorSheetBase = (globalThis as any).foundry?.appv1?.sheets?.ActorSheet || 
+                       (globalThis as any).ActorSheet ||
+                       class {
+                           static get defaultOptions() { return {}; }
+                           _renderHTML() { throw new Error('ActorSheet base class not available'); }
+                           _replaceHTML() { throw new Error('ActorSheet base class not available'); }
+                       };
+
+/**
+ * Actor Sheet Context interface for template rendering
+ */
+interface ActorSheetContext {
+    actor: any;
+    system: any;
+    flags: any;
+    abilityTotalModifiers: Record<string, number>;
+    skillTotalModifiers: Record<string, number>;
+    skillsByAbility: Record<string, any[]>;
+    items: Record<string, any[]>;
+}
+
 /**
  * Actor Sheet for Avant Native System - FoundryVTT v13+
  * @class AvantActorSheet
- * @extends {foundry.appv1.sheets.ActorSheet}
+ * @extends {ActorSheetBase}
  * @description Handles actor sheet functionality including tabs, rolls, and item management
  */
-export class AvantActorSheet extends foundry.appv1.sheets.ActorSheet {
+export class AvantActorSheet extends ActorSheetBase {
+    /** The actor document associated with this sheet */
+    declare actor: any;
+    
     /**
      * Define default options for the actor sheet
      * @static
-     * @returns {Object} Sheet configuration options
+     * @returns Sheet configuration options
      * @override
      */
-    static get defaultOptions() {
-        return foundry.utils.mergeObject(super.defaultOptions, {
+    static get defaultOptions(): any {
+        const foundryUtils = (globalThis as any).foundry?.utils;
+        const mergeObject = foundryUtils?.mergeObject || Object.assign;
+        
+        const options = mergeObject(super.defaultOptions, {
             classes: ["avant", "sheet", "actor"],
             template: "systems/avant/templates/actor-sheet.html",
             width: 900,
@@ -55,15 +86,36 @@ export class AvantActorSheet extends foundry.appv1.sheets.ActorSheet {
                 initial: "core"
             }]
         });
+        
+        return options;
+    }
+
+    /**
+     * Override isEditable to ensure proper sheet behavior
+     * @returns Whether the sheet is editable
+     * @override
+     */
+    get isEditable(): boolean {
+        return (this as any).options?.editable !== false;
+    }
+    
+    /**
+     * Allow setting isEditable property for FoundryVTT compatibility
+     * @param value - Whether the sheet should be editable
+     */
+    set isEditable(value: boolean) {
+        if (this.options) {
+            this.options.editable = value;
+        }
     }
 
     /**
      * Prepare data for rendering the actor sheet
-     * @returns {Object} The context data for template rendering
+     * @returns The context data for template rendering
      * @override
      */
-    getData() {
-        const context = super.getData();
+    getData(): ActorSheetContext {
+        const context = super.getData() as any;
         const actorData = this.actor.toObject(false);
         
         // Deep copy system data to avoid modifying original with null safety
@@ -125,10 +177,10 @@ export class AvantActorSheet extends foundry.appv1.sheets.ActorSheet {
 
     /**
      * Handle core listener activation for v13 compatibility
-     * @param {jQuery} html - The rendered HTML
+     * @param html - The rendered HTML
      * @override
      */
-    _activateCoreListeners(html) {
+    _activateCoreListeners(html: any): void {
         // FoundryVTT v13 compatibility fix for core listeners
         // Handle various types of HTML input that FoundryVTT might pass
         let element = html;
@@ -171,16 +223,14 @@ export class AvantActorSheet extends foundry.appv1.sheets.ActorSheet {
 
     /**
      * Activate event listeners for the actor sheet
-     * @param {jQuery} html - The rendered HTML
+     * @param html - The rendered HTML
      * @override
      */
-    activateListeners(html) {
+    activateListeners(html: any): void {
         super.activateListeners(html);
 
         // Everything below here is only needed if the sheet is editable
         if (!this.isEditable) return;
-
-
 
         // Add Inventory Item
         html.find('.item-create').click(this._onItemCreate.bind(this));
@@ -212,42 +262,44 @@ export class AvantActorSheet extends foundry.appv1.sheets.ActorSheet {
 
     /**
      * Handle item creation
-     * @param {Event} event - The triggering event
-     * @returns {Promise<Item|void>} The created item or void
+     * @param event - The triggering event
+     * @returns The created item or void
      * @private
      */
-    async _onItemCreate(event) {
+    async _onItemCreate(event: Event): Promise<any | void> {
         event.preventDefault();
-        const header = event.currentTarget;
+        const header = event.currentTarget as HTMLElement;
         const type = header.dataset.type;
-        const data = foundry.utils.duplicate(header.dataset);
+        const foundryUtils = (globalThis as any).foundry?.utils;
+        const data = foundryUtils?.duplicate(header.dataset) || {...header.dataset};
         
         // Use pure function to prepare item data
-        const itemData = prepareItemData(type, data);
+        const itemData = prepareItemData(type || '', data);
         if (!itemData) {
             logger.warn('Avant | Invalid item type for creation');
-            ui.notifications.warn('Invalid item type');
+            FoundryUI.notify('Invalid item type', 'warn');
             return;
         }
         
         try {
+            const Item = (globalThis as any).Item;
             const createdItem = await Item.create(itemData, {parent: this.actor});
             logger.log(`Avant | Created ${type} item: ${createdItem.name}`);
             return createdItem;
         } catch (error) {
             logger.error('Avant | Error creating item:', error);
-            ui.notifications.error(`Failed to create ${type}: ${error.message}`);
+            FoundryUI.notify(`Failed to create ${type}: ${(error as Error).message}`, 'error');
         }
     }
 
     /**
      * Handle item editing
-     * @param {Event} event - The triggering event
+     * @param event - The triggering event
      * @private
      */
-    _onItemEdit(event) {
+    _onItemEdit(event: Event): void {
         event.preventDefault();
-        const li = event.currentTarget.closest(".item");
+        const li = (event.currentTarget as HTMLElement).closest(".item") as HTMLElement;
         
         // Use pure function to extract item ID
         const itemId = extractItemIdFromElement(li);
@@ -259,7 +311,7 @@ export class AvantActorSheet extends foundry.appv1.sheets.ActorSheet {
         const item = this.actor.items.get(itemId);
         if (!item) {
             logger.warn(`Avant | Item with ID '${itemId}' not found`);
-            ui.notifications.warn('Item not found');
+            FoundryUI.notify('Item not found', 'warn');
             return;
         }
         
@@ -268,13 +320,13 @@ export class AvantActorSheet extends foundry.appv1.sheets.ActorSheet {
 
     /**
      * Handle item deletion
-     * @param {Event} event - The triggering event
-     * @returns {Promise<void>}
+     * @param event - The triggering event
+     * @returns Promise for deletion completion
      * @private
      */
-    async _onItemDelete(event) {
+    async _onItemDelete(event: Event): Promise<void> {
         event.preventDefault();
-        const li = event.currentTarget.closest(".item");
+        const li = (event.currentTarget as HTMLElement).closest(".item") as HTMLElement;
         
         // Use pure function to extract item ID
         const itemId = extractItemIdFromElement(li);
@@ -286,7 +338,7 @@ export class AvantActorSheet extends foundry.appv1.sheets.ActorSheet {
         const item = this.actor.items.get(itemId);
         if (!item) {
             logger.warn(`Avant | Item with ID '${itemId}' not found`);
-            ui.notifications.warn('Item not found');
+            FoundryUI.notify('Item not found', 'warn');
             return;
         }
 
@@ -303,19 +355,19 @@ export class AvantActorSheet extends foundry.appv1.sheets.ActorSheet {
             }
         } catch (error) {
             logger.error('Avant | Error deleting item:', error);
-            ui.notifications.error(`Failed to delete item: ${error.message}`);
+            FoundryUI.notify(`Failed to delete item: ${(error as Error).message}`, 'error');
         }
     }
 
     /**
      * Handle generic rolls
-     * @param {Event} event - The triggering event
-     * @returns {Promise<Roll|void>} The executed roll or void
+     * @param event - The triggering event
+     * @returns The executed roll or void
      * @private
      */
-    async _onRoll(event) {
+    async _onRoll(event: Event): Promise<any | void> {
         event.preventDefault();
-        const element = event.currentTarget;
+        const element = event.currentTarget as HTMLElement;
         const dataset = element.dataset;
 
         // Handle different types of rolls
@@ -338,6 +390,10 @@ export class AvantActorSheet extends foundry.appv1.sheets.ActorSheet {
                     return;
                 }
                 
+                const Roll = (globalThis as any).Roll;
+                const ChatMessage = (globalThis as any).ChatMessage;
+                const game = (globalThis as any).game;
+                
                 const roll = new Roll(rollConfig.rollExpression, this.actor.getRollData());
                 await roll.evaluate();
                 
@@ -349,20 +405,20 @@ export class AvantActorSheet extends foundry.appv1.sheets.ActorSheet {
                 return roll;
             } catch (error) {
                 logger.error('Avant | Error in generic roll:', error);
-                ui.notifications.error(`Roll failed: ${error.message}`);
+                FoundryUI.notify(`Roll failed: ${(error as Error).message}`, 'error');
             }
         }
     }
 
     /**
      * Handle ability rolls (checks only - no more score generation)
-     * @param {Event} event - The triggering event
-     * @returns {Promise<Roll|void>} The executed roll or void
+     * @param event - The triggering event
+     * @returns The executed roll or void
      * @private
      */
-    async _onAbilityRoll(event) {
+    async _onAbilityRoll(event: Event): Promise<any | void> {
         event.preventDefault();
-        const element = event.currentTarget;
+        const element = event.currentTarget as HTMLElement;
         const dataset = element.dataset;
         const ability = dataset.ability;
         
@@ -376,13 +432,17 @@ export class AvantActorSheet extends foundry.appv1.sheets.ActorSheet {
         const level = actor.system.level;
         
         // Validate roll data using pure function
-        const validation = validateAbilityRollData(ability, abilityData, level);
+        const validation = validateAbilityRollData(ability, abilityData, level) as any;
         if (!validation.valid) {
             logger.warn(`Avant | ${validation.error}`);
             return;
         }
 
         try {
+            const Roll = (globalThis as any).Roll;
+            const ChatMessage = (globalThis as any).ChatMessage;
+            const game = (globalThis as any).game;
+            
             // Ability Check: 2d10 + Level + Ability Modifier (Avant system)
             const roll = new Roll("2d10 + @level + @abilityMod", { 
                 level: validation.level,
@@ -401,19 +461,19 @@ export class AvantActorSheet extends foundry.appv1.sheets.ActorSheet {
             return roll;
         } catch (error) {
             logger.error('Avant | Error in ability roll:', error);
-            ui.notifications.error(`Failed to roll ${ability} check: ${error.message}`);
+            FoundryUI.notify(`Failed to roll ${ability} check: ${(error as Error).message}`, 'error');
         }
     }
 
     /**
      * Handle skill rolls
-     * @param {Event} event - The triggering event
-     * @returns {Promise<Roll|void>} The executed roll or void
+     * @param event - The triggering event
+     * @returns The executed roll or void
      * @private
      */
-    async _onSkillRoll(event) {
+    async _onSkillRoll(event: Event): Promise<any | void> {
         event.preventDefault();
-        const element = event.currentTarget;
+        const element = event.currentTarget as HTMLElement;
         const dataset = element.dataset;
         const skill = dataset.skill;
         
@@ -424,19 +484,23 @@ export class AvantActorSheet extends foundry.appv1.sheets.ActorSheet {
         
         const actor = this.actor;
         const skillValue = actor.system.skills[skill];
-        const skillAbilities = AvantActorData.getSkillAbilities();
+        const skillAbilities = AvantActorData.getSkillAbilities() as any;
         const abilityKey = skillAbilities[skill];
         const abilityData = actor.system.abilities[abilityKey];
         const level = actor.system.level;
         
         // Validate roll data using pure function
-        const validation = validateSkillRollData(skill, skillValue, abilityData, level);
+        const validation = validateSkillRollData(skill, skillValue, abilityData, level) as any;
         if (!validation.valid) {
             logger.warn(`Avant | ${validation.error}`);
             return;
         }
         
         try {
+            const Roll = (globalThis as any).Roll;
+            const ChatMessage = (globalThis as any).ChatMessage;
+            const game = (globalThis as any).game;
+            
             // Avant uses 2d10 + Level + Ability Modifier + Skill Modifier
             const roll = new Roll("2d10 + @level + @abilityMod + @skillMod", {
                 level: validation.level,
@@ -457,29 +521,29 @@ export class AvantActorSheet extends foundry.appv1.sheets.ActorSheet {
             return roll;
         } catch (error) {
             logger.error('Avant | Error in skill roll:', error);
-            ui.notifications.error(`Failed to roll ${skill} check: ${error.message}`);
+            FoundryUI.notify(`Failed to roll ${skill} check: ${(error as Error).message}`, 'error');
         }
     }
 
     /**
      * Handle power point usage
-     * @param {Event} event - The triggering event
-     * @returns {Promise<void>}
+     * @param event - The triggering event
+     * @returns Promise for completion
      * @private
      */
-    async _onPowerPointsRoll(event) {
+    async _onPowerPointsRoll(event: Event): Promise<void> {
         event.preventDefault();
-        const element = event.currentTarget;
+        const element = event.currentTarget as HTMLElement;
         const dataset = element.dataset;
-        const cost = parseInt(dataset.cost) || 1;
+        const cost = parseInt(dataset.cost || '1') || 1;
         
         const actor = this.actor;
         const currentPP = actor.system.powerPoints.value;
         
         // Use pure function to validate power point usage
-        const validation = validatePowerPointUsage(currentPP, cost);
+        const validation = validatePowerPointUsage(currentPP, cost) as any;
         if (!validation.valid) {
-            ui.notifications.warn(validation.error);
+            FoundryUI.notify(validation.error || 'Power point validation failed', 'warn');
             return;
         }
         
@@ -488,40 +552,45 @@ export class AvantActorSheet extends foundry.appv1.sheets.ActorSheet {
             "system.powerPoints.value": validation.remaining
         });
         
-        ui.notifications.info(`Spent ${cost} Power Point${cost > 1 ? 's' : ''}. Remaining: ${validation.remaining}`);
+        FoundryUI.notify(`Spent ${cost} Power Point${cost > 1 ? 's' : ''}. Remaining: ${validation.remaining}`, 'info');
     }
 
     /**
      * Handle weapon attack rolls
-     * @param {Event} event - The triggering event
-     * @returns {Promise<Roll|void>} The executed roll or void
+     * @param event - The triggering event
+     * @returns The executed roll or void
      * @private
      */
-    async _onAttackRoll(event) {
+    async _onAttackRoll(event: Event): Promise<any | void> {
         event.preventDefault();
-        const element = event.currentTarget;
-        const dataset = element.dataset;
-        const itemId = dataset.itemId;
+        const element = event.currentTarget as HTMLElement;
+        const li = element.closest(".item") as HTMLElement;
         
+        // Use pure function to extract item ID
+        const itemId = extractItemIdFromElement(li);
         if (!itemId) {
-            logger.warn('Avant | No item ID found for attack roll');
+            logger.warn('Avant | No item element found for attack roll');
             return;
         }
         
-        const weapon = this.actor.items.get(itemId);
-        if (!weapon) {
-            logger.warn(`Avant | Weapon with ID '${itemId}' not found`);
-            ui.notifications.warn('Weapon not found');
+        const item = this.actor.items.get(itemId);
+        if (!item) {
+            logger.warn(`Avant | Item with ID '${itemId}' not found`);
+            FoundryUI.notify('Item not found', 'warn');
             return;
         }
-
+        
         try {
             // Use pure function to prepare weapon attack roll
-            const rollConfig = prepareWeaponAttackRoll(weapon, this.actor);
+            const rollConfig = prepareWeaponAttackRoll(item, this.actor.getRollData());
             if (!rollConfig) {
-                logger.warn('Avant | Invalid weapon or actor data for attack roll');
+                logger.warn('Avant | Invalid weapon data for attack roll');
                 return;
             }
+            
+            const Roll = (globalThis as any).Roll;
+            const ChatMessage = (globalThis as any).ChatMessage;
+            const game = (globalThis as any).game;
             
             const roll = new Roll(rollConfig.rollExpression, rollConfig.rollData);
             await roll.evaluate();
@@ -531,44 +600,50 @@ export class AvantActorSheet extends foundry.appv1.sheets.ActorSheet {
                 flavor: rollConfig.flavor,
                 rollMode: game.settings.get('core', 'rollMode'),
             });
+            
             return roll;
         } catch (error) {
-            logger.error('Avant | Error in weapon attack roll:', error);
-            ui.notifications.error(`Failed to roll weapon attack: ${error.message}`);
+            logger.error('Avant | Error in attack roll:', error);
+            FoundryUI.notify(`Attack roll failed: ${(error as Error).message}`, 'error');
         }
     }
 
     /**
      * Handle weapon damage rolls
-     * @param {Event} event - The triggering event
-     * @returns {Promise<Roll|void>} The executed roll or void
+     * @param event - The triggering event
+     * @returns The executed roll or void
      * @private
      */
-    async _onDamageRoll(event) {
+    async _onDamageRoll(event: Event): Promise<any | void> {
         event.preventDefault();
-        const element = event.currentTarget;
-        const dataset = element.dataset;
-        const itemId = dataset.itemId;
+        const element = event.currentTarget as HTMLElement;
+        const li = element.closest(".item") as HTMLElement;
         
+        // Use pure function to extract item ID
+        const itemId = extractItemIdFromElement(li);
         if (!itemId) {
-            logger.warn('Avant | No item ID found for damage roll');
+            logger.warn('Avant | No item element found for damage roll');
             return;
         }
         
-        const weapon = this.actor.items.get(itemId);
-        if (!weapon) {
-            logger.warn(`Avant | Weapon with ID '${itemId}' not found`);
-            ui.notifications.warn('Weapon not found');
+        const item = this.actor.items.get(itemId);
+        if (!item) {
+            logger.warn(`Avant | Item with ID '${itemId}' not found`);
+            FoundryUI.notify('Item not found', 'warn');
             return;
         }
-
+        
         try {
             // Use pure function to prepare weapon damage roll
-            const rollConfig = prepareWeaponDamageRoll(weapon, this.actor);
+            const rollConfig = prepareWeaponDamageRoll(item, this.actor.getRollData());
             if (!rollConfig) {
-                logger.warn('Avant | Invalid weapon or actor data for damage roll');
+                logger.warn('Avant | Invalid weapon data for damage roll');
                 return;
             }
+            
+            const Roll = (globalThis as any).Roll;
+            const ChatMessage = (globalThis as any).ChatMessage;
+            const game = (globalThis as any).game;
             
             const roll = new Roll(rollConfig.rollExpression, rollConfig.rollData);
             await roll.evaluate();
@@ -578,45 +653,50 @@ export class AvantActorSheet extends foundry.appv1.sheets.ActorSheet {
                 flavor: rollConfig.flavor,
                 rollMode: game.settings.get('core', 'rollMode'),
             });
+            
             return roll;
         } catch (error) {
-            logger.error('Avant | Error in weapon damage roll:', error);
-            ui.notifications.error(`Failed to roll weapon damage: ${error.message}`);
+            logger.error('Avant | Error in damage roll:', error);
+            FoundryUI.notify(`Damage roll failed: ${(error as Error).message}`, 'error');
         }
     }
 
     /**
      * Handle armor rolls
-     * @param {Event} event - The triggering event
-     * @returns {Promise<Roll|void>} The executed roll or void
+     * @param event - The triggering event
+     * @returns The executed roll or void
      * @private
      */
-    async _onArmorRoll(event) {
+    async _onArmorRoll(event: Event): Promise<any | void> {
         event.preventDefault();
-        const element = event.currentTarget;
-        const dataset = element.dataset;
-        const itemId = dataset.itemId;
+        const element = event.currentTarget as HTMLElement;
+        const li = element.closest(".item") as HTMLElement;
         
+        // Use pure function to extract item ID
+        const itemId = extractItemIdFromElement(li);
         if (!itemId) {
-            logger.warn('Avant | No item ID found for armor roll');
+            logger.warn('Avant | No item element found for armor roll');
             return;
         }
         
-        const armor = this.actor.items.get(itemId);
-        
-        if (!armor) {
-            logger.warn(`Avant | Armor with ID '${itemId}' not found`);
-            ui.notifications.warn('Armor not found');
+        const item = this.actor.items.get(itemId);
+        if (!item) {
+            logger.warn(`Avant | Item with ID '${itemId}' not found`);
+            FoundryUI.notify('Item not found', 'warn');
             return;
         }
         
         try {
             // Use pure function to prepare armor roll
-            const rollConfig = prepareArmorRoll(armor, this.actor);
+            const rollConfig = prepareArmorRoll(item, this.actor.getRollData());
             if (!rollConfig) {
-                logger.warn('Avant | Invalid armor or actor data for armor roll');
+                logger.warn('Avant | Invalid armor data for roll');
                 return;
             }
+            
+            const Roll = (globalThis as any).Roll;
+            const ChatMessage = (globalThis as any).ChatMessage;
+            const game = (globalThis as any).game;
             
             const roll = new Roll(rollConfig.rollExpression, rollConfig.rollData);
             await roll.evaluate();
@@ -626,10 +706,60 @@ export class AvantActorSheet extends foundry.appv1.sheets.ActorSheet {
                 flavor: rollConfig.flavor,
                 rollMode: game.settings.get('core', 'rollMode'),
             });
+            
             return roll;
         } catch (error) {
             logger.error('Avant | Error in armor roll:', error);
-            ui.notifications.error(`Failed to roll armor check: ${error.message}`);
+            FoundryUI.notify(`Armor roll failed: ${(error as Error).message}`, 'error');
         }
+    }
+
+    /**
+     * Handle item rolls from the sheet
+     * @param event - The triggering event
+     * @returns The executed roll or void
+     * @private
+     */
+    async _onItemRoll(event: Event): Promise<any | void> {
+        event.preventDefault();
+        const element = event.currentTarget as HTMLElement;
+        const li = element.closest(".item") as HTMLElement;
+        
+        // Use pure function to extract item ID
+        const itemId = extractItemIdFromElement(li);
+        if (!itemId) {
+            logger.warn('Avant | No item element found for item roll');
+            return;
+        }
+        
+        const item = this.actor.items.get(itemId);
+        if (!item) {
+            logger.warn(`Avant | Item with ID '${itemId}' not found`);
+            FoundryUI.notify('Item not found', 'warn');
+            return;
+        }
+        
+        return item.roll();
+    }
+
+    /**
+     * Apply the correct theme immediately and forcefully
+     */
+    _applyTheme(): void {
+        const observer = new MutationObserver(() => {
+            console.log('🔍 Theme MutationObserver triggered');
+            this.render(false);
+        });
+        observer.observe(document.body, { attributes: true });
+        (this as any)._themeObserver = observer;
+        console.log('🔍 Theme MutationObserver set up for actor sheet');
+    }
+
+    /**
+     * Override _renderHTML to debug the rendering process
+     */
+    _renderHTML(): void {
+        console.log('🔍 AvantActorSheet._renderHTML called');
+        super._renderHTML();
     }
 } 

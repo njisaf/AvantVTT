@@ -74,7 +74,7 @@ describe('Bootstrap Test Suite', () => {
       const complexData = {
         skills: ['athletics', 'stealth', 'investigation'],
         abilities: { strength: 10, dexterity: 14, intelligence: 12 },
-        metadata: { version: '0.1.2', system: 'avant-native' }
+        metadata: { version: '0.1.2', system: 'avant' }
       };
 
       expect(complexData).toBeDefined();

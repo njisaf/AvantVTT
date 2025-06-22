@@ -15,7 +15,21 @@ import {
 } from '../logic/theme-utils.js';
 
 export class AvantThemeManager {
+    static _instance;
+
+    static getInstance() {
+        if (!AvantThemeManager._instance) {
+            AvantThemeManager._instance = new AvantThemeManager();
+        }
+        return AvantThemeManager._instance;
+    }
+    
     constructor() {
+        if (AvantThemeManager._instance) {
+            return AvantThemeManager._instance;
+        }
+        AvantThemeManager._instance = this;
+        
         this.currentTheme = 'dark';
         this.customThemes = new Map();
         this.themeChangeCallbacks = new Set();
@@ -42,8 +56,143 @@ export class AvantThemeManager {
             }
         };
         
+        // Try to load saved theme preference immediately in constructor
+        try {
+            // Try to load the saved theme preference early
+            const savedTheme = game.settings?.get('avant', 'selectedTheme');
+            if (savedTheme) {
+                this.currentTheme = savedTheme;
+                logger.log('Avant Theme Manager | Early theme load:', this.currentTheme);
+            } else {
+                this.currentTheme = 'dark';
+                logger.log('Avant Theme Manager | Using default theme (constructor):', this.currentTheme);
+            }
+        } catch (error) {
+            // If settings aren't ready yet, try localStorage as backup
+            try {
+                const localStorageTheme = localStorage.getItem('avant-theme-preference');
+                if (localStorageTheme && (localStorageTheme === 'dark' || localStorageTheme === 'light')) {
+                    this.currentTheme = localStorageTheme;
+                    logger.log('Avant Theme Manager | Loaded theme from localStorage:', this.currentTheme);
+                } else {
+                    this.currentTheme = 'dark';
+                    logger.log('Avant Theme Manager | Settings and localStorage not available, using default theme:', this.currentTheme);
+                }
+            } catch (localStorageError) {
+                this.currentTheme = 'dark';
+                logger.log('Avant Theme Manager | All theme loading methods failed, using default:', this.currentTheme);
+            }
+        }
+        
+        // Set up early theme application hooks immediately
+        this.setupEarlyThemeHooks();
+        
+        // Apply theme to body immediately if it has .avant class
+        if (document.body && document.body.classList.contains('avant')) {
+            logger.log('Avant Theme Manager | Applying theme to body element in constructor');
+            this.applyTheme(this.currentTheme);
+        }
+        
         // Initialize non-async parts only in constructor
         logger.log('Avant Theme Manager | Constructor initialized');
+    }
+    
+    /**
+     * Set up hooks that need to be active before init() is called
+     * These hooks catch applications even before full initialization
+     */
+    setupEarlyThemeHooks() {
+        // Critical early hook - catch ALL application renders before anything else
+        Hooks.on('renderApplication', (app, html, data) => {
+            // Check for Avant applications by multiple criteria
+            const isAvantApp = app?.constructor?.name?.includes('Avant') || 
+                              app?.element?.[0]?.classList?.contains('avant') ||
+                              app?.element?.classList?.contains('avant') ||
+                              (html && html.find && html.find('.avant').length > 0) ||
+                              (html && html.hasClass && html.hasClass('avant'));
+            
+            if (isAvantApp) {
+                logger.log('Avant Theme Manager | Early hook - applying theme for:', app?.constructor?.name);
+                // Apply theme immediately with no delay to prevent light theme flashing
+                this.applyTheme(this.currentTheme);
+                
+                // Also apply directly to the app element
+                const appElement = app?.element?.[0] || app?.element;
+                if (appElement && appElement.classList) {
+                    // Remove any existing theme classes that might have been added
+                    appElement.classList.remove('theme-light', 'theme-dark');
+                    // Apply our current theme
+                    this.applyThemeToElement(appElement, this.currentTheme);
+                }
+            }
+        });
+        
+        // Actor sheet specific hook - highest priority
+        Hooks.on('renderActorSheet', (app, html, data) => {
+            // More robust detection: check for avant class in element or defaultOptions
+            const isAvantSheet = app?.constructor?.name?.includes('Avant') ||
+                                app?.constructor?.defaultOptions?.classes?.includes('avant') ||
+                                app?.element?.[0]?.classList?.contains('avant') ||
+                                app?.element?.classList?.contains('avant');
+                                
+            if (isAvantSheet) {
+                logger.log('Avant Theme Manager | Early actor sheet hook triggered');
+                // Immediate application with no timeout
+                const appElement = app?.element?.[0] || app?.element;
+                if (appElement && appElement.classList) {
+                    // Force remove any light theme that might have been applied
+                    appElement.classList.remove('theme-light');
+                    // Ensure avant class is present
+                    if (!appElement.classList.contains('avant')) {
+                        appElement.classList.add('avant');
+                    }
+                    // Apply saved theme immediately
+                    this.applyThemeToElement(appElement, this.currentTheme);
+                }
+            }
+        });
+
+        // Item sheet specific hook
+        Hooks.on('renderItemSheet', (app, html, data) => {
+            // More robust detection: check for avant class in element or defaultOptions
+            const isAvantSheet = app?.constructor?.name?.includes('Avant') ||
+                                app?.constructor?.defaultOptions?.classes?.includes('avant') ||
+                                app?.element?.[0]?.classList?.contains('avant') ||
+                                app?.element?.classList?.contains('avant');
+                                
+            if (isAvantSheet) {
+                logger.log('Avant Theme Manager | Early item sheet hook triggered');
+                const appElement = app?.element?.[0] || app?.element;
+                if (appElement) {
+                    // Force remove any light theme that might have been applied
+                    if (appElement.classList) {
+                        appElement.classList.remove('theme-light');
+                        // Ensure the element has the avant class for theming
+                        if (!appElement.classList.contains('avant')) {
+                            appElement.classList.add('avant');
+                        }
+                    }
+                    this.applyThemeToElement(appElement, this.currentTheme);
+                }
+            }
+        });
+        
+        // Catch theme manager dialog specifically
+        Hooks.on('renderApplication', (app, html, data) => {
+            if (app?.constructor?.name === 'AvantThemeManagerApp') {
+                logger.log('Avant Theme Manager | Early theme manager dialog hook');
+                const appElement = app?.element?.[0] || app?.element;
+                if (appElement) {
+                    if (appElement.classList) {
+                        appElement.classList.remove('theme-light');
+                        if (!appElement.classList.contains('avant')) {
+                            appElement.classList.add('avant');
+                        }
+                    }
+                    this.applyThemeToElement(appElement, this.currentTheme);
+                }
+            }
+        });
     }
     
     /**
@@ -52,9 +201,17 @@ export class AvantThemeManager {
     async init() {
         logger.log('Avant Theme Manager | Initializing');
         
-        // Load saved theme preference (safely check if game.settings exists)
-        this.currentTheme = (game.settings && game.settings.get('avant', 'selectedTheme')) || 'dark';
-        logger.log('Avant Theme Manager | Loaded theme preference:', this.currentTheme);
+        // Re-check saved theme preference now that settings should be fully available
+        try {
+            const savedTheme = game.settings?.get('avant', 'selectedTheme');
+            if (savedTheme && savedTheme !== this.currentTheme) {
+                logger.log('Avant Theme Manager | Correcting theme during init:', savedTheme);
+                this.currentTheme = savedTheme;
+            }
+            logger.log('Avant Theme Manager | Loaded saved theme preference:', this.currentTheme);
+        } catch (error) {
+            logger.log('Avant Theme Manager | Settings still not ready during init, keeping current theme:', this.currentTheme);
+        }
         
         // Load custom themes from settings
         await this.loadCustomThemes();
@@ -62,71 +219,47 @@ export class AvantThemeManager {
         // Apply current theme immediately to any existing elements
         this.applyTheme(this.currentTheme);
         
-        // Listen for application renders to apply themes
-        Hooks.on('renderApplication', this.onRenderApplication.bind(this));
-        
-        // Also listen specifically for actor sheet renders
-        Hooks.on('renderActorSheet', (app, html, data) => {
-            logger.log('Avant Theme Manager | renderActorSheet hook triggered');
-            if (app?.constructor?.name?.includes('Avant')) {
-                logger.log('Avant Theme Manager | Applying theme to Avant actor sheet');
-                setTimeout(() => {
-                    this.applyTheme(this.currentTheme);
-                    const appElement = app?.element?.[0] || app?.element;
-                    if (appElement && appElement.classList && appElement.classList.contains('avant')) {
-                        this.applyThemeToElement(appElement, this.currentTheme);
+        // Set up a setup hook to double-check theme once settings are fully loaded
+        if (!this._settingsReadyHandled) {
+            Hooks.once('setup', () => {
+                logger.log('Avant Theme Manager | Setup hook - final theme check');
+                try {
+                    const actualSavedTheme = game.settings.get('avant', 'selectedTheme');
+                    if (actualSavedTheme && actualSavedTheme !== this.currentTheme) {
+                        logger.log('Avant Theme Manager | Final theme correction to saved preference:', actualSavedTheme);
+                        this.currentTheme = actualSavedTheme;
+                        this.applyTheme(this.currentTheme);
                     }
-                }, 100);
-            }
-        });
-
-        // Listen specifically for item sheet renders to apply theming
-        Hooks.on('renderItemSheet', (app, html, data) => {
-            logger.log('Avant Theme Manager | renderItemSheet hook triggered');
-            if (app?.constructor?.name?.includes('Avant')) {
-                logger.log('Avant Theme Manager | Applying theme to Avant item sheet');
-                setTimeout(() => {
-                    const appElement = app?.element?.[0] || app?.element;
-                    if (appElement) {
-                        // Ensure the element has the avant class for theming
-                        if (!appElement.classList.contains('avant')) {
-                            appElement.classList.add('avant');
-                        }
-                        this.applyThemeToElement(appElement, this.currentTheme);
-                    }
-                }, 50);
-            }
-        });
-        
-        // Listen for reroll dialog renders to apply theming immediately
-        Hooks.on('renderApplication', (app, html, data) => {
-            if (app?.constructor?.name === 'AvantRerollDialog') {
-                logger.log('Avant Theme Manager | AvantRerollDialog detected, applying theme');
-                setTimeout(() => {
-                    const appElement = app?.element?.[0] || app?.element;
-                    if (appElement) {
-                        if (!appElement.classList.contains('avant')) {
-                            appElement.classList.add('avant');
-                        }
-                        this.applyThemeToElement(appElement, this.currentTheme);
-                    }
-                }, 10); // Very short delay to prevent flicker
-            }
-        });
+                } catch (error) {
+                    logger.warn('Avant Theme Manager | Could not load theme preference on setup:', error);
+                }
+            });
+            this._settingsReadyHandled = true;
+        }
         
         // Force theme application when the DOM is ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
                 logger.log('Avant Theme Manager | DOM loaded, applying theme');
-                setTimeout(() => this.applyTheme(this.currentTheme), 100);
+                this.applyTheme(this.currentTheme);
             });
         } else {
-            // DOM already loaded
-            setTimeout(() => {
-                logger.log('Avant Theme Manager | DOM already ready, applying theme');
-                this.applyTheme(this.currentTheme);
-            }, 100);
+            // DOM already loaded - apply immediately
+            logger.log('Avant Theme Manager | DOM already ready, applying theme');
+            this.applyTheme(this.currentTheme);
         }
+        
+        // Add periodic theme application to catch any missed elements
+        setTimeout(() => {
+            logger.log('Avant Theme Manager | Performing delayed theme application (500ms)');
+            this.applyTheme(this.currentTheme);
+        }, 500);
+        
+        // Add a second delayed application to catch late-rendered elements
+        setTimeout(() => {
+            logger.log('Avant Theme Manager | Performing final delayed theme application (1000ms)');
+            this.applyTheme(this.currentTheme);
+        }, 1000);
     }
     
     /**
@@ -142,10 +275,7 @@ export class AvantThemeManager {
             type: String,
             default: 'dark',
             onChange: value => {
-                const themeManager = game.avant?.themeManager;
-                if (themeManager) {
-                    themeManager.setTheme(value);
-                }
+                AvantThemeManager.getInstance().setTheme(value);
             }
         });
         
@@ -156,10 +286,7 @@ export class AvantThemeManager {
             type: Object,
             default: {},
             onChange: value => {
-                const themeManager = game.avant?.themeManager;
-                if (themeManager) {
-                    themeManager.loadCustomThemes();
-                }
+                AvantThemeManager.getInstance().loadCustomThemes();
             }
         });
         
@@ -192,15 +319,14 @@ export class AvantThemeManager {
      */
     applyTheme(themeId) {
         logger.log(`Avant Theme Manager | Applying theme: ${themeId}`);
+        logger.log(`Avant Theme Manager | Found ${document.querySelectorAll('*').length} elements`);
         
-        const avantElements = document.querySelectorAll('.avant');
-        logger.log(`Avant Theme Manager | Found ${avantElements.length} .avant elements`);
+        const avantElements = document.querySelectorAll('.avant, .themed');
+        logger.log(`Avant Theme Manager | Found ${avantElements.length} .avant/.themed elements`);
         
-        avantElements.forEach(element => {
-            logger.log(`Avant Theme Manager | Processing element:`, element);
-            
-            // Remove existing theme classes more thoroughly
-            const classesToRemove = ['theme-dark', 'theme-light'];
+        avantElements.forEach((element, index) => {
+            // Remove existing theme classes more thoroughly, including 'themed' which causes FoundryVTT interference
+            const classesToRemove = ['theme-dark', 'theme-light', 'theme-forest-green', 'themed'];
             classesToRemove.forEach(className => {
                 if (element.classList.contains(className)) {
                     element.classList.remove(className);
@@ -222,6 +348,12 @@ export class AvantThemeManager {
                 const themeClass = `theme-${themeId}`;
                 element.classList.add(themeClass);
                 logger.log(`Avant Theme Manager | Added class: ${themeClass}`);
+                
+                // Special handling for built-in themes with custom colors (like forest-green)
+                if (this.builtInThemes[themeId].colors) {
+                    this.applyCustomTheme(element, themeId);
+                    logger.log(`🎨 Avant Theme Manager | Applied custom colors for built-in theme "${themeId}"`);
+                }
             } else if (this.customThemes.has(themeId)) {
                 // Custom theme
                 logger.log(`Avant Theme Manager | Applying custom theme: ${themeId}`);
@@ -258,7 +390,8 @@ export class AvantThemeManager {
      * Uses pure function logic with DOM manipulation wrapper
      */
     applyCustomTheme(element, themeId) {
-        const theme = this.customThemes.get(themeId);
+        // Get theme from custom themes or built-in themes
+        const theme = this.customThemes.get(themeId) || this.builtInThemes[themeId];
         if (!theme) return;
         
         // Generate CSS variables using pure function
@@ -269,15 +402,61 @@ export class AvantThemeManager {
             element.style.setProperty(cssVar, value);
         }
         
-        logger.log(`Avant Theme Manager | Applied custom theme "${theme.name}" using pure function logic`);
+        logger.log(`Avant Theme Manager | Applied theme "${theme.name}" using pure function logic`);
     }
     
     /**
      * Set the active theme
      */
     async setTheme(themeId) {
-        await game.settings.set('avant', 'selectedTheme', themeId);
-        this.applyTheme(themeId);
+        try {
+            logger.log(`Avant Theme Manager | Setting theme to: ${themeId}`);
+            
+            // Update the current theme immediately
+            this.currentTheme = themeId;
+            
+            // Apply the theme to existing elements immediately - no delays
+            this.applyTheme(themeId);
+            
+            // Force application to all .avant/.themed elements specifically
+            const avantElements = document.querySelectorAll('.avant, .themed');
+            avantElements.forEach(element => {
+                // Remove any existing theme classes that might interfere
+                element.classList.remove('theme-light', 'theme-dark');
+                this.applyThemeToElement(element, themeId);
+            });
+            
+            // Save to localStorage immediately for instant persistence
+            try {
+                localStorage.setItem('avant-theme-preference', themeId);
+                logger.log(`Avant Theme Manager | Theme saved to localStorage: ${themeId}`);
+            } catch (localStorageError) {
+                logger.warn('Avant Theme Manager | Could not save to localStorage:', localStorageError);
+            }
+            
+            // Try to save to FoundryVTT settings if available
+            if (game.settings) {
+                try {
+                    await game.settings.set('avant', 'selectedTheme', themeId);
+                    logger.log(`Avant Theme Manager | Theme successfully saved to FoundryVTT settings: ${themeId}`);
+                } catch (settingsError) {
+                    logger.warn('Avant Theme Manager | Could not save to FoundryVTT settings:', settingsError);
+                    // localStorage backup already saved above
+                }
+            } else {
+                logger.warn('Avant Theme Manager | FoundryVTT settings not available, using localStorage backup');
+            }
+            
+            // Notify callbacks
+            this.notifyThemeChange(themeId);
+            
+        } catch (error) {
+            logger.error('Avant Theme Manager | Error setting theme:', error);
+            // Still apply the theme even if saving fails
+            this.currentTheme = themeId;
+            this.applyTheme(themeId);
+            this.notifyThemeChange(themeId);
+        }
     }
     
     /**
@@ -346,11 +525,19 @@ export class AvantThemeManager {
      * Load custom themes from game settings
      */
     async loadCustomThemes() {
-        const savedThemes = game.settings.get('avant', 'customThemes') || {};
-        this.customThemes.clear();
-        
-        for (const [id, theme] of Object.entries(savedThemes)) {
-            this.customThemes.set(id, theme);
+        try {
+            const savedThemes = game.settings?.get('avant', 'customThemes') || {};
+            this.customThemes.clear();
+            
+            for (const [id, theme] of Object.entries(savedThemes)) {
+                this.customThemes.set(id, theme);
+            }
+            
+            logger.log(`Avant Theme Manager | Loaded ${this.customThemes.size} custom themes`);
+        } catch (error) {
+            // If settings aren't available yet, clear custom themes and log warning
+            this.customThemes.clear();
+            logger.log('Avant Theme Manager | Could not load custom themes (settings not ready)');
         }
     }
     
@@ -397,69 +584,90 @@ export class AvantThemeManager {
     }
     
     /**
-     * Handle application rendering to apply themes
+     * Handle application rendering to apply themes (legacy method - now handled by early hooks)
      */
     onRenderApplication(app, html) {
-        logger.log(`Avant Theme Manager | onRenderApplication called for:`, app?.constructor?.name);
-        
-        // Check if this is an Avant-related application
-        const isAvantApp = app?.constructor?.name?.includes('Avant') || 
-                          app?.element?.hasClass?.('avant') ||
-                          (html && html.find && html.find('.avant').length > 0) ||
-                          (html && html.hasClass && html.hasClass('avant'));
-        
-        if (isAvantApp) {
-            logger.log(`Avant Theme Manager | Applying theme to ${app?.constructor?.name || 'application'}`);
-            
-            // Wait a tick to ensure DOM is ready, then apply theme
-            setTimeout(() => {
-                this.applyTheme(this.currentTheme);
-                
-                // Also apply directly to the application element if it has .avant class
-                const appElement = app?.element?.[0] || app?.element;
-                if (appElement && appElement.classList && appElement.classList.contains('avant')) {
-                    logger.log(`Avant Theme Manager | Applying theme directly to app element:`, appElement);
-                    this.applyThemeToElement(appElement, this.currentTheme);
-                }
-            }, 50); // Increased delay to ensure DOM is fully ready
-        }
+        // This method is kept for compatibility but the actual work is now done
+        // by the early hooks in setupEarlyThemeHooks() to prevent timing issues
+        logger.log(`Avant Theme Manager | Legacy onRenderApplication called for:`, app?.constructor?.name);
     }
     
     /**
      * Apply theme to a specific element
+     * @param {HTMLElement} element - The element to apply theme to
+     * @param {string} themeId - The theme ID to apply
      */
     applyThemeToElement(element, themeId) {
-        logger.log(`Avant Theme Manager | Applying theme ${themeId} to specific element:`, element);
+        if (!element) {
+            logger.log('Avant Theme Manager | applyThemeToElement called with null element');
+            return;
+        }
         
-        // Remove existing theme classes more thoroughly
-        const classesToRemove = ['theme-dark', 'theme-light'];
+        logger.log(`🎨 Avant Theme Manager | Applying theme ${themeId} to specific element:`, element);
+        
+        // Log current element state
+        if (element.classList) {
+            const currentClasses = Array.from(element.classList);
+            logger.log(`🎨 Avant Theme Manager | Element classes BEFORE theme application:`, currentClasses);
+        }
+        
+        // Add or ensure the element has the 'avant' class
+        if (element.classList && !element.classList.contains('avant')) {
+            element.classList.add('avant');
+            logger.log('Avant Theme Manager | Added "avant" class to element');
+        }
+        
+        // Remove existing theme classes more thoroughly, including 'themed' which causes FoundryVTT interference
+        const classesToRemove = ['theme-dark', 'theme-light', 'theme-forest-green', 'themed'];
         classesToRemove.forEach(className => {
-            if (element.classList.contains(className)) {
+            if (element.classList && element.classList.contains(className)) {
                 element.classList.remove(className);
-                logger.log(`Avant Theme Manager | Removed class ${className} from element`);
+                logger.log(`🎨 Avant Theme Manager | Removed class "${className}" from element`);
             }
         });
         
-        // Remove existing theme attribute
+        // Clear theme attribute
         if (element.removeAttribute) {
             element.removeAttribute('data-theme');
         }
         
-        // Clear all custom theme CSS variables first
+        // Clear existing theme variables
         this.clearCustomThemeVariables(element);
         
         if (this.builtInThemes[themeId]) {
             // Built-in theme
             const themeClass = `theme-${themeId}`;
-            element.classList.add(themeClass);
-            logger.log(`Avant Theme Manager | Added class ${themeClass} to element`);
+            if (element.classList) {
+                element.classList.add(themeClass);
+                logger.log(`🎨 Avant Theme Manager | Added class "${themeClass}" to element`);
+            }
+            
+            // Special handling for built-in themes with custom colors (like forest-green)
+            if (this.builtInThemes[themeId].colors) {
+                this.applyCustomTheme(element, themeId);
+                logger.log(`🎨 Avant Theme Manager | Applied custom colors for built-in theme "${themeId}"`);
+            }
         } else if (this.customThemes.has(themeId)) {
             // Custom theme
             if (element.setAttribute) {
                 element.setAttribute('data-theme', 'custom');
             }
             this.applyCustomTheme(element, themeId);
+            logger.log(`🎨 Avant Theme Manager | Applied custom theme "${themeId}" to element`);
+        } else {
+            logger.log(`🎨 Avant Theme Manager | Unknown theme ID: ${themeId}, applying default dark theme`);
+            if (element.classList) {
+                element.classList.add('theme-dark');
+            }
         }
+        
+        // Log final element state
+        if (element.classList) {
+            const finalClasses = Array.from(element.classList);
+            logger.log(`🎨 Avant Theme Manager | Element classes AFTER theme application:`, finalClasses);
+        }
+        
+        logger.log(`🎨 Avant Theme Manager | ✅ Theme ${themeId} applied successfully to element`);
     }
     
     /**
@@ -558,7 +766,7 @@ class AvantThemeManagerApp extends FormApplication {
     }
     
     getData() {
-        const themeManager = game.avant?.themeManager;
+        const themeManager = AvantThemeManager.getInstance();
         if (!themeManager) {
             return { themes: [] };
         }
@@ -591,7 +799,7 @@ class AvantThemeManagerApp extends FormApplication {
     async _onThemeSelect(event) {
         event.preventDefault();
         const themeId = event.currentTarget.dataset.themeId;
-        await game.avant.themeManager.setTheme(themeId);
+        await AvantThemeManager.getInstance().setTheme(themeId);
         this.render();
     }
     
@@ -600,7 +808,7 @@ class AvantThemeManagerApp extends FormApplication {
         if (!file) return;
         
         try {
-            await game.avant.themeManager.uploadCustomTheme(file);
+            await AvantThemeManager.getInstance().uploadCustomTheme(file);
             this.render();
         } catch (error) {
             // Error already handled in uploadCustomTheme
@@ -613,7 +821,7 @@ class AvantThemeManagerApp extends FormApplication {
     _onThemeExport(event) {
         event.preventDefault();
         const themeId = event.currentTarget.dataset.themeId;
-        game.avant.themeManager.exportTheme(themeId);
+        AvantThemeManager.getInstance().exportTheme(themeId);
     }
     
     /**
@@ -630,7 +838,7 @@ class AvantThemeManagerApp extends FormApplication {
         });
         
         if (confirmed) {
-            await game.avant.themeManager.deleteCustomTheme(themeId);
+            await AvantThemeManager.getInstance().deleteCustomTheme(themeId);
             this.render();
         }
     }

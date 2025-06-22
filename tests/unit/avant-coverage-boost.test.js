@@ -1,5 +1,5 @@
 /**
- * @fileoverview Micro-unit tests to boost coverage for scripts/avant.js
+ * @fileoverview Micro-unit tests to boost coverage for scripts/avant.ts
  * Targets specific uncovered lines identified in Stage 6b coverage analysis
  */
 

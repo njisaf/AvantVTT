@@ -102,7 +102,7 @@ describe('Avant Hooks Integration', () => {
     describe('Hook Registration and Execution', () => {
         test('system registers init and ready hooks', async () => {
             // Import system to register hooks
-            await import('../../scripts/avant.js?v=' + Date.now());
+            await import('../../scripts/avant.ts?v=' + Date.now());
 
             // Verify hooks were registered
             expect(global.Hooks.once).toHaveBeenCalledWith('init', expect.any(Function));
@@ -114,7 +114,7 @@ describe('Avant Hooks Integration', () => {
 
         test('init hook executes setupDataModels correctly', async () => {
             // Import system to register hooks
-            await import('../../scripts/avant.js?v=' + Date.now());
+            await import('../../scripts/avant.ts?v=' + Date.now());
 
             // Execute init hook
             await global.Hooks.call('init');
@@ -131,7 +131,7 @@ describe('Avant Hooks Integration', () => {
 
         test('ready hook executes successfully', async () => {
             // Import system to register hooks
-            await import('../../scripts/avant.js?v=' + Date.now());
+            await import('../../scripts/avant.ts?v=' + Date.now());
 
             // Execute both hooks in sequence
             await global.Hooks.call('init');
@@ -152,7 +152,7 @@ describe('Avant Hooks Integration', () => {
             const mockLoadTemplates = jest.fn().mockResolvedValue([]);
 
             // Import system to register hooks
-            await import('../../scripts/avant.js?v=' + Date.now());
+            await import('../../scripts/avant.ts?v=' + Date.now());
 
             // Just verify the hooks were registered without mocking specific functionality
             expect(global.Hooks.once).toHaveBeenCalledWith('init', expect.any(Function));
@@ -162,7 +162,7 @@ describe('Avant Hooks Integration', () => {
     describe('Hook Error Handling', () => {
         test('init hook handles setup errors gracefully', async () => {
             // Import system to register hooks
-            await import('../../scripts/avant.js?v=' + Date.now());
+            await import('../../scripts/avant.ts?v=' + Date.now());
 
             // Test that hooks can be called without throwing
             await expect(global.Hooks.call('init')).resolves.not.toThrow();
@@ -173,7 +173,7 @@ describe('Avant Hooks Integration', () => {
 
         test('ready hook handles initialization errors gracefully', async () => {
             // Import system to register hooks
-            await import('../../scripts/avant.js?v=' + Date.now());
+            await import('../../scripts/avant.ts?v=' + Date.now());
 
             // Break the theme manager to cause ready error
             global.game.avant = null;
@@ -201,7 +201,7 @@ describe('Avant Hooks Integration', () => {
             });
 
             // Import system to register hooks
-            await import('../../scripts/avant.js?v=' + Date.now());
+            await import('../../scripts/avant.ts?v=' + Date.now());
 
             // Execute hooks in order
             await global.Hooks.call('init');
@@ -213,7 +213,7 @@ describe('Avant Hooks Integration', () => {
 
         test('system handles multiple hook executions', async () => {
             // Import system to register hooks
-            await import('../../scripts/avant.js?v=' + Date.now());
+            await import('../../scripts/avant.ts?v=' + Date.now());
 
             // Execute init multiple times (should be safe)
             await global.Hooks.call('init');

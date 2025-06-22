@@ -71,19 +71,34 @@ avantVtt/
 
 ## Development
 
+### Build Process
+
+The system uses a modern build pipeline that creates a complete runtime package:
+
+- **Build complete system**: `npm run build`
+- **Development mode** (auto-recompile): `npm run dev`
+- **TypeScript compilation**: `npm run build:ts`
+- **SCSS compilation**: `npm run build:scss`
+
+**Important Build Notes**: 
+- `npm run build` creates a complete system in `/dist` directory
+- The `/dist` directory contains everything needed to run the system
+- Source files are in the project root; built files go to `/dist`
+- Only commit source files; `/dist` is generated during build/release
+
 ### SCSS Compilation
 
-The system uses SCSS for styling. Available commands:
+The system uses SCSS for styling:
 
 - **Build once**: `npm run build`
 - **Watch mode** (auto-recompile): `npm run dev`
-- **SCSS only**: `npm run compile-scss`
+- **SCSS only**: `npm run build:scss`
 - **SCSS watch**: `npm run watch-scss`
 
 **Important**: 
 - Always edit the `.scss` file, never the `.css` file directly
 - The `.css` file is generated and will be overwritten
-- Both `.scss` and `.css` files should be committed to version control
+- Only source `.scss` files should be committed to version control
 
 ### Theme Development
 
@@ -130,12 +145,12 @@ This includes:
 
 ### Method 2: Manifest URL
 1. In FoundryVTT, go to "Add-on Modules" → "Install System"
-2. Use manifest URL: `https://raw.githubusercontent.com/njisaf/AvantVTT/main/system.json`
+2. Use manifest URL: `https://github.com/njisaf/AvantVTT/releases/latest/download/system.json`
 3. Click "Install"
 
 ## Requirements
 
-- FoundryVTT v12+
+- FoundryVTT v13+
 - Node.js 16+ (for development)
 
 ## Support

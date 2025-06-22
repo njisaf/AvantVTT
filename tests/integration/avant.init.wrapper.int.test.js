@@ -12,7 +12,7 @@ describe('Avant System Init Wrapper', () => {
         global.Items.registerSheet = jest.fn();
         
         // Import the module to exercise the init code
-        await import('../../scripts/avant.js');
+        await import('../../scripts/avant.ts');
         
         // Fire the init hook to exercise the initialization code
         await global.Hooks.callAll('init');
@@ -27,7 +27,7 @@ describe('Avant System Init Wrapper', () => {
         global.game.avant = {};
         
         // Import module if not already imported
-        await import('../../scripts/avant.js');
+        await import('../../scripts/avant.ts');
         
         // Fire ready hook to exercise additional setup code
         await global.Hooks.callAll('ready');

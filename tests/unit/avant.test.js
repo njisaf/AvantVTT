@@ -65,12 +65,12 @@ describe('Avant Native System', () => {
     describe('System Loading', () => {
         test('loads system without throwing errors', async () => {
             await expect(async () => {
-                await import('../../scripts/avant.js');
+                await import('../../scripts/avant.ts');
             }).not.toThrow();
         });
 
         test('logs system loading message', async () => {
-            await import('../../scripts/avant.js');
+            await import('../../scripts/avant.ts');
             
             expect(global.console.log).toHaveBeenCalledWith(
                 expect.stringContaining('Avant | Loading Avant Native System...')
@@ -81,7 +81,7 @@ describe('Avant Native System', () => {
     describe('Hook Registration', () => {
         test('registers init hook', async () => {
             const beforeCalls = global.Hooks.once.mock.calls.length;
-            await import('../../scripts/avant.js?v=' + Math.random());
+            await import('../../scripts/avant.ts?v=' + Math.random());
             
             // Should have added at least one call for init
             const afterCalls = global.Hooks.once.mock.calls.length;
@@ -95,7 +95,7 @@ describe('Avant Native System', () => {
 
         test('registers ready hook', async () => {
             const beforeCalls = global.Hooks.once.mock.calls.length;
-            await import('../../scripts/avant.js?v=' + Math.random());
+            await import('../../scripts/avant.ts?v=' + Math.random());
             
             // Should have added at least one call for ready
             const afterCalls = global.Hooks.once.mock.calls.length;
@@ -109,7 +109,7 @@ describe('Avant Native System', () => {
 
         test('registers exactly two hooks', async () => {
             const beforeCalls = global.Hooks.once.mock.calls.length;
-            await import('../../scripts/avant.js?v=' + Math.random());
+            await import('../../scripts/avant.ts?v=' + Math.random());
             
             // Should have added exactly 2 calls (init and ready)
             const afterCalls = global.Hooks.once.mock.calls.length;
@@ -122,7 +122,7 @@ describe('Avant Native System', () => {
 
         beforeEach(async () => {
             // Import system to register hooks with fresh cache
-            await import('../../scripts/avant.js?v=' + Math.random());
+            await import('../../scripts/avant.ts?v=' + Math.random());
             
             // Find the init callback from all registered calls
             const initCalls = global.Hooks.once.mock.calls.filter(call => call[0] === 'init');
@@ -156,7 +156,7 @@ describe('Avant Native System', () => {
 
         beforeEach(async () => {
             // Import system to register hooks with fresh cache
-            await import('../../scripts/avant.js?v=' + Math.random());
+            await import('../../scripts/avant.ts?v=' + Math.random());
             
             // Find the ready callback from all registered calls
             const readyCalls = global.Hooks.once.mock.calls.filter(call => call[0] === 'ready');
@@ -182,12 +182,12 @@ describe('Avant Native System', () => {
         test('imports all required modules without errors', async () => {
             // Test that the main module can be imported without dependency issues
             await expect(async () => {
-                await import('../../scripts/avant.js');
+                await import('../../scripts/avant.ts');
             }).not.toThrow();
         });
 
         test('sets up game.avant namespace', async () => {
-            await import('../../scripts/avant.js?v=' + Math.random());
+            await import('../../scripts/avant.ts?v=' + Math.random());
             
             // The ready callback should set up the game.avant object
             const readyCalls = global.Hooks.once.mock.calls.filter(call => call[0] === 'ready');
@@ -209,7 +209,7 @@ describe('Avant Native System', () => {
             
             await expect(async () => {
                 // Re-import to test error handling with cache busting
-                await import('../../scripts/avant.js?cache=' + Date.now());
+                await import('../../scripts/avant.ts?cache=' + Date.now());
             }).not.toThrow();
             
             // Restore global
@@ -222,7 +222,7 @@ describe('Avant Native System', () => {
             
             // Should not throw even without Hooks
             await expect(async () => {
-                await import('../../scripts/avant.js?cache=' + Date.now());
+                await import('../../scripts/avant.ts?cache=' + Date.now());
             }).not.toThrow();
             
             global.Hooks = originalHooks;
@@ -231,7 +231,7 @@ describe('Avant Native System', () => {
 
     describe('System Configuration', () => {
         test('maintains compatibility with FoundryVTT v12 and v13', async () => {
-            await import('../../scripts/avant.js?v=' + Math.random());
+            await import('../../scripts/avant.ts?v=' + Math.random());
             
             // System should not use v13-only APIs that break v12 compatibility
             const initCalls = global.Hooks.once.mock.calls.filter(call => call[0] === 'init');
@@ -244,7 +244,7 @@ describe('Avant Native System', () => {
         });
 
         test('sets up system metadata correctly', async () => {
-            await import('../../scripts/avant.js?v=' + Math.random());
+            await import('../../scripts/avant.ts?v=' + Math.random());
             
             const initCalls = global.Hooks.once.mock.calls.filter(call => call[0] === 'init');
             expect(initCalls.length).toBeGreaterThan(0);
@@ -272,7 +272,7 @@ describe('Avant Native System', () => {
         test('imports complete within reasonable time', async () => {
             const startTime = Date.now();
             
-            await import('../../scripts/avant.js');
+            await import('../../scripts/avant.ts');
             
             const loadTime = Date.now() - startTime;
             expect(loadTime).toBeLessThan(1000); // Should load in under 1 second
@@ -281,7 +281,7 @@ describe('Avant Native System', () => {
         test('does not pollute global namespace excessively', async () => {
             const beforeKeys = Object.keys(global);
             
-            await import('../../scripts/avant.js');
+            await import('../../scripts/avant.ts');
             
             const afterKeys = Object.keys(global);
             const newKeys = afterKeys.filter(key => !beforeKeys.includes(key));
@@ -293,7 +293,7 @@ describe('Avant Native System', () => {
 
     describe('Hook Callback Validation', () => {
         test('all registered callbacks are async or return promises', async () => {
-            await import('../../scripts/avant.js');
+            await import('../../scripts/avant.ts');
             
             const allCallbacks = global.Hooks.once.mock.calls.map(call => call[1]);
             
@@ -311,7 +311,7 @@ describe('Avant Native System', () => {
         });
 
         test('callbacks handle undefined game object gracefully', async () => {
-            await import('../../scripts/avant.js');
+            await import('../../scripts/avant.ts');
             
             const originalGame = global.game;
             global.game = undefined;

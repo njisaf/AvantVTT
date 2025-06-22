@@ -14,15 +14,23 @@
  */
 
 export default {
+  preset: 'ts-jest/presets/default-esm',
+  extensionsToTreatAsEsm: ['.ts'],
+  globals: {
+    'ts-jest': {
+      useESM: true
+    }
+  },
   projects: [
     // Unit tests project - Fast, isolated, pure function tests
     {
       displayName: 'unit',
       rootDir: '.',
       testEnvironment: 'jsdom',
+      preset: 'ts-jest/presets/default-esm',
       testMatch: [
-        '<rootDir>/tests/unit/**/*.test.js',
-        '!<rootDir>/tests/unit/**/*.int.test.js'
+        '<rootDir>/tests/unit/**/*.test.[jt]s',
+        '!<rootDir>/tests/unit/**/*.int.test.[jt]s'
       ],
       setupFilesAfterEnv: [
         '<rootDir>/tests/setup.js'
@@ -67,8 +75,9 @@ export default {
       displayName: 'integration',
       rootDir: '.',
       testEnvironment: 'jsdom',
+      preset: 'ts-jest/presets/default-esm',
       testMatch: [
-        '<rootDir>/tests/integration/**/*.int.test.js'
+        '<rootDir>/tests/integration/**/*.int.test.[jt]s'
       ],
       setupFilesAfterEnv: [
         '<rootDir>/tests/setup.js'
@@ -121,6 +130,7 @@ export default {
   
   // Module file extensions in order of resolution
   moduleFileExtensions: [
+    'ts',
     'js',
     'json'
   ],

@@ -15,7 +15,7 @@ describe('Actor Sheet Wrapper Integration', () => {
         mockActor = createMockActor();
         
         // Import the actor sheet class
-        const { AvantActorSheet } = await import('../../scripts/sheets/actor-sheet.js');
+        const { AvantActorSheet } = await import('../../scripts/sheets/actor-sheet.ts');
         
         // Create sheet instance
         actorSheet = new AvantActorSheet(mockActor, {});

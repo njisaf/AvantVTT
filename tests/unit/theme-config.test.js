@@ -26,7 +26,7 @@ describe('Theme Config', () => {
     // Basic sanity check for theme config
     const testConfig = {
       version: '2.0.0',
-      system: 'avant-native'
+      system: 'avant'
     };
     
     expect(testConfig)
