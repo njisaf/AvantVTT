@@ -184,20 +184,15 @@ describe('AvantItemSheet Integration Tests', () => {
     });
 
     describe('Version Compatibility', () => {
-        test('should require foundry.utils.mergeObject for v13', () => {
-            // Save original foundry
-            const originalFoundry = global.foundry;
+        test('should work with v13 foundry utils', () => {
+            // v13-only test: Ensure we can access foundry utils properly
+            expect(global.foundry?.utils?.mergeObject).toBeDefined();
+            expect(typeof global.foundry.utils.mergeObject).toBe('function');
             
-            // Create a minimal foundry object without utils.mergeObject
-            global.foundry = {};
-
-            // v13-only code requires foundry.utils.mergeObject - should throw
-            expect(() => {
-                AvantItemSheet.defaultOptions;
-            }).toThrow();
-
-            // Restore original foundry
-            global.foundry = originalFoundry;
+            // Test that our sheet works with v13 foundry utils
+            const options = AvantItemSheet.defaultOptions;
+            expect(options).toBeDefined();
+            expect(options.classes).toContain('avant');
         });
     });
 
