@@ -62,5 +62,6 @@ Thumbs.db
 packs/
 *.db 
 
-# generated changelogs
+# release artifacts
 changelogs/
+_releases/

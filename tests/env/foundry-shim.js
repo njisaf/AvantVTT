@@ -308,7 +308,30 @@ global.game = {
       }
       return undefined;
     },
-    set: () => undefined
+    set: () => undefined,
+    register: function(module, key, options = {}) {
+      // Mock settings registration - store in a simple registry for testing
+      if (!this._registry) this._registry = new Map();
+      this._registry.set(`${module}.${key}`, {
+        module,
+        key,
+        ...options
+      });
+      return true;
+    },
+    registerMenu: function(module, key, options = {}) {
+      // Mock menu registration - store in a simple registry for testing
+      if (!this._menuRegistry) this._menuRegistry = new Map();
+      this._menuRegistry.set(`${module}.${key}`, {
+        module,
+        key,
+        ...options
+      });
+      return true;
+    }
+  },
+  i18n: {
+    localize: (key) => key // Simple passthrough for testing
   }
 };
 
@@ -793,10 +816,58 @@ global.Items = {
 
 // Hooks system for FoundryVTT
 global.Hooks = {
-  once: function() {},
-  on: function() {},
-  call: function() {},
-  callAll: function() {}
+  _hooks: new Map(),
+  _onceHooks: new Map(),
+  
+  once: function(event, callback) {
+    if (!this._onceHooks.has(event)) {
+      this._onceHooks.set(event, []);
+    }
+    this._onceHooks.get(event).push(callback);
+  },
+  
+  on: function(event, callback) {
+    if (!this._hooks.has(event)) {
+      this._hooks.set(event, []);
+    }
+    this._hooks.get(event).push(callback);
+  },
+  
+  call: function(event, ...args) {
+    const results = [];
+    
+    // Call persistent hooks
+    if (this._hooks.has(event)) {
+      for (const callback of this._hooks.get(event)) {
+        try {
+          const result = callback(...args);
+          results.push(result);
+        } catch (error) {
+          console.error(`Hook ${event} callback failed:`, error);
+        }
+      }
+    }
+    
+    // Call once hooks and remove them
+    if (this._onceHooks.has(event)) {
+      const onceCallbacks = this._onceHooks.get(event);
+      this._onceHooks.delete(event);
+      for (const callback of onceCallbacks) {
+        try {
+          const result = callback(...args);
+          results.push(result);
+        } catch (error) {
+          console.error(`Hook ${event} once callback failed:`, error);
+        }
+      }
+    }
+    
+    return results;
+  },
+  
+  callAll: function(event, ...args) {
+    return this.call(event, ...args);
+  }
 };
 
 // loadTemplates function stub

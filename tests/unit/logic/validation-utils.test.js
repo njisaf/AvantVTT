@@ -161,7 +161,7 @@ describe('Validation Utils Pure Functions', () => {
             expect(result.focus.modifier).toBe(0);
         });
 
-        test('should enforce modifier bounds', () => {
+        test('should allow free input without bounds checking', () => {
             const input = {
                 might: { modifier: 15 },
                 grace: { modifier: -15 }
@@ -169,8 +169,8 @@ describe('Validation Utils Pure Functions', () => {
             
             const result = validateAbilities(input);
             
-            expect(result.might.modifier).toBe(10);
-            expect(result.grace.modifier).toBe(-10);
+            expect(result.might.modifier).toBe(15);
+            expect(result.grace.modifier).toBe(-15);
         });
 
         test('should handle null/undefined input', () => {
@@ -377,8 +377,8 @@ describe('Validation Utils Pure Functions', () => {
             
             const result = validateHealthData(input);
             
-            expect(result.value).toBe(20); // default
-            expect(result.max).toBe(20); // default  
+            expect(result.value).toBe(0); // default
+            expect(result.max).toBe(0); // default  
             expect(result.temp).toBe(0); // default
         });
     });
@@ -409,8 +409,8 @@ describe('Validation Utils Pure Functions', () => {
             
             const result = validatePowerPointsData(input);
             
-            expect(result.value).toBe(10); // default
-            expect(result.max).toBe(10); // default
+            expect(result.value).toBe(0); // default
+            expect(result.max).toBe(0); // default
         });
     });
 

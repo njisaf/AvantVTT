@@ -8,9 +8,10 @@
 /**
  * Represents a single ability score in the game.
  * Abilities like Might, Grace, Intellect, and Focus define character capabilities.
+ * Now uses only the modifier field for direct user input.
  */
 export interface Ability {
-  /** The ability modifier (-10 to +10) */
+  /** The ability modifier (user-defined, no calculation) */
   modifier: number;
   /** Display label for the ability */
   label?: string;
@@ -76,30 +77,61 @@ export interface Skills {
 }
 
 /**
+ * Health-related statistics for a character.
+ * All values are now direct user input without calculation.
+ */
+export interface HealthStats {
+  /** Current health points */
+  value: number;
+  /** Maximum health points */
+  max: number;
+  /** Temporary health points */
+  temp?: number;
+}
+
+/**
+ * Power point statistics for special abilities.
+ * All values are now direct user input.
+ */
+export interface PowerPointStats {
+  /** Current power points */
+  value: number;
+  /** Maximum power points */
+  max: number;
+  /** Usage limit per action (user-defined) */
+  limit?: number;
+}
+
+/**
+ * Expertise point tracking for character advancement.
+ * All values are now direct user input without automatic calculation.
+ */
+export interface ExpertisePointStats {
+  /** Total expertise points available */
+  total: number;
+  /** Expertise points already spent */
+  spent: number;
+  /** Remaining expertise points (user-defined, not calculated) */
+  remaining: number;
+}
+
+/**
  * Character statistics derived from abilities and other factors.
- * These are calculated values that change based on character progression.
+ * These are now direct user input values instead of calculated values.
  */
 export interface CharacterStats {
-  /** Current health points */
-  health: {
-    value: number;
-    max: number;
-    temp?: number;
-  };
-  /** Current power points (for special abilities) */
-  powerPoints: {
-    value: number;
-    max: number;
-  };
-  /** Defense threshold (difficulty to hit in combat) */
-  defense: number;
+  /** Health statistics */
+  health: HealthStats;
+  /** Power point statistics */
+  powerPoints: PowerPointStats;
+  /** Defense threshold (user-defined, not calculated from abilities) */
+  defenseThreshold: number;
   /** Character tier (0-6, representing power level) */
-  tier: number;
+  tier?: number;
   /** Fortune points (metacurrency for rerolls) */
-  fortune: {
-    value: number;
-    max: number;
-  };
+  fortunePoints?: number;
+  /** Expertise points for advancement */
+  expertisePoints: ExpertisePointStats;
 }
 
 /**
@@ -111,14 +143,29 @@ export interface ActorData {
   name: string;
   /** Actor type (character, npc, vehicle) */
   type: 'character' | 'npc' | 'vehicle';
-  /** Core ability scores */
+  /** Character level */
+  level: number;
+  /** Core ability scores (now simplified to modifiers only) */
   abilities: Abilities;
   /** Learned skills */
   skills: Skills;
-  /** Derived statistics */
-  stats: CharacterStats;
+  /** Character statistics (now user-defined) */
+  stats?: CharacterStats;
+  /** Character-specific fields from template */
+  health: HealthStats;
+  powerPoints: PowerPointStats;
+  expertisePoints: ExpertisePointStats;
+  defenseThreshold: number;
+  fortunePoints: number;
+  /** Character background information */
+  ancestry?: string;
+  lineage?: string;
+  culture?: string;
+  vocation?: string;
+  languages?: string;
   /** Character biography and description */
   biography?: string;
+  notes?: string;
   /** Character portrait image path */
   image?: string;
   /** Custom flags for system-specific data */

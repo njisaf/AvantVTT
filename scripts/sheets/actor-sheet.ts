@@ -5,20 +5,18 @@
  * @description Actor sheet handling for character management with v13-only implementation
  */
 
-import { AvantActorData } from '../data/actor-data.js';
+import { AvantActorData } from '../data/actor-data.ts';
 import { logger } from '../utils/logger.js';
 import {
     calculateAbilityTotalModifiers,
     calculateSkillTotalModifiers,
-    calculateDefenseValues,
-    calculateDefenseThreshold,
-    calculateRemainingExpertisePoints,
     calculatePowerPointLimit,
     organizeSkillsByAbility,
     organizeItemsByType,
     validateAbilityRollData,
-    validateSkillRollData
-} from '../logic/actor-sheet.js';
+    validateSkillRollData,
+    type SkillAbilityMap
+} from '../logic/actor-sheet-utils.ts';
 import {
     prepareItemData,
     validatePowerPointUsage,
@@ -28,7 +26,7 @@ import {
     prepareGenericRoll,
     extractItemIdFromElement,
     formatFlavorText
-} from '../logic/actor-sheet-utils.js';
+} from '../logic/actor-sheet-utils.ts';
 
 // Import local foundry UI adapter for safe notifications
 import { FoundryUI } from '../types/adapters/foundry-ui.ts';
@@ -133,42 +131,30 @@ export class AvantActorSheet extends ActorSheetBase {
         
         // Extract basic character data
         const level = (context.system && context.system.level) || 1;
-        const tier = (context.system && context.system.tier) || 1;
         const abilities = context.system.abilities || {};
         const skills = context.system.skills || {};
-        const skillAbilities = AvantActorData.getSkillAbilities() || {};
+        const skillAbilities = (AvantActorData.getSkillAbilities() || {}) as SkillAbilityMap;
         
-        // Calculate total modifiers using pure functions
+        // Calculate total modifiers for display on roll buttons (but don't override user values)
         context.abilityTotalModifiers = calculateAbilityTotalModifiers(abilities, level);
         context.skillTotalModifiers = calculateSkillTotalModifiers(skills, abilities, skillAbilities, level);
         
-        // Calculate defense values using pure functions
-        const defenseValues = calculateDefenseValues(abilities, tier);
-        if (!context.system.defense) {
-            context.system.defense = {};
-        }
-        Object.assign(context.system.defense, defenseValues);
+        // NO LONGER CALCULATING OR OVERRIDING USER VALUES:
+        // - Defense threshold is now user input (system.defenseThreshold)
+        // - Expertise points remaining is now user input (system.expertisePoints.remaining) 
+        // - Power point limit can still be calculated for mechanics but doesn't override user input
         
-        // Calculate defense threshold using pure function
-        context.system.defenseThreshold = calculateDefenseThreshold(defenseValues);
-        
-        // Calculate remaining expertise points using pure function
-        if (context.system && context.system.expertisePoints) {
-            const total = context.system.expertisePoints.total || 0;
-            const spent = context.system.expertisePoints.spent || 0;
-            context.system.expertisePoints.remaining = calculateRemainingExpertisePoints(total, spent);
-        }
-        
-        // Calculate power point limit using pure function
+        // Still calculate power point limit for internal mechanics (if needed for validation)
         if (context.system && context.system.powerPoints) {
             const maxPower = context.system.powerPoints.max || 10;
-            context.system.powerPoints.limit = calculatePowerPointLimit(maxPower);
+            // Store internally but don't override user's limit field
+            context.system.powerPoints._calculatedLimit = calculatePowerPointLimit(maxPower);
         }
         
-        // Organize skills by abilities using pure function
+        // Organize skills by abilities for display (pure organizational function)
         context.skillsByAbility = organizeSkillsByAbility(skills, abilities, skillAbilities, level);
         
-        // Organize items by type using pure function
+        // Organize items by type for display (pure organizational function)
         const itemsArray = this.actor.items ? Array.from(this.actor.items) : [];
         context.items = organizeItemsByType(itemsArray);
         

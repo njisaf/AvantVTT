@@ -16,7 +16,7 @@ import { ValidationUtils } from './utils/validation.js';
 import { registerSheets, setupConfigDebug, setupDataModels } from './logic/avant-init-utils.js';
 
 // Data models
-import { AvantActorData } from './data/actor-data.js';
+import { AvantActorData } from './data/actor-data.ts';
 import { AvantActionData, AvantFeatureData, AvantTalentData, AvantAugmentData, AvantWeaponData, AvantArmorData, AvantGearData } from './data/item-data.js';
 
 // Sheet classes
@@ -33,7 +33,7 @@ import { AvantChatContextMenu } from './chat/context-menu.ts';
 import { AvantThemeManager } from './themes/theme-manager.js';
 
 // Initialization manager
-import { InitializationManager, FoundryInitializationHelper } from './utils/initialization-manager.js';
+import { InitializationManager, FoundryInitializationHelper } from './utils/initialization-manager.ts';
 
 // Extend global types for FoundryVTT (avoiding redeclaration)
 declare global {

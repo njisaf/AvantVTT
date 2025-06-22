@@ -88,6 +88,14 @@ describe('AvantThemeManager', () => {
         
         themeManager = new AvantThemeManager();
         
+        // Reset singleton state - clear any existing callbacks from previous tests
+        if (themeManager.customThemes) {
+            themeManager.customThemes.clear();
+        }
+        if (themeManager.themeChangeCallbacks) {
+            themeManager.themeChangeCallbacks.clear();
+        }
+        
         mockElement = {
             classList: {
                 contains: jest.fn(() => false),
@@ -192,7 +200,7 @@ describe('AvantThemeManager', () => {
         test('finds and processes Avant elements', () => {
             themeManager.applyTheme('dark');
             
-            expect(global.document.querySelectorAll).toHaveBeenCalledWith('.avant');
+            expect(global.document.querySelectorAll).toHaveBeenCalledWith('.avant, .themed');
         });
 
         test('removes existing theme classes', () => {

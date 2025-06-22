@@ -5,20 +5,182 @@
  * @description Complete actor data schema supporting abilities, skills, power points, health, and character details
  */
 
+// Import types from FoundryVTT system
+// Note: Using any types for FoundryVTT API as official types are not available
+
+/**
+ * Interface for ability data structure
+ */
+export interface AbilityData {
+    modifier: number;
+}
+
+/**
+ * Interface for health data structure
+ */
+export interface HealthData {
+    value: number;
+    max: number;
+    temp: number;
+}
+
+/**
+ * Interface for power points data structure
+ */
+export interface PowerPointsData {
+    value: number;
+    max: number;
+    limit: number;
+}
+
+/**
+ * Interface for expertise points data structure
+ */
+export interface ExpertisePointsData {
+    total: number;
+    spent: number;
+    remaining: number;
+}
+
+/**
+ * Interface for character details data structure
+ */
+export interface CharacterDetailsData {
+    archetype: string;
+    type: string;
+    flavor: string;
+    background: string;
+    hometown: string;
+    note: string;
+}
+
+/**
+ * Interface for defense data structure
+ */
+export interface DefenseData {
+    might: number;
+    grace: number;
+    intellect: number;
+    focus: number;
+}
+
+/**
+ * Interface for physical characteristics data structure
+ */
+export interface PhysicalData {
+    weight: number;
+    encumbrance: {
+        value: number;
+        max: number;
+    };
+}
+
+/**
+ * Interface for currency data structure
+ */
+export interface CurrencyData {
+    gold: number;
+    silver: number;
+    copper: number;
+}
+
+/**
+ * Interface for experience data structure
+ */
+export interface ExperienceData {
+    value: number;
+    max: number;
+}
+
+/**
+ * Interface for skills data structure
+ */
+export interface SkillsData {
+    // Might-based skills
+    force: number;
+    surge: number;
+    command: number;
+    // Grace-based skills
+    finesse: number;
+    hide: number;
+    charm: number;
+    // Intellect-based skills
+    debate: number;
+    inspect: number;
+    recall: number;
+    // Focus-based skills
+    discern: number;
+    endure: number;
+    intuit: number;
+}
+
+/**
+ * Interface for complete actor system data
+ */
+export interface AvantActorSystemData {
+    level: number;
+    tier: number;
+    effort: number;
+    ancestry: string;
+    lineage: string;
+    culture: string;
+    vocation: string;
+    background: string;
+    languages: string;
+    abilities: Record<string, AbilityData>;
+    skills: SkillsData;
+    character: CharacterDetailsData;
+    health: HealthData;
+    powerPoints: PowerPointsData;
+    expertisePoints: ExpertisePointsData;
+    fortunePoints: number;
+    experience: ExperienceData;
+    defense: DefenseData;
+    defenseThreshold: number;
+    physical: PhysicalData;
+    currency: CurrencyData;
+    biography: string;
+    notes: string;
+}
+
 /**
  * Actor Data Model for Avant - v12/v13 Compatible
  * @class AvantActorData
  * @extends {foundry.abstract.DataModel}
  * @description Defines the complete data schema for Avant actors including abilities, skills, power points, and character details
  */
-export class AvantActorData extends foundry.abstract.DataModel {
+export class AvantActorData extends (foundry as any).abstract.DataModel {
+    declare level: number;
+    declare tier: number;
+    declare effort: number;
+    declare ancestry: string;
+    declare lineage: string;
+    declare culture: string;
+    declare vocation: string;
+    declare background: string;
+    declare languages: string;
+    declare abilities: Record<string, AbilityData>;
+    declare skills: SkillsData;
+    declare character: CharacterDetailsData;
+    declare health: HealthData;
+    declare powerPoints: PowerPointsData;
+    declare expertisePoints: ExpertisePointsData;
+    declare fortunePoints: number;
+    declare experience: ExperienceData;
+    declare defense: DefenseData;
+    declare defenseThreshold: number;
+    declare physical: PhysicalData;
+    declare currency: CurrencyData;
+    declare biography: string;
+    declare notes: string;
+
     /**
      * Define the data schema for Avant actors
      * @static
      * @returns {Object} The schema definition object
      */
-    static defineSchema() {
-        const fields = foundry.data.fields;
+    static defineSchema(): Record<string, any> {
+        const fields = (foundry as any).data.fields;
         return {
             // Basic Info
             level: new fields.NumberField({ required: true, initial: 1, integer: true, min: 1, max: 20 }),
@@ -49,27 +211,27 @@ export class AvantActorData extends foundry.abstract.DataModel {
                 })
             }),
             
-            // Skills (1-point system for Avant)
+            // Skills - Free input integer values (no maximum constraint)
             skills: new fields.SchemaField({
                 // Might-based skills
-                debate: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0, max: 6 }),
-                force: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0, max: 6 }),
+                debate: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0 }),
+                force: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0 }),
                 
                 // Grace-based skills
-                finesse: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0, max: 6 }),
-                hide: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0, max: 6 }),
+                finesse: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0 }),
+                hide: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0 }),
                 
                 // Intellect-based skills
-                command: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0, max: 6 }),
-                inspect: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0, max: 6 }),
-                recall: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0, max: 6 }),
+                command: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0 }),
+                inspect: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0 }),
+                recall: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0 }),
                 
                 // Focus-based skills
-                charm: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0, max: 6 }),
-                discern: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0, max: 6 }),
-                endure: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0, max: 6 }),
-                intuit: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0, max: 6 }),
-                surge: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0, max: 6 })
+                charm: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0 }),
+                discern: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0 }),
+                endure: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0 }),
+                intuit: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0 }),
+                surge: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0 })
             }),
             
             // Character Details
@@ -90,9 +252,9 @@ export class AvantActorData extends foundry.abstract.DataModel {
             }),
             
             powerPoints: new fields.SchemaField({
-                value: new fields.NumberField({ required: true, initial: 10, integer: true, min: 0 }),
-                max: new fields.NumberField({ required: true, initial: 10, integer: true, min: 0 }),
-                limit: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0 })
+                value: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0 }),
+                max: new fields.NumberField({ required: true, initial: 0, integer: true }),
+                limit: new fields.NumberField({ required: true, initial: 0, integer: true })
             }),
             
             expertisePoints: new fields.SchemaField({
@@ -102,7 +264,7 @@ export class AvantActorData extends foundry.abstract.DataModel {
             }),
             
             // Fortune Points for rerolls
-            fortunePoints: new fields.NumberField({ required: true, initial: 3, integer: true, min: 0, max: 10 }),
+            fortunePoints: new fields.NumberField({ required: true, initial: 0, integer: true }),
             
             // Advancement
             experience: new fields.SchemaField({
@@ -149,19 +311,19 @@ export class AvantActorData extends foundry.abstract.DataModel {
      * @static
      * @returns {Object} Mapping of skill names to ability names
      */
-    static getSkillAbilities() {
+    static getSkillAbilities(): Record<string, string> {
         return {
             'debate': 'intellect',
+            'inspect': 'intellect',
+            'recall': 'intellect',
             'discern': 'focus',
+            'intuit': 'focus',
             'endure': 'focus',
             'finesse': 'grace',
-            'force': 'might',
-            'command': 'might',
             'charm': 'grace',
             'hide': 'grace',
-            'inspect': 'intellect',
-            'intuit': 'focus',
-            'recall': 'intellect',
+            'force': 'might',
+            'command': 'might',
             'surge': 'might'
         };
     }
@@ -172,7 +334,7 @@ export class AvantActorData extends foundry.abstract.DataModel {
      * @param {string} skillName - The name of the skill
      * @returns {string|null} The governing ability name or null if not found
      */
-    static getSkillAbility(skillName) {
+    static getSkillAbility(skillName: string): string | null {
         const skillAbilities = this.getSkillAbilities();
         return skillAbilities[skillName] || null;
     }
@@ -183,9 +345,9 @@ export class AvantActorData extends foundry.abstract.DataModel {
      * @param {string} abilityName - The name of the ability
      * @returns {Array<string>} Array of skill names governed by this ability
      */
-    static getAbilitySkills(abilityName) {
+    static getAbilitySkills(abilityName: string): string[] {
         const skillAbilities = this.getSkillAbilities();
-        const skills = [];
+        const skills: string[] = [];
         
         for (const [skill, ability] of Object.entries(skillAbilities)) {
             if (ability === abilityName) {
@@ -200,14 +362,14 @@ export class AvantActorData extends foundry.abstract.DataModel {
      * Prepare derived data for the actor
      * Called automatically when actor data changes
      */
-    prepareDerivedData() {
+    prepareDerivedData(): void {
         // Note: DataModel doesn't have prepareDerivedData, so no super call needed
         
         // No need to calculate ability modifiers - they are direct values now
         
         // Calculate defense values (base 11 + tier + ability modifier)
         for (const [abilityName, abilityData] of Object.entries(this.abilities)) {
-            this.defense[abilityName] = 11 + this.tier + (abilityData.modifier || 0);
+            this.defense[abilityName as keyof DefenseData] = 11 + this.tier + (abilityData.modifier || 0);
         }
         
         // Ensure current health doesn't exceed max (only constraint we keep)
@@ -215,8 +377,7 @@ export class AvantActorData extends foundry.abstract.DataModel {
             this.health.value = this.health.max;
         }
         
-        // Calculate power point limit (can be spent at once) - typically 1/3 of max
-        this.powerPoints.limit = Math.max(1, Math.floor(this.powerPoints.max / 3));
+        // Power point limit is now user input - no automatic calculation
         
         // Ensure current power points don't exceed max
         if (this.powerPoints.value > this.powerPoints.max) {
@@ -227,7 +388,7 @@ export class AvantActorData extends foundry.abstract.DataModel {
         this.expertisePoints.remaining = Math.max(0, this.expertisePoints.total - this.expertisePoints.spent);
         
         // Calculate encumbrance max based on might modifier + base value
-        const mightModifier = this.abilities.might.modifier || 0;
+        const mightModifier = this.abilities.might?.modifier || 0;
         const baseEncumbrance = 100; // Base carrying capacity
         this.physical.encumbrance.max = baseEncumbrance + (mightModifier * 10); // Simple encumbrance calculation
     }

@@ -141,7 +141,7 @@ describe('Validation Utils Pure Functions', () => {
                 focus: { modifier: 0 }
             };
             
-            const result = validateAbilities(input);
+            const result = validateAbilities(input) as any;
             
             expect(result.might.modifier).toBe(3);
             expect(result.grace.modifier).toBe(-1);
@@ -154,7 +154,7 @@ describe('Validation Utils Pure Functions', () => {
                 might: { modifier: 2 }
             };
             
-            const result = validateAbilities(input);
+            const result = validateAbilities(input) as any;
             
             expect(result.might.modifier).toBe(2);
             expect(result.grace.modifier).toBe(0);
@@ -162,21 +162,21 @@ describe('Validation Utils Pure Functions', () => {
             expect(result.focus.modifier).toBe(0);
         });
 
-        test('should enforce modifier bounds', () => {
+        test('should allow free input without bounds checking', () => {
             const input = {
                 might: { modifier: 15 },
                 grace: { modifier: -15 }
             };
             
-            const result = validateAbilities(input);
+            const result = validateAbilities(input) as any;
             
-            expect(result.might.modifier).toBe(10);
-            expect(result.grace.modifier).toBe(-10);
+            expect(result.might.modifier).toBe(15);
+            expect(result.grace.modifier).toBe(-15);
         });
 
         test('should handle null/undefined input', () => {
-            const result1 = validateAbilities(null);
-            const result2 = validateAbilities(undefined);
+            const result1 = validateAbilities(null) as any;
+            const result2 = validateAbilities(undefined) as any;
             
             expect(result1.might.modifier).toBe(0);
             expect(result1.grace.modifier).toBe(0);
@@ -190,7 +190,7 @@ describe('Validation Utils Pure Functions', () => {
                 grace: { modifier: "-1" }
             };
             
-            const result = validateAbilities(input);
+            const result = validateAbilities(input) as any;
             
             expect(result.might.modifier).toBe(3);
             expect(result.grace.modifier).toBe(-1);

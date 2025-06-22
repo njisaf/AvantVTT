@@ -128,7 +128,7 @@ describe('Actor Sheet Logic - Pure Functions', () => {
     });
 
     describe('calculateDefenseValues', () => {
-        test('calculates correct defense values', () => {
+        test('no longer calculates defense values - returns empty object', () => {
             const abilities = {
                 might: { modifier: 2 },
                 intellect: { modifier: -1 },
@@ -138,14 +138,11 @@ describe('Actor Sheet Logic - Pure Functions', () => {
             
             const result = calculateDefenseValues(abilities, tier);
             
-            expect(result).toEqual({
-                might: 15,       // 11 + 2 + 2 = 15
-                intellect: 12,   // 11 + 2 + (-1) = 12
-                personality: 14  // 11 + 2 + 1 = 14
-            });
+            // Function now returns empty object since defense is user input
+            expect(result).toEqual({});
         });
 
-        test('handles invalid input data', () => {
+        test('handles invalid input data by returning empty object', () => {
             expect(calculateDefenseValues(null, 2)).toEqual({});
             expect(calculateDefenseValues(undefined, 2)).toEqual({});
             expect(calculateDefenseValues({}, 2)).toEqual({});
@@ -153,7 +150,7 @@ describe('Actor Sheet Logic - Pure Functions', () => {
     });
 
     describe('calculateDefenseThreshold', () => {
-        test('returns highest defense value', () => {
+        test('no longer calculates defense threshold - returns 0', () => {
             const defenseValues = {
                 might: 15,
                 intellect: 12,
@@ -163,24 +160,26 @@ describe('Actor Sheet Logic - Pure Functions', () => {
             
             const result = calculateDefenseThreshold(defenseValues);
             
-            expect(result).toBe(18);
+            // Function now returns 0 since defense threshold is user input
+            expect(result).toBe(0);
         });
 
-        test('returns default when no valid defenses', () => {
-            expect(calculateDefenseThreshold({})).toBe(10);
-            expect(calculateDefenseThreshold(null)).toBe(10);
+        test('returns 0 for any input since defense threshold is now user input', () => {
+            expect(calculateDefenseThreshold({})).toBe(0);
+            expect(calculateDefenseThreshold(null)).toBe(0);
         });
     });
 
     describe('calculateRemainingExpertisePoints', () => {
-        test('calculates positive remaining points', () => {
+        test('no longer calculates remaining points - returns 0', () => {
             const result = calculateRemainingExpertisePoints(15, 10);
-            expect(result).toBe(5);
+            // Function now returns 0 since remaining points are user input
+            expect(result).toBe(0);
         });
 
-        test('calculates negative remaining points (overspent)', () => {
+        test('returns 0 for any input since remaining points are now user input', () => {
             const result = calculateRemainingExpertisePoints(10, 15);
-            expect(result).toBe(-5);
+            expect(result).toBe(0);
         });
     });
 

@@ -179,7 +179,7 @@ describe('Direct Avant Main System Test', () => {
             },
             async () => {
                 try {
-                    const actorData = await import('../../scripts/data/actor-data.js');
+                    const actorData = await import('../../scripts/data/actor-data.ts');
                     expect(actorData.AvantActorData).toBeDefined();
                 } catch (e) { /* ignore */ }
             },

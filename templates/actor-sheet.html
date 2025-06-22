@@ -27,8 +27,8 @@
             <div class="sidebar-section">
                 <h4>Defense Threshold</h4>
                 <div class="stat-tiles-row">
-                    <div class="stat-tile readonly">
-                        <span class="stat-tile-value">{{system.defenseThreshold}}</span>
+                    <div class="stat-tile">
+                        <input type="text" name="system.defenseThreshold" value="{{system.defenseThreshold}}" data-dtype="Number" class="stat-tile-input"/>
                         <span class="stat-tile-label">Defense</span>
                     </div>
                 </div>
@@ -66,8 +66,8 @@
                         <input type="text" name="system.expertisePoints.spent" value="{{system.expertisePoints.spent}}" data-dtype="Number" class="stat-tile-input"/>
                         <span class="stat-tile-label">Spent</span>
                     </div>
-                    <div class="stat-tile readonly">
-                        <span class="stat-tile-value">{{system.expertisePoints.remaining}}</span>
+                    <div class="stat-tile">
+                        <input type="text" name="system.expertisePoints.remaining" value="{{system.expertisePoints.remaining}}" data-dtype="Number" class="stat-tile-input"/>
                         <span class="stat-tile-label">Remaining</span>
                     </div>
                 </div>

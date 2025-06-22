@@ -173,13 +173,7 @@ export function validateAbilities(abilities) {
         if (abilities[abilityName] && typeof abilities[abilityName] === 'object') {
             let modifier = validateNumber(abilities[abilityName].modifier, 0, true);
             
-            // Ensure ability modifier is within reasonable bounds (-10 to +10)
-            if (modifier < -10) {
-                modifier = -10;
-            }
-            if (modifier > 10) {
-                modifier = 10;
-            }
+            // No bounds checking - allow free input for ability modifiers
             
             validatedAbilities[abilityName] = { modifier };
         } else {
@@ -345,10 +339,10 @@ export function validateHealthData(healthData) {
     const validated = { ...healthData };
     
     if (healthData.value !== undefined) {
-        validated.value = validateNumber(healthData.value, 20, true);
+        validated.value = validateNumber(healthData.value, 0, true);
     }
     if (healthData.max !== undefined) {
-        validated.max = validateNumber(healthData.max, 20, true);
+        validated.max = validateNumber(healthData.max, 0, true);
     }
     if (healthData.temp !== undefined) {
         validated.temp = validateNumber(healthData.temp, 0, true);
@@ -385,10 +379,10 @@ export function validatePowerPointsData(powerPointsData) {
     const validated = { ...powerPointsData };
     
     if (powerPointsData.value !== undefined) {
-        validated.value = validateNumber(powerPointsData.value, 10, true);
+        validated.value = validateNumber(powerPointsData.value, 0, true);
     }
     if (powerPointsData.max !== undefined) {
-        validated.max = validateNumber(powerPointsData.max, 10, true);
+        validated.max = validateNumber(powerPointsData.max, 0, true);
     }
     
     return validated;
