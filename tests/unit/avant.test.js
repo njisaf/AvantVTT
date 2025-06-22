@@ -30,7 +30,12 @@ describe('Avant Native System', () => {
         
         // Set up FoundryVTT environment
         global.game = {
-            avant: {}
+            avant: {},
+            settings: {
+                register: jest.fn(),
+                registerMenu: jest.fn(),
+                get: jest.fn().mockReturnValue('light')
+            }
         };
         
         // Set up Hooks system with callback storage
@@ -230,10 +235,10 @@ describe('Avant Native System', () => {
     });
 
     describe('System Configuration', () => {
-        test('maintains compatibility with FoundryVTT v12 and v13', async () => {
+        test('maintains compatibility with FoundryVTT v13', async () => {
             await import('../../scripts/avant.ts?v=' + Math.random());
             
-            // System should not use v13-only APIs that break v12 compatibility
+            // v13-only system should work with current FoundryVTT APIs
             const initCalls = global.Hooks.once.mock.calls.filter(call => call[0] === 'init');
             expect(initCalls.length).toBeGreaterThan(0);
             const initCallback = initCalls[initCalls.length - 1][1];

@@ -15,11 +15,21 @@ describe('Avant System Initialization', () => {
         // Reset global state
         global.CONFIG = { 
             AVANT: undefined,
-            debug: { hooks: false }
+            debug: { hooks: false },
+            Actor: {
+                documentClass: undefined,
+                dataModels: {}
+            },
+            Item: {
+                documentClass: undefined,
+                dataModels: {}
+            }
         };
         global.game = { 
             settings: { 
-                get: jest.fn().mockReturnValue('light') 
+                get: jest.fn().mockReturnValue('light'),
+                register: jest.fn(),
+                registerMenu: jest.fn()
             } 
         };
         

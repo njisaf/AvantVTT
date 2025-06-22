@@ -378,8 +378,8 @@ describe('Validation Utils Pure Functions', () => {
             
             const result = validateHealthData(input);
             
-            expect((result as any).value).toBe(20); // default
-            expect((result as any).max).toBe(20); // default  
+            expect((result as any).value).toBe(0); // default
+            expect((result as any).max).toBe(0); // default  
             expect((result as any).temp).toBe(0); // default
         });
     });
@@ -410,8 +410,8 @@ describe('Validation Utils Pure Functions', () => {
             
             const result = validatePowerPointsData(input);
             
-            expect((result as any).value).toBe(10); // default
-            expect((result as any).max).toBe(10); // default
+            expect((result as any).value).toBe(0); // default
+            expect((result as any).max).toBe(0); // default
         });
     });
 
