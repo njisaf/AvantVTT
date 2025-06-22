@@ -10,7 +10,7 @@ import { jest } from '@jest/globals';
 import '../../setup.js';
 
 // Import the sheet class
-import { AvantItemSheet } from '../../../scripts/sheets/item-sheet.js';
+import { AvantItemSheet } from '../../../scripts/sheets/item-sheet.ts';
 
 describe('AvantItemSheet Integration Tests', () => {
     let itemSheet;

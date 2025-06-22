@@ -128,7 +128,7 @@ describe('Actor Sheet Logic - Pure Functions', () => {
     });
 
     describe('calculateDefenseValues', () => {
-        test('calculates correct defense values', () => {
+        test('no longer calculates defense values - returns empty object', () => {
             const abilities = {
                 might: { modifier: 2 },
                 intellect: { modifier: -1 },
@@ -138,14 +138,11 @@ describe('Actor Sheet Logic - Pure Functions', () => {
             
             const result = calculateDefenseValues(abilities, tier);
             
-            expect(result).toEqual({
-                might: 15,       // 11 + 2 + 2 = 15
-                intellect: 12,   // 11 + 2 + (-1) = 12
-                personality: 14  // 11 + 2 + 1 = 14
-            });
+            // Function now returns empty object since defense is user input
+            expect(result).toEqual({});
         });
 
-        test('handles invalid input data', () => {
+        test('handles invalid input data by returning empty object', () => {
             expect(calculateDefenseValues(null, 2)).toEqual({});
             expect(calculateDefenseValues(undefined, 2)).toEqual({});
             expect(calculateDefenseValues({}, 2)).toEqual({});
@@ -153,7 +150,7 @@ describe('Actor Sheet Logic - Pure Functions', () => {
     });
 
     describe('calculateDefenseThreshold', () => {
-        test('returns highest defense value', () => {
+        test('no longer calculates defense threshold - returns 0', () => {
             const defenseValues = {
                 might: 15,
                 intellect: 12,
@@ -163,24 +160,26 @@ describe('Actor Sheet Logic - Pure Functions', () => {
             
             const result = calculateDefenseThreshold(defenseValues);
             
-            expect(result).toBe(18);
+            // Function now returns 0 since defense threshold is user input
+            expect(result).toBe(0);
         });
 
-        test('returns default when no valid defenses', () => {
-            expect(calculateDefenseThreshold({})).toBe(10);
-            expect(calculateDefenseThreshold(null)).toBe(10);
+        test('returns 0 for any input since defense threshold is now user input', () => {
+            expect(calculateDefenseThreshold({})).toBe(0);
+            expect(calculateDefenseThreshold(null)).toBe(0);
         });
     });
 
     describe('calculateRemainingExpertisePoints', () => {
-        test('calculates positive remaining points', () => {
+        test('no longer calculates remaining points - returns 0', () => {
             const result = calculateRemainingExpertisePoints(15, 10);
-            expect(result).toBe(5);
+            // Function now returns 0 since remaining points are user input
+            expect(result).toBe(0);
         });
 
-        test('calculates negative remaining points (overspent)', () => {
+        test('returns 0 for any input since remaining points are now user input', () => {
             const result = calculateRemainingExpertisePoints(10, 15);
-            expect(result).toBe(-5);
+            expect(result).toBe(0);
         });
     });
 
@@ -242,8 +241,195 @@ describe('Actor Sheet Logic - Pure Functions', () => {
             expect(result).toEqual({
                 action: [],
                 weapon: [],
+                armor: [],
+                gear: [],
                 talent: [],
+                augment: [],
+                feature: [],
                 other: []
+            });
+        });
+
+        // ===== CONTRACT VERIFICATION TESTS =====
+        // These tests ensure the function meets all template requirements
+        
+        describe('Template Contract Verification', () => {
+            test('provides all item categories required by actor sheet template', () => {
+                const result = organizeItemsByType([]);
+                
+                // These categories MUST exist for template compatibility
+                const requiredCategories = [
+                    'weapon', 'armor', 'gear', 'talent', 
+                    'augment', 'feature', 'action', 'other'
+                ];
+                
+                requiredCategories.forEach(category => {
+                    expect(result).toHaveProperty(category);
+                    expect(Array.isArray(result[category])).toBe(true);
+                });
+            });
+            
+            test('organizes all supported item types correctly', () => {
+                const allItemTypes = [
+                    { type: 'weapon', name: 'Sword', _id: 'w1' },
+                    { type: 'armor', name: 'Chain Mail', _id: 'a1' },
+                    { type: 'gear', name: 'Rope', _id: 'g1' },
+                    { type: 'talent', name: 'Fireball', _id: 't1' },
+                    { type: 'augment', name: 'Enhanced Vision', _id: 'au1' },
+                    { type: 'feature', name: 'Dark Vision', _id: 'f1' },
+                    { type: 'action', name: 'Attack', _id: 'ac1' },
+                    { type: 'unknown', name: 'Mystery Item', _id: 'u1' }
+                ];
+                
+                const result = organizeItemsByType(allItemTypes);
+                
+                // Verify each type goes to correct category
+                expect(result.weapon).toHaveLength(1);
+                expect(result.weapon[0].name).toBe('Sword');
+                
+                expect(result.armor).toHaveLength(1);
+                expect(result.armor[0].name).toBe('Chain Mail');
+                
+                expect(result.gear).toHaveLength(1);
+                expect(result.gear[0].name).toBe('Rope');
+                
+                expect(result.talent).toHaveLength(1);
+                expect(result.talent[0].name).toBe('Fireball');
+                
+                expect(result.augment).toHaveLength(1);
+                expect(result.augment[0].name).toBe('Enhanced Vision');
+                
+                expect(result.feature).toHaveLength(1);
+                expect(result.feature[0].name).toBe('Dark Vision');
+                
+                expect(result.action).toHaveLength(1);
+                expect(result.action[0].name).toBe('Attack');
+                
+                // Unknown types should go to 'other'
+                expect(result.other).toHaveLength(1);
+                expect(result.other[0].name).toBe('Mystery Item');
+            });
+            
+            test('handles mixed item collections without category conflicts', () => {
+                const mixedItems = [
+                    { type: 'weapon', name: 'Sword' },
+                    { type: 'weapon', name: 'Bow' },
+                    { type: 'armor', name: 'Leather' },
+                    { type: 'armor', name: 'Plate' },
+                    { type: 'gear', name: 'Rope' },
+                    { type: 'gear', name: 'Torch' },
+                    { type: 'talent', name: 'Spell A' },
+                    { type: 'augment', name: 'Cyber Eye' },
+                    { type: 'feature', name: 'Night Vision' }
+                ];
+                
+                const result = organizeItemsByType(mixedItems);
+                
+                expect(result.weapon).toHaveLength(2);
+                expect(result.armor).toHaveLength(2);
+                expect(result.gear).toHaveLength(2);
+                expect(result.talent).toHaveLength(1);
+                expect(result.augment).toHaveLength(1);
+                expect(result.feature).toHaveLength(1);
+                expect(result.action).toHaveLength(0);
+                expect(result.other).toHaveLength(0);
+            });
+            
+            test('handles edge cases for item categorization', () => {
+                const edgeCaseItems = [
+                    { type: '', name: 'Empty Type', _id: 'empty' },
+                    { type: 'invalid-type', name: 'Invalid Type', _id: 'invalid' },
+                    { name: 'No Type', _id: 'notype' }, // Missing type property
+                    { type: null, name: 'Null Type', _id: 'null' },
+                    { type: undefined, name: 'Undefined Type', _id: 'undef' }
+                ];
+                
+                const result = organizeItemsByType(edgeCaseItems);
+                
+                // All edge cases should go to 'other' category
+                expect(result.other).toHaveLength(5);
+                
+                // Verify specific edge case handling
+                const otherItems = result.other;
+                expect(otherItems.find(item => item.name === 'Empty Type')).toBeDefined();
+                expect(otherItems.find(item => item.name === 'Invalid Type')).toBeDefined();
+                expect(otherItems.find(item => item.name === 'No Type')).toBeDefined();
+                expect(otherItems.find(item => item.name === 'Null Type')).toBeDefined();
+                expect(otherItems.find(item => item.name === 'Undefined Type')).toBeDefined();
+                
+                // All other categories should be empty
+                expect(result.weapon).toHaveLength(0);
+                expect(result.armor).toHaveLength(0);
+                expect(result.gear).toHaveLength(0);
+                expect(result.talent).toHaveLength(0);
+                expect(result.augment).toHaveLength(0);
+                expect(result.feature).toHaveLength(0);
+                expect(result.action).toHaveLength(0);
+            });
+            
+            test('preserves item object integrity during organization', () => {
+                const originalItems = [
+                    { type: 'weapon', name: 'Magic Sword', _id: 'w1', system: { damage: '1d8' } },
+                    { type: 'armor', name: 'Dragon Scale', _id: 'a1', system: { defense: 5 } }
+                ];
+                
+                const result = organizeItemsByType(originalItems);
+                
+                // Verify items are not modified during organization
+                expect(result.weapon[0]).toEqual(originalItems[0]);
+                expect(result.armor[0]).toEqual(originalItems[1]);
+                
+                // Verify system data is preserved
+                expect(result.weapon[0].system.damage).toBe('1d8');
+                expect(result.armor[0].system.defense).toBe(5);
+            });
+
+            test('would have caught the original bug (missing categories)', () => {
+                // This test verifies that incomplete implementations would fail
+                const testFunction = (items) => {
+                    // Simulate the old buggy implementation
+                    const incompleteResult = {
+                        action: [],
+                        weapon: [],
+                        talent: [],
+                        other: []
+                        // Missing: armor, gear, augment, feature
+                    };
+                    
+                    if (!Array.isArray(items)) {
+                        return incompleteResult;
+                    }
+                    
+                    for (const item of items) {
+                        const itemType = item?.type || 'other';
+                        if (incompleteResult[itemType]) {
+                            incompleteResult[itemType].push(item);
+                        } else {
+                            incompleteResult.other.push(item);
+                        }
+                    }
+                    
+                    return incompleteResult;
+                };
+                
+                const testItems = [
+                    { type: 'armor', name: 'Chain Mail' },
+                    { type: 'gear', name: 'Rope' }
+                ];
+                
+                // The buggy implementation would fail this test
+                const buggyResult = testFunction(testItems);
+                
+                // Verify the bug exists in simulated old implementation
+                expect(buggyResult).not.toHaveProperty('armor');
+                expect(buggyResult).not.toHaveProperty('gear');
+                expect(buggyResult.other).toHaveLength(2); // Items incorrectly categorized
+                
+                // Verify the current implementation passes
+                const correctResult = organizeItemsByType(testItems);
+                expect(correctResult.armor).toHaveLength(1);
+                expect(correctResult.gear).toHaveLength(1);
+                expect(correctResult.other).toHaveLength(0);
             });
         });
     });

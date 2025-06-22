@@ -10,7 +10,7 @@ import { jest } from '@jest/globals';
 import '../../setup.js';
 
 // Import the sheet class
-import { AvantActorSheet } from '../../../scripts/sheets/actor-sheet.js';
+import { AvantActorSheet } from '../../../scripts/sheets/actor-sheet.ts';
 
 describe('AvantActorSheet Integration Tests', () => {
     let actorSheet;
@@ -234,6 +234,259 @@ describe('AvantActorSheet Integration Tests', () => {
             expect(context.items.weapon).toHaveLength(1);
             expect(context.items.action).toHaveLength(1);
             expect(context.items.talent).toHaveLength(1);
+        });
+
+        // ===== COMPREHENSIVE INTEGRATION TESTS =====
+        // These tests verify complete data flow from getData() to template context
+
+        test('organizes all item types correctly for template consumption', () => {
+            // Setup: Actor with all supported item types
+            const mockItems = [
+                { type: 'weapon', name: 'Magic Sword', _id: 'w1' },
+                { type: 'armor', name: 'Dragon Scale Armor', _id: 'a1' },
+                { type: 'gear', name: 'Healing Potion', _id: 'g1' },
+                { type: 'talent', name: 'Fireball', _id: 't1' },
+                { type: 'augment', name: 'Cybernetic Eye', _id: 'au1' },
+                { type: 'feature', name: 'Night Vision', _id: 'f1' },
+                { type: 'action', name: 'Power Attack', _id: 'ac1' }
+            ];
+            
+            mockActor.items = mockItems;
+            
+            // Execute: Get sheet data
+            const context = actorSheet.getData();
+            
+            // Verify: Items are properly organized for template
+            expect(context.items).toBeDefined();
+            expect(context.items.weapon).toHaveLength(1);
+            expect(context.items.weapon[0].name).toBe('Magic Sword');
+            
+            expect(context.items.armor).toHaveLength(1);
+            expect(context.items.armor[0].name).toBe('Dragon Scale Armor');
+            
+            expect(context.items.gear).toHaveLength(1);
+            expect(context.items.gear[0].name).toBe('Healing Potion');
+            
+            expect(context.items.talent).toHaveLength(1);
+            expect(context.items.talent[0].name).toBe('Fireball');
+            
+            expect(context.items.augment).toHaveLength(1);
+            expect(context.items.augment[0].name).toBe('Cybernetic Eye');
+            
+            expect(context.items.feature).toHaveLength(1);
+            expect(context.items.feature[0].name).toBe('Night Vision');
+            
+            expect(context.items.action).toHaveLength(1);
+            expect(context.items.action[0].name).toBe('Power Attack');
+            
+            // Empty category should exist as empty array
+            expect(context.items.other).toEqual([]);
+        });
+        
+        test('handles empty item collections gracefully', () => {
+            mockActor.items = [];
+            
+            const context = actorSheet.getData();
+            
+            // All categories should exist as empty arrays
+            const requiredCategories = [
+                'weapon', 'armor', 'gear', 'talent', 
+                'augment', 'feature', 'action', 'other'
+            ];
+            
+            requiredCategories.forEach(category => {
+                expect(context.items[category]).toEqual([]);
+            });
+        });
+        
+        test('handles items with missing or invalid types', () => {
+            const mockItems = [
+                { type: 'weapon', name: 'Valid Weapon', _id: 'valid' },
+                { type: '', name: 'Empty Type', _id: 'empty' },
+                { type: 'invalid-type', name: 'Invalid Type', _id: 'invalid' },
+                { name: 'No Type', _id: 'notype' } // Missing type property
+            ];
+            
+            mockActor.items = mockItems;
+            
+            const context = actorSheet.getData();
+            
+            expect(context.items.weapon).toHaveLength(1);
+            expect(context.items.weapon[0].name).toBe('Valid Weapon');
+            
+            // Invalid/missing types should go to 'other'
+            expect(context.items.other).toHaveLength(3);
+            expect(context.items.other.find(item => item.name === 'Empty Type')).toBeDefined();
+            expect(context.items.other.find(item => item.name === 'Invalid Type')).toBeDefined();
+            expect(context.items.other.find(item => item.name === 'No Type')).toBeDefined();
+        });
+
+        test('preserves item system data during organization', () => {
+            const mockItems = [
+                { 
+                    type: 'weapon', 
+                    name: 'Magic Sword', 
+                    _id: 'w1',
+                    system: { 
+                        damage: '2d6+3',
+                        range: 'melee',
+                        properties: ['magical', 'sharp']
+                    }
+                },
+                { 
+                    type: 'armor', 
+                    name: 'Plate Mail', 
+                    _id: 'a1',
+                    system: { 
+                        defense: 8,
+                        weight: 'heavy',
+                        material: 'steel'
+                    }
+                }
+            ];
+            
+            mockActor.items = mockItems;
+            
+            const context = actorSheet.getData();
+            
+            // Verify system data is preserved through getData() flow
+            expect(context.items.weapon[0].system.damage).toBe('2d6+3');
+            expect(context.items.weapon[0].system.properties).toEqual(['magical', 'sharp']);
+            
+            expect(context.items.armor[0].system.defense).toBe(8);
+            expect(context.items.armor[0].system.material).toBe('steel');
+        });
+
+        test('handles large item collections efficiently', () => {
+            // Test with a realistic large collection
+            const largeItemCollection = [];
+            
+            // Add 10 items of each type
+            const itemTypes = ['weapon', 'armor', 'gear', 'talent', 'augment', 'feature', 'action'];
+            itemTypes.forEach(type => {
+                for (let i = 0; i < 10; i++) {
+                    largeItemCollection.push({
+                        type: type,
+                        name: `${type.charAt(0).toUpperCase() + type.slice(1)} ${i + 1}`,
+                        _id: `${type}-${i + 1}`
+                    });
+                }
+            });
+            
+            mockActor.items = largeItemCollection;
+            
+            const context = actorSheet.getData();
+            
+            // Verify all items are properly organized
+            expect(context.items.weapon).toHaveLength(10);
+            expect(context.items.armor).toHaveLength(10);
+            expect(context.items.gear).toHaveLength(10);
+            expect(context.items.talent).toHaveLength(10);
+            expect(context.items.augment).toHaveLength(10);
+            expect(context.items.feature).toHaveLength(10);
+            expect(context.items.action).toHaveLength(10);
+            expect(context.items.other).toHaveLength(0);
+            
+            // Verify performance: getData() should complete quickly even with many items
+            const startTime = performance.now();
+            actorSheet.getData();
+            const endTime = performance.now();
+            
+            expect(endTime - startTime).toBeLessThan(50); // Should complete in under 50ms
+        });
+    });
+
+    describe('Template Context Completeness', () => {
+        test('provides all required context properties for template rendering', () => {
+            const context = actorSheet.getData();
+            
+            // Verify essential context properties exist
+            expect(context.system).toBeDefined();
+            expect(context.items).toBeDefined();
+            expect(context.abilityTotalModifiers).toBeDefined();
+            expect(context.skillTotalModifiers).toBeDefined();
+            
+            // Verify items context has all required categories
+            const requiredItemCategories = [
+                'weapon', 'armor', 'gear', 'talent', 
+                'augment', 'feature', 'action', 'other'
+            ];
+            
+            requiredItemCategories.forEach(category => {
+                expect(context.items).toHaveProperty(category);
+                expect(Array.isArray(context.items[category])).toBe(true);
+            });
+        });
+
+        test('maintains data consistency between multiple getData() calls', () => {
+            // Setup consistent test data
+            mockActor.items = [
+                { type: 'weapon', name: 'Sword' },
+                { type: 'armor', name: 'Shield' }
+            ];
+            
+            // Call getData() multiple times
+            const context1 = actorSheet.getData();
+            const context2 = actorSheet.getData();
+            const context3 = actorSheet.getData();
+            
+            // Results should be consistent
+            expect(context1.items.weapon).toEqual(context2.items.weapon);
+            expect(context2.items.weapon).toEqual(context3.items.weapon);
+            expect(context1.items.armor).toEqual(context2.items.armor);
+            expect(context2.items.armor).toEqual(context3.items.armor);
+        });
+
+        test('integrates item organization with other sheet data correctly', () => {
+            // Setup: Actor with items and other system data
+            mockActor.items = [
+                { type: 'weapon', name: 'Sword' },
+                { type: 'armor', name: 'Plate' }
+            ];
+            
+            const context = actorSheet.getData();
+            
+            // Verify item organization doesn't interfere with other calculations
+            expect(context.abilityTotalModifiers).toBeDefined();
+            expect(context.abilityTotalModifiers.might).toBe(4); // level 2 + modifier 2
+            
+            expect(context.system.defense).toBeDefined();
+            expect(context.system.defense.might).toBe(14); // 11 + tier 1 + modifier 2
+            
+            // Verify items are properly integrated alongside other data
+            expect(context.items.weapon).toHaveLength(1);
+            expect(context.items.armor).toHaveLength(1);
+        });
+
+        test('would have caught original bug - missing item categories in template context', () => {
+            // Setup items that would have been misorganized by the original bug
+            mockActor.items = [
+                { type: 'armor', name: 'Chain Mail' },
+                { type: 'gear', name: 'Rope' },
+                { type: 'augment', name: 'Cyber Arm' },
+                { type: 'feature', name: 'Darkvision' }
+            ];
+            
+            const context = actorSheet.getData();
+            
+            // These should be properly categorized now (would have failed before fix)
+            expect(context.items.armor).toHaveLength(1);
+            expect(context.items.armor[0].name).toBe('Chain Mail');
+            
+            expect(context.items.gear).toHaveLength(1);
+            expect(context.items.gear[0].name).toBe('Rope');
+            
+            expect(context.items.augment).toHaveLength(1);
+            expect(context.items.augment[0].name).toBe('Cyber Arm');
+            
+            expect(context.items.feature).toHaveLength(1);
+            expect(context.items.feature[0].name).toBe('Darkvision');
+            
+            // These should be empty (not filled with incorrectly categorized items)
+            expect(context.items.other).toHaveLength(0);
+            expect(context.items.weapon).toHaveLength(0);
+            expect(context.items.action).toHaveLength(0);
+            expect(context.items.talent).toHaveLength(0);
         });
     });
 

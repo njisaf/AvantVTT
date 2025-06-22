@@ -10,21 +10,48 @@ import { executeRoll, processFormData } from '../logic/item-sheet.js';
 import { prepareTemplateData, extractItemFormData } from '../logic/item-sheet-utils.js';
 import { logger } from '../utils/logger.js';
 
+// Import local foundry UI adapter for safe notifications
+import { FoundryUI } from '../types/adapters/foundry-ui.ts';
+
+// Access FoundryVTT ItemSheet class - prioritize v13 namespaced class
+const ItemSheetBase = (globalThis as any).foundry?.appv1?.sheets?.ItemSheet || 
+                      (globalThis as any).ItemSheet ||
+                      class {
+                          static get defaultOptions() { return {}; }
+                          _renderHTML() { throw new Error('ItemSheet base class not available'); }
+                          _replaceHTML() { throw new Error('ItemSheet base class not available'); }
+                      };
+
+/**
+ * Item Sheet Context interface for template rendering
+ */
+interface ItemSheetContext {
+    item: any;
+    system: any;
+    flags: any;
+}
+
 /**
  * Item Sheet for Avant Native System - FoundryVTT v13+
  * @class AvantItemSheet
- * @extends {foundry.appv1.sheets.ItemSheet}
+ * @extends {ItemSheetBase}
  * @description Handles item sheet functionality with validation and roll handling
  */
-export class AvantItemSheet extends foundry.appv1.sheets.ItemSheet {
+export class AvantItemSheet extends ItemSheetBase {
+    /** The item document associated with this sheet */
+    declare item: any;
+    
     /**
      * Define default options for the item sheet
      * @static
-     * @returns {Object} Sheet configuration options
+     * @returns Sheet configuration options
      * @override
      */
-    static get defaultOptions() {
-        return foundry.utils.mergeObject(super.defaultOptions, {
+    static get defaultOptions(): any {
+        const foundryUtils = (globalThis as any).foundry?.utils;
+        const mergeObject = foundryUtils?.mergeObject || Object.assign;
+        
+        return mergeObject(super.defaultOptions, {
             classes: ["avant", "sheet", "item"],
             width: 520,
             height: 480,
@@ -33,22 +60,29 @@ export class AvantItemSheet extends foundry.appv1.sheets.ItemSheet {
     }
 
     /**
+     * Check if this sheet is editable
+     */
+    get isEditable(): boolean {
+        return (this as any).options?.editable !== false;
+    }
+
+    /**
      * Get the template path for this item type
-     * @returns {string} The template path
+     * @returns The template path
      * @override
      */
-    get template() {
+    get template(): string {
         const path = "systems/avant/templates/item";
         return `${path}/item-${this.item.type}-sheet.html`;
     }
 
     /**
      * Prepare data for rendering the item sheet
-     * @returns {Object} The context data for template rendering
+     * @returns The context data for template rendering
      * @override
      */
-    getData() {
-        const context = super.getData();
+    getData(): ItemSheetContext {
+        const context = super.getData() as any;
         const itemData = this.item.toObject(false);
         
         // Use pure function to prepare template data
@@ -67,10 +101,10 @@ export class AvantItemSheet extends foundry.appv1.sheets.ItemSheet {
 
     /**
      * Handle core listener activation for v13 compatibility
-     * @param {jQuery} html - The rendered HTML
+     * @param html - The rendered HTML
      * @override
      */
-    _activateCoreListeners(html) {
+    _activateCoreListeners(html: any): void {
         // FoundryVTT v13 compatibility fix for core listeners
         // Handle various types of HTML input that FoundryVTT might pass
         let element = html;
@@ -111,12 +145,14 @@ export class AvantItemSheet extends foundry.appv1.sheets.ItemSheet {
         super._activateCoreListeners(jQueryElement);
     }
 
+
+
     /**
      * Activate event listeners for the item sheet
-     * @param {jQuery} html - The rendered HTML
+     * @param html - The rendered HTML
      * @override
      */
-    activateListeners(html) {
+    activateListeners(html: any): void {
         super.activateListeners(html);
 
         if (!this.isEditable) return;
@@ -127,25 +163,29 @@ export class AvantItemSheet extends foundry.appv1.sheets.ItemSheet {
 
     /**
      * Handle rolls from the item sheet
-     * @param {Event} event - The triggering event
-     * @returns {Promise<Roll|void>} The executed roll or void
+     * @param event - The triggering event
+     * @returns The executed roll or void
      * @private
      */
-    async _onRoll(event) {
+    async _onRoll(event: Event): Promise<any | void> {
         event.preventDefault();
-        const element = event.currentTarget;
+        const element = event.currentTarget as HTMLElement;
         const dataset = element.dataset;
 
         // Use pure function to prepare roll configuration
+        const game = (globalThis as any).game;
         const rollMode = game?.settings?.get?.('core', 'rollMode') || 'publicroll';
         const rollConfig = executeRoll(
-            dataset,
+            dataset as any,  // Cast to any to handle DOMStringMap typing
             { name: this.item.name },
             rollMode
-        );
+        ) as any;  // Cast result to any to access properties
 
         if (rollConfig) {
             try {
+                const Roll = (globalThis as any).Roll;
+                const ChatMessage = (globalThis as any).ChatMessage;
+                
                 const roll = new Roll(rollConfig.rollExpression, this.item.getRollData());
                 await roll.evaluate();
                 
@@ -160,9 +200,7 @@ export class AvantItemSheet extends foundry.appv1.sheets.ItemSheet {
                 return roll;
             } catch (error) {
                 logger.error('Avant | Error in item sheet roll:', error);
-                if (ui?.notifications?.error) {
-                    ui.notifications.error(`Roll failed: ${error.message}`);
-                }
+                FoundryUI.notify(`Roll failed: ${(error as Error).message}`, 'error');
                 return null;
             }
         }
@@ -172,17 +210,19 @@ export class AvantItemSheet extends foundry.appv1.sheets.ItemSheet {
 
     /**
      * Override the default update object method to ensure proper data type conversion
-     * @param {Event} event - The form submission event
-     * @param {Object} formData - The form data to process
-     * @returns {Promise<Object>} The processed update data
+     * @param event - The form submission event
+     * @param formData - The form data to process
+     * @returns The processed update data
      * @override
      */
-    async _updateObject(event, formData) {
+    async _updateObject(event: Event, formData: any): Promise<any> {
         // Use pure function to extract and process the form data
         const processedData = extractItemFormData(formData);
         
         // Convert back to flat object for FoundryVTT
-        const flatData = foundry.utils.flattenObject(processedData);
+        const foundryUtils = (globalThis as any).foundry?.utils;
+        const flattenObject = foundryUtils?.flattenObject || ((obj: any) => obj);
+        const flatData = flattenObject(processedData);
         
         // Call parent method with processed data
         return super._updateObject(event, flatData);

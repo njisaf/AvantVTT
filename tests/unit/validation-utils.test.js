@@ -142,7 +142,7 @@ describe('ValidationUtils', () => {
       
       expect(result.system.health)
         .toContainEntry(['value', 15])
-        .toContainEntry(['max', 20]) // default
+        .toContainEntry(['max', 0]) // default
         .toContainEntry(['temp', -5]); // preserves negative
     });
   });

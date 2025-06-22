@@ -7,7 +7,7 @@ import '../env/foundry-shim.js';
 
 describe('Minimal Coverage Boost', () => {
     test('should exercise item sheet defaultOptions', async () => {
-        const { AvantItemSheet } = await import('../../scripts/sheets/item-sheet.js');
+        const { AvantItemSheet } = await import('../../scripts/sheets/item-sheet.ts');
         
         // Exercise static defaultOptions property
         const options = AvantItemSheet.defaultOptions;

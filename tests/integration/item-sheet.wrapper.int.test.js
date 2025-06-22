@@ -20,7 +20,7 @@ const mockItemSheetUtils = {
 };
 
 // Import the sheet class
-import { AvantItemSheet } from '../../scripts/sheets/item-sheet.js';
+import { AvantItemSheet } from '../../scripts/sheets/item-sheet.ts';
 
 // Use manual mock as ItemSheetUtils
 const ItemSheetUtils = mockItemSheetUtils;

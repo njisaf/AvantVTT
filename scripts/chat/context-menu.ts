@@ -3,7 +3,12 @@
  * @version 2.0.0 - FoundryVTT v13+ Only
  * @author Avant Development Team
  * @description Chat context menu for Fortune Point rerolls in v13
+ * 
+ * TypeScript conversion: Added minimal typing for better IDE support
  */
+
+// TypeScript compiler hint to allow any types for now during gradual migration
+// @ts-check
 
 import { AvantRerollDialog } from '../dialogs/reroll-dialog.js';
 import { logger } from '../utils/logger.js';
@@ -27,7 +32,7 @@ export class AvantChatContextMenu {
      * Initialize context menu listeners for v13
      * @static
      */
-    static addContextMenuListeners() {
+    static addContextMenuListeners(): void {
         logger.log('Avant | Initializing v13 context menu system...');
         
         logger.log('Avant | Using v13 approach: Direct ChatLog._getEntryContextOptions extension');
@@ -46,8 +51,9 @@ export class AvantChatContextMenu {
         logger.log('Avant | Initializing v13 context menu approach...');
         
         // Improved initialization with multiple timing checks
-        const initializeV13Menu = () => {
-            if (ui.chat && ui.chat._getEntryContextOptions) {
+        const initializeV13Menu = (): void => {
+            const chat = (ui as any).chat;
+            if (chat && chat._getEntryContextOptions) {
                 logger.log('Avant | ui.chat available, extending context menu...');
                 AvantChatContextMenu._extendChatLogContextMenuV13();
             } else {
@@ -64,7 +70,8 @@ export class AvantChatContextMenu {
         Hooks.once('ready', () => {
             logger.log('Avant | Ready hook - ensuring v13 context menu is initialized...');
             setTimeout(() => {
-                if (ui.chat && !ui.chat._avantExtended) {
+                const chat = (ui as any).chat;
+                if (chat && !chat._avantExtended) {
                     logger.log('Avant | Context menu not yet extended, doing it now...');
                     AvantChatContextMenu._extendChatLogContextMenuV13();
                 }
@@ -75,7 +82,8 @@ export class AvantChatContextMenu {
         Hooks.once('renderChatLog', () => {
             logger.log('Avant | ChatLog rendered - final context menu check...');
             setTimeout(() => {
-                if (ui.chat && !ui.chat._avantExtended) {
+                const chat = (ui as any).chat;
+                if (chat && !chat._avantExtended) {
                     logger.log('Avant | Final attempt at context menu extension...');
                     AvantChatContextMenu._extendChatLogContextMenuV13();
                 }
@@ -97,7 +105,7 @@ export class AvantChatContextMenu {
         }
         
         // Store the original method
-        const originalGetEntryContextOptions = ui.chat._getEntryContextOptions;
+        const originalGetEntryContextOptions = (ui as any).chat._getEntryContextOptions;
         
         if (!originalGetEntryContextOptions) {
             logger.log('Avant | ERROR: _getEntryContextOptions method not found on ChatLog');
@@ -107,21 +115,21 @@ export class AvantChatContextMenu {
         logger.log('Avant | Found _getEntryContextOptions method, extending...');
         
         // Mark as extended to prevent duplicate extensions
-        ui.chat._avantExtended = true;
+        (ui as any).chat._avantExtended = true;
         
         // Override the method
-        ui.chat._getEntryContextOptions = function() {
+        (ui as any).chat._getEntryContextOptions = function() {
             logger.log('Avant | 🎯 EXTENDED _getEntryContextOptions called (v13)!');
             
             // Get the original options
             const options = originalGetEntryContextOptions.call(this);
-            logger.log('Avant | Original options:', options.map(opt => opt.name));
+            logger.log('Avant | Original options:', options.map((opt: any) => opt.name));
             
             // Add our reroll option using pure function delegation
             const rerollOption = AvantChatContextMenu._createRerollMenuOption();
             options.push(rerollOption);
             
-            logger.log('Avant | Extended options (v13):', options.map(opt => opt.name));
+            logger.log('Avant | Extended options (v13):', options.map((opt: any) => opt.name));
             return options;
         };
         
@@ -138,7 +146,7 @@ export class AvantChatContextMenu {
         return {
             name: "Reroll with Fortune Points",
             icon: '<i class="fas fa-dice"></i>',
-            condition: (li) => {
+            condition: (li: any) => {
                 try {
                     logger.log('Avant | Condition check - li element:', li);
                     
@@ -148,7 +156,7 @@ export class AvantChatContextMenu {
                     
                     if (!messageId) return false;
                     
-                    const message = game.messages?.get(messageId);
+                    const message = (game as any).messages?.get(messageId);
                     logger.log('Avant | Message object:', message);
                     
                     if (!message) return false;
@@ -163,13 +171,13 @@ export class AvantChatContextMenu {
                     return false;
                 }
             },
-            callback: (li) => {
+            callback: (li: any) => {
                 try {
                     logger.log('Avant | === CONTEXT MENU CALLBACK TRIGGERED ===');
                     
                     // Extract message ID using pure function
                     const messageId = extractMessageId(li);
-                    const message = game.messages?.get(messageId);
+                    const message = (game as any).messages?.get(messageId);
                     
                     // Validate message using pure function
                     const validation = validateMessageForReroll(message);
@@ -198,7 +206,7 @@ export class AvantChatContextMenu {
      * @param {Object} actionData - Action data from pure callback
      * @private
      */
-    static _executeRerollAction(actionData) {
+    static _executeRerollAction(actionData: any) {
         if (actionData.action !== 'openRerollDialog') {
             logger.log('Avant | Unknown action:', actionData.action);
             return;
@@ -209,7 +217,7 @@ export class AvantChatContextMenu {
             actionData.actor, 
             actionData.flavor
         );
-        dialog.render(true);
+        (dialog as any).render(true);
         logger.log('Avant | Dialog rendered');
     }
     
@@ -221,7 +229,7 @@ export class AvantChatContextMenu {
      * @private
      * @deprecated Use getActorFromMessage from chat-context-utils.js instead
      */
-    static _getActorFromMessage(message) {
+    static _getActorFromMessage(message: any) {
         logger.log('Avant | DEPRECATED: _getActorFromMessage called, use pure function instead');
         return getActorFromMessage(message);
     }
@@ -234,7 +242,7 @@ export class AvantChatContextMenu {
      * @private
      * @deprecated Use isEligibleRoll from chat-context-utils.js instead
      */
-    static _isEligibleRoll(roll) {
+    static _isEligibleRoll(roll: any) {
         logger.log('Avant | DEPRECATED: _isEligibleRoll called, use pure function instead');
         return isEligibleRoll(roll);
     }

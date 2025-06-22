@@ -117,13 +117,25 @@ $spacing-xxl: 30px;
   border-radius: 0;
 }
 
-// Theme Classes - Apply specific themes
-.avant.theme-dark {
+// Theme Classes - Apply specific themes with higher specificity
+.avant.theme-dark,
+.avant.theme-dark.themed {
   @include theme-dark;
 }
 
-.avant.theme-light {
+.avant.theme-light,
+.avant.theme-light.themed {
   @include theme-light;
+}
+
+// CRITICAL: Ensure dark theme overrides any light theme interference
+.avant.theme-dark.theme-light {
+  @include theme-dark;
+}
+
+// Ensure themed elements without explicit theme get dark theme
+.avant.themed:not(.theme-light):not(.theme-dark) {
+  @include theme-dark;
 }
 
 // Main Avant Class with Theme System

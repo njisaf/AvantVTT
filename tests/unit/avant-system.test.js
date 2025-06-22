@@ -35,7 +35,7 @@ describe('Avant System', () => {
 
   test('should define system constants correctly', () => {
     // Test system identification
-    const systemId = 'avant-native';
+    const systemId = 'avant';
     const version = '0.1.2';
     
     expect(systemId)
@@ -50,7 +50,7 @@ describe('Avant System', () => {
   test('should handle basic system configuration', () => {
     // Test basic configuration structure
     const mockConfig = {
-      systemName: 'avant-native',
+      systemName: 'avant',
       version: '0.1.2',
       compatibleCoreVersion: '12.0.0'
     };

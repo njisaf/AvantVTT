@@ -1,5 +1,5 @@
 /**
- * Integration tests for scripts/avant.js system initialization
+ * Integration tests for scripts/avant.ts system initialization
  * 
  * Tests the main system initialization workflow including hook registration,
  * sheet registration, and CONFIG setup. Uses FoundryVTT shim environment.
@@ -38,7 +38,7 @@ describe('Avant System Initialization', () => {
     
     test('registers init hook and initializes system configuration', async () => {
         // ACT: Import the main system file (triggers initialization)
-        await import('../../scripts/avant.js');
+        await import('../../scripts/avant.ts');
         
         // ASSERT: Hooks.once should be called for 'init'
         expect(hooksOnceSpy).toHaveBeenCalledWith('init', expect.any(Function));
@@ -60,7 +60,7 @@ describe('Avant System Initialization', () => {
     
     test('registers ready hook and performs ready-state initialization', async () => {
         // ACT: Import system and trigger hooks
-        await import('../../scripts/avant.js');
+        await import('../../scripts/avant.ts');
         
         // Find and trigger the ready hook
         const readyCall = hooksOnceSpy.mock.calls.find(call => call[0] === 'ready');
@@ -78,7 +78,7 @@ describe('Avant System Initialization', () => {
         global.CONFIG.debug = { hooks: true };
         
         // ACT: Import and initialize
-        await import('../../scripts/avant.js');
+        await import('../../scripts/avant.ts');
         const initCallback = hooksOnceSpy.mock.calls.find(call => call[0] === 'init')[1];
         
         // ASSERT: Init callback should execute without throwing
@@ -87,7 +87,7 @@ describe('Avant System Initialization', () => {
     
     test('system loads without throwing errors', async () => {
         // ACT & ASSERT: System import should not throw
-        await expect(import('../../scripts/avant.js')).resolves.toBeDefined();
+        await expect(import('../../scripts/avant.ts')).resolves.toBeDefined();
         
         // Trigger all registered hooks without errors
         for (const call of hooksOnceSpy.mock.calls) {

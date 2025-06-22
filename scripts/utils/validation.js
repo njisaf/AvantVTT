@@ -20,7 +20,7 @@ import {
     validateUsesData,
     isValidDocumentId,
     sanitizeHtml
-} from '../logic/validation-utils.js';
+} from '../logic/validation-utils.ts';
 
 /**
  * Validation utilities for data normalization and type safety

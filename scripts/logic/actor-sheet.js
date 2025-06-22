@@ -1,6 +1,6 @@
 /**
- * @fileoverview Actor Sheet Logic - Pure Functions
- * @description Pure functions for actor sheet operations without FoundryVTT dependencies
+ * @fileoverview Actor Sheet Logic - Pure Functions (Simplified)
+ * @description Pure functions for actor sheet operations without calculations - user provides all values
  * @version 2.0.0
  * @author Avant Development Team
  */
@@ -12,7 +12,7 @@
  * the total modifier used in ability checks. In the Avant system,
  * ability checks use 2d10 + Level + Ability Modifier.
  * 
- * @param {Object} abilities - The character's abilities object
+ * @param {Object} abilities - The character's abilities object (now using modifier field)
  * @param {number} level - The character's level
  * @returns {Object} Object with ability names as keys and total modifiers as values
  * 
@@ -48,7 +48,7 @@ export function calculateAbilityTotalModifiers(abilities, level) {
  * skill checks use 2d10 + Level + Ability Modifier + Skill Value.
  * 
  * @param {Object} skills - The character's skills object
- * @param {Object} abilities - The character's abilities object  
+ * @param {Object} abilities - The character's abilities object (now using modifier field)
  * @param {Object} skillAbilityMap - Mapping of skills to their governing abilities
  * @param {number} level - The character's level
  * @returns {Object} Object with skill names as keys and total modifiers as values
@@ -81,88 +81,54 @@ export function calculateSkillTotalModifiers(skills, abilities, skillAbilityMap,
 }
 
 /**
- * Calculates defense values for all abilities
+ * No longer calculates defense values - returns user-provided values as-is
  * 
- * In the Avant system, each ability has a defense value calculated as
- * Base 11 + Tier + Ability Modifier. This represents how hard it is
- * to affect the character through that particular ability.
+ * Defense values are now direct user input. This function is kept for 
+ * compatibility but simply returns an empty object since defense threshold
+ * is now a direct user input field.
  * 
- * @param {Object} abilities - The character's abilities object
- * @param {number} tier - The character's tier (default 1)
- * @returns {Object} Object with ability names as keys and defense values as values
+ * @param {Object} abilities - The character's abilities object (unused)
+ * @param {number} tier - The character's tier (unused)
+ * @returns {Object} Empty object (no calculations performed)
  * 
- * @example
- * // Character with tier 2 and +3 might modifier
- * const defenses = calculateDefenseValues(
- *     { might: { modifier: 3 } },
- *     2
- * );
- * // Result: { might: 16 } (11 base + 2 tier + 3 modifier = 16)
+ * @deprecated Defense values are now direct user input
  */
 export function calculateDefenseValues(abilities, tier) {
-    if (!abilities || typeof abilities !== 'object') {
-        return {};
-    }
-    
-    const result = {};
-    const characterTier = Number(tier) || 1;
-    const baseDefense = 11;
-    
-    for (const [abilityName, abilityData] of Object.entries(abilities)) {
-        const abilityMod = abilityData?.modifier || 0;
-        result[abilityName] = baseDefense + characterTier + abilityMod;
-    }
-    
-    return result;
+    // No longer performs calculations - defense threshold is user input
+    return {};
 }
 
 /**
- * Finds the highest defense value (defense threshold)
+ * No longer calculates defense threshold - returns user input
  * 
- * The defense threshold is the highest defense value among all abilities.
- * This is used in some game mechanics where you need to beat the character's
- * best defense.
+ * The defense threshold is now a direct user input field rather than
+ * a calculated value. This function is kept for compatibility.
  * 
- * @param {Object} defenseValues - Object with defense values for each ability
- * @returns {number} The highest defense value, or 10 if no valid defenses
+ * @param {Object} defenseValues - Unused parameter (kept for compatibility)
+ * @returns {number} Returns 0 (no calculation performed)
  * 
- * @example
- * // Character with varying defense values
- * const threshold = calculateDefenseThreshold({
- *     might: 15, intellect: 12, personality: 18
- * });
- * // Result: 18 (highest defense)
+ * @deprecated Defense threshold is now direct user input
  */
 export function calculateDefenseThreshold(defenseValues) {
-    if (!defenseValues || typeof defenseValues !== 'object') {
-        return 10;
-    }
-    
-    const validDefenses = Object.values(defenseValues)
-        .filter(val => typeof val === 'number' && !isNaN(val));
-    
-    return validDefenses.length > 0 ? Math.max(...validDefenses) : 10;
+    // No longer performs calculations - defense threshold is user input
+    return 0;
 }
 
 /**
- * Calculates remaining expertise points
+ * No longer calculates remaining expertise points - returns user input
  * 
- * This function determines how many expertise points a character has left
- * to spend. The result can be negative if the character has overspent.
+ * Remaining expertise points are now a direct user input field rather than
+ * a calculated value. This function is kept for compatibility.
  * 
- * @param {number} totalPoints - Total expertise points available
- * @param {number} spentPoints - Expertise points already spent
- * @returns {number} Remaining expertise points (can be negative)
+ * @param {number} totalPoints - Unused parameter (kept for compatibility)
+ * @param {number} spentPoints - Unused parameter (kept for compatibility)
+ * @returns {number} Returns 0 (no calculation performed)
  * 
- * @example
- * // Character with 15 total points and 12 spent
- * const remaining = calculateRemainingExpertisePoints(15, 12);
- * // Result: 3 (15 - 12 = 3 points left)
+ * @deprecated Remaining expertise points are now direct user input
  */
 export function calculateRemainingExpertisePoints(totalPoints, spentPoints) {
-    const total = Number(totalPoints) || 0;
-    const spent = Number(spentPoints) || 0;
-    return total - spent;
+    // No longer performs calculations - remaining points are user input
+    return 0;
 }
 
 /**
@@ -170,7 +136,8 @@ export function calculateRemainingExpertisePoints(totalPoints, spentPoints) {
  * 
  * In the Avant system, characters can only spend a limited number of
  * power points at once, calculated as max power points divided by 3
- * (minimum 1 point).
+ * (minimum 1 point). This calculation is preserved as it's still needed
+ * for game mechanics.
  * 
  * @param {number} maxPowerPoints - Maximum power points the character has
  * @returns {number} Maximum power points that can be spent at once
@@ -195,9 +162,10 @@ export function calculatePowerPointLimit(maxPowerPoints) {
  * This function takes the raw skills data and organizes it into groups
  * based on which ability governs each skill. This makes it easier to
  * display skills in organized sections on the character sheet.
+ * Now works with simplified ability structure (modifier field only).
  * 
  * @param {Object} skills - The character's skills object
- * @param {Object} abilities - The character's abilities object
+ * @param {Object} abilities - The character's abilities object (modifier field only)
  * @param {Object} skillAbilityMap - Mapping of skills to their governing abilities
  * @param {number} level - The character's level
  * @returns {Object} Object with ability names as keys and arrays of skill objects as values
@@ -316,10 +284,11 @@ export function organizeItemsByType(items) {
  * Validates ability roll data
  * 
  * This function checks if the provided data is sufficient to perform
- * an ability roll in the Avant system.
+ * an ability roll in the Avant system. Now works with simplified 
+ * ability structure (modifier field only).
  * 
  * @param {string} abilityName - Name of the ability to roll
- * @param {Object} abilityData - The ability's data object
+ * @param {Object} abilityData - The ability's data object (with modifier field)
  * @param {number} level - Character level
  * @returns {Object} Object with valid boolean and error message, plus roll data if valid
  * 
@@ -359,11 +328,12 @@ export function validateAbilityRollData(abilityName, abilityData, level) {
  * Validates skill roll data
  * 
  * This function checks if the provided data is sufficient to perform
- * a skill roll in the Avant system.
+ * a skill roll in the Avant system. Now works with simplified
+ * ability structure (modifier field only).
  * 
  * @param {string} skillName - Name of the skill to roll
  * @param {number} skillValue - The skill's value
- * @param {Object} abilityData - The governing ability's data object
+ * @param {Object} abilityData - The governing ability's data object (with modifier field)
  * @param {number} level - Character level
  * @returns {Object} Object with valid boolean and error message, plus roll data if valid
  * 

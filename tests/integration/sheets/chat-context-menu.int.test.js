@@ -6,7 +6,7 @@
  */
 
 import { describe, test, expect, beforeEach, afterEach, jest } from '@jest/globals';
-import { AvantChatContextMenu } from '../../../scripts/chat/context-menu.js';
+import { AvantChatContextMenu } from '../../../scripts/chat/context-menu.ts';
 
 // Mock FoundryVTT environment for chat context menu testing
 describe('AvantChatContextMenu Integration Tests', () => {

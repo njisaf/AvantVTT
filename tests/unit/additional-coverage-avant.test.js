@@ -20,7 +20,7 @@ describe('Avant System Additional Coverage', () => {
         if (global.AvantItem) delete global.AvantItem;
         
         // Import the system to load classes
-        await import('../../scripts/avant.js');
+        await import('../../scripts/avant.ts');
         
         // Classes should be available globally
         AvantActor = global.AvantActor;
@@ -236,7 +236,7 @@ describe('Avant System Additional Coverage', () => {
             const mockLog = jest.spyOn(console, 'log').mockImplementation();
             
             // Clear module cache for ES modules by using dynamic import
-            await import('../../scripts/avant.js?v=' + Math.random());
+            await import('../../scripts/avant.ts?v=' + Math.random());
             
             expect(mockLog).toHaveBeenCalledWith(
                 expect.stringContaining('System loaded successfully')
@@ -287,7 +287,7 @@ describe('Additional Coverage Tests for Stage 3(b)', () => {
     describe('AvantActor Class Coverage', () => {
         test('should exercise AvantActor methods', async () => {
             // Import the module to get the AvantActor class
-            await import('../../scripts/avant.js');
+            await import('../../scripts/avant.ts');
             
             // Create a mock actor instance with minimal system data
             const mockActor = {
@@ -333,7 +333,7 @@ describe('Additional Coverage Tests for Stage 3(b)', () => {
     describe('AvantItem Class Coverage', () => {
         test('should exercise AvantItem methods', async () => {
             // Import the module to get the AvantItem class
-            await import('../../scripts/avant.js');
+            await import('../../scripts/avant.ts');
             
             // Create a mock item instance
             const mockItem = {
@@ -363,7 +363,7 @@ describe('Additional Coverage Tests for Stage 3(b)', () => {
     describe('Module Imports and Global Assignments', () => {
         test('should exercise global assignments at module level', async () => {
             // Import the module which should set up global assignments
-            await import('../../scripts/avant.js');
+            await import('../../scripts/avant.ts');
             
             // Also import ValidationUtils directly to ensure it's available
             const { ValidationUtils } = await import('../../scripts/utils/validation.js');
@@ -383,7 +383,7 @@ describe('Additional Coverage Tests for Stage 3(b)', () => {
             global.CONFIG.Item = global.CONFIG.Item || {};
             
             // Import module to exercise CONFIG assignment code
-            await import('../../scripts/avant.js');
+            await import('../../scripts/avant.ts');
             
             // Basic verification that CONFIG setup was attempted
             expect(global.CONFIG.Actor).toBeDefined();

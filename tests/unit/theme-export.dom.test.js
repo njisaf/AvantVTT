@@ -37,8 +37,10 @@ describe('Theme Export Tests', () => {
         const { AvantThemeManager } = await import('../../scripts/themes/theme-manager.js');
         themeManager = new AvantThemeManager();
         
-        // Initialize the customThemes map
-        if (!themeManager.customThemes) {
+        // Reset singleton state - clear any existing custom themes from previous tests
+        if (themeManager.customThemes) {
+            themeManager.customThemes.clear();
+        } else {
             themeManager.customThemes = new Map();
         }
         

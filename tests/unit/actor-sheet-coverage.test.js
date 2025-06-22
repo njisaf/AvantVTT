@@ -4,7 +4,7 @@
  */
 
 import { createMockActor } from '../mocks/actor-factory.js';
-import { AvantActorSheet } from '../../scripts/sheets/actor-sheet.js';
+import { AvantActorSheet } from '../../scripts/sheets/actor-sheet.ts';
 import '../env/foundry-shim.js';
 
 describe('Actor Sheet Coverage Tests', () => {
@@ -16,14 +16,14 @@ describe('Actor Sheet Coverage Tests', () => {
         mockActor = createMockActor();
         
         // Import the actor sheet class
-        const { AvantActorSheet } = await import('../../scripts/sheets/actor-sheet.js');
+        const { AvantActorSheet } = await import('../../scripts/sheets/actor-sheet.ts');
         
         // Create sheet instance
         actorSheet = new AvantActorSheet(mockActor, {});
     });
 
     test('should exercise defaultOptions static method', async () => {
-        const { AvantActorSheet } = await import('../../scripts/sheets/actor-sheet.js');
+        const { AvantActorSheet } = await import('../../scripts/sheets/actor-sheet.ts');
         
         // Call static defaultOptions method
         const options = AvantActorSheet.defaultOptions;

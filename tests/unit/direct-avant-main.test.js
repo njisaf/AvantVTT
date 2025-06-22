@@ -31,7 +31,7 @@ describe('Direct Avant Main System Test', () => {
         };
         
         global.game = {
-            system: { id: 'avant-native' },
+            system: { id: 'avant' },
             settings: { register: jest.fn() },
             avant: {}
         };
@@ -68,7 +68,7 @@ describe('Direct Avant Main System Test', () => {
         
         try {
             // Import the main system file - this will execute the Hook registrations
-            avantModule = await import('../../scripts/avant.js');
+            avantModule = await import('../../scripts/avant.ts');
             
             // Verify hooks were registered
             expect(global.Hooks.once).toHaveBeenCalledWith('init', expect.any(Function));
@@ -87,7 +87,7 @@ describe('Direct Avant Main System Test', () => {
     test('should execute init hook manually for coverage', async () => {
         try {
             // Import to register hooks
-            await import('../../scripts/avant.js');
+            await import('../../scripts/avant.ts');
             
             // Get the init callback and execute it manually
             const initCallback = global.__mockHooks?.init;
@@ -111,7 +111,7 @@ describe('Direct Avant Main System Test', () => {
     test('should execute ready hook manually for coverage', async () => {
         try {
             // Import to register hooks
-            await import('../../scripts/avant.js');
+            await import('../../scripts/avant.ts');
             
             // Get the ready callback and execute it manually  
             const readyCallback = global.__mockHooks?.ready;
@@ -130,7 +130,7 @@ describe('Direct Avant Main System Test', () => {
 
     test('should test AvantActor class methods for coverage', async () => {
         try {
-            await import('../../scripts/avant.js');
+            await import('../../scripts/avant.ts');
             
             // The import will define AvantActor and AvantItem classes
             // Test them if they're available
@@ -179,7 +179,7 @@ describe('Direct Avant Main System Test', () => {
             },
             async () => {
                 try {
-                    const actorData = await import('../../scripts/data/actor-data.js');
+                    const actorData = await import('../../scripts/data/actor-data.ts');
                     expect(actorData.AvantActorData).toBeDefined();
                 } catch (e) { /* ignore */ }
             },
@@ -191,13 +191,13 @@ describe('Direct Avant Main System Test', () => {
             },
             async () => {
                 try {
-                    const actorSheet = await import('../../scripts/sheets/actor-sheet.js');
+                    const actorSheet = await import('../../scripts/sheets/actor-sheet.ts');
                     expect(actorSheet.AvantActorSheet).toBeDefined();
                 } catch (e) { /* ignore */ }
             },
             async () => {
                 try {
-                    const itemSheet = await import('../../scripts/sheets/item-sheet.js');
+                    const itemSheet = await import('../../scripts/sheets/item-sheet.ts');
                     expect(itemSheet.AvantItemSheet).toBeDefined();
                 } catch (e) { /* ignore */ }
             }
@@ -219,7 +219,7 @@ describe('Direct Avant Main System Test', () => {
         global.CONFIG = null;
         
         try {
-            await import('../../scripts/avant.js');
+            await import('../../scripts/avant.ts');
         } catch (error) {
             // Expected - we're testing error paths
         }
@@ -231,7 +231,7 @@ describe('Direct Avant Main System Test', () => {
         global.Hooks = null;
         
         try {
-            await import('../../scripts/avant.js');
+            await import('../../scripts/avant.ts');
         } catch (error) {
             // Expected - we're testing error paths
         }

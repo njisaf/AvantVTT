@@ -3,7 +3,7 @@
     "types": ["character", "npc", "vehicle"],
     "character": {
       "level": 1,
-      "fortunePoints": 3,
+      "fortunePoints": 0,
       "ancestry": "",
       "lineage": "",
       "culture": "",
@@ -11,20 +11,16 @@
       "languages": "",
       "abilities": {
         "might": {
-          "value": 10,
-          "mod": 0
+          "modifier": 0
         },
         "grace": {
-          "value": 10,
-          "mod": 0
+          "modifier": 0
         },
         "intellect": {
-          "value": 10,
-          "mod": 0
+          "modifier": 0
         },
         "focus": {
-          "value": 10,
-          "mod": 0
+          "modifier": 0
         }
       },
       "skills": {
@@ -52,17 +48,17 @@
         "remaining": 0
       },
       "health": {
-        "value": 25,
-        "max": 25,
+        "value": 0,
+        "max": 0,
         "temp": 0
       },
-      "defenseThreshold": 11,
+      "defenseThreshold": 0,
       "biography": "",
       "notes": ""
     },
     "npc": {
       "level": 1,
-      "fortunePoints": 3,
+      "fortunePoints": 0,
       "ancestry": "",
       "lineage": "",
       "culture": "",
@@ -70,20 +66,16 @@
       "languages": "",
       "abilities": {
         "might": {
-          "value": 10,
-          "mod": 0
+          "modifier": 0
         },
         "grace": {
-          "value": 10,
-          "mod": 0
+          "modifier": 0
         },
         "intellect": {
-          "value": 10,
-          "mod": 0
+          "modifier": 0
         },
         "focus": {
-          "value": 10,
-          "mod": 0
+          "modifier": 0
         }
       },
       "skills": {
@@ -111,17 +103,17 @@
         "remaining": 0
       },
       "health": {
-        "value": 25,
-        "max": 25,
+        "value": 0,
+        "max": 0,
         "temp": 0
       },
-      "defenseThreshold": 11,
+      "defenseThreshold": 0,
       "biography": "",
       "notes": ""
     },
     "vehicle": {
       "level": 1,
-      "fortunePoints": 3,
+      "fortunePoints": 0,
       "ancestry": "",
       "lineage": "",
       "culture": "",
@@ -129,20 +121,16 @@
       "languages": "",
       "abilities": {
         "might": {
-          "value": 10,
-          "mod": 0
+          "modifier": 0
         },
         "grace": {
-          "value": 10,
-          "mod": 0
+          "modifier": 0
         },
         "intellect": {
-          "value": 10,
-          "mod": 0
+          "modifier": 0
         },
         "focus": {
-          "value": 10,
-          "mod": 0
+          "modifier": 0
         }
       },
       "skills": {
@@ -170,11 +158,11 @@
         "remaining": 0
       },
       "health": {
-        "value": 25,
-        "max": 25,
+        "value": 0,
+        "max": 0,
         "temp": 0
       },
-      "defenseThreshold": 11,
+      "defenseThreshold": 0,
       "biography": "",
       "notes": ""
     }
