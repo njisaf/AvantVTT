@@ -168,11 +168,12 @@
     }
   },
   "Item": {
-    "types": ["action", "feature", "talent", "augment", "weapon", "armor", "gear"],
+    "types": ["action", "feature", "talent", "augment", "weapon", "armor", "gear", "trait"],
     "action": {
       "description": "",
       "ability": "might",
-      "difficulty": 11
+      "difficulty": 11,
+      "traits": []
     },
     "feature": {
       "description": "",
@@ -181,7 +182,13 @@
       "uses": {
         "value": 0,
         "max": 0
-      }
+      },
+      "color": "",
+      "icon": "",
+      "localKey": "",
+      "isActive": false,
+      "powerPointCost": 0,
+      "traits": []
     },
     "talent": {
       "description": "",
@@ -192,7 +199,8 @@
         "max": 0
       },
       "powerPointCost": 1,
-      "isActive": false
+      "isActive": false,
+      "traits": []
     },
     "augment": {
       "description": "",
@@ -203,7 +211,8 @@
       "augmentType": "enhancement",
       "powerPointCost": 0,
       "isActive": false,
-      "rarity": "common"
+      "rarity": "common",
+      "traits": []
     },
     "weapon": {
       "description": "",
@@ -217,7 +226,8 @@
       "properties": "",
       "threshold": 11,
       "quantity": 1,
-      "equipped": false
+      "equipped": false,
+      "traits": []
     },
     "armor": {
       "description": "",
@@ -230,7 +240,8 @@
       "armorType": "light",
       "quantity": 1,
       "equipped": false,
-      "properties": ""
+      "properties": "",
+      "traits": []
     },
     "gear": {
       "description": "",
@@ -243,7 +254,17 @@
       "uses": {
         "value": 0,
         "max": 0
-      }
+      },
+      "traits": []
+    },
+    "trait": {
+      "description": "",
+      "color": "#00E0DC",
+      "icon": "fas fa-tag",
+      "localKey": "",
+      "tags": [],
+      "rarity": "common",
+      "effects": ""
     }
   }
 } 

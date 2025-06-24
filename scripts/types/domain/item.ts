@@ -9,7 +9,7 @@
  * All possible item types in the Avant system.
  * Each type has different properties and behaviors.
  */
-export type ItemType = 'action' | 'feature' | 'talent' | 'augment' | 'weapon' | 'armor' | 'gear';
+export type ItemType = 'action' | 'feature' | 'talent' | 'augment' | 'weapon' | 'armor' | 'gear' | 'trait';
 
 /**
  * Data specific to weapon items.

@@ -326,6 +326,19 @@
                                 {{#each items.weapon as |item id|}}
                                 <div class="item" data-item-id="{{item._id}}">
                                     <div class="item-name">{{item.name}}</div>
+                                    {{#if item.displayTraits}}
+                                    <div class="item-traits">
+                                        {{#each item.displayTraits as |trait|}}
+                                            <span class="trait-chip trait-chip--small" data-trait="{{trait.id}}"
+                                                  {{traitChipData trait}}
+                                                  style="{{traitChipStyle trait}}"
+                                                  title="{{#if trait.description}}{{trait.description}}{{else}}{{trait.name}}{{/if}}">
+                                                {{#if trait.icon}}<i class="trait-chip__icon {{trait.icon}}" aria-hidden="true"></i>{{/if}}
+                                                <span class="trait-chip__text">{{trait.name}}</span>
+                                            </span>
+                                        {{/each}}
+                                    </div>
+                                    {{/if}}
                                     <div class="item-details">
                                         <span class="item-property" title="Weapon Range">{{item.system.range}}</span>
                                         <span class="item-property" title="Weight">{{item.system.weight}} lbs</span>

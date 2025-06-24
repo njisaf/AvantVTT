@@ -1,0 +1,983 @@
+/**
+ * @fileoverview TraitProvider Service
+ * @version 1.0.0 - Stage 1: Foundation  
+ * @description Service for managing trait data from system and world compendium packs
+ * @author Avant VTT Team
+ */
+
+import type {
+  Trait,
+  TraitSource,
+  FoundryTraitItem,
+  TraitItemSystemData,
+  TraitProviderConfig,
+  TraitProviderResult,
+  TraitCacheEntry,
+  TraitRetrievalOptions,
+  CompendiumPackInfo
+} from '../types/domain/trait.js';
+
+/**
+ * Service that provides access to trait data from both system and world compendium packs.
+ * 
+ * This service waits for FoundryVTT initialization, merges traits from multiple sources,
+ * provides caching for performance, and automatically creates world packs if needed.
+ */
+export class TraitProvider {
+  private static _instance: TraitProvider | undefined;
+  
+  private readonly config!: TraitProviderConfig;
+  private cache: TraitCacheEntry | null = null;
+  private isInitialized = false;
+  private readonly foundry: any;
+  private readonly game: any;
+  
+  /**
+   * Create a new TraitProvider instance.
+   * Use getInstance() instead for singleton access.
+   * 
+   * @param config - Configuration for the trait provider
+   */
+  constructor(config?: Partial<TraitProviderConfig>) {
+    // Singleton pattern
+    if (TraitProvider._instance) {
+      return TraitProvider._instance;
+    }
+    
+    TraitProvider._instance = this;
+    
+    // Default configuration - explicit assignment to fix TypeScript error
+    const defaultConfig: TraitProviderConfig = {
+      systemPackName: 'avant.avant-traits',
+      worldPackName: 'world.custom-traits',  // Fixed: Use full v13 world pack name
+      worldPackLabel: 'Custom Traits',
+      itemType: 'trait', // Use new 'trait' type from system.json
+      enableCaching: true,
+      cacheTimeout: 300000 // 5 minutes
+    };
+    
+    this.config = { ...defaultConfig, ...config };
+    
+    // Get FoundryVTT globals safely
+    this.foundry = (globalThis as any).foundry;
+    this.game = (globalThis as any).game;
+    
+    console.log('🏷️ TraitProvider | Instance created with config:', this.config);
+  }
+  
+  /**
+   * Get the singleton instance of TraitProvider
+   * 
+   * @param config - Optional configuration for first-time initialization
+   * @returns TraitProvider singleton instance
+   */
+  static getInstance(config?: Partial<TraitProviderConfig>): TraitProvider {
+    if (!TraitProvider._instance) {
+      new TraitProvider(config);
+    }
+    return TraitProvider._instance!;
+  }
+  
+  /**
+   * Initialize the trait provider by waiting for FoundryVTT and setting up packs.
+   * This method is called by the InitializationManager.
+   * 
+   * @returns Promise that resolves when initialization is complete
+   */
+  async initialize(): Promise<TraitProviderResult<boolean>> {
+    try {
+      console.log('🏷️ TraitProvider | Starting initialization...');
+      
+      // Verify FoundryVTT is ready
+      if (!this.game?.ready) {
+        return {
+          success: false,
+          error: 'FoundryVTT game not ready - cannot initialize TraitProvider'
+        };
+      }
+      
+      // Ensure world pack exists
+      const worldPackResult = await this.ensureWorldPackExists();
+      if (!worldPackResult.success) {
+        return {
+          success: false,
+          error: `Failed to ensure world pack exists: ${worldPackResult.error}`
+        };
+      }
+      
+      // Load initial traits to populate cache
+      const traitsResult = await this.getAll({ forceRefresh: true });
+      if (!traitsResult.success) {
+        return {
+          success: false,
+          error: `Failed to load initial traits: ${traitsResult.error}`
+        };
+      }
+      
+      // Emit hook for each initially loaded trait
+      if (traitsResult.data) {
+        for (const trait of traitsResult.data) {
+          this._emitTraitRegisteredHook(trait, 'initialized');
+        }
+      }
+      
+      this.isInitialized = true;
+      console.log(`🏷️ TraitProvider | Initialized successfully with ${traitsResult.data?.length || 0} traits`);
+      
+      return {
+        success: true,
+        data: true,
+        metadata: { 
+          traitsLoaded: traitsResult.data?.length || 0,
+          systemPackExists: await this.checkPackExists('system'),
+          worldPackExists: await this.checkPackExists('world')
+        }
+      };
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('🏷️ TraitProvider | Initialization failed:', error);
+      return {
+        success: false,
+        error: `TraitProvider initialization failed: ${errorMessage}`
+      };
+    }
+  }
+  
+  /**
+   * Get all available traits from both system and world packs.
+   * 
+   * @param options - Options for trait retrieval
+   * @returns All available traits
+   */
+  async getAll(options: TraitRetrievalOptions = {}): Promise<TraitProviderResult<Trait[]>> {
+    try {
+      const opts = {
+        includeSystem: true,
+        includeWorld: true,
+        forceRefresh: false,
+        ...options
+      };
+      
+      // Check cache first (if not forcing refresh)
+      if (!opts.forceRefresh && this.config.enableCaching && this.cache) {
+        const cacheAge = Date.now() - this.cache.timestamp;
+        if (cacheAge < this.config.cacheTimeout!) {
+          console.log('🏷️ TraitProvider | Returning cached traits');
+          return {
+            success: true,
+            data: this.filterTraits(this.cache.traits, opts),
+            metadata: { source: 'cache', cacheAge }
+          };
+        }
+      }
+      
+      // Load traits from packs
+      const allTraits: Trait[] = [];
+      const sources: TraitSource[] = [];
+      
+      if (opts.includeSystem) {
+        const systemTraits = await this.loadTraitsFromPack('system');
+        if (systemTraits.success && systemTraits.data) {
+          allTraits.push(...systemTraits.data);
+          sources.push('system');
+        }
+      }
+      
+      if (opts.includeWorld) {
+        const worldTraits = await this.loadTraitsFromPack('world');
+        if (worldTraits.success && worldTraits.data) {
+          allTraits.push(...worldTraits.data);
+          sources.push('world');
+        }
+      }
+      
+      // Deduplicate traits (world takes precedence over system)
+      const deduplicatedTraits = this.deduplicateTraits(allTraits);
+      
+      // Update cache
+      if (this.config.enableCaching) {
+        this.cache = {
+          traits: deduplicatedTraits,
+          timestamp: Date.now(),
+          sources
+        };
+      }
+      
+      console.log(`🏷️ TraitProvider | Loaded ${deduplicatedTraits.length} traits from ${sources.join(', ')}`);
+      
+      return {
+        success: true,
+        data: this.filterTraits(deduplicatedTraits, opts),
+        metadata: { 
+          sources,
+          totalTraits: deduplicatedTraits.length,
+          loadedFrom: 'packs'
+        }
+      };
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('🏷️ TraitProvider | Failed to get all traits:', error);
+      return {
+        success: false,
+        error: `Failed to get traits: ${errorMessage}`
+      };
+    }
+  }
+  
+  /**
+   * Get a specific trait by ID.
+   * 
+   * @param id - The trait ID to find
+   * @param options - Options for trait retrieval
+   * @returns The requested trait or null if not found
+   */
+  async get(id: string, options: TraitRetrievalOptions = {}): Promise<TraitProviderResult<Trait | null>> {
+    try {
+      const allTraitsResult = await this.getAll(options);
+      
+      if (!allTraitsResult.success || !allTraitsResult.data) {
+        return {
+          success: false,
+          error: `Failed to load traits: ${allTraitsResult.error}`
+        };
+      }
+      
+      const trait = allTraitsResult.data.find(t => t.id === id) || null;
+      
+      return {
+        success: true,
+        data: trait,
+        metadata: { searchedId: id, found: trait !== null }
+      };
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error(`🏷️ TraitProvider | Failed to get trait '${id}':`, error);
+      return {
+        success: false,
+        error: `Failed to get trait: ${errorMessage}`
+      };
+    }
+  }
+  
+  /**
+   * Check if the TraitProvider is initialized and ready to use.
+   * 
+   * @returns True if initialized
+   */
+  isReady(): boolean {
+    return this.isInitialized;
+  }
+  
+  /**
+   * Clear the internal cache, forcing next request to reload from packs.
+   */
+  clearCache(): void {
+    this.cache = null;
+    console.log('🏷️ TraitProvider | Cache cleared');
+  }
+  
+  /**
+   * Get information about both system and world compendium packs.
+   * 
+   * @returns Information about trait compendium packs
+   */
+  async getPackInfo(): Promise<TraitProviderResult<{ system: CompendiumPackInfo; world: CompendiumPackInfo }>> {
+    try {
+      const systemPack = await this.getPackInfo_internal('system');
+      const worldPack = await this.getPackInfo_internal('world');
+      
+      return {
+        success: true,
+        data: { system: systemPack, world: worldPack }
+      };
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      return {
+        success: false,
+        error: `Failed to get pack info: ${errorMessage}`
+      };
+    }
+  }
+  
+  /**
+   * Create a new trait in the world pack.
+   * 
+   * @param traitData - Data for the new trait
+   * @returns Result with the created trait
+   */
+  async createTrait(traitData: Partial<FoundryTraitItem>): Promise<TraitProviderResult<Trait | null>> {
+    try {
+      if (!this.isInitialized) {
+        return {
+          success: false,
+          error: 'TraitProvider not initialized'
+        };
+      }
+      
+      const worldPack = this.game.packs.get(this.config.worldPackName);
+      if (!worldPack) {
+        return {
+          success: false,
+          error: 'World pack not found'
+        };
+      }
+      
+      // Create the item in the world pack
+      const itemData = {
+        name: traitData.name || 'New Trait',
+        type: this.config.itemType,
+        system: traitData.system || {},
+        ...traitData
+      };
+      
+      const [createdItem] = await worldPack.createDocuments([itemData]);
+      
+      if (!createdItem) {
+        return {
+          success: false,
+          error: 'Failed to create trait item'
+        };
+      }
+      
+      // Convert to trait object
+      const trait = this.convertItemToTrait(createdItem, 'world');
+      
+      if (trait) {
+        // Clear cache to force reload
+        this.clearCache();
+        
+        // Emit hook for trait registration
+        this._emitTraitRegisteredHook(trait, 'created');
+        
+        console.log(`🏷️ TraitProvider | Created trait '${trait.name}' in world pack`);
+      }
+      
+      return {
+        success: true,
+        data: trait,
+        metadata: { 
+          itemId: createdItem._id,
+          packName: this.config.worldPackName
+        }
+      };
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('🏷️ TraitProvider | Failed to create trait:', error);
+      return {
+        success: false,
+        error: `Failed to create trait: ${errorMessage}`
+      };
+    }
+  }
+  
+  /**
+   * Update an existing trait in the world pack.
+   * 
+   * @param traitId - ID of the trait to update
+   * @param updateData - Data to update
+   * @returns Result with the updated trait
+   */
+  async updateTrait(traitId: string, updateData: Partial<FoundryTraitItem>): Promise<TraitProviderResult<Trait | null>> {
+    try {
+      if (!this.isInitialized) {
+        return {
+          success: false,
+          error: 'TraitProvider not initialized'
+        };
+      }
+      
+      const worldPack = this.game.packs.get(this.config.worldPackName);
+      if (!worldPack) {
+        return {
+          success: false,
+          error: 'World pack not found'
+        };
+      }
+      
+      // Find the existing item
+      const existingItem = worldPack.get(traitId);
+      if (!existingItem) {
+        return {
+          success: false,
+          error: 'Trait not found in world pack'
+        };
+      }
+      
+      // Update the item
+      await existingItem.update(updateData);
+      
+      // Convert to trait object
+      const trait = this.convertItemToTrait(existingItem, 'world');
+      
+      if (trait) {
+        // Clear cache to force reload
+        this.clearCache();
+        
+        // Emit hook for trait registration
+        this._emitTraitRegisteredHook(trait, 'updated');
+        
+        console.log(`🏷️ TraitProvider | Updated trait '${trait.name}' in world pack`);
+      }
+      
+      return {
+        success: true,
+        data: trait,
+        metadata: { 
+          itemId: traitId,
+          packName: this.config.worldPackName
+        }
+      };
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('🏷️ TraitProvider | Failed to update trait:', error);
+      return {
+        success: false,
+        error: `Failed to update trait: ${errorMessage}`
+      };
+    }
+  }
+  
+  /**
+   * Delete a trait from the world pack.
+   * 
+   * @param traitId - ID of the trait to delete
+   * @returns Result indicating success or failure
+   */
+  async deleteTrait(traitId: string): Promise<TraitProviderResult<boolean>> {
+    try {
+      if (!this.isInitialized) {
+        return {
+          success: false,
+          error: 'TraitProvider not initialized'
+        };
+      }
+      
+      const worldPack = this.game.packs.get(this.config.worldPackName);
+      if (!worldPack) {
+        return {
+          success: false,
+          error: 'World pack not found'
+        };
+      }
+      
+      // Find the existing item
+      const existingItem = worldPack.get(traitId);
+      if (!existingItem) {
+        return {
+          success: false,
+          error: 'Trait not found in world pack'
+        };
+      }
+      
+      // Convert to trait object before deletion for the hook
+      const trait = this.convertItemToTrait(existingItem, 'world');
+      
+      // Delete the item
+      await existingItem.delete();
+      
+      // Clear cache to force reload
+      this.clearCache();
+      
+      // Emit hook for trait deletion
+      if (trait) {
+        this._emitTraitDeletedHook(trait);
+      }
+      
+      console.log(`🏷️ TraitProvider | Deleted trait '${existingItem.name}' from world pack`);
+      
+      return {
+        success: true,
+        data: true,
+        metadata: { 
+          itemId: traitId,
+          packName: this.config.worldPackName
+        }
+      };
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('🏷️ TraitProvider | Failed to delete trait:', error);
+      return {
+        success: false,
+        error: `Failed to delete trait: ${errorMessage}`
+      };
+    }
+  }
+  
+  /**
+   * Search traits by name and tags
+   * 
+   * @param searchTerm - The search term to look for
+   * @param options - Options for trait retrieval and search
+   * @returns Matching traits
+   */
+  async search(searchTerm: string, options: TraitRetrievalOptions = {}): Promise<TraitProviderResult<Trait[]>> {
+    try {
+      const allTraitsResult = await this.getAll(options);
+      
+      if (!allTraitsResult.success || !allTraitsResult.data) {
+        return {
+          success: false,
+          error: `Failed to load traits for search: ${allTraitsResult.error}`
+        };
+      }
+      
+      const searchTermLower = searchTerm.toLowerCase().trim();
+      
+      if (!searchTermLower) {
+        // Return all traits if no search term
+        return allTraitsResult;
+      }
+      
+      const matchingTraits = allTraitsResult.data.filter(trait => {
+        // Search in trait name
+        if (trait.name.toLowerCase().includes(searchTermLower)) {
+          return true;
+        }
+        
+        // Search in trait tags
+        if (trait.tags && trait.tags.length > 0) {
+          return trait.tags.some(tag => tag.toLowerCase().includes(searchTermLower));
+        }
+        
+        // Search in legacy metadata tags for backward compatibility
+        if (trait.item.system.traitMetadata?.tags && trait.item.system.traitMetadata.tags.length > 0) {
+          return trait.item.system.traitMetadata.tags.some(tag => tag.toLowerCase().includes(searchTermLower));
+        }
+        
+        return false;
+      });
+      
+      console.log(`🏷️ TraitProvider | Search for '${searchTerm}' found ${matchingTraits.length} matches`);
+      
+      return {
+        success: true,
+        data: matchingTraits,
+        metadata: { 
+          searchTerm,
+          totalTraits: allTraitsResult.data.length,
+          matchCount: matchingTraits.length
+        }
+      };
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error(`🏷️ TraitProvider | Failed to search traits for '${searchTerm}':`, error);
+      return {
+        success: false,
+        error: `Failed to search traits: ${errorMessage}`
+      };
+    }
+  }
+  
+  // =========================================================================
+  // PRIVATE METHODS
+  // =========================================================================
+  
+  /**
+   * Load traits from a specific pack (system or world)
+   * 
+   * @private
+   */
+  private async loadTraitsFromPack(source: TraitSource): Promise<TraitProviderResult<Trait[]>> {
+    try {
+      const packName = source === 'system' ? this.config.systemPackName : this.config.worldPackName;
+      const pack = this.game.packs.get(packName);
+      
+      console.log(`🏷️ TRAIT DEBUG | loadTraitsFromPack called for source '${source}', packName: '${packName}'`);
+      console.log(`🏷️ TRAIT DEBUG | Pack found:`, !!pack);
+      console.log(`🏷️ TRAIT DEBUG | Current timestamp: ${new Date().toISOString()}`);
+      
+      if (!pack) {
+        console.log(`🏷️ TRAIT DEBUG | Pack '${packName}' not found for source '${source}'`);
+        console.log(`🏷️ TRAIT DEBUG | Available packs:`, this.game.packs.keys());
+        return {
+          success: true, // Not finding a pack is not an error
+          data: []
+        };
+      }
+      
+      console.log(`🏷️ TRAIT DEBUG | Pack details - type: ${pack.documentName}, title: ${pack.title}, size: ${pack.size}`);
+      console.log(`🏷️ TRAIT DEBUG | Getting documents from pack...`);
+      
+      // Get all items from the pack with retry logic for system pack
+      let items = await pack.getDocuments();
+      console.log(`🏷️ TRAIT DEBUG | Initial getDocuments() retrieved ${items.length} items from pack`);
+      
+      // If system pack is empty, this means the build process didn't populate it correctly
+      if (items.length === 0 && source === 'system') {
+        console.warn(`🏷️ TRAIT DEBUG | System pack is empty - this should be populated during build process`);
+        console.warn(`🏷️ TRAIT DEBUG | Run 'npm run build:packs' to populate system compendium pack`);
+        console.warn(`🏷️ TRAIT DEBUG | Continuing with empty system pack...`);
+      }
+      
+      console.log(`🏷️ TRAIT DEBUG | Final document count: ${items.length}`);
+      console.log(`🏷️ TRAIT DEBUG | Sample items:`, items.slice(0, 3).map((i: any) => ({ id: i._id, name: i.name, type: i.type })));
+      
+      const traits: Trait[] = [];
+      let processedCount = 0;
+      let skippedCount = 0;
+      let convertedCount = 0;
+      
+      for (const item of items) {
+        processedCount++;
+        console.log(`🏷️ TRAIT DEBUG | Processing item ${processedCount}: ${item.name} (type: ${item.type})`);
+        
+        // For system pack, only process items of the configured type (feature)
+        // For world pack, allow any item type if it has the required trait properties
+        if (source === 'system') {
+          if (item.type !== this.config.itemType) {
+            console.log(`🏷️ TRAIT DEBUG | Skipping system item '${item.name}' - wrong type (${item.type} !== ${this.config.itemType})`);
+            skippedCount++;
+            continue;
+          }
+        } else {
+          // For world pack, check if the item has trait properties regardless of item type
+          // localKey is optional for custom/world traits since they don't need localization
+          const system = item.system;
+          const hasTraitProperties = !!(system?.color && system?.icon);
+          
+          if (!hasTraitProperties) {
+            const missingProps = [];
+            if (!system?.color) missingProps.push('color');
+            if (!system?.icon) missingProps.push('icon');
+            console.log(`🏷️ TRAIT DEBUG | Skipping world item '${item.name}' (type: ${item.type}) - missing trait properties (${missingProps.join(', ')})`);
+            skippedCount++;
+            continue;
+          } else {
+            console.log(`🏷️ TRAIT DEBUG | World item '${item.name}' (type: ${item.type}) has trait properties, will attempt conversion`);
+          }
+        }
+        
+        const trait = this.convertItemToTrait(item, source);
+        if (trait) {
+          traits.push(trait);
+          convertedCount++;
+          console.log(`🏷️ TRAIT DEBUG | Converted item '${item.name}' to trait successfully`);
+        } else {
+          skippedCount++;
+          console.log(`🏷️ TRAIT DEBUG | Failed to convert item '${item.name}' to trait`);
+        }
+      }
+      
+      console.log(`🏷️ TRAIT DEBUG | Final results - processed: ${processedCount}, skipped: ${skippedCount}, converted: ${convertedCount}`);
+      console.log(`🏷️ TraitProvider | Loaded ${traits.length} traits from ${source} pack '${packName}'`);
+      
+      return {
+        success: true,
+        data: traits
+      };
+    } catch (error) {
+      console.error(`🏷️ TraitProvider | Error loading traits from ${source} pack:`, error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        data: []
+      };
+    }
+  }
+  
+  /**
+   * Convert a FoundryVTT item to a Trait object
+   * 
+   * @private
+   */
+  private convertItemToTrait(item: any, source: TraitSource): Trait | null {
+    try {
+      console.log(`🏷️ TRAIT DEBUG | convertItemToTrait called for item '${item.name}'`);
+      console.log(`🏷️ TRAIT DEBUG | Item ID info - _id: ${item._id}, id: ${item.id}, uuid: ${item.uuid}`);
+      console.log(`🏷️ TRAIT DEBUG | Full item object keys:`, Object.keys(item));
+      
+      const system = item.system as TraitItemSystemData;
+      console.log(`🏷️ TRAIT DEBUG | Item system properties:`, {
+        color: system.color,
+        icon: system.icon, 
+        localKey: system.localKey,
+        description: system.description,
+        tags: system.tags
+      });
+      
+      // For new trait items, validate required properties
+      if (item.type === 'trait') {
+        if (!system.color || !system.icon) {
+          console.warn(`🏷️ TRAIT DEBUG | Trait item '${item.name}' missing required properties (color, icon), skipping`);
+          return null;
+        }
+      } else {
+        // For legacy feature items used as traits, validate required trait properties
+        // localKey is optional for world/custom traits since they don't need localization
+        if (!system.color || !system.icon || (source === 'system' && !system.localKey)) {
+          const missingProps = [];
+          if (!system.color) missingProps.push('color');
+          if (!system.icon) missingProps.push('icon');
+          if (source === 'system' && !system.localKey) missingProps.push('localKey');
+          console.warn(`🏷️ TRAIT DEBUG | Item '${item.name}' missing required trait properties (${missingProps.join(', ')}), skipping`);
+          return null;
+        }
+      }
+      
+      console.log(`🏷️ TRAIT DEBUG | All required properties present, creating trait object...`);
+      
+      // Generate ID with fallback strategy if item._id is null
+      let traitId = item._id || item.id;
+      if (!traitId) {
+        // Generate a deterministic ID based on name and source
+        traitId = `${source}_trait_${item.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}_${Date.now()}`;
+        console.log(`🏷️ TRAIT DEBUG | Generated fallback ID: ${traitId}`);
+      }
+      
+      const trait: Trait = {
+        id: traitId,
+        name: item.name,
+        color: system.color,
+        icon: system.icon,
+        localKey: system.localKey || `CUSTOM.Trait.${item.name.replace(/[^a-zA-Z0-9]/g, '')}`,
+        description: system.description,
+        source,
+        tags: system.tags || [], // Include tags for search functionality
+        item: {
+          _id: traitId,
+          name: item.name,
+          type: item.type,
+          system: system,
+          img: item.img,
+          sort: item.sort,
+          flags: item.flags
+        }
+      };
+      
+      console.log(`🏷️ TRAIT DEBUG | Successfully created trait object for '${item.name}' with ID: ${traitId}`);
+      console.log(`🏷️ TRAIT DEBUG | Final trait object ID field: ${trait.id}, tags: ${trait.tags}`);
+      return trait;
+      
+    } catch (error) {
+      console.error(`🏷️ TRAIT DEBUG | Failed to convert item '${item.name}' to trait:`, error);
+      console.error(`🏷️ TRAIT DEBUG | Error stack:`, (error as Error)?.stack || 'No stack trace');
+      return null;
+    }
+  }
+  
+  /**
+   * Remove duplicate traits, preferring world traits over system traits
+   * 
+   * @private
+   */
+  private deduplicateTraits(traits: Trait[]): Trait[] {
+    const traitMap = new Map<string, Trait>();
+    
+    console.log(`🏷️ TRAIT DEBUG | deduplicateTraits called with ${traits.length} traits`);
+    console.log(`🏷️ TRAIT DEBUG | Input trait names:`, traits.map(t => t.name));
+    
+    // First add all system traits (use trait name as key, not ID)
+    for (const trait of traits) {
+      if (trait.source === 'system') {
+        traitMap.set(trait.name, trait);
+        console.log(`🏷️ TRAIT DEBUG | Added system trait '${trait.name}' with key '${trait.name}'`);
+      }
+    }
+    
+    // Then add world traits, which will override system traits with same name
+    for (const trait of traits) {
+      if (trait.source === 'world') {
+        traitMap.set(trait.name, trait);
+        console.log(`🏷️ TRAIT DEBUG | Added/overwrote world trait '${trait.name}' with key '${trait.name}'`);
+      }
+    }
+    
+    const result = Array.from(traitMap.values());
+    console.log(`🏷️ TRAIT DEBUG | deduplicateTraits result: ${result.length} unique traits`);
+    console.log(`🏷️ TRAIT DEBUG | Result trait names:`, result.map(t => t.name));
+    
+    return result;
+  }
+  
+  /**
+   * Filter traits based on retrieval options
+   * 
+   * @private
+   */
+  private filterTraits(traits: Trait[], options: TraitRetrievalOptions): Trait[] {
+    let filtered = traits;
+    
+    // Filter by categories
+    if (options.categories?.length) {
+      filtered = filtered.filter(trait => {
+        const categories = trait.item.system.traitMetadata?.categories || [];
+        return options.categories!.some(cat => categories.includes(cat));
+      });
+    }
+    
+    // Filter by tags
+    if (options.tags?.length) {
+      filtered = filtered.filter(trait => {
+        const tags = trait.item.system.traitMetadata?.tags || [];
+        return options.tags!.some(tag => tags.includes(tag));
+      });
+    }
+    
+    return filtered;
+  }
+  
+  /**
+   * Ensure the world compendium pack exists, creating it if necessary
+   * 
+   * @private
+   */
+  private async ensureWorldPackExists(): Promise<TraitProviderResult<boolean>> {
+    try {
+      const packExists = await this.checkPackExists('world');
+      
+      if (packExists) {
+        console.log('🏷️ TraitProvider | World pack already exists');
+        return { success: true, data: true };
+      }
+      
+      // Create the world pack
+      console.log('🏷️ TraitProvider | Creating world pack...');
+      
+      const packData = {
+        name: this.config.worldPackName,
+        label: this.config.worldPackLabel,
+        path: `./packs/${this.config.worldPackName}.db`,
+        type: 'Item',
+        system: this.game.system.id
+      };
+      
+      await (this.foundry as any).documents.collections.CompendiumCollection.createCompendium(packData);
+      
+      console.log(`🏷️ TraitProvider | World pack '${this.config.worldPackName}' created successfully`);
+      
+      return { success: true, data: true };
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      
+      // Check if error is about pack already existing - this is not actually an error
+      if (errorMessage.includes('already exists') || errorMessage.includes('cannot be created')) {
+        console.log('🏷️ TraitProvider | World pack already exists (detected via error), continuing...');
+        return { success: true, data: true };
+      }
+      
+      console.error('🏷️ TraitProvider | Failed to ensure world pack exists:', error);
+      return {
+        success: false,
+        error: `Failed to create world pack: ${errorMessage}`
+      };
+    }
+  }
+  
+  /**
+   * Check if a specific pack exists
+   * 
+   * @private
+   */
+  private async checkPackExists(source: TraitSource): Promise<boolean> {
+    try {
+      const packName = source === 'system' ? this.config.systemPackName : this.config.worldPackName;
+      const pack = this.game?.packs?.get(packName);
+      return pack !== undefined && pack !== null;
+    } catch (error) {
+      console.error(`🏷️ TraitProvider | Error checking if ${source} pack exists:`, error);
+      return false;
+    }
+  }
+  
+  /**
+   * Get detailed information about a specific pack
+   * 
+   * @private
+   */
+  private async getPackInfo_internal(source: TraitSource): Promise<CompendiumPackInfo> {
+    const packName = source === 'system' ? this.config.systemPackName : this.config.worldPackName;
+    const packLabel = source === 'system' ? 'Avant Traits' : this.config.worldPackLabel;
+    
+    try {
+      const pack = this.game?.packs?.get(packName);
+      const exists = pack !== undefined && pack !== null;
+      
+      return {
+        name: packName,
+        label: packLabel,
+        exists,
+        accessible: exists && pack.visible !== false,
+        collection: exists ? pack : undefined
+      };
+      
+    } catch (error) {
+      console.error(`🏷️ TraitProvider | Error getting pack info for ${source}:`, error);
+      return {
+        name: packName,
+        label: packLabel,
+        exists: false,
+        accessible: false
+      };
+    }
+  }
+  
+  /**
+   * Emit the 'avantTraitRegistered' hook for plugin integration.
+   * 
+   * @private
+   * @param trait - The trait that was registered/updated
+   * @param action - The action that occurred ('created', 'updated', 'initialized')
+   */
+  private _emitTraitRegisteredHook(trait: Trait, action: 'created' | 'updated' | 'initialized'): void {
+    try {
+      const hookData = {
+        trait: trait,
+        action: action,
+        source: trait.source,
+        timestamp: new Date().toISOString(),
+        provider: this
+      };
+      
+      // Emit the hook for plugins to listen to
+      if (this.foundry?.utils?.hooks?.call) {
+        this.foundry.utils.hooks.call('avantTraitRegistered', hookData);
+      } else if ((globalThis as any).Hooks?.call) {
+        (globalThis as any).Hooks.call('avantTraitRegistered', hookData);
+      }
+      
+      console.log(`🏷️ TraitProvider | Emitted 'avantTraitRegistered' hook for trait '${trait.name}' (${action})`);
+      
+    } catch (error) {
+      console.error('🏷️ TraitProvider | Failed to emit trait registered hook:', error);
+    }
+  }
+  
+  /**
+   * Emit the 'avantTraitDeleted' hook for plugin integration.
+   * 
+   * @private
+   * @param trait - The trait that was deleted
+   */
+  private _emitTraitDeletedHook(trait: Trait): void {
+    try {
+      const hookData = {
+        trait: trait,
+        action: 'deleted' as const,
+        source: trait.source,
+        timestamp: new Date().toISOString(),
+        provider: this
+      };
+      
+      // Emit the hook for plugins to listen to
+      if (this.foundry?.utils?.hooks?.call) {
+        this.foundry.utils.hooks.call('avantTraitDeleted', hookData);
+      } else if ((globalThis as any).Hooks?.call) {
+        (globalThis as any).Hooks.call('avantTraitDeleted', hookData);
+      }
+      
+      console.log(`🏷️ TraitProvider | Emitted 'avantTraitDeleted' hook for trait '${trait.name}'`);
+      
+    } catch (error) {
+      console.error('🏷️ TraitProvider | Failed to emit trait deleted hook:', error);
+    }
+  }
+} 

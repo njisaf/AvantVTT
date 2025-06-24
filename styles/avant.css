@@ -5,6 +5,349 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&display=swap");
 /**
+ * @fileoverview Trait Chip Component Styles
+ * @version 1.0.0 - Stage 2: UI Components
+ * @description Styled chip components for trait display and input
+ * @author Avant VTT Team
+ */
+.trait-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 4px 8px;
+  margin: 2px;
+  background: var(--trait-color, var(--color-primary, #00E0DC));
+  color: var(--trait-text-color, #ffffff);
+  border: 1px solid var(--trait-border-color, transparent);
+  border-radius: 12px;
+  font-family: var(--font-primary, "Exo 2", sans-serif);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: default;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  z-index: 5;
+}
+.trait-chip[data-color] {
+  background: var(--trait-color);
+}
+.trait-chip[data-color][data-light=true] {
+  color: #000000;
+  --trait-text-color: #000000;
+}
+.trait-chip[data-color][data-light=false] {
+  color: #ffffff;
+  --trait-text-color: #ffffff;
+}
+.trait-chip .trait-chip__icon {
+  width: 12px;
+  height: 12px;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+.trait-chip .trait-chip__icon:last-child {
+  margin-right: 0;
+  margin-left: 4px;
+}
+.trait-chip .trait-chip__text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+.trait-chip .trait-chip__remove {
+  margin-left: 4px;
+  width: 12px;
+  height: 12px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  opacity: 0.7;
+  transition: all 0.2s ease-in-out;
+}
+.trait-chip .trait-chip__remove:hover, .trait-chip .trait-chip__remove:focus {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.1);
+  transform: scale(1.1);
+}
+.trait-chip .trait-chip__remove:active {
+  transform: scale(0.95);
+}
+
+.trait-chip--clickable {
+  cursor: pointer;
+}
+.trait-chip--clickable:hover {
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  filter: brightness(1.1);
+}
+.trait-chip--clickable:active {
+  transform: translateY(0) scale(1);
+}
+.trait-chip--clickable:focus {
+  outline: 2px solid var(--color-focus, var(--color-primary));
+  outline-offset: 2px;
+}
+
+.trait-chip--small {
+  height: 20px;
+  padding: 2px 6px;
+  font-size: 9px;
+}
+.trait-chip--small .trait-chip__icon {
+  width: 10px;
+  height: 10px;
+  margin-right: 3px;
+}
+.trait-chip--small .trait-chip__icon:last-child {
+  margin-left: 3px;
+}
+.trait-chip--small .trait-chip__remove {
+  width: 10px;
+  height: 10px;
+  margin-left: 3px;
+  font-size: 7px;
+}
+
+.trait-chip--large {
+  height: 32px;
+  padding: 6px 12px;
+  font-size: 12px;
+}
+.trait-chip--large .trait-chip__icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+}
+.trait-chip--large .trait-chip__icon:last-child {
+  margin-left: 6px;
+}
+.trait-chip--large .trait-chip__remove {
+  width: 16px;
+  height: 16px;
+  margin-left: 6px;
+  font-size: 10px;
+}
+
+.trait-chip--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.trait-chip--disabled .trait-chip__remove {
+  pointer-events: none;
+}
+
+.trait-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: flex-start;
+}
+.trait-chips:empty::before {
+  content: attr(data-empty-text);
+  color: var(--color-text-secondary, #666);
+  font-style: italic;
+  font-size: 10px;
+}
+.trait-chips--vertical {
+  flex-direction: column;
+  align-items: stretch;
+}
+.trait-chips--vertical .trait-chip {
+  margin: 2px 0;
+}
+.trait-chips--centered {
+  justify-content: center;
+}
+.trait-chips--right {
+  justify-content: flex-end;
+}
+
+.trait-chip-input {
+  position: relative;
+}
+.trait-chip-input .trait-chip-input__field {
+  min-height: 32px;
+  padding: 6px;
+  border: 1px solid var(--color-border, #ccc);
+  border-radius: 4px;
+  background: var(--color-bg-input, #fff);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  cursor: text;
+  transition: all 0.2s ease-in-out;
+}
+.trait-chip-input .trait-chip-input__field:focus-within {
+  border-color: var(--color-primary, #00E0DC);
+  box-shadow: 0 0 0 2px rgba(0, 224, 220, 0.2);
+}
+.trait-chip-input .trait-chip-input__field .trait-chip-input__input {
+  flex: 1;
+  min-width: 120px;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 11px;
+  font-family: inherit;
+  color: var(--color-text, #333);
+}
+.trait-chip-input .trait-chip-input__field .trait-chip-input__input::placeholder {
+  color: var(--color-text-secondary, #666);
+}
+.trait-chip-input .trait-chip-input__field .trait-chip {
+  margin: 0;
+}
+.trait-chip-input .trait-chip-input__dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  background: var(--color-bg-dropdown, #fff);
+  border: 1px solid var(--color-border, #ccc);
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  display: none;
+}
+.trait-chip-input .trait-chip-input__dropdown--open {
+  display: block;
+}
+.trait-chip-input .trait-chip-input__dropdown .trait-chip-input__suggestion {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.trait-chip-input .trait-chip-input__dropdown .trait-chip-input__suggestion:hover, .trait-chip-input .trait-chip-input__dropdown .trait-chip-input__suggestion--highlighted {
+  background: var(--color-bg-hover, #f5f5f5);
+}
+.trait-chip-input .trait-chip-input__dropdown .trait-chip-input__suggestion:active {
+  background: var(--color-bg-active, #e5e5e5);
+}
+.trait-chip-input .trait-chip-input__dropdown .trait-chip-input__suggestion .trait-chip--preview {
+  pointer-events: none;
+}
+.trait-chip-input .trait-chip-input__dropdown .trait-chip-input__suggestion .trait-chip-input__suggestion-text {
+  flex: 1;
+}
+.trait-chip-input .trait-chip-input__dropdown .trait-chip-input__suggestion .trait-chip-input__suggestion-text .trait-chip-input__suggestion-name {
+  font-weight: 500;
+  color: var(--color-text, #333);
+}
+.trait-chip-input .trait-chip-input__dropdown .trait-chip-input__suggestion .trait-chip-input__suggestion-text .trait-chip-input__suggestion-match {
+  background: var(--color-highlight, #ffeb3b);
+  padding: 1px 2px;
+  border-radius: 2px;
+}
+.trait-chip-input .trait-chip-input__dropdown .trait-chip-input__no-results {
+  padding: 12px;
+  text-align: center;
+  color: var(--color-text-secondary, #666);
+  font-style: italic;
+}
+
+.theme-dark .trait-chip {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.theme-dark .trait-chip:hover {
+  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+}
+.theme-dark .trait-chip-input__field {
+  background: var(--color-bg-input-dark, #2a2a2a);
+  border-color: var(--color-border-dark, #555);
+  color: var(--color-text-dark, #fff);
+}
+.theme-dark .trait-chip-input__dropdown {
+  background: var(--color-bg-dropdown-dark, #2a2a2a);
+  border-color: var(--color-border-dark, #555);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+.theme-dark .trait-chip-input__suggestion:hover, .theme-dark .trait-chip-input__suggestion--highlighted {
+  background: var(--color-bg-hover-dark, #3a3a3a);
+}
+.theme-dark .trait-chip-input__suggestion:active {
+  background: var(--color-bg-active-dark, #1a1a1a);
+}
+
+.theme-light .trait-chip {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+.theme-light .trait-chip:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.trait-chip[aria-label]::after {
+  content: "";
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+@media (prefers-contrast: high) {
+  .trait-chip {
+    border-width: 2px;
+    border-style: solid;
+    border-color: currentColor;
+  }
+  .trait-chip-input__field {
+    border-width: 2px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .trait-chip,
+  .trait-chip-input__field,
+  .trait-chip-input__suggestion {
+    transition: none;
+  }
+  .trait-chip--clickable:hover {
+    transform: none;
+  }
+}
+.trait-chip:focus-visible,
+.trait-chip-input__suggestion:focus-visible {
+  outline: 2px solid var(--color-focus, var(--color-primary));
+  outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+  .trait-chip {
+    height: 28px;
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+  .trait-chip-input__field {
+    min-height: 36px;
+    padding: 8px;
+  }
+  .trait-chip-input__dropdown {
+    max-height: 150px;
+  }
+}
+@media (min-width: 1200px) {
+  .trait-chip-input__dropdown {
+    max-height: 300px;
+  }
+}
+/**
  * Avant VTT - Base Theme Structure
  * Defines the core theme variables and structure for extensibility
  * Compatible with FoundryVTT v12 and v13
@@ -19,7 +362,8 @@
  * A clean, professional light theme for better readability
  * Compatible with FoundryVTT v12 and v13
  */
-.avant.theme-dark {
+.avant.theme-dark,
+.avant.theme-dark.themed {
   --theme-bg-primary: initial;
   --theme-bg-secondary: initial;
   --theme-bg-tertiary: initial;
@@ -75,7 +419,8 @@
   --theme-backdrop-blur: blur(10px);
   --theme-backdrop-saturate: saturate(180%);
 }
-.avant.theme-dark::before {
+.avant.theme-dark::before,
+.avant.theme-dark.themed::before {
   content: "Theme: " var(--theme-name, "Unknown") " by " var(--theme-author, "Unknown");
   position: fixed;
   top: -100px;
@@ -85,7 +430,8 @@
   z-index: -1;
 }
 
-.avant.theme-light {
+.avant.theme-light,
+.avant.theme-light.themed {
   --theme-bg-primary: initial;
   --theme-bg-secondary: initial;
   --theme-bg-tertiary: initial;
@@ -143,7 +489,140 @@
   --theme-hover-overlay: rgba(0, 102, 204, 0.1);
   --theme-focus-outline: var(--theme-accent-primary);
 }
-.avant.theme-light::before {
+.avant.theme-light::before,
+.avant.theme-light.themed::before {
+  content: "Theme: " var(--theme-name, "Unknown") " by " var(--theme-author, "Unknown");
+  position: fixed;
+  top: -100px;
+  left: -100px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.avant.theme-dark.theme-light {
+  --theme-bg-primary: initial;
+  --theme-bg-secondary: initial;
+  --theme-bg-tertiary: initial;
+  --theme-text-primary: initial;
+  --theme-text-secondary: initial;
+  --theme-text-muted: initial;
+  --theme-accent-primary: initial;
+  --theme-accent-secondary: initial;
+  --theme-accent-tertiary: initial;
+  --theme-border-primary: initial;
+  --theme-border-accent: initial;
+  --theme-success: initial;
+  --theme-warning: initial;
+  --theme-error: initial;
+  --theme-info: initial;
+  --theme-shadow-primary: initial;
+  --theme-shadow-accent: initial;
+  --theme-shadow-deep: initial;
+  --theme-gradient-primary: initial;
+  --theme-gradient-accent: initial;
+  --theme-font-primary: initial;
+  --theme-font-display: initial;
+  --theme-name: initial;
+  --theme-author: initial;
+  --theme-version: initial;
+  --theme-name: "Cyberpunk Dark";
+  --theme-author: "Avant VTT Team";
+  --theme-version: "1.0.0";
+  --theme-bg-primary: #1C1C1C;
+  --theme-bg-secondary: #2A2A2A;
+  --theme-bg-tertiary: #333333;
+  --theme-text-primary: #FFFFFF;
+  --theme-text-secondary: #BFBFBF;
+  --theme-text-muted: #808080;
+  --theme-accent-primary: #00E0DC;
+  --theme-accent-secondary: #4CE2E1;
+  --theme-accent-tertiary: #00B8B5;
+  --theme-border-primary: #404040;
+  --theme-border-accent: var(--theme-accent-primary);
+  --theme-success: #10B981;
+  --theme-warning: #F59E0B;
+  --theme-error: #EF4444;
+  --theme-info: var(--theme-accent-primary);
+  --theme-shadow-primary: 0 4px 20px rgba(0, 224, 220, 0.1);
+  --theme-shadow-accent: 0 0 20px rgba(0, 224, 220, 0.3);
+  --theme-shadow-deep: 0 8px 32px rgba(0, 0, 0, 0.6);
+  --theme-gradient-primary: linear-gradient(135deg, var(--theme-bg-primary) 0%, var(--theme-bg-secondary) 100%);
+  --theme-gradient-accent: linear-gradient(135deg, var(--theme-accent-primary) 0%, var(--theme-accent-secondary) 100%);
+  --theme-font-primary: "Exo 2", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  --theme-font-display: "Orbitron", monospace;
+  --theme-glow-primary: 0 0 10px var(--theme-accent-primary);
+  --theme-glow-secondary: 0 0 15px var(--theme-accent-secondary);
+  --theme-backdrop-blur: blur(10px);
+  --theme-backdrop-saturate: saturate(180%);
+}
+.avant.theme-dark.theme-light::before {
+  content: "Theme: " var(--theme-name, "Unknown") " by " var(--theme-author, "Unknown");
+  position: fixed;
+  top: -100px;
+  left: -100px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.avant.themed:not(.theme-light):not(.theme-dark) {
+  --theme-bg-primary: initial;
+  --theme-bg-secondary: initial;
+  --theme-bg-tertiary: initial;
+  --theme-text-primary: initial;
+  --theme-text-secondary: initial;
+  --theme-text-muted: initial;
+  --theme-accent-primary: initial;
+  --theme-accent-secondary: initial;
+  --theme-accent-tertiary: initial;
+  --theme-border-primary: initial;
+  --theme-border-accent: initial;
+  --theme-success: initial;
+  --theme-warning: initial;
+  --theme-error: initial;
+  --theme-info: initial;
+  --theme-shadow-primary: initial;
+  --theme-shadow-accent: initial;
+  --theme-shadow-deep: initial;
+  --theme-gradient-primary: initial;
+  --theme-gradient-accent: initial;
+  --theme-font-primary: initial;
+  --theme-font-display: initial;
+  --theme-name: initial;
+  --theme-author: initial;
+  --theme-version: initial;
+  --theme-name: "Cyberpunk Dark";
+  --theme-author: "Avant VTT Team";
+  --theme-version: "1.0.0";
+  --theme-bg-primary: #1C1C1C;
+  --theme-bg-secondary: #2A2A2A;
+  --theme-bg-tertiary: #333333;
+  --theme-text-primary: #FFFFFF;
+  --theme-text-secondary: #BFBFBF;
+  --theme-text-muted: #808080;
+  --theme-accent-primary: #00E0DC;
+  --theme-accent-secondary: #4CE2E1;
+  --theme-accent-tertiary: #00B8B5;
+  --theme-border-primary: #404040;
+  --theme-border-accent: var(--theme-accent-primary);
+  --theme-success: #10B981;
+  --theme-warning: #F59E0B;
+  --theme-error: #EF4444;
+  --theme-info: var(--theme-accent-primary);
+  --theme-shadow-primary: 0 4px 20px rgba(0, 224, 220, 0.1);
+  --theme-shadow-accent: 0 0 20px rgba(0, 224, 220, 0.3);
+  --theme-shadow-deep: 0 8px 32px rgba(0, 0, 0, 0.6);
+  --theme-gradient-primary: linear-gradient(135deg, var(--theme-bg-primary) 0%, var(--theme-bg-secondary) 100%);
+  --theme-gradient-accent: linear-gradient(135deg, var(--theme-accent-primary) 0%, var(--theme-accent-secondary) 100%);
+  --theme-font-primary: "Exo 2", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  --theme-font-display: "Orbitron", monospace;
+  --theme-glow-primary: 0 0 10px var(--theme-accent-primary);
+  --theme-glow-secondary: 0 0 15px var(--theme-accent-secondary);
+  --theme-backdrop-blur: blur(10px);
+  --theme-backdrop-saturate: saturate(180%);
+}
+.avant.themed:not(.theme-light):not(.theme-dark)::before {
   content: "Theme: " var(--theme-name, "Unknown") " by " var(--theme-author, "Unknown");
   position: fixed;
   top: -100px;

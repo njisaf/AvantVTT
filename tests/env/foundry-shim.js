@@ -17,6 +17,38 @@ import { TextEncoder, TextDecoder } from 'util';
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
 
+// Fix JSDOM initialization issues before any other setup
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+  // Ensure document has the proper EventTarget methods
+  if (!document.addEventListener) {
+    document.addEventListener = function() {};
+    document.removeEventListener = function() {};
+    document.dispatchEvent = function() { return true; };
+  }
+  
+  // Ensure window has the proper EventTarget methods
+  if (!window.addEventListener) {
+    window.addEventListener = function() {};
+    window.removeEventListener = function() {};
+    window.dispatchEvent = function() { return true; };
+  }
+  
+  // Fix the problematic window.document reference that JSDOM expects
+  if (typeof window.document === 'undefined' || window.document !== document) {
+    Object.defineProperty(window, 'document', {
+      value: document,
+      writable: false,
+      configurable: false
+    });
+  }
+  
+  // Fix Node.js global reference if needed
+  if (typeof global !== 'undefined' && typeof global.window === 'undefined') {
+    global.window = window;
+    global.document = document;
+  }
+}
+
 // Basic foundry namespace
 global.foundry = {
   abstract: {

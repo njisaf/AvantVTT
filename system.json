@@ -2,7 +2,7 @@
   "id": "avant",
   "title": "Avant",
   "description": "A cutting-edge narrative RPG system focused on experimental storytelling, collaborative worldbuilding, and innovative narrative mechanics",
-  "version": "0.2.1",
+  "version": "0.4.0",
   "compatibility": {
     "minimum": "13.344",
     "verified": "13.344",
@@ -31,6 +31,15 @@
       "path": "lang/en.json"
     }
   ],
+  "packs": [
+    {
+      "name": "avant-traits",
+      "label": "Avant Traits", 
+      "path": "./packs/avant-traits.db",
+      "type": "Item",
+      "system": "avant"
+    }
+  ],
   "documentTypes": {
     "Actor": {
       "character": {},
@@ -44,7 +53,8 @@
       "augment": {},
       "weapon": {},
       "armor": {},
-      "gear": {}
+      "gear": {},
+      "trait": {}
     }
   },
   "grid": {
@@ -54,6 +64,6 @@
   "primaryTokenAttribute": "health",
   "secondaryTokenAttribute": "powerPoints",
   "url": "https://github.com/njisaf/AvantVTT",
-  "manifest": "https://raw.githubusercontent.com/njisaf/AvantVTT/main/system.json",
-  "download": "https://github.com/njisaf/AvantVTT/archive/main.zip"
+  "manifest": "https://github.com/njisaf/AvantVTT/releases/download/v0.2.1/system.json",
+  "download": "https://github.com/njisaf/AvantVTT/releases/download/v0.2.1/avant-v0.2.1.zip"
 } 

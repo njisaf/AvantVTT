@@ -86,4 +86,18 @@ export type {
   MessageValidator,
   RollEligibilityChecker,
   PermissionChecker
-} from './chat-context'; 
+} from './chat-context';
+
+// Trait system types
+export type {
+  Trait,
+  TraitSource,
+  FoundryTraitItem,
+  TraitItemSystemData,
+  TraitMetadata,
+  TraitProviderConfig,
+  TraitProviderResult,
+  TraitCacheEntry,
+  TraitRetrievalOptions,
+  CompendiumPackInfo
+} from './trait'; 

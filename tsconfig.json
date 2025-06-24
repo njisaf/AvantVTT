@@ -10,7 +10,7 @@
     "outDir": "dist",
     "sourceMap": true,
     "baseUrl": ".",
-    "types": ["jest"],
+    "types": ["jest", "node"],
     "paths": {
       "@types/*": ["scripts/types/*"],
       "@logic/*": ["scripts/logic/*"]

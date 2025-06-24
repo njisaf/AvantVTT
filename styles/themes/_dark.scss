@@ -4,8 +4,10 @@
  * Compatible with FoundryVTT v12 and v13
  */
 
+@use 'base';
+
 @mixin theme-dark {
-  @include theme-base;
+  @include base.theme-base;
   
   // Theme Metadata
   --theme-name: "Cyberpunk Dark";

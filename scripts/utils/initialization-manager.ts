@@ -419,13 +419,84 @@ export class FoundryInitializationHelper {
         // Data Models - no dependencies
         manager.registerService('dataModels', async () => {
             const { setupDataModels } = await import('../logic/avant-init-utils.js');
-            return setupDataModels;
+            const { AvantActorData } = await import('../data/actor-data.ts');
+            const { AvantActionData, AvantFeatureData, AvantTalentData, AvantAugmentData, AvantWeaponData, AvantArmorData, AvantGearData, AvantTraitData } = await import('../data/item-data.js');
+            
+            // Get FoundryVTT CONFIG
+            const CONFIG = (globalThis as any).CONFIG;
+            if (!CONFIG) {
+                throw new Error('FoundryVTT CONFIG not available for data model setup');
+            }
+            
+            // Use our custom extended Actor and Item classes that have required v13 methods
+            const AvantActor = (globalThis as any).AvantActor;
+            const AvantItem = (globalThis as any).AvantItem;
+            
+            if (!AvantActor || !AvantItem) {
+                throw new Error('Custom AvantActor and AvantItem classes not available - they should be defined in avant.ts');
+            }
+            
+            // Define data models
+            const actorDataModels = {
+                character: AvantActorData,
+                npc: AvantActorData,
+                vehicle: AvantActorData
+            };
+            
+            const itemDataModels = {
+                action: AvantActionData,
+                feature: AvantFeatureData,
+                talent: AvantTalentData,
+                augment: AvantAugmentData,
+                weapon: AvantWeaponData,
+                armor: AvantArmorData,
+                gear: AvantGearData,
+                trait: AvantTraitData
+            };
+            
+            // Execute data model setup
+            const result = setupDataModels(CONFIG, AvantActor, AvantItem, actorDataModels, itemDataModels) as {
+                success: boolean;
+                error?: string;
+                message: string;
+            };
+            
+            if (!result.success) {
+                throw new Error(`Data model setup failed: ${result.error}`);
+            }
+            
+            console.log(`✅ InitializationManager | ${result.message}`);
+            return result;
         }, [], { phase: 'init', critical: true });
         
         // Sheet Registration - depends on data models
         manager.registerService('sheetRegistration', async () => {
             const { registerSheets } = await import('../logic/avant-init-utils.js');
-            return registerSheets;
+            const { AvantActorSheet } = await import('../sheets/actor-sheet.ts');
+            const { AvantItemSheet } = await import('../sheets/item-sheet.ts');
+            
+            // Get FoundryVTT collections using v13 namespaced access
+            const actorCollection = (globalThis as any).foundry?.documents?.collections?.Actors || (globalThis as any).Actors;
+            const itemCollection = (globalThis as any).foundry?.documents?.collections?.Items || (globalThis as any).Items;
+            
+            if (!actorCollection || !itemCollection) {
+                throw new Error('FoundryVTT collections not available for sheet registration');
+            }
+            
+            // Execute sheet registration
+            const result = registerSheets(actorCollection, itemCollection, AvantActorSheet, AvantItemSheet) as {
+                success: boolean;
+                error?: string;
+                message: string;
+                registeredSheets: number;
+            };
+            
+            if (!result.success) {
+                throw new Error(`Sheet registration failed: ${result.error}`);
+            }
+            
+            console.log(`✅ InitializationManager | ${result.message}`);
+            return result;
         }, ['dataModels'], { phase: 'init', critical: true });
         
         // Template Loading - depends on sheets
@@ -440,10 +511,73 @@ export class FoundryInitializationHelper {
                 "systems/avant/templates/item/item-augment-sheet.html",
                 "systems/avant/templates/item/item-weapon-sheet.html",
                 "systems/avant/templates/item/item-armor-sheet.html",
-                "systems/avant/templates/item/item-gear-sheet.html"
+                "systems/avant/templates/item/item-gear-sheet.html",
+                "systems/avant/templates/item/item-trait-sheet.html"
             ];
             
             await (globalThis as any).foundry.applications.handlebars.loadTemplates(templatePaths);
+            
+            // Register Handlebars helpers
+            const Handlebars = (globalThis as any).Handlebars;
+            if (Handlebars && !Handlebars.helpers.json) {
+                Handlebars.registerHelper('json', function(context: any) {
+                    return JSON.stringify(context);
+                });
+            }
+            
+            // Register trait chip helper for proper color and icon styling
+            if (Handlebars && !Handlebars.helpers.traitChipStyle) {
+                Handlebars.registerHelper('traitChipStyle', function(trait: any) {
+                    if (!trait || !trait.color) {
+                        return '';
+                    }
+                    
+                    // Calculate if color is light or dark for proper text contrast
+                    const isLight = isLightColor(trait.color);
+                    const textColor = isLight ? '#000000' : '#ffffff';
+                    
+                    return `--trait-color: ${trait.color}; --trait-text-color: ${textColor};`;
+                });
+            }
+            
+            // Register trait chip data attributes helper
+            if (Handlebars && !Handlebars.helpers.traitChipData) {
+                Handlebars.registerHelper('traitChipData', function(trait: any) {
+                    if (!trait || !trait.color) {
+                        return '';
+                    }
+                    
+                    const isLight = isLightColor(trait.color);
+                    return `data-color="${trait.color}" data-light="${isLight}"`;
+                });
+            }
+            
+            /**
+             * Calculate if a color is light or dark for proper text contrast
+             * Uses relative luminance calculation (WCAG standard)
+             */
+            function isLightColor(hexColor: string): boolean {
+                // Remove # if present
+                const color = hexColor.replace('#', '');
+                
+                // Parse RGB values
+                const r = parseInt(color.substr(0, 2), 16) / 255;
+                const g = parseInt(color.substr(2, 2), 16) / 255;
+                const b = parseInt(color.substr(4, 2), 16) / 255;
+                
+                // Convert to linear RGB
+                const toLinear = (c: number) => c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+                const rLinear = toLinear(r);
+                const gLinear = toLinear(g);
+                const bLinear = toLinear(b);
+                
+                // Calculate relative luminance
+                const luminance = 0.2126 * rLinear + 0.7152 * gLinear + 0.0722 * bLinear;
+                
+                // Return true if light (luminance > 0.5)
+                return luminance > 0.5;
+            }
+            
             return templatePaths;
         }, ['sheetRegistration'], { phase: 'init', critical: true });
         
@@ -461,5 +595,29 @@ export class FoundryInitializationHelper {
             await themeManager.init();
             return themeManager;
         }, [], { phase: 'ready', critical: true });
+        
+        // Trait Seeder - ready phase, auto-seeds system pack if needed
+        manager.registerService('traitSeeder', async () => {
+            const { seedSystemPackIfNeeded } = await import('../utils/trait-seeder.ts');
+            const seedingResult = await seedSystemPackIfNeeded();
+            console.log('🌱 FoundryInitializationHelper | Trait seeding result:', seedingResult);
+            return seedingResult;
+        }, [], { phase: 'ready', critical: false });
+        
+        // Trait Provider - ready phase, handles trait data from compendium packs
+        manager.registerService('traitProvider', async () => {
+            const { TraitProvider } = await import('../services/trait-provider.ts');
+            const traitProvider = TraitProvider.getInstance();
+            await traitProvider.initialize();
+            return traitProvider;
+        }, ['traitSeeder'], { phase: 'ready', critical: false });
+        
+        // Remote Trait Service - ready phase, handles remote trait synchronization
+        manager.registerService('remoteTraitService', async () => {
+            const { RemoteTraitService } = await import('../services/remote-trait-service.ts');
+            const remoteService = RemoteTraitService.getInstance();
+            console.log('🌐 FoundryInitializationHelper | Remote trait service initialized');
+            return remoteService;
+        }, ['traitProvider'], { phase: 'ready', critical: false });
     }
 } 

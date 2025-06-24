@@ -44,6 +44,54 @@ avantVtt/
 
 **End users only need the contents of `/dist`** (provided in the release zip).
 
+## CLI Quick Start
+
+Avant includes powerful CLI utilities for trait management:
+
+### Trait Management
+
+```bash
+# Export all traits to JSON
+npm run traits:export my-traits.json
+
+# Export only world traits
+npm run traits:export world-traits.json -- --world-only
+
+# Import with dry-run (safe preview)
+npm run traits:import my-traits.json -- --dry-run
+
+# Import and overwrite existing traits
+npm run traits:import my-traits.json -- --overwrite
+
+# Sync from remote repository
+npm run traits:sync
+
+# Check data integrity
+npm run traits:integrity
+
+# Get remote trait information
+npm run traits:remote
+```
+
+### Alternative: Binary Usage
+
+```bash
+# Via npm exec (after installation)
+npm exec traits export my-traits.json
+npm exec traits import my-traits.json --dry-run
+npm exec traits integrity
+```
+
+### Command Reference
+
+| Command | Description | Options |
+|---------|-------------|---------|
+| `traits:export` | Export traits to JSON | `--world-only`, `--system-only`, `--compact` |
+| `traits:import` | Import traits from JSON | `--dry-run`, `--overwrite` |
+| `traits:sync` | Sync from remote repository | None |
+| `traits:remote` | Get remote information | None |
+| `traits:integrity` | Check data integrity | None |
+
 ## Development
 
 ### Build Process

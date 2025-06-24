@@ -25,11 +25,15 @@ import {
     prepareArmorRoll,
     prepareGenericRoll,
     extractItemIdFromElement,
+    extractCombatItemId,
     formatFlavorText
 } from '../logic/actor-sheet-utils.ts';
 
 // Import local foundry UI adapter for safe notifications
 import { FoundryUI } from '../types/adapters/foundry-ui.ts';
+
+// Import trait integration utilities for chat messages
+import { createTraitHtmlForChat, itemHasTraits } from '../logic/chat/trait-resolver.ts';
 
 // Access FoundryVTT ActorSheet class - prioritize v13 namespaced class
 const ActorSheetBase = (globalThis as any).foundry?.appv1?.sheets?.ActorSheet || 
@@ -112,7 +116,7 @@ export class AvantActorSheet extends ActorSheetBase {
      * @returns The context data for template rendering
      * @override
      */
-    getData(): ActorSheetContext {
+    async getData(): Promise<ActorSheetContext> {
         const context = super.getData() as any;
         const actorData = this.actor.toObject(false);
         
@@ -158,7 +162,90 @@ export class AvantActorSheet extends ActorSheetBase {
         const itemsArray = this.actor.items ? Array.from(this.actor.items) : [];
         context.items = organizeItemsByType(itemsArray);
         
+        // Add trait display data to each item for actor sheet display
+        await this._addTraitDisplayDataToItems(context.items);
+        
         return context;
+    }
+
+    /**
+     * Add trait display data to items for actor sheet display
+     * @param items - Organized items by type
+     * @private
+     */
+    private async _addTraitDisplayDataToItems(items: any): Promise<void> {
+        try {
+            // Get TraitProvider service if available
+            const game = (globalThis as any).game;
+            if (!game?.avant?.initializationManager) {
+                return;
+            }
+
+            const traitProvider = game.avant.initializationManager.getService('traitProvider');
+            if (!traitProvider) {
+                return;
+            }
+
+            // Get all available traits
+            const result = await traitProvider.getAll();
+            if (!result.success || !result.data) {
+                return;
+            }
+
+            const allTraits = result.data;
+
+            // Add trait display data to each item in each category
+            for (const [categoryName, itemsList] of Object.entries(items)) {
+                if (Array.isArray(itemsList)) {
+                    for (const item of itemsList) {
+                        if (item.system?.traits && Array.isArray(item.system.traits)) {
+                            item.displayTraits = item.system.traits.map((traitId: string) => {
+                                const trait = allTraits.find((t: any) => t.id === traitId);
+                                if (trait) {
+                                    return {
+                                        id: traitId,
+                                        name: trait.name,
+                                        color: trait.color,
+                                        icon: trait.icon,
+                                        description: trait.description,
+                                        displayId: traitId
+                                    };
+                                } else {
+                                    return {
+                                        id: traitId,
+                                        name: this._generateFallbackTraitName(traitId),
+                                        displayId: traitId
+                                    };
+                                }
+                            });
+                        } else {
+                            item.displayTraits = [];
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            console.warn('🏷️ Avant | Failed to add trait display data to items:', error);
+        }
+    }
+
+    /**
+     * Generate a fallback display name from a trait ID
+     * @param traitId - The trait ID to generate a name from
+     * @private
+     */
+    private _generateFallbackTraitName(traitId: string): string {
+        // For system traits like "system_trait_fire_1750695472058", extract "fire"
+        if (traitId.startsWith('system_trait_')) {
+            return traitId
+                .replace(/^system_trait_/, '')
+                .replace(/_\d+$/, '')
+                .replace(/_/g, ' ')
+                .replace(/\b\w/g, l => l.toUpperCase());
+        }
+        
+        // For other IDs, just return as-is (this will show the raw ID for custom traits)
+        return traitId;
     }
 
     /**
@@ -550,47 +637,82 @@ export class AvantActorSheet extends ActorSheetBase {
     async _onAttackRoll(event: Event): Promise<any | void> {
         event.preventDefault();
         const element = event.currentTarget as HTMLElement;
-        const li = element.closest(".item") as HTMLElement;
         
-        // Use pure function to extract item ID
-        const itemId = extractItemIdFromElement(li);
+        const itemId = extractCombatItemId(element);
         if (!itemId) {
-            logger.warn('Avant | No item element found for attack roll');
+            console.error('Could not find item ID for attack roll');
             return;
         }
-        
+
         const item = this.actor.items.get(itemId);
         if (!item) {
-            logger.warn(`Avant | Item with ID '${itemId}' not found`);
-            FoundryUI.notify('Item not found', 'warn');
+            console.error(`Item with ID ${itemId} not found`);
             return;
         }
-        
+
         try {
-            // Use pure function to prepare weapon attack roll
-            const rollConfig = prepareWeaponAttackRoll(item, this.actor.getRollData());
+            const rollConfig = prepareWeaponAttackRoll(item, this.actor);
             if (!rollConfig) {
-                logger.warn('Avant | Invalid weapon data for attack roll');
+                console.error('Invalid weapon data for attack roll');
                 return;
             }
             
             const Roll = (globalThis as any).Roll;
             const ChatMessage = (globalThis as any).ChatMessage;
-            const game = (globalThis as any).game;
             
             const roll = new Roll(rollConfig.rollExpression, rollConfig.rollData);
             await roll.evaluate();
+
+            const speaker = ChatMessage.getSpeaker({ actor: this.actor });
             
+            // Build flavor text with trait display
+            let flavor = rollConfig.flavor;
+            
+            // Add trait chips to chat message if item has traits
+            if (itemHasTraits(item)) {
+                try {
+                    console.log('🏷️ TRAIT DEBUG | Attack roll - attempting to add traits for item:', item.name);
+                    console.log('🏷️ TRAIT DEBUG | Attack roll - item traits:', item.system.traits);
+                    
+                    // Get TraitProvider service from initialization manager
+                    const { getInitializationManager } = await import('../utils/initialization-manager.js');
+                    const manager = getInitializationManager();
+                    console.log('🏷️ TRAIT DEBUG | Attack roll - manager exists:', !!manager);
+                    
+                    const traitProvider = manager.getService('traitProvider'); // Fixed: lowercase 't'
+                    console.log('🏷️ TRAIT DEBUG | Attack roll - traitProvider service exists:', !!traitProvider);
+                    
+                    if (traitProvider) {
+                        const traitHtml = await createTraitHtmlForChat(
+                            item.system.traits, 
+                            traitProvider, 
+                            'small'
+                        );
+                        console.log('🏷️ TRAIT DEBUG | Attack roll - generated trait HTML:', traitHtml);
+                        if (traitHtml) {
+                            flavor += `<br/>${traitHtml}`;
+                            console.log('🏷️ TRAIT DEBUG | Attack roll - added traits to flavor, final flavor:', flavor);
+                        }
+                    } else {
+                        console.warn('🏷️ TRAIT DEBUG | Attack roll - TraitProvider service not available');
+                        const statusReport = manager.getStatusReport();
+                        console.log('🏷️ TRAIT DEBUG | Attack roll - service status:', statusReport);
+                    }
+                } catch (traitError) {
+                    console.warn('Avant | Failed to add traits to attack roll:', traitError);
+                    console.error('🏷️ TRAIT DEBUG | Attack roll - trait error details:', traitError);
+                    // Continue with roll even if trait display fails
+                }
+            }
+
             await roll.toMessage({
-                speaker: ChatMessage.getSpeaker({ actor: this.actor }),
-                flavor: rollConfig.flavor,
-                rollMode: game.settings.get('core', 'rollMode'),
+                speaker: speaker,
+                flavor: flavor
             });
-            
+
             return roll;
         } catch (error) {
-            logger.error('Avant | Error in attack roll:', error);
-            FoundryUI.notify(`Attack roll failed: ${(error as Error).message}`, 'error');
+            console.error('Error executing attack roll:', error);
         }
     }
 
@@ -603,47 +725,82 @@ export class AvantActorSheet extends ActorSheetBase {
     async _onDamageRoll(event: Event): Promise<any | void> {
         event.preventDefault();
         const element = event.currentTarget as HTMLElement;
-        const li = element.closest(".item") as HTMLElement;
         
-        // Use pure function to extract item ID
-        const itemId = extractItemIdFromElement(li);
+        const itemId = extractCombatItemId(element);
         if (!itemId) {
-            logger.warn('Avant | No item element found for damage roll');
+            console.error('Could not find item ID for damage roll');
             return;
         }
-        
+
         const item = this.actor.items.get(itemId);
         if (!item) {
-            logger.warn(`Avant | Item with ID '${itemId}' not found`);
-            FoundryUI.notify('Item not found', 'warn');
+            console.error(`Item with ID ${itemId} not found`);
             return;
         }
-        
+
         try {
-            // Use pure function to prepare weapon damage roll
-            const rollConfig = prepareWeaponDamageRoll(item, this.actor.getRollData());
+            const rollConfig = prepareWeaponDamageRoll(item, this.actor);
             if (!rollConfig) {
-                logger.warn('Avant | Invalid weapon data for damage roll');
+                console.error('Invalid weapon data for damage roll');
                 return;
             }
             
             const Roll = (globalThis as any).Roll;
             const ChatMessage = (globalThis as any).ChatMessage;
-            const game = (globalThis as any).game;
             
             const roll = new Roll(rollConfig.rollExpression, rollConfig.rollData);
             await roll.evaluate();
+
+            const speaker = ChatMessage.getSpeaker({ actor: this.actor });
             
+            // Build flavor text with trait display
+            let flavor = rollConfig.flavor;
+            
+            // Add trait chips to chat message if item has traits
+            if (itemHasTraits(item)) {
+                try {
+                    console.log('🏷️ TRAIT DEBUG | Damage roll - attempting to add traits for item:', item.name);
+                    console.log('🏷️ TRAIT DEBUG | Damage roll - item traits:', item.system.traits);
+                    
+                    // Get TraitProvider service from initialization manager
+                    const { getInitializationManager } = await import('../utils/initialization-manager.js');
+                    const manager = getInitializationManager();
+                    console.log('🏷️ TRAIT DEBUG | Damage roll - manager exists:', !!manager);
+                    
+                    const traitProvider = manager.getService('traitProvider'); // Fixed: lowercase 't'
+                    console.log('🏷️ TRAIT DEBUG | Damage roll - traitProvider service exists:', !!traitProvider);
+                    
+                    if (traitProvider) {
+                        const traitHtml = await createTraitHtmlForChat(
+                            item.system.traits, 
+                            traitProvider, 
+                            'small'
+                        );
+                        console.log('🏷️ TRAIT DEBUG | Damage roll - generated trait HTML:', traitHtml);
+                        if (traitHtml) {
+                            flavor += `<br/>${traitHtml}`;
+                            console.log('🏷️ TRAIT DEBUG | Damage roll - added traits to flavor, final flavor:', flavor);
+                        }
+                    } else {
+                        console.warn('🏷️ TRAIT DEBUG | Damage roll - TraitProvider service not available');
+                        const statusReport = manager.getStatusReport();
+                        console.log('🏷️ TRAIT DEBUG | Damage roll - service status:', statusReport);
+                    }
+                } catch (traitError) {
+                    console.warn('Avant | Failed to add traits to damage roll:', traitError);
+                    console.error('🏷️ TRAIT DEBUG | Damage roll - trait error details:', traitError);
+                    // Continue with roll even if trait display fails
+                }
+            }
+
             await roll.toMessage({
-                speaker: ChatMessage.getSpeaker({ actor: this.actor }),
-                flavor: rollConfig.flavor,
-                rollMode: game.settings.get('core', 'rollMode'),
+                speaker: speaker,
+                flavor: flavor
             });
-            
+
             return roll;
         } catch (error) {
-            logger.error('Avant | Error in damage roll:', error);
-            FoundryUI.notify(`Damage roll failed: ${(error as Error).message}`, 'error');
+            console.error('Error executing damage roll:', error);
         }
     }
 
@@ -656,47 +813,82 @@ export class AvantActorSheet extends ActorSheetBase {
     async _onArmorRoll(event: Event): Promise<any | void> {
         event.preventDefault();
         const element = event.currentTarget as HTMLElement;
-        const li = element.closest(".item") as HTMLElement;
         
-        // Use pure function to extract item ID
-        const itemId = extractItemIdFromElement(li);
+        const itemId = extractCombatItemId(element);
         if (!itemId) {
-            logger.warn('Avant | No item element found for armor roll');
+            console.error('Could not find item ID for armor roll');
             return;
         }
-        
+
         const item = this.actor.items.get(itemId);
         if (!item) {
-            logger.warn(`Avant | Item with ID '${itemId}' not found`);
-            FoundryUI.notify('Item not found', 'warn');
+            console.error(`Item with ID ${itemId} not found`);
             return;
         }
-        
+
         try {
-            // Use pure function to prepare armor roll
-            const rollConfig = prepareArmorRoll(item, this.actor.getRollData());
+            const rollConfig = prepareArmorRoll(item, this.actor);
             if (!rollConfig) {
-                logger.warn('Avant | Invalid armor data for roll');
+                console.error('Invalid armor data for roll');
                 return;
             }
             
             const Roll = (globalThis as any).Roll;
             const ChatMessage = (globalThis as any).ChatMessage;
-            const game = (globalThis as any).game;
             
             const roll = new Roll(rollConfig.rollExpression, rollConfig.rollData);
             await roll.evaluate();
+
+            const speaker = ChatMessage.getSpeaker({ actor: this.actor });
             
+            // Build flavor text with trait display
+            let flavor = rollConfig.flavor;
+            
+            // Add trait chips to chat message if item has traits
+            if (itemHasTraits(item)) {
+                try {
+                    console.log('🏷️ TRAIT DEBUG | Armor roll - attempting to add traits for item:', item.name);
+                    console.log('🏷️ TRAIT DEBUG | Armor roll - item traits:', item.system.traits);
+                    
+                    // Get TraitProvider service from initialization manager
+                    const { getInitializationManager } = await import('../utils/initialization-manager.js');
+                    const manager = getInitializationManager();
+                    console.log('🏷️ TRAIT DEBUG | Armor roll - manager exists:', !!manager);
+                    
+                    const traitProvider = manager.getService('traitProvider'); // Fixed: lowercase 't'
+                    console.log('🏷️ TRAIT DEBUG | Armor roll - traitProvider service exists:', !!traitProvider);
+                    
+                    if (traitProvider) {
+                        const traitHtml = await createTraitHtmlForChat(
+                            item.system.traits, 
+                            traitProvider, 
+                            'small'
+                        );
+                        console.log('🏷️ TRAIT DEBUG | Armor roll - generated trait HTML:', traitHtml);
+                        if (traitHtml) {
+                            flavor += `<br/>${traitHtml}`;
+                            console.log('🏷️ TRAIT DEBUG | Armor roll - added traits to flavor, final flavor:', flavor);
+                        }
+                    } else {
+                        console.warn('🏷️ TRAIT DEBUG | Armor roll - TraitProvider service not available');
+                        const statusReport = manager.getStatusReport();
+                        console.log('🏷️ TRAIT DEBUG | Armor roll - service status:', statusReport);
+                    }
+                } catch (traitError) {
+                    console.warn('Avant | Failed to add traits to armor roll:', traitError);
+                    console.error('🏷️ TRAIT DEBUG | Armor roll - trait error details:', traitError);
+                    // Continue with roll even if trait display fails
+                }
+            }
+
             await roll.toMessage({
-                speaker: ChatMessage.getSpeaker({ actor: this.actor }),
-                flavor: rollConfig.flavor,
-                rollMode: game.settings.get('core', 'rollMode'),
+                speaker: speaker,
+                flavor: flavor
             });
-            
+
             return roll;
         } catch (error) {
-            logger.error('Avant | Error in armor roll:', error);
-            FoundryUI.notify(`Armor roll failed: ${(error as Error).message}`, 'error');
+            console.error('Error executing armor roll:', error);
         }
     }
 

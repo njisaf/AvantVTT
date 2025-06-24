@@ -14,7 +14,8 @@ import {
     prepareArmorRoll,
     prepareGenericRoll,
     extractItemIdFromElement,
-    formatFlavorText
+    formatFlavorText,
+    extractCombatItemId
 } from '../../../scripts/logic/actor-sheet-utils.js';
 
 describe('Actor Sheet Utils - Pure Functions', () => {
@@ -303,21 +304,51 @@ describe('Actor Sheet Utils - Pure Functions', () => {
     });
 
     describe('extractItemIdFromElement', () => {
-        test('should extract item ID from closest .item element', () => {
+        test('should extract item ID from element with direct data-item-id (combat buttons)', () => {
             const mockElement = {
-                closest: jest.fn().mockReturnValue({
-                    dataset: { itemId: 'test-item-123' }
+                dataset: { itemId: 'combat-item-123' },
+                closest: jest.fn()
+            };
+
+            const result = extractItemIdFromElement(mockElement);
+            
+            expect(result).toBe('combat-item-123');
+            // Should not need to call closest since data-item-id is directly on element
+        });
+
+        test('should extract item ID from closest .item element (gear tab)', () => {
+            const mockElement = {
+                // No direct dataset
+                closest: jest.fn().mockImplementation((selector) => {
+                    if (selector === '.item') {
+                        return { dataset: { itemId: 'gear-item-456' } };
+                    }
+                    return null;
                 })
             };
 
             const result = extractItemIdFromElement(mockElement);
             
-            expect(result).toBe('test-item-123');
-            // Jest mocking assertion commented out due to Jest ES module compatibility issue
-            // expect(mockElement.closest).toHaveBeenCalledWith('.item');
+            expect(result).toBe('gear-item-456');
         });
 
-        test('should return null if no .item element found', () => {
+        test('should extract item ID from closest .combat-item element', () => {
+            const mockElement = {
+                // No direct dataset
+                closest: jest.fn().mockImplementation((selector) => {
+                    if (selector === '.combat-item') {
+                        return { dataset: { itemId: 'combat-item-789' } };
+                    }
+                    return null;
+                })
+            };
+
+            const result = extractItemIdFromElement(mockElement);
+            
+            expect(result).toBe('combat-item-789');
+        });
+
+        test('should return null if no .item or .combat-item element found', () => {
             const mockElement = {
                 closest: jest.fn().mockReturnValue(null)
             };
@@ -339,6 +370,53 @@ describe('Actor Sheet Utils - Pure Functions', () => {
 
         test('should handle null element input', () => {
             const result = extractItemIdFromElement(null);
+            
+            expect(result).toBeNull();
+        });
+    });
+
+    describe('extractCombatItemId', () => {
+        test('should extract item ID from element with data-item-id', () => {
+            const mockElement = {
+                dataset: { itemId: 'weapon-123' }
+            };
+
+            const result = extractCombatItemId(mockElement);
+            
+            expect(result).toBe('weapon-123');
+        });
+
+        test('should extract item ID using getAttribute fallback', () => {
+            const mockElement = {
+                getAttribute: jest.fn().mockReturnValue('armor-456')
+            };
+
+            const result = extractCombatItemId(mockElement);
+            
+            expect(result).toBe('armor-456');
+        });
+
+        test('should return null if no data-item-id found', () => {
+            const mockElement = {
+                dataset: {},
+                getAttribute: jest.fn().mockReturnValue(null)
+            };
+
+            const result = extractCombatItemId(mockElement);
+            
+            expect(result).toBeNull();
+        });
+
+        test('should handle null element input', () => {
+            const result = extractCombatItemId(null);
+            
+            expect(result).toBeNull();
+        });
+
+        test('should handle element without dataset or getAttribute', () => {
+            const mockElement = {};
+
+            const result = extractCombatItemId(mockElement);
             
             expect(result).toBeNull();
         });

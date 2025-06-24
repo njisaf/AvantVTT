@@ -1,0 +1,116 @@
+<!-- Trait Item Sheet Template -->
+<form class="{{cssClass}} flexcol" autocomplete="off">
+    <header class="sheet-header">
+        <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" height="64" width="64"/>
+        <div class="header-fields">
+            <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Trait Name"/></h1>
+        </div>
+    </header>
+
+    <nav class="sheet-tabs tabs" data-group="primary">
+        <a class="item" data-tab="definition">Definition</a>
+        <a class="item" data-tab="appearance">Appearance</a>
+        <a class="item" data-tab="categorization">Categorization</a>
+    </nav>
+
+    <section class="sheet-body">
+        <div class="tab" data-group="primary" data-tab="definition">
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="system.description" rows="6" placeholder="Describe what this trait represents and its mechanical effects...">{{system.description}}</textarea>
+                <p class="hint">This description will appear as hover text when players interact with the trait chip</p>
+            </div>
+            
+            <div class="form-group">
+                <label>Game Effects</label>
+                <textarea name="system.effects" rows="4" placeholder="Describe any game mechanical effects this trait provides (optional)...">{{system.effects}}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Rarity</label>
+                <select name="system.rarity">
+                    {{#select system.rarity}}
+                    <option value="common">Common</option>
+                    <option value="uncommon">Uncommon</option>
+                    <option value="rare">Rare</option>
+                    <option value="epic">Epic</option>
+                    <option value="legendary">Legendary</option>
+                    <option value="artifact">Artifact</option>
+                    {{/select}}
+                </select>
+            </div>
+        </div>
+
+        <div class="tab" data-group="primary" data-tab="appearance">
+            <div class="form-group">
+                <label>Trait Color</label>
+                <input type="text" name="system.color" value="{{system.color}}" placeholder="#00E0DC" 
+                       title="Hex color code for the trait chip (e.g., #FF5733)"/>
+                <p class="hint">Hex color code that will be used as the background color for this trait chip</p>
+            </div>
+
+            <div class="form-group">
+                <label>Trait Icon</label>
+                <input type="text" name="system.icon" value="{{system.icon}}" placeholder="fas fa-tag" 
+                       title="FontAwesome icon class (e.g., fas fa-fire, fas fa-snowflake)"/>
+                <p class="hint">FontAwesome icon class that will appear in the trait chip</p>
+            </div>
+
+            <div class="form-group">
+                <label>Localization Key</label>
+                <input type="text" name="system.localKey" value="{{system.localKey}}" placeholder="CUSTOM.Trait.MyTraitName" 
+                       title="Unique identifier for this trait (optional)"/>
+                <p class="hint">Optional localization key for multi-language support</p>
+            </div>
+
+            {{#if system.color}}
+                <div class="trait-preview">
+                    <label>Preview:</label>
+                    <span class="trait-chip trait-chip--preview" style="background-color: {{system.color}};">
+                        {{#if system.icon}}
+                        <i class="{{system.icon}}"></i>
+                        {{/if}}
+                        <span class="trait-chip__text">{{item.name}}</span>
+                    </span>
+                </div>
+            {{/if}}
+        </div>
+
+        <div class="tab" data-group="primary" data-tab="categorization">
+            <div class="form-group">
+                <label>Tags</label>
+                <input type="text" name="system.tags" value="{{system.tagsString}}" 
+                       placeholder="weapon,armor,talent" 
+                       title="Comma-separated tags that define what item types this trait can apply to"/>
+                <p class="hint">Comma-separated list of tags (e.g., "weapon,armor" or "talent,feature"). This determines what items this trait can be applied to and helps with search filtering.</p>
+            </div>
+
+            <div class="form-group">
+                <label>Common Tag Examples</label>
+                <div class="tag-examples">
+                    <button type="button" class="tag-example" data-tags="weapon">Weapon</button>
+                    <button type="button" class="tag-example" data-tags="armor">Armor</button>
+                    <button type="button" class="tag-example" data-tags="gear">Gear</button>
+                    <button type="button" class="tag-example" data-tags="talent">Talent</button>
+                    <button type="button" class="tag-example" data-tags="feature">Feature</button>
+                    <button type="button" class="tag-example" data-tags="augment">Augment</button>
+                    <button type="button" class="tag-example" data-tags="action">Action</button>
+                    <button type="button" class="tag-example" data-tags="weapon,armor">Combat Gear</button>
+                    <button type="button" class="tag-example" data-tags="talent,feature">Character Ability</button>
+                </div>
+                <p class="hint">Click the buttons above to quickly add common tag combinations</p>
+            </div>
+
+            {{#if system.tags}}
+                <div class="current-tags">
+                    <label>Current Tags:</label>
+                    <div class="tag-list">
+                        {{#each system.tags as |tag|}}
+                        <span class="tag-chip">{{tag}}</span>
+                        {{/each}}
+                    </div>
+                </div>
+            {{/if}}
+        </div>
+    </section>
+</form> 
