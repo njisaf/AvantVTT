@@ -7,4 +7,5 @@
 
 // Trait system services
 export { TraitProvider } from './trait-provider.js';
-export { RemoteTraitService } from './remote-trait-service.js'; 
+export { RemoteTraitService } from './remote-trait-service.js';
+export { TagRegistryService } from './tag-registry-service.ts'; 

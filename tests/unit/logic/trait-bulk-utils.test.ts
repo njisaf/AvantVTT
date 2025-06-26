@@ -33,7 +33,7 @@ function createMockTrait(id: string, name: string, categories: string[] = [], ta
     item: {
       _id: id,
       name,
-      type: 'feature',
+      type: 'trait',
       system: {
         color: '#FF0000',
         icon: 'fas fa-fire',

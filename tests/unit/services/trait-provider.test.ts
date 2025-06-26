@@ -47,7 +47,7 @@ const createMockPack = (items: any[] = []) => ({
 const createMockTraitItem = (id: string, name: string, source: 'system' | 'world' = 'system') => ({
   _id: id,
   name: name,
-  type: 'feature',
+  type: 'trait',
   system: {
     color: '#FF6B6B',
     icon: 'fas fa-fire',
@@ -132,7 +132,7 @@ describe('TraitProvider', () => {
       expect(config.systemPackName).toBe('avant.avant-traits');
       expect(config.worldPackName).toBe('custom-traits');
       expect(config.worldPackLabel).toBe('Custom Traits');
-      expect(config.itemType).toBe('feature');
+      expect(config.itemType).toBe('trait');
       expect(config.enableCaching).toBe(true);
       expect(config.cacheTimeout).toBe(300000);
     });
@@ -152,7 +152,7 @@ describe('TraitProvider', () => {
       expect(config.worldPackLabel).toBe('My Custom Traits');
       // Defaults should still be present
       expect(config.systemPackName).toBe('avant.avant-traits');
-      expect(config.itemType).toBe('feature');
+      expect(config.itemType).toBe('trait');
     });
   });
   

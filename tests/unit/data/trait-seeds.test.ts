@@ -169,7 +169,7 @@ describe('TraitSeedUtils', () => {
     test('should validate correct seed data', () => {
       const validSeed: TraitSeedData = {
         name: 'Test Trait',
-        type: 'feature',
+        type: 'trait',
         system: {
           color: '#123456',
           icon: 'fas fa-test',
@@ -183,7 +183,7 @@ describe('TraitSeedUtils', () => {
     
     test('should invalidate seed with missing name', () => {
       const invalidSeed = {
-        type: 'feature',
+        type: 'trait',
         system: {
           color: '#123456',
           icon: 'fas fa-test',
@@ -197,7 +197,7 @@ describe('TraitSeedUtils', () => {
     test('should invalidate seed with missing system properties', () => {
       const invalidSeed: TraitSeedData = {
         name: 'Test',
-        type: 'feature',
+        type: 'trait',
         system: {
           color: '#123456',
           icon: 'fas fa-test',
@@ -211,7 +211,7 @@ describe('TraitSeedUtils', () => {
     test('should invalidate seed with invalid color format', () => {
       const invalidSeed: TraitSeedData = {
         name: 'Test',
-        type: 'feature',
+        type: 'trait',
         system: {
           color: 'red', // Not hex format
           icon: 'fas fa-test',
@@ -225,7 +225,7 @@ describe('TraitSeedUtils', () => {
     test('should invalidate seed with invalid localKey format', () => {
       const invalidSeed: TraitSeedData = {
         name: 'Test',
-        type: 'feature',
+        type: 'trait',
         system: {
           color: '#123456',
           icon: 'fas fa-test',
@@ -266,7 +266,7 @@ describe('TraitSeedUtils', () => {
     test('should default sort to 0 when not provided', () => {
       const seed: TraitSeedData = {
         name: 'Test',
-        type: 'feature',
+        type: 'trait',
         system: {
           color: '#123456',
           icon: 'fas fa-test',

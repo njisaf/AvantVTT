@@ -2,29 +2,62 @@
 
 A narrative RPG system for FoundryVTT.
 
+## What is Avant?
+Avant is a modular, narrative-focused game system for Foundry Virtual Tabletop (FoundryVTT v13+). It provides a modern, themeable, and extensible ruleset for digital tabletop play.
+
+---
+
+## Installation
+
+Avant is distributed as an official release package via GitHub Releases. End users should NOT clone the repository or build from source unless developing or contributing.
+
+### Method 1: Manifest URL (Recommended)
+1. In FoundryVTT, go to "Add-on Modules" → "Install System"
+2. Use manifest URL: `https://github.com/njisaf/AvantVTT/releases/latest/download/system.json`
+3. Click "Install"
+
+### Method 2: Manual Download
+1. Download the latest release zip from: `https://github.com/njisaf/AvantVTT/releases/latest/download/avant-v0.1.6.zip`
+2. Extract to your FoundryVTT `Data/systems/avant/` directory (the directory name MUST be `avant`)
+3. Restart FoundryVTT
+4. Create a new world using the "Avant" system
+
+**Note:** The release zip contains everything needed to run the system. Do not copy source files unless you are developing.
+
+---
+
 ## Quick Start
 
 ### Prerequisites
+- FoundryVTT v13.344+
+- Node.js 16+ (for development/building only)
 
-- Node.js 16+ 
-- npm (comes with Node.js)
+### For End Users
+- Install Avant using one of the methods above.
+- Start FoundryVTT and select Avant as your game system when creating a new world.
 
-### Development Setup
+### For Developers/Contributors
+If you want to contribute code, develop modules, or build from source, please see our [Contributor Guide](docs/CONTRIBUTORS.md).
 
-1. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+---
 
-2. **Build the system**:
-   ```bash
-   npm run build
-   ```
+## Tag System
+For full details on tags, tag management, and tag API, see [docs/TAGS.md](docs/TAGS.md).
 
-3. **For active development** (auto-recompiles on changes):
-   ```bash
-   npm run dev
-   ```
+---
+
+## CLI Usage
+For advanced CLI usage, automation, and compendium management, see [docs/CLI_COMPENDIUM.md](docs/CLI_COMPENDIUM.md).
+
+---
+
+## Support
+- **GitHub**: [AvantVTT Repository](https://github.com/njisaf/AvantVTT)
+- **Discord**: bipolardiceroller, ManSally
+
+---
+
+*For developer and contributor documentation, see [docs/CONTRIBUTORS.md](docs/CONTRIBUTORS.md).*
 
 ## File Structure (Updated)
 
@@ -42,7 +75,6 @@ avantVtt/
 └── changelogs/          # Changelog and release notes
 ```
 
-**End users only need the contents of `/dist`** (provided in the release zip).
 
 ## CLI Quick Start
 
@@ -91,6 +123,133 @@ npm exec traits integrity
 | `traits:sync` | Sync from remote repository | None |
 | `traits:remote` | Get remote information | None |
 | `traits:integrity` | Check data integrity | None |
+
+## Developer Tools / Compendium CLI
+
+Avant includes advanced compendium management tools for developers working with FoundryVTT packs:
+
+### Compendium Operations
+
+```bash
+# List all available compendium packs
+npm run cli:compendium list
+
+# Show detailed pack information  
+npm run cli:compendium list --verbose
+
+# Filter packs by type
+npm run cli:compendium list --filter Item
+
+# Export pack content to JSON
+npm run cli:compendium export world.my-pack output.json
+
+# Compare differences between packs
+npm run cli:compendium diff system-pack world-pack
+
+# Create new compendium pack
+npm run cli:compendium create world.new-pack Item "My New Pack"
+
+# Validate pack integrity
+npm run cli:compendium validate world.my-pack
+
+# Copy documents between packs
+npm run cli:compendium copy source-pack target-pack --filter name:Fire
+```
+
+### JSON Output Format
+
+All CLI commands support `--json` for machine-readable output:
+
+```bash
+# JSON output for integration with other tools
+npm run cli:compendium list --json
+npm run cli:compendium diff pack1 pack2 --json
+```
+
+### Advanced Options
+
+| Option | Description | Available Commands |
+|--------|-------------|------------------|
+| `--json` | Output in JSON format | All commands |
+| `--filter <type>` | Filter by document type | `list`, `copy` |
+| `--verbose` | Detailed information | `list`, `validate` |
+| `--dry-run` | Preview without changes | `copy`, `create` |
+| `--force` | Overwrite existing | `create`, `copy` |
+
+### Developer Examples
+
+```bash
+# Development workflow: Check what's in your custom traits
+npm run cli:compendium list --filter trait --verbose
+
+# Export custom traits for backup/sharing
+npm run cli:compendium export world.custom-traits backup-traits.json
+
+# Compare system traits with custom modifications
+npm run cli:compendium diff avant.avant-traits world.custom-traits
+
+# Validate data integrity during development
+npm run cli:compendium validate world.custom-traits --json
+```
+
+**📖 For complete CLI reference, see [docs/CLI_COMPENDIUM.md](docs/CLI_COMPENDIUM.md)**
+
+## Tag Registry System
+
+Avant includes a comprehensive tag management system for organizing and categorizing traits and items:
+
+### Tag Example Buttons
+
+The trait item sheet includes interactive tag buttons that allow quick addition/removal of common tags:
+
+- **Click to Add**: Clicking a tag button adds the tag(s) to the trait's tags field
+- **Click to Remove**: If the tag is already applied, clicking removes it
+- **Visual Feedback**: Selected buttons are highlighted with cyan accents
+- **Multi-Tag Support**: Some buttons apply multiple tags at once (e.g., "Combat Gear" adds both "weapon" and "armor")
+
+### Default Tags
+
+The system includes 12 predefined tags:
+
+| Tag | Category | Description |
+|-----|----------|-------------|
+| Weapon | item | Combat weapons and offensive tools |
+| Armor | item | Protective gear and defensive equipment |
+| Gear | item | General equipment and utility items |
+| Talent | character | Character abilities and skills |
+| Feature | character | Character traits and background elements |
+| Augment | character | Cybernetic and technological enhancements |
+| Action | ability | Special actions and maneuvers |
+| Elemental | damage | Fire, ice, lightning, and elemental effects |
+| Physical | damage | Blunt force, piercing, and physical damage |
+| Tech | damage | Digital, electromagnetic, and tech-based effects |
+| Healing | beneficial | Restorative and healing abilities |
+| Defensive | beneficial | Protective and defensive bonuses |
+
+### TagRegistryService API
+
+For developers integrating with the tag system:
+
+```typescript
+import { TagRegistryService } from './scripts/services/tag-registry-service.ts';
+
+// Get the singleton instance
+const tagRegistry = TagRegistryService.getInstance();
+
+// Get all tags
+const allTags = tagRegistry.getAll();
+
+// Filter tags by category
+const itemTags = tagRegistry.getAll({ category: 'item' });
+
+// Search for tags
+const matchingTags = tagRegistry.search('weapon');
+
+// Get specific tag
+const weaponTag = tagRegistry.getById('weapon');
+```
+
+**📖 For complete tag system documentation, see [docs/TAGS.md](docs/TAGS.md)**
 
 ## Development
 
@@ -155,49 +314,13 @@ Avant includes a robust theming system with three built-in themes:
 
 Theme persistence is fully fixed and works reliably in all environments. Custom themes are supported via the theme manager.
 
-📖 **For complete theming documentation, see [THEMES.md](styles/themes/THEMES.md)**
+📖 **For complete theming documentation, see [THEMES.md](docs/THEMES.md)**
 
 This includes:
 - User guide for creating and applying custom themes
 - Developer guide for extending the theming engine  
 - CLI utilities and npm scripts for theme development
 - Examples and troubleshooting
-
-## Installation (Recommended)
-
-Avant is now distributed as an official release package via GitHub Releases. End users should NOT clone the repository or build from source unless developing or contributing.
-
-### Method 1: Manifest URL (Recommended)
-1. In FoundryVTT, go to "Add-on Modules" → "Install System"
-2. Use manifest URL: `https://github.com/njisaf/AvantVTT/releases/latest/download/system.json`
-3. Click "Install"
-
-### Method 2: Manual Download
-1. Download the latest release zip from: `https://github.com/njisaf/AvantVTT/releases/latest/download/avant-v0.1.6.zip`
-2. Extract to your FoundryVTT `Data/systems/avant/` directory (the directory name MUST be `avant`)
-3. Restart FoundryVTT
-4. Create a new world using the "Avant" system
-
-**Note:** The `/dist` directory in the release zip contains everything needed to run the system. Do not copy source files unless you are developing.
-
-## Release Process (For Maintainers)
-
-Avant uses a modern build and release workflow:
-
-1. Make changes in TypeScript (`.ts`) and SCSS (`.scss`) source files only.
-2. Run `npm run build` to generate the complete `/dist` runtime package (TypeScript → JS, SCSS → CSS).
-3. Zip the contents of `/dist` (not the folder itself) as `avant-v0.1.6.zip`.
-4. Create a new GitHub Release and upload both `avant-v0.1.6.zip` and the generated `system.json`.
-5. Update the manifest URL and download URL in the release description if needed.
-6. Test installation via manifest URL in a clean FoundryVTT v13 instance.
-
-**Important:** The system ID is `avant` and the directory name in `Data/systems/` must match exactly.
-
-## TypeScript & SCSS-First Development
-
-- All source code is written in TypeScript and SCSS.
-- Never edit `.css` or built `.js` files directly.
-- Only commit source files; `/dist` is generated during build/release.
 
 ## System Requirements
 
@@ -209,8 +332,4 @@ Avant uses a modern build and release workflow:
 - The system ID is `avant`.
 - The directory in `Data/systems/` must be named `avant` for FoundryVTT to recognize the system.
 
-## Support
-
-- **GitHub**: [AvantVTT Repository](https://github.com/njisaf/AvantVTT)
-- **Discord**: bipolardiceroller, ManSally
  

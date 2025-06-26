@@ -196,7 +196,10 @@ export class AvantItemSheet extends ItemSheetBase {
                                 return {
                                     id: traitId,
                                     name: this._generateFallbackTraitName(traitId),
-                                    displayId: traitId
+                                    displayId: traitId,
+                                    // Provide default styling for missing traits
+                                    color: '#6C757D', // Bootstrap secondary gray
+                                    icon: 'fas fa-tag'  // Generic tag icon
                                 };
                             }
                         });
@@ -216,12 +219,15 @@ export class AvantItemSheet extends ItemSheetBase {
             console.warn('🏷️ TRAIT DEBUG | Error accessing TraitProvider, falling back to name generation:', error);
         }
 
-        // Fallback: create basic display data using ID parsing
+        // Fallback: create basic display data using ID parsing with default colors/icons
         console.log('🏷️ TRAIT DEBUG | Using fallback name generation for trait display');
         context.displayTraits = traitIds.map((traitId: string) => ({
             id: traitId,
             name: this._generateFallbackTraitName(traitId),
-            displayId: traitId
+            displayId: traitId,
+            // Provide default styling for missing traits
+            color: '#6C757D', // Bootstrap secondary gray
+            icon: 'fas fa-tag'  // Generic tag icon
         }));
 
         console.log('🏷️ TRAIT DEBUG | Prepared trait display data for', context.item?.name || 'item', ':', context.displayTraits);
@@ -366,6 +372,14 @@ export class AvantItemSheet extends ItemSheetBase {
         
         // Trait input field clicks (for focus)
         html.find('.trait-chip-input__field').click(this._onTraitFieldClick.bind(this));
+        
+        // ✅ NEW: Tag example button click handlers for trait sheets
+        html.find('.tag-example').click(this._onTagExampleClick.bind(this));
+        
+        // ✅ NEW: Initialize tag button states on render
+        if (this.item.type === 'trait') {
+            this._updateTagButtonStates();
+        }
         
         console.log('🏷️ TRAIT DEBUG | All trait event listeners set up successfully');
     }
@@ -527,6 +541,116 @@ export class AvantItemSheet extends ItemSheetBase {
     }
 
     /**
+     * Handle clicking on tag example buttons
+     * @param event - The click event
+     * @private
+     */
+    private _onTagExampleClick(event: Event): void {
+        console.log('🏷️ TAG DEBUG | Tag example button clicked');
+        event.preventDefault();
+        event.stopPropagation();
+        
+        const button = event.currentTarget as HTMLElement;
+        const tags = button.dataset.tags;
+        
+        if (!tags) {
+            console.warn('🏷️ TAG DEBUG | No tags data attribute found on button');
+            return;
+        }
+        
+        console.log('🏷️ TAG DEBUG | Button tags:', tags);
+        
+        // Find the tags input field
+        const tagsInput = this.element.find('input[name="system.tags"]')[0] as HTMLInputElement;
+        
+        if (!tagsInput) {
+            console.warn('🏷️ TAG DEBUG | Tags input field not found');
+            return;
+        }
+        
+        const currentValue = tagsInput.value.trim();
+        console.log('🏷️ TAG DEBUG | Current input value:', currentValue);
+        
+        // Parse current tags and new tags
+        const currentTags = currentValue ? currentValue.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : [];
+        const newTags = tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+        
+        console.log('🏷️ TAG DEBUG | Current tags:', currentTags);
+        console.log('🏷️ TAG DEBUG | New tags to add:', newTags);
+        
+        // Determine if we're adding or removing
+        const isRemoving = newTags.every(tag => currentTags.includes(tag));
+        
+        let updatedTags: string[];
+        
+        if (isRemoving) {
+            // Remove the tags
+            updatedTags = currentTags.filter(tag => !newTags.includes(tag));
+            button.classList.remove('selected');
+            console.log('🏷️ TAG DEBUG | Removing tags, button deselected');
+        } else {
+            // Add the tags (avoid duplicates)
+            updatedTags = [...currentTags];
+            for (const newTag of newTags) {
+                if (!updatedTags.includes(newTag)) {
+                    updatedTags.push(newTag);
+                }
+            }
+            button.classList.add('selected');
+            console.log('🏷️ TAG DEBUG | Adding tags, button selected');
+        }
+        
+        // Update the input field
+        const newValue = updatedTags.join(',');
+        tagsInput.value = newValue;
+        console.log('🏷️ TAG DEBUG | Updated input value:', newValue);
+        
+        // Trigger change event for FoundryVTT form handling
+        tagsInput.dispatchEvent(new Event('change', { bubbles: true }));
+        
+        // Update button states for all buttons
+        this._updateTagButtonStates();
+    }
+
+    /**
+     * Update the visual state of all tag example buttons based on current input
+     * @private
+     */
+    private _updateTagButtonStates(): void {
+        console.log('🏷️ TAG DEBUG | Updating tag button states');
+        
+        const tagsInput = this.element.find('input[name="system.tags"]')[0] as HTMLInputElement;
+        if (!tagsInput) {
+            console.warn('🏷️ TAG DEBUG | Tags input not found for state update');
+            return;
+        }
+        
+        const currentValue = tagsInput.value.trim();
+        const currentTags = currentValue ? currentValue.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : [];
+        
+        console.log('🏷️ TAG DEBUG | Current tags for state update:', currentTags);
+        
+        // Update each tag button
+        this.element.find('.tag-example').each((index: number, element: HTMLElement) => {
+            const button = element as HTMLElement;
+            const buttonTags = button.dataset.tags;
+            
+            if (!buttonTags) return;
+            
+            const tags = buttonTags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+            const isSelected = tags.every(tag => currentTags.includes(tag));
+            
+            if (isSelected) {
+                button.classList.add('selected');
+            } else {
+                button.classList.remove('selected');
+            }
+            
+            console.log(`🏷️ TAG DEBUG | Button "${button.textContent}" with tags [${tags.join(', ')}] is ${isSelected ? 'selected' : 'not selected'}`);
+        });
+    }
+
+    /**
      * Show trait suggestions dropdown
      * @param query - The search query
      * @private
@@ -560,8 +684,8 @@ export class AvantItemSheet extends ItemSheetBase {
                 return;
             }
             
-            console.log('🏷️ TRAIT DEBUG | TraitProvider found, calling getAll()...');
-            const traitsResult = await traitProvider.getAll();
+            console.log('🏷️ TRAIT DEBUG | TraitProvider found, calling getAll() with force refresh...');
+            const traitsResult = await traitProvider.getAll({ forceRefresh: true });
             console.log('🏷️ TRAIT DEBUG | getAll() result:', traitsResult);
             console.log('🏷️ TRAIT DEBUG | Result success:', traitsResult?.success);
             console.log('🏷️ TRAIT DEBUG | Result data length:', traitsResult?.data?.length);

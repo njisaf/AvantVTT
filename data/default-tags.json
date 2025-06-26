@@ -1,0 +1,88 @@
+{
+  "tags": [
+    {
+      "id": "weapon",
+      "label": "Weapon",
+      "color": "#DC3545",
+      "icon": "fas fa-sword",
+      "categories": ["trait", "item"]
+    },
+    {
+      "id": "armor",
+      "label": "Armor",
+      "color": "#6C757D",
+      "icon": "fas fa-shield-alt",
+      "categories": ["trait", "item"]
+    },
+    {
+      "id": "gear",
+      "label": "Gear",
+      "color": "#17A2B8",
+      "icon": "fas fa-cog",
+      "categories": ["trait", "item"]
+    },
+    {
+      "id": "talent",
+      "label": "Talent",
+      "color": "#28A745",
+      "icon": "fas fa-star",
+      "categories": ["trait", "character"]
+    },
+    {
+      "id": "feature",
+      "label": "Feature",
+      "color": "#FFC107",
+      "icon": "fas fa-gem",
+      "categories": ["trait", "character"]
+    },
+    {
+      "id": "augment",
+      "label": "Augment",
+      "color": "#6F42C1",
+      "icon": "fas fa-microchip",
+      "categories": ["trait", "character"]
+    },
+    {
+      "id": "action",
+      "label": "Action",
+      "color": "#FD7E14",
+      "icon": "fas fa-bolt",
+      "categories": ["trait", "ability"]
+    },
+    {
+      "id": "elemental",
+      "label": "Elemental",
+      "color": "#00E0DC",
+      "icon": "fas fa-fire",
+      "categories": ["trait", "damage"]
+    },
+    {
+      "id": "physical",
+      "label": "Physical",
+      "color": "#8B4513",
+      "icon": "fas fa-fist-raised",
+      "categories": ["trait", "damage"]
+    },
+    {
+      "id": "tech",
+      "label": "Tech",
+      "color": "#007BFF",
+      "icon": "fas fa-robot",
+      "categories": ["trait", "damage"]
+    },
+    {
+      "id": "healing",
+      "label": "Healing",
+      "color": "#20C997",
+      "icon": "fas fa-heart",
+      "categories": ["trait", "beneficial"]
+    },
+    {
+      "id": "defensive",
+      "label": "Defensive",
+      "color": "#6C757D",
+      "icon": "fas fa-shield",
+      "categories": ["trait", "beneficial"]
+    }
+  ]
+} 

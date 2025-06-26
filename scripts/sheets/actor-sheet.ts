@@ -214,7 +214,10 @@ export class AvantActorSheet extends ActorSheetBase {
                                     return {
                                         id: traitId,
                                         name: this._generateFallbackTraitName(traitId),
-                                        displayId: traitId
+                                        displayId: traitId,
+                                        // Provide default styling for missing traits
+                                        color: '#6C757D', // Bootstrap secondary gray
+                                        icon: 'fas fa-tag'  // Generic tag icon
                                     };
                                 }
                             });

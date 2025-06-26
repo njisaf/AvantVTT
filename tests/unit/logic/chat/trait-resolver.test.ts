@@ -34,7 +34,7 @@ const mockTraits = [
     item: {
       _id: 'fire',
       name: 'Fire',
-      type: 'feature',
+      type: 'trait',
       system: {
         color: '#FF6B6B',
         icon: 'fas fa-fire',
@@ -57,7 +57,7 @@ const mockTraits = [
     item: {
       _id: 'ice',
       name: 'Ice',
-      type: 'feature',
+      type: 'trait',
       system: {
         color: '#4ECDC4',
         icon: 'fas fa-snowflake',
@@ -80,7 +80,7 @@ const mockTraits = [
     item: {
       _id: 'lightning',
       name: 'Lightning',
-      type: 'feature',
+      type: 'trait',
       system: {
         color: '#FFE66D',
         icon: 'fas fa-bolt',
@@ -357,7 +357,7 @@ describe('createTraitHtmlForChat', () => {
         item: {
           _id: 'xss',
           name: '<script>alert("xss")</script>',
-          type: 'feature',
+          type: 'trait',
           system: {
             color: '#FF0000',
             icon: 'fas fa-skull',

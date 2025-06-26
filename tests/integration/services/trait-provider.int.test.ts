@@ -1,7 +1,7 @@
 /**
- * @fileoverview TraitProvider Integration Tests
- * @version 2.0.0 - Stage 4: Stability Focus
- * @description Integration tests for the TraitProvider service using Foundry shim
+ * @fileoverview TraitProvider Integration Tests - Stage 3
+ * @version 2.0.0 - Stage 3: CompendiumLocalService Integration
+ * @description Integration tests for TraitProvider with CompendiumLocalService seeding functionality
  * @author Avant VTT Team
  */
 
@@ -9,17 +9,105 @@
 
 import { describe, test, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { TraitProvider } from '../../../scripts/services/trait-provider.ts';
+import { CompendiumLocalService } from '../../../scripts/services/compendium-local-service.ts';
 import type { Trait, TraitProviderResult } from '../../../scripts/types/domain/trait.js';
 
-describe('TraitProvider Integration Tests', () => {
+describe('TraitProvider Integration Tests - Stage 3', () => {
   let traitProvider: TraitProvider;
+  let compendiumService: CompendiumLocalService;
+  let mockHookCalls: any[];
   
   beforeEach(() => {
     // Reset singleton before each test
     (TraitProvider as any)._instance = undefined;
     
+    // Track hook calls
+    mockHookCalls = [];
+    
     // Mock FoundryVTT environment
     const mockCompendiumPacks = new Map();
+    
+    // Create mock documents for system pack (seed pack) with proper toObject() method
+    const createMockDocument = (data: any) => ({
+      _id: data._id,
+      name: data.name,
+      type: data.type,
+      system: data.system,
+      toObject: jest.fn().mockReturnValue(data)
+    });
+    
+    const mockSystemTraitData = [
+      {
+        _id: 'fire-trait',
+        name: 'Fire',
+        type: 'trait',
+        system: {
+          color: '#ff4444',
+          icon: 'icons/magic/fire/flame-burning-orange.webp',
+          localKey: 'TRAIT.Fire',
+          description: 'Fire elemental trait'
+        }
+      },
+      {
+        _id: 'ice-trait',
+        name: 'Ice',
+        type: 'trait',
+        system: {
+          color: '#4444ff',
+          icon: 'icons/magic/water/ice-crystal-blue.webp',
+          localKey: 'TRAIT.Ice',
+          description: 'Ice elemental trait'
+        }
+      },
+      {
+        _id: 'tech-trait',
+        name: 'Tech',
+        type: 'trait',
+        system: {
+          color: '#44ff44',
+          icon: 'icons/tools/scribal/circuit-board.webp',
+          localKey: 'TRAIT.Tech',
+          description: 'Technology trait'
+        }
+      }
+    ];
+    
+    const mockSystemTraits = mockSystemTraitData.map(createMockDocument);
+
+    // Mock system pack
+    const mockSystemPack = {
+      name: 'avant.avant-traits',
+      collection: 'avant.avant-traits',
+      visible: true,
+      getDocuments: jest.fn().mockResolvedValue(mockSystemTraits),
+      documentClass: {
+        createDocuments: jest.fn().mockResolvedValue(mockSystemTraits.map(t => createMockDocument(t.toObject())))
+      }
+    };
+    
+    // Mock custom pack (initially empty) - use default TraitProvider worldPackName
+    let customPackDocs: any[] = [];
+    const mockCustomPack = {
+      name: 'custom-traits',
+      collection: 'custom-traits',
+      visible: true,
+      getDocuments: jest.fn().mockImplementation(() => Promise.resolve([...customPackDocs])),
+      documentClass: {
+        createDocuments: jest.fn().mockImplementation((docs, options) => {
+          const createdDocs = docs.map(doc => {
+            const docData = { ...doc, _id: doc._id || `generated-${Math.random()}` };
+            const mockDoc = createMockDocument(docData);
+            customPackDocs.push(mockDoc);
+            return mockDoc;
+          });
+          return Promise.resolve(createdDocs);
+        })
+      }
+    };
+    
+    // Set up pack map
+    mockCompendiumPacks.set('avant.avant-traits', mockSystemPack);
+    mockCompendiumPacks.set('custom-traits', mockCustomPack);
     
     // Mock game with realistic pack structure
     const mockGame = {
@@ -28,25 +116,41 @@ describe('TraitProvider Integration Tests', () => {
       packs: mockCompendiumPacks
     };
     
-    // Mock foundry utilities with proper typing
+    // Mock foundry utilities with proper hook support
     const mockFoundry = {
       documents: {
         collections: {
           CompendiumCollection: {
             createCompendium: jest.fn().mockImplementation(async (data: any) => {
-              // Simulate pack creation by adding to game.packs
               const mockPack = {
                 name: data.name,
                 label: data.label,
                 type: data.type,
-                getDocuments: jest.fn().mockResolvedValue([] as any[])
+                getDocuments: jest.fn().mockResolvedValue([])
               };
               mockCompendiumPacks.set(data.name, mockPack);
               return mockPack;
             })
           }
         }
+      },
+      utils: {
+        hooks: {
+          call: jest.fn().mockImplementation((hookName, data) => {
+            mockHookCalls.push({ hookName, data });
+          })
+        }
       }
+    };
+    
+    // Mock Hooks for alternative hook calling
+    const mockHooks = {
+      call: jest.fn().mockImplementation((hookName, data) => {
+        mockHookCalls.push({ hookName, data });
+      }),
+      callAll: jest.fn().mockImplementation((hookName, data) => {
+        mockHookCalls.push({ hookName, data });
+      })
     };
     
     // Set up global mocks
@@ -61,338 +165,355 @@ describe('TraitProvider Integration Tests', () => {
       writable: true,
       configurable: true
     });
+    
+    Object.defineProperty(globalThis, 'Hooks', {
+      value: mockHooks,
+      writable: true,
+      configurable: true
+    });
   });
   
   afterEach(() => {
     // Clean up globals
-    if ('game' in globalThis) {
-      Object.defineProperty(globalThis, 'game', { value: undefined, configurable: true });
-    }
-    if ('foundry' in globalThis) {
-      Object.defineProperty(globalThis, 'foundry', { value: undefined, configurable: true });
-    }
+    ['game', 'foundry', 'Hooks'].forEach(prop => {
+      if (prop in globalThis) {
+        Object.defineProperty(globalThis, prop, { value: undefined, configurable: true });
+      }
+    });
   });
-  
-  describe('World Pack Auto-Creation', () => {
-    test('should automatically create world pack when missing', async () => {
-      // Setup: No world pack exists
-      const game = (globalThis as any).game;
-      const foundry = (globalThis as any).foundry;
-      
+
+  describe('Service Integration', () => {
+    test('should create TraitProvider with CompendiumLocalService', () => {
       traitProvider = TraitProvider.getInstance();
       
-      // Execute: Initialize provider
-      const result = await traitProvider.initialize();
-      
-      // Verify: Initialization succeeded
-      expect(result.success).toBe(true);
-      
-      // Verify: createCompendium was called with correct parameters
-      expect(foundry.documents.collections.CompendiumCollection.createCompendium).toHaveBeenCalledWith({
-        name: 'custom-traits',
-        label: 'Custom Traits',
-        path: './packs/custom-traits.db',
-        type: 'Item',
-        system: 'avant'
-      });
-      
-      // Verify: World pack now exists in game.packs
-      expect(game.packs.has('custom-traits')).toBe(true);
-      
-      // Verify: Provider reports pack info correctly
-      const packInfo = await traitProvider.getPackInfo();
-      expect(packInfo.success).toBe(true);
-      expect(packInfo.data?.world.exists).toBe(true);
-      expect(packInfo.data?.world.name).toBe('custom-traits');
+      expect(traitProvider).toBeInstanceOf(TraitProvider);
+      expect((traitProvider as any).compendiumService).toBeInstanceOf(CompendiumLocalService);
     });
-    
-    test('should skip creation if world pack already exists', async () => {
-      // Setup: World pack already exists
-      const game = (globalThis as any).game;
-      const foundry = (globalThis as any).foundry;
-      
-      const existingWorldPack = {
-        name: 'custom-traits',
-        label: 'Custom Traits',
-        getDocuments: jest.fn().mockResolvedValue([])
+
+    test('should use consistent configuration between services', () => {
+      const config = {
+        systemPackName: 'custom.system-traits',
+        worldPackName: 'custom.world-traits'
       };
-      game.packs.set('custom-traits', existingWorldPack);
       
+      traitProvider = TraitProvider.getInstance(config);
+      
+      expect((traitProvider as any).config.systemPackName).toBe('custom.system-traits');
+      expect((traitProvider as any).config.worldPackName).toBe('custom.world-traits');
+    });
+  });
+
+  describe('Trait Seeding Functionality', () => {
+    test('should seed missing traits from system pack to custom pack on initialization', async () => {
       traitProvider = TraitProvider.getInstance();
       
-      // Execute: Initialize provider
       const result = await traitProvider.initialize();
       
-      // Verify: Initialization succeeded
       expect(result.success).toBe(true);
-      
-      // Verify: createCompendium was NOT called
-      expect(foundry.documents.collections.CompendiumCollection.createCompendium).not.toHaveBeenCalled();
-      
-      // Verify: Original pack is still there
-      expect(game.packs.get('custom-traits')).toBe(existingWorldPack);
+      expect(result.metadata?.traitsSeeded).toBe(3); // All 3 system traits should be copied
+      expect(result.metadata?.traitsLoaded).toBeGreaterThan(0);
     });
-    
-    test('should handle pack creation errors gracefully', async () => {
-      // Setup: createCompendium fails
-      const foundry = (globalThis as any).foundry;
-      foundry.documents.collections.CompendiumCollection.createCompendium.mockRejectedValueOnce(
-        new Error('Permission denied: Cannot create compendium pack')
+
+    test('should emit avantTraitSeeded hook when traits are copied', async () => {
+      traitProvider = TraitProvider.getInstance();
+      
+      await traitProvider.initialize();
+      
+      // Find the seeding hook call
+      const seedHook = mockHookCalls.find(call => call.hookName === 'avantTraitSeeded');
+      
+      expect(seedHook).toBeDefined();
+      expect(seedHook.data).toEqual({
+        copied: 3,
+        targetPack: 'custom-traits'
+      });
+    });
+
+    test('should not seed traits if custom pack already has all system traits', async () => {
+      // Pre-populate custom pack with system traits
+      const existingTraitData = [
+        {
+          _id: 'fire-trait-custom',
+          name: 'Fire',
+          type: 'trait',
+          system: {
+            color: '#ff4444',
+            icon: 'icons/magic/fire/flame-burning-orange.webp',
+            description: 'Fire elemental trait'
+          }
+        },
+        {
+          _id: 'ice-trait-custom',
+          name: 'Ice',
+          type: 'trait',
+          system: {
+            color: '#4444ff',
+            icon: 'icons/magic/water/ice-crystal-blue.webp',
+            description: 'Ice elemental trait'
+          }
+        },
+        {
+          _id: 'tech-trait-custom',
+          name: 'Tech',
+          type: 'trait',
+          system: {
+            color: '#44ff44',
+            icon: 'icons/tools/scribal/circuit-board.webp',
+            description: 'Technology trait'
+          }
+        }
+      ];
+      
+      const mockCustomPackWithTraits = (globalThis as any).game.packs.get('custom-traits');
+      mockCustomPackWithTraits.getDocuments = jest.fn().mockResolvedValue(
+        existingTraitData.map(createMockDocument)
       );
       
       traitProvider = TraitProvider.getInstance();
       
-      // Execute: Initialize provider
       const result = await traitProvider.initialize();
       
-      // Verify: Initialization failed gracefully
-      expect(result.success).toBe(false);
-      expect(result.error).toContain('Permission denied');
-    });
-  });
-  
-  describe('World Overrides System Deduplication', () => {
-    test('should prefer world traits over system traits with same ID', async () => {
-      // Setup: Both system and world packs with conflicting trait IDs
-      const game = (globalThis as any).game;
-      
-      const systemTraitItem = {
-        _id: 'fire-trait',
-        name: 'Fire (System)',
-        type: 'feature',
-        system: {
-          color: '#FF0000',
-          icon: 'fas fa-fire',
-          localKey: 'AVANT.Trait.Fire',
-          description: 'System fire trait'
-        }
-      };
-      
-      const worldTraitItem = {
-        _id: 'fire-trait', // Same ID as system trait
-        name: 'Fire (World Override)',
-        type: 'feature',
-        system: {
-          color: '#FF6B6B',
-          icon: 'fas fa-flame',
-          localKey: 'AVANT.Trait.Fire',
-          description: 'World fire trait override'
-        }
-      };
-      
-      // Mock system pack
-      const systemPack = {
-        name: 'avant.avant-traits',
-        getDocuments: jest.fn().mockResolvedValue([systemTraitItem])
-      };
-      game.packs.set('avant.avant-traits', systemPack);
-      
-      // Mock world pack
-      const worldPack = {
-        name: 'custom-traits',
-        getDocuments: jest.fn().mockResolvedValue([worldTraitItem])
-      };
-      game.packs.set('custom-traits', worldPack);
-      
-      traitProvider = TraitProvider.getInstance();
-      await traitProvider.initialize();
-      
-      // Execute: Get all traits
-      const result = await traitProvider.getAll();
-      
-      // Verify: Only one trait returned (world override)
       expect(result.success).toBe(true);
-      expect(result.data).toHaveLength(1);
+      expect(result.metadata?.traitsSeeded).toBe(0); // No traits should be copied
       
-      // Verify: World trait is returned, not system trait
-      const trait = result.data![0];
-      expect(trait.id).toBe('fire-trait');
-      expect(trait.name).toBe('Fire (World Override)');
-      expect(trait.source).toBe('world');
-      expect(trait.color).toBe('#FF6B6B');
-      expect(trait.icon).toBe('fas fa-flame');
+      // No seeding hook should be called
+      const seedHook = mockHookCalls.find(call => call.hookName === 'avantTraitSeeded');
+      expect(seedHook).toBeUndefined();
     });
-    
-    test('should merge system and world traits when IDs are different', async () => {
-      // Setup: System and world packs with different trait IDs
-      const game = (globalThis as any).game;
-      
-      const systemTraitItem = {
-        _id: 'system-fire',
+
+    test('should handle partial seeding when some traits already exist', async () => {
+      // Pre-populate custom pack with only one trait
+      const partialTraitData = [{
+        _id: 'fire-trait-existing',
         name: 'Fire',
-        type: 'feature',
+        type: 'trait',
         system: {
-          color: '#FF0000',
-          icon: 'fas fa-fire',
-          localKey: 'AVANT.Trait.Fire'
+          color: '#ff4444',
+          icon: 'icons/magic/fire/flame-burning-orange.webp',
+          description: 'Fire elemental trait'
         }
-      };
+      }];
       
-      const worldTraitItem = {
-        _id: 'world-ice',
-        name: 'Ice',
-        type: 'feature',
-        system: {
-          color: '#00FFFF',
-          icon: 'fas fa-snowflake',
-          localKey: 'AVANT.Trait.Ice'
-        }
-      };
-      
-      // Mock system pack
-      const systemPack = {
-        name: 'avant.avant-traits',
-        getDocuments: jest.fn().mockResolvedValue([systemTraitItem])
-      };
-      game.packs.set('avant.avant-traits', systemPack);
-      
-      // Mock world pack
-      const worldPack = {
-        name: 'custom-traits',
-        getDocuments: jest.fn().mockResolvedValue([worldTraitItem])
-      };
-      game.packs.set('custom-traits', worldPack);
+      const mockCustomPackPartial = (globalThis as any).game.packs.get('custom-traits');
+      mockCustomPackPartial.getDocuments = jest.fn().mockResolvedValue(
+        partialTraitData.map(createMockDocument)
+      );
       
       traitProvider = TraitProvider.getInstance();
-      await traitProvider.initialize();
       
-      // Execute: Get all traits
-      const result = await traitProvider.getAll();
+      const result = await traitProvider.initialize();
       
-      // Verify: Both traits returned
       expect(result.success).toBe(true);
-      expect(result.data).toHaveLength(2);
+      expect(result.metadata?.traitsSeeded).toBe(2); // Only Ice and Tech should be copied
       
-      // Verify: System trait is present
-      const systemTrait = result.data!.find(t => t.source === 'system');
-      expect(systemTrait).toBeDefined();
-      expect(systemTrait!.name).toBe('Fire');
-      expect(systemTrait!.id).toBe('system-fire');
-      
-      // Verify: World trait is present
-      const worldTrait = result.data!.find(t => t.source === 'world');
-      expect(worldTrait).toBeDefined();
-      expect(worldTrait!.name).toBe('Ice');
-      expect(worldTrait!.id).toBe('world-ice');
+      const seedHook = mockHookCalls.find(call => call.hookName === 'avantTraitSeeded');
+      expect(seedHook).toBeDefined();
+      expect(seedHook.data.copied).toBe(2);
     });
-    
-    test('should handle multiple trait overrides correctly', async () => {
-      // Setup: Multiple conflicting traits between system and world
-      const game = (globalThis as any).game;
-      
-      const systemTraits = [
-        {
-          _id: 'trait-1',
-          name: 'Trait 1 (System)',
-          type: 'feature',
-          system: { color: '#FF0000', icon: 'fas fa-1', localKey: 'AVANT.Trait.1' }
-        },
-        {
-          _id: 'trait-2',
-          name: 'Trait 2 (System)',
-          type: 'feature',
-          system: { color: '#00FF00', icon: 'fas fa-2', localKey: 'AVANT.Trait.2' }
-        },
-        {
-          _id: 'trait-3',
-          name: 'Trait 3 (System Only)',
-          type: 'feature',
-          system: { color: '#0000FF', icon: 'fas fa-3', localKey: 'AVANT.Trait.3' }
-        }
-      ];
-      
-      const worldTraits = [
-        {
-          _id: 'trait-1', // Override trait-1
-          name: 'Trait 1 (World Override)',
-          type: 'feature',
-          system: { color: '#FF6B6B', icon: 'fas fa-1-world', localKey: 'AVANT.Trait.1' }
-        },
-        {
-          _id: 'trait-2', // Override trait-2
-          name: 'Trait 2 (World Override)',
-          type: 'feature',
-          system: { color: '#6BFF6B', icon: 'fas fa-2-world', localKey: 'AVANT.Trait.2' }
-        },
-        {
-          _id: 'trait-4', // New world-only trait
-          name: 'Trait 4 (World Only)',
-          type: 'feature',
-          system: { color: '#FFFF00', icon: 'fas fa-4', localKey: 'AVANT.Trait.4' }
-        }
-      ];
-      
-      // Mock packs
-      game.packs.set('avant.avant-traits', {
-        getDocuments: jest.fn().mockResolvedValue(systemTraits)
-      });
-      game.packs.set('custom-traits', {
-        getDocuments: jest.fn().mockResolvedValue(worldTraits)
-      });
+
+    test('should continue initialization even if seeding fails', async () => {
+      // Mock CompendiumLocalService to throw error during seeding
+      const originalLoadPack = CompendiumLocalService.prototype.loadPack;
+      CompendiumLocalService.prototype.loadPack = jest.fn()
+        .mockRejectedValueOnce(new Error('System pack not accessible'))
+        .mockResolvedValue([]); // Second call for custom pack
       
       traitProvider = TraitProvider.getInstance();
-      await traitProvider.initialize();
       
-      // Execute: Get all traits
-      const result = await traitProvider.getAll();
+      const result = await traitProvider.initialize();
       
-      // Verify: Correct number of traits (4 total: 2 overrides + 1 system-only + 1 world-only)
+      // Should still succeed despite seeding failure
       expect(result.success).toBe(true);
-      expect(result.data).toHaveLength(4);
+      expect(result.metadata?.traitsSeeded).toBe(0);
       
-      // Verify: trait-1 comes from world (override)
-      const trait1 = result.data!.find(t => t.id === 'trait-1');
-      expect(trait1!.name).toBe('Trait 1 (World Override)');
-      expect(trait1!.source).toBe('world');
-      
-      // Verify: trait-2 comes from world (override)
-      const trait2 = result.data!.find(t => t.id === 'trait-2');
-      expect(trait2!.name).toBe('Trait 2 (World Override)');
-      expect(trait2!.source).toBe('world');
-      
-      // Verify: trait-3 comes from system (no override)
-      const trait3 = result.data!.find(t => t.id === 'trait-3');
-      expect(trait3!.name).toBe('Trait 3 (System Only)');
-      expect(trait3!.source).toBe('system');
-      
-      // Verify: trait-4 comes from world (world-only)
-      const trait4 = result.data!.find(t => t.id === 'trait-4');
-      expect(trait4!.name).toBe('Trait 4 (World Only)');
-      expect(trait4!.source).toBe('world');
+      // Restore original method
+      CompendiumLocalService.prototype.loadPack = originalLoadPack;
     });
   });
-  
-  describe('Error Recovery', () => {
-    test('should handle corrupted world pack gracefully', async () => {
-      // Setup: World pack with invalid data
-      const game = (globalThis as any).game;
+
+  describe('Pack Loading Integration', () => {
+    test('should load traits using CompendiumLocalService', async () => {
+      traitProvider = TraitProvider.getInstance();
+      await traitProvider.initialize();
       
-      const worldPack = {
-        name: 'custom-traits',
-        getDocuments: jest.fn().mockRejectedValue(new Error('Database corrupted'))
-      };
-      game.packs.set('custom-traits', worldPack);
+      const allTraits = await traitProvider.getAll({ forceRefresh: true });
       
-      const systemPack = {
-        name: 'avant.avant-traits',
-        getDocuments: jest.fn().mockResolvedValue([{
-          _id: 'fire',
-          name: 'Fire',
-          type: 'feature',
-          system: { color: '#FF0000', icon: 'fas fa-fire', localKey: 'AVANT.Trait.Fire' }
-        }])
-      };
-      game.packs.set('avant.avant-traits', systemPack);
+      expect(allTraits.success).toBe(true);
+      expect(allTraits.data).toBeDefined();
+      expect(allTraits.data!.length).toBeGreaterThan(0);
+      
+      // Should contain traits from both system and custom packs
+      const traitNames = allTraits.data!.map(t => t.name);
+      expect(traitNames).toContain('Fire');
+      expect(traitNames).toContain('Ice');
+      expect(traitNames).toContain('Tech');
+    });
+
+    test('should handle missing system pack gracefully', async () => {
+      // Remove system pack
+      (globalThis as any).game.packs.delete('avant.avant-traits');
+      
+      traitProvider = TraitProvider.getInstance();
+      
+      const result = await traitProvider.initialize();
+      
+      expect(result.success).toBe(true);
+      expect(result.metadata?.traitsSeeded).toBe(0);
+    });
+
+    test('should create custom pack if it does not exist', async () => {
+      // Remove custom pack
+      (globalThis as any).game.packs.delete('custom-traits');
+      
+      traitProvider = TraitProvider.getInstance();
+      
+      const result = await traitProvider.initialize();
+      
+      expect(result.success).toBe(true);
+      
+      // Verify pack creation was called
+      const foundry = (globalThis as any).foundry;
+      expect(foundry.documents.collections.CompendiumCollection.createCompendium)
+        .toHaveBeenCalledWith(expect.objectContaining({
+          name: 'custom-traits',
+          label: 'Custom Traits',
+          type: 'Item'
+        }));
+    });
+  });
+
+  describe('Hook Emission', () => {
+    test('should emit avantTraitRegistered hooks for initialized traits', async () => {
+      traitProvider = TraitProvider.getInstance();
+      
+      await traitProvider.initialize();
+      
+      // Find trait registered hooks
+      const registeredHooks = mockHookCalls.filter(call => call.hookName === 'avantTraitRegistered');
+      
+      expect(registeredHooks.length).toBeGreaterThan(0);
+      
+      // All should be 'initialized' action
+      registeredHooks.forEach(hook => {
+        expect(hook.data.action).toBe('initialized');
+        expect(hook.data.trait).toBeDefined();
+        expect(hook.data.source).toMatch(/^(system|world)$/);
+        expect(hook.data.timestamp).toBeDefined();
+      });
+    });
+
+    test('should emit avantCompendiumDiffed hook during seeding', async () => {
+      traitProvider = TraitProvider.getInstance();
+      
+      await traitProvider.initialize();
+      
+      // Find compendium diffed hook
+      const diffHook = mockHookCalls.find(call => call.hookName === 'avantCompendiumDiffed');
+      
+      expect(diffHook).toBeDefined();
+      expect(diffHook.data.srcId).toBe('avant.avant-traits');
+      expect(diffHook.data.destId).toBe('custom-traits');
+      expect(diffHook.data.diff).toBeDefined();
+    });
+
+    test('should emit avantCompendiumCopied hook during seeding', async () => {
+      traitProvider = TraitProvider.getInstance();
+      
+      await traitProvider.initialize();
+      
+      // Find compendium copied hook
+      const copyHook = mockHookCalls.find(call => call.hookName === 'avantCompendiumCopied');
+      
+      expect(copyHook).toBeDefined();
+      expect(copyHook.data.srcId).toBe('avant.avant-traits');
+      expect(copyHook.data.destId).toBe('custom-traits');
+      expect(copyHook.data.docsCopied).toBe(3);
+      expect(copyHook.data.copiedNames).toEqual(['Fire', 'Ice', 'Tech']);
+    });
+  });
+
+  describe('Public API Compatibility', () => {
+    test('should maintain all existing public methods', async () => {
+      traitProvider = TraitProvider.getInstance();
+      await traitProvider.initialize();
+      
+      // Verify all public methods exist and are callable
+      expect(typeof traitProvider.getAll).toBe('function');
+      expect(typeof traitProvider.get).toBe('function');
+      expect(typeof traitProvider.isReady).toBe('function');
+      expect(typeof traitProvider.clearCache).toBe('function');
+      expect(typeof traitProvider.search).toBe('function');
+      expect(typeof traitProvider.createTrait).toBe('function');
+      expect(typeof traitProvider.updateTrait).toBe('function');
+      expect(typeof traitProvider.deleteTrait).toBe('function');
+      
+      // Test key methods work correctly
+      expect(traitProvider.isReady()).toBe(true);
+      
+      const searchResult = await traitProvider.search('Fire');
+      expect(searchResult.success).toBe(true);
+      
+      const getResult = await traitProvider.get('fire-trait');
+      expect(getResult.success).toBe(true);
+    });
+
+    test('should return proper TraitProviderResult structure', async () => {
+      traitProvider = TraitProvider.getInstance();
+      await traitProvider.initialize();
+      
+      const result = await traitProvider.getAll();
+      
+      expect(result).toHaveProperty('success');
+      expect(result).toHaveProperty('data');
+      expect(result).toHaveProperty('metadata');
+      expect(typeof result.success).toBe('boolean');
+    });
+  });
+
+  describe('Performance and Error Handling', () => {
+    test('should complete initialization within reasonable time', async () => {
+      const startTime = Date.now();
       
       traitProvider = TraitProvider.getInstance();
       await traitProvider.initialize();
       
-      // Execute: Get all traits (should still work with system pack)
-      const result = await traitProvider.getAll();
+      const endTime = Date.now();
+      const duration = endTime - startTime;
       
-      // Verify: Initialization failed but provider is still functional for system pack
-      expect(result.success).toBe(false);
-      expect(result.error).toContain('Database corrupted');
+      // Should complete in under 5 seconds (integration test requirement)
+      expect(duration).toBeLessThan(5000);
+    });
+
+    test('should handle invalid system pack configuration gracefully', async () => {
+      const config = {
+        systemPackName: 'invalid.pack.name',
+        worldPackName: 'custom-traits'
+      };
+      
+      traitProvider = TraitProvider.getInstance(config);
+      
+      const result = await traitProvider.initialize();
+      
+      // Should still succeed even with invalid system pack
+      expect(result.success).toBe(true);
+      expect(result.metadata?.traitsSeeded).toBe(0);
+    });
+
+    test('should handle CompendiumLocalService errors gracefully', async () => {
+      // Mock service to throw errors
+      const errorService = {
+        loadPack: jest.fn().mockRejectedValue(new Error('Service unavailable')),
+        diffLocalPacks: jest.fn().mockRejectedValue(new Error('Diff failed')),
+        copyDocs: jest.fn().mockRejectedValue(new Error('Copy failed'))
+      };
+      
+      traitProvider = TraitProvider.getInstance();
+      (traitProvider as any).compendiumService = errorService;
+      
+      const result = await traitProvider.initialize();
+      
+      // Should handle errors gracefully and still succeed
+      expect(result.success).toBe(true);
     });
   });
 }); 

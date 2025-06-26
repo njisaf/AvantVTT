@@ -63,5 +63,5 @@ packs/
 *.db 
 
 # release artifacts
-changelogs/
 _releases/
+_sprints/

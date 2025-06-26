@@ -28,7 +28,7 @@ const mockTraits = [
     item: {
       _id: 'fire',
       name: 'Fire',
-      type: 'feature',
+      type: 'trait',
       system: {
         color: '#FF6B6B',
         icon: 'fas fa-fire',
@@ -51,7 +51,7 @@ const mockTraits = [
     item: {
       _id: 'ice',
       name: 'Ice',
-      type: 'feature',
+      type: 'trait',
       system: {
         color: '#4ECDC4',
         icon: 'fas fa-snowflake',
@@ -74,7 +74,7 @@ const mockTraits = [
     item: {
       _id: 'bright-yellow',
       name: 'Bright Light',
-      type: 'feature',
+      type: 'trait',
       system: {
         color: '#FFEB3B',
         icon: 'fas fa-sun',

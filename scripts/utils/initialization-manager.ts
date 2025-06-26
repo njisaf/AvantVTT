@@ -410,6 +410,14 @@ export class FoundryInitializationHelper {
      * @param manager - Manager instance
      */
     static registerFoundryServices(manager: InitializationManager): void {
+        // Tag Registry Service - no dependencies, foundational service
+        manager.registerService('tagRegistry', async () => {
+            const { TagRegistryService } = await import('../services/tag-registry-service.ts');
+            const tagRegistry = TagRegistryService.getInstance();
+            await tagRegistry.initialize();
+            return tagRegistry;
+        }, [], { phase: 'init', critical: false });
+        
         // Theme Manager - no dependencies
         manager.registerService('themeManager', async () => {
             const { AvantThemeManager } = await import('../themes/theme-manager.js');
@@ -528,8 +536,10 @@ export class FoundryInitializationHelper {
             // Register trait chip helper for proper color and icon styling
             if (Handlebars && !Handlebars.helpers.traitChipStyle) {
                 Handlebars.registerHelper('traitChipStyle', function(trait: any) {
+                    // ✅ FIX: Always provide fallback styling to prevent color loss
                     if (!trait || !trait.color) {
-                        return '';
+                        // Use fallback grey color instead of empty string
+                        return '--trait-color: #6C757D; --trait-text-color: #ffffff;';
                     }
                     
                     // Calculate if color is light or dark for proper text contrast
@@ -543,8 +553,10 @@ export class FoundryInitializationHelper {
             // Register trait chip data attributes helper
             if (Handlebars && !Handlebars.helpers.traitChipData) {
                 Handlebars.registerHelper('traitChipData', function(trait: any) {
+                    // ✅ FIX: Always provide fallback data attributes to prevent attribute loss
                     if (!trait || !trait.color) {
-                        return '';
+                        // Use fallback grey color instead of empty string
+                        return 'data-color="#6C757D" data-light="false"';
                     }
                     
                     const isLight = isLightColor(trait.color);

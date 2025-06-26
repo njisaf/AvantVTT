@@ -35,7 +35,7 @@ const createMockTrait = (id: string, name: string, color: string = '#FF6B6B', ic
   item: {
     _id: id,
     name,
-    type: 'feature',
+    type: 'trait',
     system: {
       color,
       icon,

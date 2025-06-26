@@ -1,7 +1,7 @@
 /**
  * @fileoverview TraitProvider Service
- * @version 1.0.0 - Stage 1: Foundation  
- * @description Service for managing trait data from system and world compendium packs
+ * @version 2.0.0 - Stage 3: Compendium Integration  
+ * @description Service for managing trait data from system and world compendium packs using CompendiumLocalService
  * @author Avant VTT Team
  */
 
@@ -16,12 +16,14 @@ import type {
   TraitRetrievalOptions,
   CompendiumPackInfo
 } from '../types/domain/trait.js';
+import { CompendiumLocalService } from './compendium-local-service.ts';
 
 /**
  * Service that provides access to trait data from both system and world compendium packs.
  * 
  * This service waits for FoundryVTT initialization, merges traits from multiple sources,
- * provides caching for performance, and automatically creates world packs if needed.
+ * provides caching for performance, automatically creates world packs if needed, and 
+ * seeds custom traits with defaults from the system pack using CompendiumLocalService.
  */
 export class TraitProvider {
   private static _instance: TraitProvider | undefined;
@@ -31,6 +33,7 @@ export class TraitProvider {
   private isInitialized = false;
   private readonly foundry: any;
   private readonly game: any;
+  private readonly compendiumService!: CompendiumLocalService;
   
   /**
    * Create a new TraitProvider instance.
@@ -49,9 +52,9 @@ export class TraitProvider {
     // Default configuration - explicit assignment to fix TypeScript error
     const defaultConfig: TraitProviderConfig = {
       systemPackName: 'avant.avant-traits',
-      worldPackName: 'world.custom-traits',  // Fixed: Use full v13 world pack name
+      worldPackName: 'world.custom-traits',  // Use proper world pack format for v13
       worldPackLabel: 'Custom Traits',
-      itemType: 'trait', // Use new 'trait' type from system.json
+      itemType: 'trait', // Use trait type to avoid collision with future feature items
       enableCaching: true,
       cacheTimeout: 300000 // 5 minutes
     };
@@ -61,6 +64,9 @@ export class TraitProvider {
     // Get FoundryVTT globals safely
     this.foundry = (globalThis as any).foundry;
     this.game = (globalThis as any).game;
+    
+    // Initialize CompendiumLocalService for pack operations
+    this.compendiumService = new CompendiumLocalService();
     
     console.log('🏷️ TraitProvider | Instance created with config:', this.config);
   }
@@ -79,8 +85,11 @@ export class TraitProvider {
   }
   
   /**
-   * Initialize the trait provider by waiting for FoundryVTT and setting up packs.
-   * This method is called by the InitializationManager.
+   * Initialize the trait provider by waiting for FoundryVTT, setting up packs, and seeding custom traits.
+   * 
+   * This method ensures the world pack exists, loads the seed pack (system traits), compares them with
+   * the custom pack, and copies any missing default traits to ensure the world always has the standard
+   * 8 traits available. After seeding, it loads all traits to populate the cache.
    * 
    * @returns Promise that resolves when initialization is complete
    */
@@ -104,6 +113,56 @@ export class TraitProvider {
           error: `Failed to ensure world pack exists: ${worldPackResult.error}`
         };
       }
+
+      // Seed custom traits from system pack using CompendiumLocalService
+      let traitsSeeded = 0;
+      try {
+        console.log('🏷️ TraitProvider | Starting trait seeding process...');
+        
+        // Load seed pack (system traits) and custom pack
+        const seedDocs = await this.compendiumService.loadPack(this.config.systemPackName);
+        const customDocs = await this.compendiumService.loadPack(this.config.worldPackName);
+        
+        // Compare packs to find missing traits in custom pack
+        const diff = await this.compendiumService.diffLocalPacks(this.config.systemPackName, this.config.worldPackName);
+        
+        if (diff.added.length > 0) {
+          console.log(`🏷️ TraitProvider | Found ${diff.added.length} traits missing from custom pack, copying...`);
+          
+          // Copy missing traits to custom pack
+          await this.compendiumService.copyDocs(
+            this.config.systemPackName, 
+            this.config.worldPackName,
+            {
+              filter: (doc) => diff.added.some(addedDoc => addedDoc.name === doc.name),
+              preserveIds: false
+            }
+          );
+          
+          traitsSeeded = diff.added.length;
+          
+          // Emit seeding hook
+          const seedHookData = {
+            copied: traitsSeeded,
+            targetPack: this.config.worldPackName
+          };
+          
+          if (this.foundry?.utils?.hooks?.call) {
+            this.foundry.utils.hooks.call('avantTraitSeeded', seedHookData);
+          } else if ((globalThis as any).Hooks?.call) {
+            (globalThis as any).Hooks.call('avantTraitSeeded', seedHookData);
+          }
+          
+          console.log(`🏷️ TraitProvider | Seeded ${traitsSeeded} traits to custom pack`);
+        } else {
+          console.log('🏷️ TraitProvider | All default traits already present in custom pack');
+        }
+        
+      } catch (seedError) {
+        // Log seeding error but don't fail initialization - custom traits may still exist
+        const seedErrorMessage = seedError instanceof Error ? seedError.message : String(seedError);
+        console.warn(`🏷️ TraitProvider | Trait seeding failed, continuing with existing traits: ${seedErrorMessage}`);
+      }
       
       // Load initial traits to populate cache
       const traitsResult = await this.getAll({ forceRefresh: true });
@@ -122,13 +181,14 @@ export class TraitProvider {
       }
       
       this.isInitialized = true;
-      console.log(`🏷️ TraitProvider | Initialized successfully with ${traitsResult.data?.length || 0} traits`);
+      console.log(`🏷️ TraitProvider | Initialized successfully with ${traitsResult.data?.length || 0} traits (${traitsSeeded} newly seeded)`);
       
       return {
         success: true,
         data: true,
         metadata: { 
           traitsLoaded: traitsResult.data?.length || 0,
+          traitsSeeded,
           systemPackExists: await this.checkPackExists('system'),
           worldPackExists: await this.checkPackExists('world')
         }
@@ -581,34 +641,45 @@ export class TraitProvider {
   // =========================================================================
   
   /**
-   * Load traits from a specific pack (system or world)
+   * Load traits from a specific pack (system or world) using CompendiumLocalService
+   * 
+   * This method uses the CompendiumLocalService for consistent pack management and
+   * then converts the loaded documents to Trait objects. It maintains compatibility
+   * with the existing trait filtering and conversion logic while leveraging the
+   * new compendium framework.
    * 
    * @private
    */
   private async loadTraitsFromPack(source: TraitSource): Promise<TraitProviderResult<Trait[]>> {
     try {
       const packName = source === 'system' ? this.config.systemPackName : this.config.worldPackName;
-      const pack = this.game.packs.get(packName);
       
       console.log(`🏷️ TRAIT DEBUG | loadTraitsFromPack called for source '${source}', packName: '${packName}'`);
-      console.log(`🏷️ TRAIT DEBUG | Pack found:`, !!pack);
+      console.log(`🏷️ TRAIT DEBUG | Using CompendiumLocalService for pack loading...`);
       console.log(`🏷️ TRAIT DEBUG | Current timestamp: ${new Date().toISOString()}`);
       
-      if (!pack) {
-        console.log(`🏷️ TRAIT DEBUG | Pack '${packName}' not found for source '${source}'`);
-        console.log(`🏷️ TRAIT DEBUG | Available packs:`, this.game.packs.keys());
-        return {
-          success: true, // Not finding a pack is not an error
-          data: []
-        };
+      // Use CompendiumLocalService to load documents
+      let items;
+      try {
+        items = await this.compendiumService.loadPack(packName);
+        console.log(`🏷️ TRAIT DEBUG | CompendiumLocalService loaded ${items.length} items from pack`);
+      } catch (loadError) {
+        // If pack doesn't exist or can't be loaded, that's not necessarily an error
+        const errorMsg = loadError instanceof Error ? loadError.message : String(loadError);
+        console.log(`🏷️ TRAIT DEBUG | Pack '${packName}' could not be loaded: ${errorMsg}`);
+        
+        // If it's a "not found" error, return empty result rather than failing
+        if (errorMsg.includes('not found')) {
+          console.log(`🏷️ TRAIT DEBUG | Pack '${packName}' not found for source '${source}' - returning empty result`);
+          return {
+            success: true, // Not finding a pack is not an error
+            data: []
+          };
+        }
+        
+        // Re-throw other errors
+        throw loadError;
       }
-      
-      console.log(`🏷️ TRAIT DEBUG | Pack details - type: ${pack.documentName}, title: ${pack.title}, size: ${pack.size}`);
-      console.log(`🏷️ TRAIT DEBUG | Getting documents from pack...`);
-      
-      // Get all items from the pack with retry logic for system pack
-      let items = await pack.getDocuments();
-      console.log(`🏷️ TRAIT DEBUG | Initial getDocuments() retrieved ${items.length} items from pack`);
       
       // If system pack is empty, this means the build process didn't populate it correctly
       if (items.length === 0 && source === 'system') {
@@ -667,7 +738,7 @@ export class TraitProvider {
       }
       
       console.log(`🏷️ TRAIT DEBUG | Final results - processed: ${processedCount}, skipped: ${skippedCount}, converted: ${convertedCount}`);
-      console.log(`🏷️ TraitProvider | Loaded ${traits.length} traits from ${source} pack '${packName}'`);
+      console.log(`🏷️ TraitProvider | Loaded ${traits.length} traits from ${source} pack '${packName}' via CompendiumLocalService`);
       
       return {
         success: true,
@@ -727,9 +798,10 @@ export class TraitProvider {
       // Generate ID with fallback strategy if item._id is null
       let traitId = item._id || item.id;
       if (!traitId) {
-        // Generate a deterministic ID based on name and source
-        traitId = `${source}_trait_${item.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}_${Date.now()}`;
-        console.log(`🏷️ TRAIT DEBUG | Generated fallback ID: ${traitId}`);
+        // Generate a stable, deterministic ID based on name and source (NO timestamp)
+        const sanitizedName = item.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+        traitId = `${source}_trait_${sanitizedName}`;
+        console.log(`🏷️ TRAIT DEBUG | Generated deterministic ID: ${traitId}`);
       }
       
       const trait: Trait = {
@@ -940,11 +1012,16 @@ export class TraitProvider {
       // Emit the hook for plugins to listen to
       if (this.foundry?.utils?.hooks?.call) {
         this.foundry.utils.hooks.call('avantTraitRegistered', hookData);
+        // ✅ NEW: Also emit avantTagsUpdated hook to trigger autocomplete index rebuild
+        this.foundry.utils.hooks.call('avantTagsUpdated', []);
       } else if ((globalThis as any).Hooks?.call) {
         (globalThis as any).Hooks.call('avantTraitRegistered', hookData);
+        // ✅ NEW: Also emit avantTagsUpdated hook to trigger autocomplete index rebuild
+        (globalThis as any).Hooks.call('avantTagsUpdated', []);
       }
       
       console.log(`🏷️ TraitProvider | Emitted 'avantTraitRegistered' hook for trait '${trait.name}' (${action})`);
+      console.log(`🏷️ TraitProvider | Emitted 'avantTagsUpdated' hook to trigger autocomplete rebuild`);
       
     } catch (error) {
       console.error('🏷️ TraitProvider | Failed to emit trait registered hook:', error);
