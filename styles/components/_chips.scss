@@ -63,19 +63,13 @@ $chip-dropdown-z-index: 1000;
   position: relative;
   z-index: $chip-z-index;
   
-  // Ensure good contrast
+  // Use explicit text color (accessibility auto-contrast disabled)
   &[data-color] {
     background: var(--trait-color);
     
-    // Auto-calculate text color based on background
-    &[data-light="true"] {
-      color: $chip-text-dark;
-      --trait-text-color: #{$chip-text-dark};
-    }
-    
-    &[data-light="false"] {
-      color: $chip-text-light;
-      --trait-text-color: #{$chip-text-light};
+    // Use explicit text color from data attribute
+    &[data-text-color] {
+      color: var(--trait-text-color);
     }
   }
   

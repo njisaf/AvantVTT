@@ -50,6 +50,13 @@
             </div>
 
             <div class="form-group">
+                <label>Text Color</label>
+                <input type="text" name="system.textColor" value="{{system.textColor}}" placeholder="#000000" 
+                       title="Hex color code for the text color (e.g., #000000 for black, #FFFFFF for white)"/>
+                <p class="hint">Hex color code that will be used for the text color on this trait chip</p>
+            </div>
+
+            <div class="form-group">
                 <label>Trait Icon</label>
                 <input type="text" name="system.icon" value="{{system.icon}}" placeholder="fas fa-tag" 
                        title="FontAwesome icon class (e.g., fas fa-fire, fas fa-snowflake)"/>
@@ -66,7 +73,7 @@
             {{#if system.color}}
                 <div class="trait-preview">
                     <label>Preview:</label>
-                    <span class="trait-chip trait-chip--preview" style="background-color: {{system.color}};">
+                    <span class="trait-chip trait-chip--preview" style="background-color: {{system.color}}; color: {{system.textColor}};">
                         {{#if system.icon}}
                         <i class="{{system.icon}}"></i>
                         {{/if}}

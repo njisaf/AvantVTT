@@ -308,12 +308,22 @@ export class CompendiumLocalService {
                     delete data._id;
                 }
                 
+                // FoundryVTT v13 compatibility: ensure clean data structure
+                // Remove any fields that might cause issues with bulk operations
+                delete data._stats;
+                delete data.folder;
+                delete data.sort;
+                delete data.ownership;
+                
                 copiedNames.push(data.name);
                 return data;
             });
 
-            // Batch create documents in destination pack
-            await destPack.documentClass.createDocuments(createData, { pack: destPack.collection });
+            // Batch create documents in destination pack with v13 compatibility
+            await destPack.documentClass.createDocuments(createData, { 
+                pack: destPack.collection,
+                keepId: preserveIds  // Explicit v13 option for ID handling
+            });
 
             // Emit success hook
             const hookData: CompendiumCopiedHookData = {

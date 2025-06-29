@@ -37,6 +37,7 @@ export const DEFAULT_TRAIT_SEEDS: TraitSeedData[] = [
     type: "feature",
     system: {
       color: "#FF6B6B",
+      textColor: "#000000", // Dark text on light red background
       icon: "fas fa-fire",
       localKey: "AVANT.Trait.Fire",
       description: "Represents fire-based abilities, damage types, or elemental affinities",
@@ -47,7 +48,7 @@ export const DEFAULT_TRAIT_SEEDS: TraitSeedData[] = [
         appliesToItems: true
       }
     },
-    img: "icons/magic/fire/flame-burning-creature-hand.webp",
+    img: "icons/svg/item-bag.svg",
     sort: 100
   },
   
@@ -56,6 +57,7 @@ export const DEFAULT_TRAIT_SEEDS: TraitSeedData[] = [
     type: "feature", 
     system: {
       color: "#4ECDC4",
+      textColor: "#000000", // Dark text on light cyan background
       icon: "fas fa-snowflake",
       localKey: "AVANT.Trait.Ice",
       description: "Represents ice and cold-based abilities, damage types, or elemental affinities",
@@ -66,7 +68,7 @@ export const DEFAULT_TRAIT_SEEDS: TraitSeedData[] = [
         appliesToItems: true
       }
     },
-    img: "icons/magic/water/ice-crystal-snowflake.webp",
+    img: "icons/svg/item-bag.svg",
     sort: 200
   },
   
@@ -75,6 +77,7 @@ export const DEFAULT_TRAIT_SEEDS: TraitSeedData[] = [
     type: "feature",
     system: {
       color: "#FFE66D",
+      textColor: "#000000", // Dark text on light yellow background
       icon: "fas fa-bolt",
       localKey: "AVANT.Trait.Lightning", 
       description: "Represents electrical and lightning-based abilities, damage types, or elemental affinities",
@@ -85,7 +88,7 @@ export const DEFAULT_TRAIT_SEEDS: TraitSeedData[] = [
         appliesToItems: true
       }
     },
-    img: "icons/magic/lightning/bolt-strike-blue.webp",
+    img: "icons/svg/item-bag.svg",
     sort: 300
   },
   
@@ -94,6 +97,7 @@ export const DEFAULT_TRAIT_SEEDS: TraitSeedData[] = [
     type: "feature",
     system: {
       color: "#6C5CE7",
+      textColor: "#FFFFFF", // Light text on dark purple background
       icon: "fas fa-eye-slash",
       localKey: "AVANT.Trait.Stealth",
       description: "Represents stealth, concealment, and sneaking abilities",
@@ -104,7 +108,7 @@ export const DEFAULT_TRAIT_SEEDS: TraitSeedData[] = [
         appliesToItems: true
       }
     },
-    img: "icons/magic/perception/eye-slit-purple.webp",
+    img: "icons/svg/item-bag.svg",
     sort: 400
   },
   
@@ -113,6 +117,7 @@ export const DEFAULT_TRAIT_SEEDS: TraitSeedData[] = [
     type: "feature",
     system: {
       color: "#00B894",
+      textColor: "#FFFFFF", // Light text on dark green background
       icon: "fas fa-heart",
       localKey: "AVANT.Trait.Healing",
       description: "Represents healing, restoration, and recovery abilities",
@@ -123,7 +128,7 @@ export const DEFAULT_TRAIT_SEEDS: TraitSeedData[] = [
         appliesToItems: true
       }
     },
-    img: "icons/magic/life/heart-glowing-red.webp",
+    img: "icons/svg/item-bag.svg",
     sort: 500
   },
   
@@ -132,6 +137,7 @@ export const DEFAULT_TRAIT_SEEDS: TraitSeedData[] = [
     type: "feature",
     system: {
       color: "#0984E3",
+      textColor: "#FFFFFF", // Light text on dark blue background
       icon: "fas fa-microchip",
       localKey: "AVANT.Trait.Tech",
       description: "Represents technological, digital, or cybernetic abilities and enhancements",
@@ -142,7 +148,7 @@ export const DEFAULT_TRAIT_SEEDS: TraitSeedData[] = [
         appliesToItems: true
       }
     },
-    img: "icons/magic/symbols/circuit-matrix-blue.webp",
+    img: "icons/svg/item-bag.svg",
     sort: 600
   },
   
@@ -151,6 +157,7 @@ export const DEFAULT_TRAIT_SEEDS: TraitSeedData[] = [
     type: "feature",
     system: {
       color: "#E17055",
+      textColor: "#FFFFFF", // Light text on dark orange background
       icon: "fas fa-brain",
       localKey: "AVANT.Trait.Psychic",
       description: "Represents mental, telepathic, and psionic abilities",
@@ -161,7 +168,7 @@ export const DEFAULT_TRAIT_SEEDS: TraitSeedData[] = [
         appliesToItems: true
       }
     },
-    img: "icons/magic/control/hypnosis-mesmerism-eye.webp",
+    img: "icons/svg/item-bag.svg",
     sort: 700
   },
   
@@ -170,6 +177,7 @@ export const DEFAULT_TRAIT_SEEDS: TraitSeedData[] = [
     type: "feature",
     system: {
       color: "#FDCB6E",
+      textColor: "#000000", // Dark text on light yellow background
       icon: "fas fa-star",
       localKey: "AVANT.Trait.Legendary",
       description: "Marks items or abilities as legendary quality or rarity",
@@ -180,7 +188,7 @@ export const DEFAULT_TRAIT_SEEDS: TraitSeedData[] = [
         appliesToItems: true
       }
     },
-    img: "icons/magic/symbols/star-inverted-yellow.webp",
+    img: "icons/svg/item-bag.svg",
     sort: 800
   }
 ];

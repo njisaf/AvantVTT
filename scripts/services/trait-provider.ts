@@ -811,6 +811,7 @@ export class TraitProvider {
         icon: system.icon,
         localKey: system.localKey || `CUSTOM.Trait.${item.name.replace(/[^a-zA-Z0-9]/g, '')}`,
         description: system.description,
+        textColor: system.textColor || '#000000', // Add missing textColor property with fallback
         source,
         tags: system.tags || [], // Include tags for search functionality
         item: {

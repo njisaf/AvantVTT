@@ -553,8 +553,15 @@ export class RemoteTraitService {
       );
       
       if (remoteItems.length > 0) {
-        await pack.deleteDocuments(remoteItems.map((item: any) => item._id));
-        console.log(`🌐 RemoteTraitService | Removed ${remoteItems.length} existing remote traits`);
+        // FoundryVTT v13 compatibility: ensure IDs are valid for bulk delete
+        const idsToDelete = remoteItems
+          .map((item: any) => item._id)
+          .filter((id: any) => id && typeof id === 'string');
+        
+        if (idsToDelete.length > 0) {
+          await pack.deleteDocuments(idsToDelete);
+          console.log(`🌐 RemoteTraitService | Removed ${idsToDelete.length} existing remote traits`);
+        }
       }
       
       // Add new remote traits
@@ -572,7 +579,10 @@ export class RemoteTraitService {
       }));
       
       if (itemsToCreate.length > 0) {
-        await pack.createDocuments(itemsToCreate);
+        // FoundryVTT v13 compatibility: explicit options for bulk create
+        await pack.createDocuments(itemsToCreate, {
+          keepId: false  // Ensure FoundryVTT generates new IDs
+        });
         console.log(`🌐 RemoteTraitService | Added ${itemsToCreate.length} remote traits to compendium`);
       }
       

@@ -166,6 +166,55 @@ export function extractStaticModifiers(roll) {
 }
 
 /**
+ * Extracts clean roll name from HTML-rich flavor text.
+ * 
+ * This function removes HTML tags and trait chip markup from flavor text,
+ * extracting only the core roll name for display in UI contexts where
+ * HTML is not appropriate (like dialog titles). Use this at the SOURCE
+ * when creating dialogs, not during rendering.
+ * 
+ * @param {string|null} flavor - The original flavor text that may contain HTML
+ * @returns {string} Clean roll name without HTML markup
+ * 
+ * @example
+ * // Extract clean name when creating dialog
+ * const htmlFlavor = 'New Weapon Attack<br /><div class="trait-chips-wrapper">...</div>';
+ * const cleanName = cleanFlavorForDisplay(htmlFlavor);
+ * const dialog = new AvantRerollDialog(roll, actor, cleanName);
+ * // Result: "New Weapon Attack"
+ * 
+ * @example
+ * // Works with already clean text too
+ * const cleanName = cleanFlavorForDisplay('Athletics Check');
+ * // Result: "Athletics Check"
+ */
+export function cleanFlavorForDisplay(flavor) {
+    if (!flavor || typeof flavor !== 'string') {
+        return '';
+    }
+    
+    // First, decode HTML entities (in case the text was already escaped)
+    let cleaned = flavor
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&')
+        .replace(/&quot;/g, '"')
+        .replace(/&#x27;/g, "'");
+    
+    // Remove everything after the first HTML tag (usually <br/> followed by trait chips)
+    const firstTagIndex = cleaned.indexOf('<');
+    if (firstTagIndex !== -1) {
+        cleaned = cleaned.substring(0, firstTagIndex);
+    }
+    
+    // Clean up any remaining whitespace
+    cleaned = cleaned.trim();
+    
+    // If we ended up with an empty string, return a fallback
+    return cleaned || 'Roll';
+}
+
+/**
  * Builds the complete data object needed to display the reroll dialog.
  * 
  * This function takes the extracted dice results and actor information and
@@ -177,7 +226,7 @@ export function extractStaticModifiers(roll) {
  * @param {Object} actor - The actor performing the reroll
  * @param {Array} d10Results - Extracted d10 dice results
  * @param {number} staticModifiers - Static modifiers from the roll
- * @param {string} originalFlavor - Original flavor text of the roll
+ * @param {string} cleanRollName - Clean name of the roll (no HTML)
  * @returns {Object} Complete dialog data structure
  * 
  * @example
@@ -188,7 +237,7 @@ export function extractStaticModifiers(roll) {
  * const data = buildDialogData(roll, actor, dice, 5, 'Athletics Check');
  * // Result: Complete dialog data with dice options and Fortune Point info
  */
-export function buildDialogData(originalRoll, actor, d10Results, staticModifiers, originalFlavor) {
+export function buildDialogData(originalRoll, actor, d10Results, staticModifiers, cleanRollName) {
     const fortunePoints = actor?.system?.fortunePoints || 0;
     const maxRerolls = Math.min(d10Results.length, fortunePoints);
     
@@ -205,7 +254,7 @@ export function buildDialogData(originalRoll, actor, d10Results, staticModifiers
         maxRerolls: maxRerolls,
         canReroll: false, // Can't reroll until dice are selected
         originalTotal: originalRoll?.total || 0,
-        originalFlavor: originalFlavor || ''
+        originalFlavor: cleanRollName // Clean roll name (no HTML processing needed)
     };
 }
 

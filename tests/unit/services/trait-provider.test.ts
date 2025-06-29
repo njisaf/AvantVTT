@@ -53,6 +53,7 @@ const createMockTraitItem = (id: string, name: string, source: 'system' | 'world
     icon: 'fas fa-fire',
     localKey: `AVANT.Trait.${name}`,
     description: `Test ${name} trait`,
+    textColor: '#000000', // Add missing textColor field
     traitMetadata: {
       categories: ['test'],
       tags: ['test', name.toLowerCase()],
@@ -130,7 +131,7 @@ describe('TraitProvider', () => {
       
       const config = (traitProvider as any).config;
       expect(config.systemPackName).toBe('avant.avant-traits');
-      expect(config.worldPackName).toBe('custom-traits');
+      expect(config.worldPackName).toBe('world.custom-traits');
       expect(config.worldPackLabel).toBe('Custom Traits');
       expect(config.itemType).toBe('trait');
       expect(config.enableCaching).toBe(true);
@@ -191,9 +192,9 @@ describe('TraitProvider', () => {
       const result = await traitProvider.initialize();
       
       expect(createSpy).toHaveBeenCalledWith({
-        name: 'custom-traits',
+        name: 'world.custom-traits',
         label: 'Custom Traits',
-        path: './packs/custom-traits.db',
+        path: './packs/world.custom-traits.db',
         type: 'Item',
         system: 'avant'
       });
@@ -213,37 +214,47 @@ describe('TraitProvider', () => {
   });
   
   describe('Trait Retrieval', () => {
+    let mockCompendiumService: any;
+
     beforeEach(() => {
       traitProvider = TraitProvider.getInstance();
       mockGame.ready = true;
+      
+      mockCompendiumService = {
+        loadPack: jest.fn().mockResolvedValue([]),
+        // Add other methods if needed by tests
+      };
+      
+      // Inject the mock service
+      (traitProvider as any).compendiumService = mockCompendiumService;
     });
     
     test('should get all traits from both system and world packs', async () => {
       const systemItem = createMockTraitItem('sys1', 'Fire', 'system');
       const worldItem = createMockTraitItem('world1', 'Custom', 'world');
       
-      mockGame.packs.get.mockImplementation((packName: string) => {
-        if (packName === 'avant.avant-traits') return createMockPack([systemItem]);
-        if (packName === 'custom-traits') return createMockPack([worldItem]);
-        return undefined;
+      mockCompendiumService.loadPack.mockImplementation((packName: string) => {
+        if (packName.includes('avant-traits')) return Promise.resolve([systemItem]);
+        if (packName.includes('custom-traits')) return Promise.resolve([worldItem]);
+        return Promise.resolve([]);
       });
       
       const result = await traitProvider.getAll();
       
       expect(result.success).toBe(true);
       expect(result.data).toHaveLength(2);
-      expect(result.data![0].name).toBe('Fire');
-      expect(result.data![1].name).toBe('Custom');
+      expect(result.data!.find(t => t.name === 'Fire')).toBeDefined();
+      expect(result.data!.find(t => t.name === 'Custom')).toBeDefined();
     });
     
     test('should deduplicate traits with world taking precedence', async () => {
       const systemItem = createMockTraitItem('trait1', 'Fire', 'system');
       const worldItem = createMockTraitItem('trait1', 'Fire', 'world'); // Same ID
       
-      mockGame.packs.get.mockImplementation((packName: string) => {
-        if (packName === 'avant.avant-traits') return createMockPack([systemItem]);
-        if (packName === 'custom-traits') return createMockPack([worldItem]);
-        return undefined;
+      mockCompendiumService.loadPack.mockImplementation((packName: string) => {
+        if (packName.includes('avant-traits')) return Promise.resolve([systemItem]);
+        if (packName.includes('custom-traits')) return Promise.resolve([worldItem]);
+        return Promise.resolve([]);
       });
       
       const result = await traitProvider.getAll();
@@ -257,24 +268,21 @@ describe('TraitProvider', () => {
       const systemItem = createMockTraitItem('sys1', 'Fire', 'system');
       const worldItem = createMockTraitItem('world1', 'Custom', 'world');
       
-      mockGame.packs.get.mockImplementation((packName: string) => {
-        if (packName === 'avant.avant-traits') return createMockPack([systemItem]);
-        if (packName === 'custom-traits') return createMockPack([worldItem]);
-        return undefined;
+      mockCompendiumService.loadPack.mockImplementation((packName: string) => {
+        if (packName.includes('avant-traits')) return Promise.resolve([systemItem]);
+        if (packName.includes('custom-traits')) return Promise.resolve([worldItem]);
+        return Promise.resolve([]);
       });
-      
-      // Reset the singleton and clear cache before each sub-test
-      (TraitProvider as any)._instance = undefined;
-      traitProvider = TraitProvider.getInstance();
       
       // Only system traits
       const systemResult = await traitProvider.getAll({ includeWorld: false });
       expect(systemResult.data).toHaveLength(1);
       expect(systemResult.data![0].name).toBe('Fire');
       
-      // Reset singleton and clear cache
+      // Clear cache by creating a new instance
       (TraitProvider as any)._instance = undefined;
       traitProvider = TraitProvider.getInstance();
+      (traitProvider as any).compendiumService = mockCompendiumService; // Re-inject mock
       
       // Only world traits
       const worldResult = await traitProvider.getAll({ includeSystem: false });
@@ -289,10 +297,7 @@ describe('TraitProvider', () => {
       const stealthItem = createMockTraitItem('stealth', 'Stealth');
       stealthItem.system.traitMetadata!.categories = ['skill'];
       
-      mockGame.packs.get.mockImplementation((packName: string) => {
-        if (packName === 'avant.avant-traits') return createMockPack([fireItem, stealthItem]);
-        return undefined;
-      });
+      mockCompendiumService.loadPack.mockResolvedValue([fireItem, stealthItem]);
       
       const result = await traitProvider.getAll({ categories: ['elemental'] });
       
@@ -308,10 +313,7 @@ describe('TraitProvider', () => {
       const iceItem = createMockTraitItem('ice', 'Ice');
       iceItem.system.traitMetadata!.tags = ['ice', 'elemental'];
       
-      mockGame.packs.get.mockImplementation((packName: string) => {
-        if (packName === 'avant.avant-traits') return createMockPack([fireItem, iceItem]);
-        return undefined;
-      });
+      mockCompendiumService.loadPack.mockResolvedValue([fireItem, iceItem]);
       
       const result = await traitProvider.getAll({ tags: ['fire'] });
       
@@ -321,8 +323,7 @@ describe('TraitProvider', () => {
     });
     
     test('should handle missing packs gracefully', async () => {
-      // No packs configured
-      mockGame.packs.get.mockReturnValue(undefined);
+      mockCompendiumService.loadPack.mockResolvedValue([]);
       
       const result = await traitProvider.getAll();
       
@@ -332,13 +333,9 @@ describe('TraitProvider', () => {
     
     test('should skip items with missing trait properties', async () => {
       const validItem = createMockTraitItem('valid', 'Valid');
-      const invalidItem = createMockTraitItem('invalid', 'Invalid');
-      (invalidItem.system as any).color = undefined; // Missing required property
+      const invalidItem = { ...createMockTraitItem('invalid', 'Invalid'), system: { ...createMockTraitItem('invalid', 'Invalid').system, color: undefined } };
       
-      mockGame.packs.get.mockImplementation((packName: string) => {
-        if (packName === 'avant.avant-traits') return createMockPack([validItem, invalidItem]);
-        return undefined;
-      });
+      mockCompendiumService.loadPack.mockResolvedValue([validItem, invalidItem]);
       
       const result = await traitProvider.getAll();
       
@@ -349,14 +346,23 @@ describe('TraitProvider', () => {
   });
   
   describe('Individual Trait Retrieval', () => {
+    let mockCompendiumService: any;
+
     beforeEach(() => {
       traitProvider = TraitProvider.getInstance();
       mockGame.ready = true;
+      
+      mockCompendiumService = {
+        loadPack: jest.fn().mockResolvedValue([]),
+      };
+      
+      (traitProvider as any).compendiumService = mockCompendiumService;
     });
     
     test('should get specific trait by ID', async () => {
       const traitItem = createMockTraitItem('fire123', 'Fire');
-      mockGame.packs.get.mockReturnValue(createMockPack([traitItem]));
+      
+      mockCompendiumService.loadPack.mockResolvedValue([traitItem]);
       
       const result = await traitProvider.get('fire123');
       
@@ -368,7 +374,8 @@ describe('TraitProvider', () => {
     
     test('should return null for non-existent trait', async () => {
       const traitItem = createMockTraitItem('fire123', 'Fire');
-      mockGame.packs.get.mockReturnValue(createMockPack([traitItem]));
+      
+      mockCompendiumService.loadPack.mockResolvedValue([traitItem]);
       
       const result = await traitProvider.get('nonexistent');
       
@@ -457,7 +464,7 @@ describe('TraitProvider', () => {
     test('should return information about both packs', async () => {
       mockGame.packs.get.mockImplementation((packName: string) => {
         if (packName === 'avant.avant-traits') return createMockPack();
-        if (packName === 'custom-traits') return createMockPack();
+        if (packName === 'world.custom-traits') return createMockPack();
         return undefined;
       });
       
@@ -470,7 +477,7 @@ describe('TraitProvider', () => {
       expect(result.data!.system.exists).toBe(true);
       expect(result.data!.system.name).toBe('avant.avant-traits');
       expect(result.data!.world.exists).toBe(true);
-      expect(result.data!.world.name).toBe('custom-traits');
+      expect(result.data!.world.name).toBe('world.custom-traits');
     });
     
     test('should handle missing packs in pack info', async () => {
@@ -498,7 +505,7 @@ describe('TraitProvider', () => {
       // Mock pack that throws error on getDocuments
       const mockPack = {
         name: 'avant.avant-traits',
-        getDocuments: jest.fn().mockRejectedValue(new Error('Pack loading failed'))
+        getDocuments: jest.fn<() => Promise<never>>().mockRejectedValue(new Error('Pack loading failed'))
       };
       mockGame.packs.get.mockReturnValue(mockPack);
       
@@ -590,9 +597,11 @@ describe('TraitProvider', () => {
       
       // Mock getAllTraits to fail
       const originalGetAll = traitProvider.getAll;
-      (traitProvider as any).getAll = jest.fn().mockResolvedValue({
+      (traitProvider as any).getAll = jest.fn<() => Promise<TraitProviderResult<Trait[]>>>().mockResolvedValue({
         success: false,
-        error: 'Simulated getAll failure'
+        error: 'Simulated getAll failure',
+        data: undefined,
+        metadata: {}
       } as TraitProviderResult<Trait[]>);
       
       const result = await traitProvider.get('test-id');

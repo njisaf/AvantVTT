@@ -31,6 +31,7 @@
 import { AvantRerollDialog } from '../dialogs/reroll-dialog.js';
 import { logger } from '../utils/logger.js';
 import { validateMessageForReroll } from '../logic/chat-context-utils.js';
+import { cleanFlavorForDisplay } from '../logic/dialog-utils.js';
 
 /**
  * Chat Message Context Menu Handler - FoundryVTT v13+
@@ -186,11 +187,14 @@ export class AvantChatContextMenu {
                             return;
                         }
                         
+                        // Extract clean roll name from flavor text (remove HTML)
+                        const cleanRollName = cleanFlavorForDisplay(validation.flavor || 'Reroll');
+                        
                         // Open the reroll dialog with validated data
                         const dialog = new AvantRerollDialog(
                             validation.roll, 
                             validation.actor, 
-                            validation.flavor || 'Reroll'
+                            cleanRollName
                         );
                         (dialog as any).render(true);
                         logger.log('Avant | ✅ Reroll dialog opened successfully');

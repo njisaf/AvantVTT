@@ -36,6 +36,16 @@ function copySystemFiles() {
       // Copy lang directory  
       copyDirSync('lang', 'dist/lang');
       
+      // Copy data directory (contains default-tags.json and other data files)
+      try {
+        const dataStat = statSync('data');
+        if (dataStat.isDirectory()) {
+          copyDirSync('data', 'dist/data');
+        }
+      } catch (e) {
+        // data directory doesn't exist, skip
+      }
+      
       // Copy assets directory (if it exists and has content)
       try {
         const assetsStat = statSync('assets');

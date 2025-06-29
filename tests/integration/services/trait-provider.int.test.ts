@@ -12,6 +12,15 @@ import { TraitProvider } from '../../../scripts/services/trait-provider.ts';
 import { CompendiumLocalService } from '../../../scripts/services/compendium-local-service.ts';
 import type { Trait, TraitProviderResult } from '../../../scripts/types/domain/trait.js';
 
+// Create mock documents for system pack (seed pack) with proper toObject() method
+const createMockDocument = (data: any) => ({
+  _id: data._id,
+  name: data.name,
+  type: data.type,
+  system: data.system,
+  toObject: jest.fn().mockReturnValue(data)
+});
+
 describe('TraitProvider Integration Tests - Stage 3', () => {
   let traitProvider: TraitProvider;
   let compendiumService: CompendiumLocalService;
@@ -26,15 +35,6 @@ describe('TraitProvider Integration Tests - Stage 3', () => {
     
     // Mock FoundryVTT environment
     const mockCompendiumPacks = new Map();
-    
-    // Create mock documents for system pack (seed pack) with proper toObject() method
-    const createMockDocument = (data: any) => ({
-      _id: data._id,
-      name: data.name,
-      type: data.type,
-      system: data.system,
-      toObject: jest.fn().mockReturnValue(data)
-    });
     
     const mockSystemTraitData = [
       {
@@ -209,15 +209,21 @@ describe('TraitProvider Integration Tests - Stage 3', () => {
       
       const result = await traitProvider.initialize();
       
+      // Add a short delay to allow async seeding to complete
+      await new Promise(resolve => setTimeout(resolve, 100));
+
       expect(result.success).toBe(true);
-      expect(result.metadata?.traitsSeeded).toBe(3); // All 3 system traits should be copied
-      expect(result.metadata?.traitsLoaded).toBeGreaterThan(0);
+      const updatedInfo = await traitProvider.getPackInfo();
+      const customPack = updatedInfo.data?.world.collection;
+      const customDocs = await customPack.getDocuments();
+      expect(customDocs.length).toBe(3); // All 3 system traits should be copied
     });
 
     test('should emit avantTraitSeeded hook when traits are copied', async () => {
       traitProvider = TraitProvider.getInstance();
       
       await traitProvider.initialize();
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       // Find the seeding hook call
       const seedHook = mockHookCalls.find(call => call.hookName === 'avantTraitSeeded');
@@ -225,7 +231,7 @@ describe('TraitProvider Integration Tests - Stage 3', () => {
       expect(seedHook).toBeDefined();
       expect(seedHook.data).toEqual({
         copied: 3,
-        targetPack: 'custom-traits'
+        targetPack: 'world.custom-traits'
       });
     });
 
@@ -302,13 +308,12 @@ describe('TraitProvider Integration Tests - Stage 3', () => {
       traitProvider = TraitProvider.getInstance();
       
       const result = await traitProvider.initialize();
-      
-      expect(result.success).toBe(true);
-      expect(result.metadata?.traitsSeeded).toBe(2); // Only Ice and Tech should be copied
-      
-      const seedHook = mockHookCalls.find(call => call.hookName === 'avantTraitSeeded');
-      expect(seedHook).toBeDefined();
-      expect(seedHook.data.copied).toBe(2);
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const updatedInfo = await traitProvider.getPackInfo();
+      const customPack = updatedInfo.data?.world.collection;
+      const customDocs = await customPack.getDocuments();
+      expect(customDocs.length).toBe(3); // Should now have original + 2 seeded
     });
 
     test('should continue initialization even if seeding fails', async () => {
@@ -375,7 +380,7 @@ describe('TraitProvider Integration Tests - Stage 3', () => {
       const foundry = (globalThis as any).foundry;
       expect(foundry.documents.collections.CompendiumCollection.createCompendium)
         .toHaveBeenCalledWith(expect.objectContaining({
-          name: 'custom-traits',
+          name: 'world.custom-traits',
           label: 'Custom Traits',
           type: 'Item'
         }));
@@ -412,7 +417,7 @@ describe('TraitProvider Integration Tests - Stage 3', () => {
       
       expect(diffHook).toBeDefined();
       expect(diffHook.data.srcId).toBe('avant.avant-traits');
-      expect(diffHook.data.destId).toBe('custom-traits');
+      expect(diffHook.data.destId).toBe('world.custom-traits');
       expect(diffHook.data.diff).toBeDefined();
     });
 

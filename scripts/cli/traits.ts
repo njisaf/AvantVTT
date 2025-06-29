@@ -5,6 +5,8 @@
  * @author Avant VTT Team
  */
 
+import { promises as fs } from 'fs';
+import { join, dirname, resolve } from 'path';
 import { TraitProvider } from '../services/trait-provider.ts';
 import { RemoteTraitService, createRemoteTraitCommands } from '../services/remote-trait-service.ts';
 import type { Trait, TraitItemSystemData } from '../types/domain/trait.ts';
@@ -255,18 +257,42 @@ export class TraitCLI {
         JSON.stringify(exportData, null, 2) : 
         JSON.stringify(exportData);
       
-      // In a real implementation, this would write to the file system
-      // For now, we'll simulate success
-      console.log(`📄 Export data prepared (${jsonContent.length} characters)`);
-      console.log(`✅ Exported ${exportedTraits.length} traits to ${outputPath}`);
+      // Resolve full output path with _export/ directory
+      const exportDir = resolve(process.cwd(), '_export');
+      const fullOutputPath = outputPath.startsWith('/') || outputPath.includes(':') ? 
+        outputPath : // Use absolute path as-is
+        join(exportDir, outputPath); // Relative path goes in _export/
       
-      return {
-        success: true,
-        processed: exportedTraits.length,
-        failed: details.filter(d => d.action === 'failed').length,
-        details,
-        outputPath
-      };
+      try {
+        // Ensure the export directory exists
+        await fs.mkdir(dirname(fullOutputPath), { recursive: true });
+        
+        // Write the JSON content to file
+        await fs.writeFile(fullOutputPath, jsonContent, 'utf-8');
+        
+        console.log(`📄 Export data prepared (${jsonContent.length} characters)`);
+        console.log(`💾 File written to: ${fullOutputPath}`);
+        console.log(`✅ Exported ${exportedTraits.length} traits successfully`);
+        
+        return {
+          success: true,
+          processed: exportedTraits.length,
+          failed: details.filter(d => d.action === 'failed').length,
+          details,
+          outputPath: fullOutputPath
+        };
+        
+      } catch (writeError) {
+        const writeErrorMessage = writeError instanceof Error ? writeError.message : String(writeError);
+        console.error(`❌ Failed to write file to ${fullOutputPath}:`, writeError);
+        return {
+          success: false,
+          processed: 0,
+          failed: exportedTraits.length,
+          error: `File write failed: ${writeErrorMessage}`,
+          details
+        };
+      }
       
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -301,25 +327,34 @@ export class TraitCLI {
         ...options
       };
       
-      // In a real implementation, this would read from the file system
-      // For now, we'll simulate reading the file
+      // Read file from file system
       console.log(`📄 Reading trait data from ${filePath}`);
       
-      // Simulate file content - in reality this would be:
-      // const fileContent = await readFile(filePath, 'utf-8');
-      // const importData: TraitExportData = JSON.parse(fileContent);
+      // Resolve full file path (check _export/ directory if relative path)
+      const exportDir = resolve(process.cwd(), '_export');
+      const fullFilePath = filePath.startsWith('/') || filePath.includes(':') ? 
+        filePath : // Use absolute path as-is
+        join(exportDir, filePath); // Relative path looks in _export/
       
-      // For demonstration, we'll create sample import data
-      const importData: TraitExportData = {
-        metadata: {
-          timestamp: new Date().toISOString(),
-          systemVersion: '1.0.0',
-          traitCount: 0,
-          formatVersion: '1.0.0',
-          exportSource: 'world'
-        },
-        traits: []
-      };
+      let importData: TraitExportData;
+      try {
+        // Read and parse the JSON file
+        const fileContent = await fs.readFile(fullFilePath, 'utf-8');
+        importData = JSON.parse(fileContent);
+        console.log(`✅ Successfully read ${fileContent.length} characters from ${fullFilePath}`);
+        
+      } catch (readError) {
+        const readErrorMessage = readError instanceof Error ? readError.message : String(readError);
+        console.error(`❌ Failed to read file ${fullFilePath}:`, readError);
+        return {
+          success: false,
+          processed: 0,
+          failed: 0,
+          error: `File read failed: ${readErrorMessage}`,
+          details: [],
+          sourceFile: fullFilePath
+        };
+      }
       
       if (opts.validateData) {
         const validationResult = this._validateImportData(importData);
@@ -443,7 +478,7 @@ export class TraitCLI {
         processed,
         failed,
         details,
-        sourceFile: filePath
+        sourceFile: fullFilePath
       };
       
     } catch (error) {
@@ -632,28 +667,28 @@ function showHelp(): void {
   console.log(`
 🔮 Avant VTT - Trait CLI Utilities
 
+⚠️  IMPORTANT: This CLI uses mock data when run outside FoundryVTT.
+💡 For REAL trait data, use the "Export Custom Traits" macro from the Avant Macros compendium!
+
 USAGE:
-  npm run traits:export [output.json] [options]      Export traits to JSON file
-  npm run traits:import <input.json> [options]       Import traits from JSON file  
+  npm run traits:export [output.json] [options]      Export traits to JSON file (mock data)
+  npm run traits:import <input.json> [options]       Import traits from JSON file
   npm run traits:sync [options]                      Sync traits from remote repository
   npm run traits:remote [info]                       Get remote trait information
   npm run traits:integrity                           Check data integrity
 
+RECOMMENDED WORKFLOW:
+  1. In FoundryVTT, open the Avant Macros compendium
+  2. Run the "Export Custom Traits" macro to download real trait data
+  3. Use the downloaded JSON with the import command if needed
+
 EXAMPLES:
-  # Export all traits
+  # Export traits (mock data when run from command line)
   npm run traits:export my-traits.json
   
-  # Export only world traits
-  npm run traits:export my-traits.json -- --world-only
-  
-  # Import with dry run
-  npm run traits:import my-traits.json -- --dry-run
-  
-  # Import and overwrite existing
-  npm run traits:import my-traits.json -- --overwrite
-  
-  # Check data integrity
-  npm run traits:integrity
+  # Import real trait data (after using the macro)
+  npm run traits:import downloaded-traits.json -- --dry-run
+  npm run traits:import downloaded-traits.json -- --overwrite
 
 OPTIONS:
   Export:
@@ -673,9 +708,54 @@ For more information, see: https://github.com/njisaf/AvantVTT/blob/main/README.m
 }
 
 /**
- * Main CLI execution function
+ * Check if running in FoundryVTT context and get real TraitProvider
  */
-async function main(): Promise<void> {
+function getTraitProvider(): any {
+  // Check if we're running in FoundryVTT context
+  if (typeof globalThis !== 'undefined' && (globalThis as any).game?.avant?.services?.traitProvider) {
+    console.log('🎮 Using real TraitProvider from FoundryVTT context');
+    return (globalThis as any).game.avant.services.traitProvider;
+  }
+  
+  // Fallback: Return mock provider with a warning
+  console.warn('⚠️  Running outside FoundryVTT context - using mock provider');
+  console.warn('💡 For real trait data, run this from a FoundryVTT macro or console');
+  
+  return {
+    async getAll() {
+      return { 
+        success: true, 
+        data: [
+          { 
+            id: 'fire', 
+            name: 'Fire', 
+            color: '#FF4444', 
+            icon: 'fas fa-fire',
+            localKey: 'fire',
+            source: 'system' as const,
+            item: { system: {} },
+            description: 'Mock fire trait - use macro for real data'
+          }
+        ] 
+      };
+    },
+    async get() {
+      return { success: false, data: null };
+    },
+    async createTrait() {
+      return { success: true };
+    },
+    async updateTrait() {
+      return { success: true };
+    }
+  } as any;
+}
+
+/**
+ * Main CLI execution function
+ * @param traitProvider - An instance of the TraitProvider service
+ */
+export async function main(traitProvider: TraitProvider): Promise<void> {
   try {
     const args = process.argv.slice(2);
     
@@ -688,37 +768,8 @@ async function main(): Promise<void> {
     const command = args[0];
     const commandArgs = args.slice(1);
     
-    // Note: In a real implementation, this would initialize the TraitProvider
-    // For now, we'll create a mock provider for demonstration
-    const mockProvider = {
-      async getAll() {
-        return { 
-          success: true, 
-          data: [
-            { 
-              id: 'fire', 
-              name: 'Fire', 
-              color: '#FF4444', 
-              icon: 'fas fa-fire',
-              localKey: 'fire',
-              source: 'system' as const,
-              item: { system: {} }
-            }
-          ] 
-        };
-      },
-      async get() {
-        return { success: false, data: null };
-      },
-      async createTrait() {
-        return { success: true };
-      },
-      async updateTrait() {
-        return { success: true };
-      }
-    } as any;
-    
-    const commands = createTraitCommands(mockProvider);
+    // Commands are created with the provided traitProvider
+    const commands = createTraitCommands(traitProvider);
     
     switch (command) {
       case 'export':
@@ -753,9 +804,16 @@ async function main(): Promise<void> {
   }
 }
 
+// Self-executing block for running the CLI directly
+async function run(): Promise<void> {
+    // Get the appropriate TraitProvider (real or mock) when run directly
+    const traitProvider = getTraitProvider();
+    await main(traitProvider);
+}
+
 // Run main function if this file is executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch(error => {
+if (import.meta.url.endsWith(process.argv[1])) {
+  run().catch(error => {
     console.error('❌ Unhandled error:', error);
     process.exit(1);
   });

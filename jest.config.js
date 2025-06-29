@@ -29,6 +29,14 @@ export default {
       rootDir: '.',
       testEnvironment: 'jsdom',
       preset: 'ts-jest/presets/default-esm',
+      transform: {
+        '^.+\\.(t|j)s$': ['ts-jest', { useESM: true }],
+      },
+      moduleNameMapper: {
+        '^(\\.{1,2}/.*)\\.js$': '$1',
+        '^@/(.*)$': '<rootDir>/scripts/$1',
+        '^#lib/(.*)$': '<rootDir>/scripts/lib/$1'
+      },
       testMatch: [
         '<rootDir>/tests/unit/**/*.test.[jt]s',
         '!<rootDir>/tests/unit/**/*.int.test.[jt]s'
@@ -56,9 +64,6 @@ export default {
           lines: 75
         },
         'scripts/avant.js': {
-          lines: 60
-        },
-        'scripts/dialogs/reroll-dialog.js': {
           lines: 60
         },
         'scripts/logic/avant-init-utils.js': {
@@ -98,6 +103,14 @@ export default {
       rootDir: '.',
       testEnvironment: 'jsdom',
       preset: 'ts-jest/presets/default-esm',
+      transform: {
+        '^.+\\.(t|j)s$': ['ts-jest', { useESM: true }],
+      },
+      moduleNameMapper: {
+        '^(\\.{1,2}/.*)\\.js$': '$1',
+        '^@/(.*)$': '<rootDir>/scripts/$1',
+        '^#lib/(.*)$': '<rootDir>/scripts/lib/$1'
+      },
       testMatch: [
         '<rootDir>/tests/integration/**/*.int.test.[jt]s'
       ],
@@ -114,9 +127,6 @@ export default {
       coverageThreshold: {
         'scripts/sheets/actor-sheet.js': {
           lines: 70
-        },
-        'scripts/dialogs/reroll-dialog.js': {
-          lines: 60
         },
         global: {
           branches: 60,

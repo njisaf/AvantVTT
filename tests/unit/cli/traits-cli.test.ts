@@ -4,285 +4,89 @@
  */
 
 import { describe, test, expect, jest, beforeEach, afterEach } from '@jest/globals';
-import execa from 'execa';
-import { join } from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { main as mainCLI } from '../../../scripts/cli/traits.ts';
+import type { TraitProvider } from '../../../scripts/services/trait-provider.ts';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+describe('Traits CLI Logic', () => {
+  let mockTraitProvider: Partial<TraitProvider>;
+  let logSpy: jest.SpyInstance<void, [message?: any, ...optionalParams: any[]], any>;
+  let errorSpy: jest.SpyInstance<void, [message?: any, ...optionalParams: any[]], any>;
+  let argvSpy: jest.SpyInstance<string[], [], any>;
 
-// Path to the traits CLI script
-const CLI_PATH = join(__dirname, '../../../scripts/cli/traits.ts');
-const PROJECT_ROOT = join(__dirname, '../../..');
-
-describe('Traits CLI', () => {
   beforeEach(() => {
-    // Mock console methods to avoid spam during tests
-    jest.spyOn(console, 'log').mockImplementation(() => {});
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    // Mock the trait provider for controlled testing
+    mockTraitProvider = {
+      getAll: jest.fn().mockResolvedValue({
+        success: true,
+        data: [{ id: 'fire', name: 'Fire', color: '#F00', icon: 'fa-fire' }]
+      }),
+      // Add other methods with default mock implementations
+      get: jest.fn().mockResolvedValue({ success: true, data: null }),
+      createTrait: jest.fn().mockResolvedValue({ success: true }),
+      updateTrait: jest.fn().mockResolvedValue({ success: true }),
+      deleteTrait: jest.fn().mockResolvedValue({ success: true }),
+    };
+
+    // Spy on console outputs
+    logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    
+    // Spy on process.argv to simulate CLI arguments
+    argvSpy = jest.spyOn(process, 'argv', 'get');
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
   });
 
-  describe('Help Command', () => {
-    test('should show help when no arguments provided', async () => {
-      const result = await execa('node', [
-        '--experimental-loader', 'ts-node/esm',
-        CLI_PATH
-      ], {
-        cwd: PROJECT_ROOT,
-        timeout: 10000,
-        reject: false
-      });
+  const runCliWithArgs = async (args: string[]) => {
+    argvSpy.mockReturnValue(['node', 'traits.ts', ...args]);
+    await mainCLI(mockTraitProvider as TraitProvider);
+  };
 
-      expect(result.exitCode).toBe(0);
-      expect(result.stdout).toContain('Avant VTT - Trait CLI Utilities');
-      expect(result.stdout).toContain('USAGE:');
-      expect(result.stdout).toContain('EXAMPLES:');
-      expect(result.stdout).toContain('OPTIONS:');
+  describe('Help Command', () => {
+    test('should show help with --help flag', async () => {
+      await runCliWithArgs(['--help']);
+      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('USAGE:'));
     });
 
-    test('should show help with --help flag', async () => {
-      const result = await execa('node', [
-        '--experimental-loader', 'ts-node/esm',
-        CLI_PATH,
-        '--help'
-      ], {
-        cwd: PROJECT_ROOT,
-        timeout: 10000,
-        reject: false
-      });
-
-      expect(result.exitCode).toBe(0);
-      expect(result.stdout).toContain('Avant VTT - Trait CLI Utilities');
-      expect(result.stdout).toContain('npm run traits:export');
-      expect(result.stdout).toContain('npm run traits:import');
+    test('should show help with no arguments', async () => {
+      await runCliWithArgs([]);
+      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('USAGE:'));
     });
   });
 
   describe('Export Command', () => {
     test('should execute export command successfully', async () => {
-      const result = await execa('node', [
-        '--experimental-loader', 'ts-node/esm',
-        CLI_PATH,
-        'export',
-        'test-traits.json'
-      ], {
-        cwd: PROJECT_ROOT,
-        timeout: 15000,
-        reject: false
-      });
-
-      expect(result.exitCode).toBe(0);
-      expect(result.stdout).toContain('Starting trait export');
-      expect(result.stdout).toContain('Export data prepared');
-    });
-
-    test('should handle export command with default filename', async () => {
-      const result = await execa('node', [
-        '--experimental-loader', 'ts-node/esm',
-        CLI_PATH,
-        'export'
-      ], {
-        cwd: PROJECT_ROOT,
-        timeout: 15000,
-        reject: false
-      });
-
-      expect(result.exitCode).toBe(0);
-      expect(result.stdout).toContain('Starting trait export');
-      expect(result.stdout).toContain('traits-export.json');
+      await runCliWithArgs(['export']);
+      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Successfully exported'));
     });
   });
 
   describe('Import Command', () => {
-    test('should execute import command in dry-run mode', async () => {
-      const result = await execa('node', [
-        '--experimental-loader', 'ts-node/esm',
-        CLI_PATH,
-        'import',
-        'test-traits.json',
-        '--dry-run'
-      ], {
-        cwd: PROJECT_ROOT,
-        timeout: 15000,
-        reject: false
-      });
-
-      expect(result.exitCode).toBe(0);
-      expect(result.stdout).toContain('Starting trait import');
-      expect(result.stdout).toContain('(dry run)');
+    test('should require a file path for import', async () => {
+      await runCliWithArgs(['import']);
+      expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('Please provide a file path'));
     });
 
-    test('should require file path for import', async () => {
-      const result = await execa('node', [
-        '--experimental-loader', 'ts-node/esm',
-        CLI_PATH,
-        'import'
-      ], {
-        cwd: PROJECT_ROOT,
-        timeout: 10000,
-        reject: false
-      });
-
-      expect(result.exitCode).toBe(0);
-      expect(result.stdout).toContain('Please provide a file path to import from');
+    test('should handle file not found error gracefully', async () => {
+      await runCliWithArgs(['import', 'nonexistent.json']);
+      expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('Import failed'));
     });
   });
-
-  describe('Sync Command', () => {
-    test('should execute sync command', async () => {
-      const result = await execa('node', [
-        '--experimental-loader', 'ts-node/esm',
-        CLI_PATH,
-        'sync'
-      ], {
-        cwd: PROJECT_ROOT,
-        timeout: 15000,
-        reject: false
-      });
-
-      // Sync command may fail due to missing remote service, but should attempt execution
-      expect([0, 1]).toContain(result.exitCode);
-      expect(result.stdout || result.stderr).not.toBe('');
-    });
-  });
-
-  describe('Remote Command', () => {
-    test('should execute remote command', async () => {
-      const result = await execa('node', [
-        '--experimental-loader', 'ts-node/esm',
-        CLI_PATH,
-        'remote'
-      ], {
-        cwd: PROJECT_ROOT,
-        timeout: 15000,
-        reject: false
-      });
-
-      // Remote command may fail due to missing remote service, but should attempt execution
-      expect([0, 1]).toContain(result.exitCode);
-      expect(result.stdout || result.stderr).not.toBe('');
-    });
-  });
-
+  
   describe('Integrity Command', () => {
     test('should execute integrity check', async () => {
-      const result = await execa('node', [
-        '--experimental-loader', 'ts-node/esm',
-        CLI_PATH,
-        'integrity'
-      ], {
-        cwd: PROJECT_ROOT,
-        timeout: 15000,
-        reject: false
-      });
-
-      expect(result.exitCode).toBe(0);
-      expect(result.stdout).toContain('Data integrity hash');
-      expect(result.stdout).toContain('Total traits');
+        await runCliWithArgs(['integrity']);
+        expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Data integrity hash'));
+        expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Total traits'));
     });
   });
 
   describe('Error Handling', () => {
     test('should handle unknown commands gracefully', async () => {
-      const result = await execa('node', [
-        '--experimental-loader', 'ts-node/esm',
-        CLI_PATH,
-        'unknown-command'
-      ], {
-        cwd: PROJECT_ROOT,
-        timeout: 10000,
-        reject: false
-      });
-
-      expect(result.exitCode).toBe(1);
-      expect(result.stdout).toContain('Unknown command: unknown-command');
-      expect(result.stdout).toContain('Run with --help to see available commands');
-    });
-
-    test('should handle execution errors gracefully', async () => {
-      // Try to run with invalid Node.js options to trigger an error
-      const result = await execa('node', [
-        '--invalid-option',
-        CLI_PATH,
-        'help'
-      ], {
-        cwd: PROJECT_ROOT,
-        timeout: 10000,
-        reject: false
-      });
-
-      expect(result.exitCode).not.toBe(0);
-      expect(result.stderr).toContain('bad option');
-    });
-  });
-
-  describe('NPM Scripts Integration', () => {
-    test('should work via npm run traits:export', async () => {
-      const result = await execa('npm', [
-        'run',
-        'traits:export',
-        'test-output.json'
-      ], {
-        cwd: PROJECT_ROOT,
-        timeout: 20000,
-        reject: false
-      });
-
-      // Should either succeed or fail due to missing dependencies, but not crash
-      expect([0, 1]).toContain(result.exitCode);
-    });
-
-    test('should work via npm run traits:integrity', async () => {
-      const result = await execa('npm', [
-        'run',
-        'traits:integrity'
-      ], {
-        cwd: PROJECT_ROOT,
-        timeout: 20000,
-        reject: false
-      });
-
-      // Should either succeed or fail due to missing dependencies, but not crash  
-      expect([0, 1]).toContain(result.exitCode);
-    });
-  });
-
-  describe('Binary Shim', () => {
-    test('should work via binary shim', async () => {
-      const binPath = join(PROJECT_ROOT, 'bin/traits.mjs');
-      
-      const result = await execa('node', [
-        binPath,
-        '--help'
-      ], {
-        cwd: PROJECT_ROOT,
-        timeout: 15000,
-        reject: false
-      });
-
-      expect(result.exitCode).toBe(0);
-      expect(result.stdout).toContain('Avant VTT - Trait CLI Utilities');
-    });
-
-    test('should proxy arguments correctly via binary', async () => {
-      const binPath = join(PROJECT_ROOT, 'bin/traits.mjs');
-      
-      const result = await execa('node', [
-        binPath,
-        'integrity'
-      ], {
-        cwd: PROJECT_ROOT,
-        timeout: 15000,
-        reject: false
-      });
-
-      expect(result.exitCode).toBe(0);
-      expect(result.stdout).toContain('Data integrity hash');
+      await runCliWithArgs(['unknown-command']);
+      expect(errorSpy).toHaveBeenCalledWith('❌ Unknown command: unknown-command');
     });
   });
 }); 

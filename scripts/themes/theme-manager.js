@@ -301,6 +301,131 @@ export class AvantThemeManager {
     }
     
     /**
+     * Register game settings for accessibility features
+     * @static
+     */
+    static registerAccessibilitySettings() {
+        // Auto-contrast setting - automatically generate accessible text colors for trait chips
+        game.settings.register('avant', 'accessibility.autoContrast', {
+            name: game.i18n?.localize('AVANT.settings.accessibility.autoContrast.name') || 'Auto-Contrast',
+            hint: game.i18n?.localize('AVANT.settings.accessibility.autoContrast.hint') || 'Automatically generate accessible text colors that meet WCAG AA standards for trait chips and UI elements',
+            scope: 'client',
+            config: false,
+            type: Boolean,
+            default: false,
+            onChange: value => {
+                // Re-render any open sheets to apply new accessibility settings
+                console.log(`Avant | Accessibility auto-contrast setting changed: ${value}`);
+                
+                // Trigger a hook for other components to react to accessibility changes
+                if (typeof Hooks !== 'undefined' && Hooks.callAll) {
+                    Hooks.callAll('avantAccessibilitySettingsChanged', {
+                        autoContrast: value,
+                        timestamp: Date.now()
+                    });
+                }
+            }
+        });
+        
+        // High contrast mode setting
+        game.settings.register('avant', 'accessibility.highContrast', {
+            name: game.i18n?.localize('AVANT.settings.accessibility.highContrast.name') || 'High Contrast Mode',
+            hint: game.i18n?.localize('AVANT.settings.accessibility.highContrast.hint') || 'Enable high contrast mode for better visibility',
+            scope: 'client',
+            config: false,
+            type: Boolean,
+            default: false,
+            onChange: value => {
+                console.log(`Avant | Accessibility high contrast setting changed: ${value}`);
+                
+                // Apply high contrast changes immediately
+                const elements = document.querySelectorAll('.avant');
+                elements.forEach(element => {
+                    if (value) {
+                        element.classList.add('high-contrast');
+                    } else {
+                        element.classList.remove('high-contrast');
+                    }
+                });
+                
+                // Trigger accessibility change hook
+                if (typeof Hooks !== 'undefined' && Hooks.callAll) {
+                    Hooks.callAll('avantAccessibilitySettingsChanged', {
+                        highContrast: value,
+                        timestamp: Date.now()
+                    });
+                }
+            }
+        });
+        
+        // Reduced motion setting
+        game.settings.register('avant', 'accessibility.reducedMotion', {
+            name: game.i18n?.localize('AVANT.settings.accessibility.reducedMotion.name') || 'Reduced Motion',
+            hint: game.i18n?.localize('AVANT.settings.accessibility.reducedMotion.hint') || 'Reduce animations and motion effects for better accessibility',
+            scope: 'client',
+            config: false,
+            type: Boolean,
+            default: false,
+            onChange: value => {
+                console.log(`Avant | Accessibility reduced motion setting changed: ${value}`);
+                
+                // Apply reduced motion changes immediately
+                const elements = document.querySelectorAll('.avant');
+                elements.forEach(element => {
+                    if (value) {
+                        element.classList.add('reduced-motion');
+                    } else {
+                        element.classList.remove('reduced-motion');
+                    }
+                });
+                
+                // Trigger accessibility change hook
+                if (typeof Hooks !== 'undefined' && Hooks.callAll) {
+                    Hooks.callAll('avantAccessibilitySettingsChanged', {
+                        reducedMotion: value,
+                        timestamp: Date.now()
+                    });
+                }
+            }
+        });
+        
+        // WCAG compliance level setting
+        game.settings.register('avant', 'accessibility.contrastLevel', {
+            name: game.i18n?.localize('AVANT.settings.accessibility.contrastLevel.name') || 'Contrast Level',
+            hint: game.i18n?.localize('AVANT.settings.accessibility.contrastLevel.hint') || 'Set the WCAG contrast compliance level for accessibility features',
+            scope: 'client',
+            config: false,
+            type: String,
+            choices: {
+                'AA': 'WCAG AA (4.5:1 normal, 3:1 large text)',
+                'AAA': 'WCAG AAA (7:1 normal, 4.5:1 large text)'
+            },
+            default: 'AA',
+            onChange: value => {
+                console.log(`Avant | Accessibility contrast level setting changed: ${value}`);
+                
+                // Trigger accessibility change hook
+                if (typeof Hooks !== 'undefined' && Hooks.callAll) {
+                    Hooks.callAll('avantAccessibilitySettingsChanged', {
+                        contrastLevel: value,
+                        timestamp: Date.now()
+                    });
+                }
+            }
+        });
+        
+        // Accessibility settings menu
+        game.settings.registerMenu('avant', 'accessibilitySettings', {
+            name: game.i18n?.localize('AVANT.settings.accessibilitySettings.name') || 'Accessibility Settings',
+            label: game.i18n?.localize('AVANT.settings.accessibilitySettings.label') || 'Configure Accessibility',
+            hint: game.i18n?.localize('AVANT.settings.accessibilitySettings.hint') || 'Configure accessibility features for better usability',
+            icon: 'fas fa-universal-access',
+            type: AvantAccessibilitySettingsApp,
+            restricted: false
+        });
+    }
+    
+    /**
      * Get all available themes
      */
     getAllThemes() {
@@ -468,7 +593,8 @@ export class AvantThemeManager {
             const theme = JSON.parse(text);
             
             // Validate theme structure
-            if (!this.validateTheme(theme)) {
+            const isValid = await this.validateTheme(theme);
+            if (!isValid) {
                 throw new Error('Invalid theme format - please check the theme structure');
             }
             
@@ -506,8 +632,8 @@ export class AvantThemeManager {
      * Validate theme JSON structure
      * Uses pure function logic with logging wrapper
      */
-    validateTheme(theme) {
-        const validation = validateThemeStructure(theme);
+    async validateTheme(theme) {
+        const validation = await validateThemeStructure(theme);
         
         if (!validation.isValid) {
             logger.error('Avant Theme Manager | Theme validation failed:');
@@ -841,5 +967,82 @@ class AvantThemeManagerApp extends FormApplication {
             await AvantThemeManager.getInstance().deleteCustomTheme(themeId);
             this.render();
         }
+    }
+}
+
+/**
+ * Accessibility Settings Application UI (Placeholder)
+ * Simple form application for configuring accessibility settings
+ */
+class AvantAccessibilitySettingsApp extends FormApplication {
+    static get defaultOptions() {
+        return foundry.utils.mergeObject(super.defaultOptions, {
+            id: 'avant-accessibility-settings',
+            title: game.i18n?.localize('AVANT.accessibilitySettings.title') || 'Avant Accessibility Settings',
+            template: 'systems/avant/templates/accessibility-settings.html',
+            width: 600,
+            height: 500,
+            classes: ['avant', 'accessibility-settings'],
+            resizable: true,
+            closeOnSubmit: false,
+            submitOnChange: true
+        });
+    }
+    
+    getData() {
+        // Get current accessibility settings from game settings
+        const data = {
+            autoContrast: game.settings?.get('avant', 'accessibility.autoContrast') || false,
+            highContrast: game.settings?.get('avant', 'accessibility.highContrast') || false,
+            reducedMotion: game.settings?.get('avant', 'accessibility.reducedMotion') || false,
+            contrastLevel: game.settings?.get('avant', 'accessibility.contrastLevel') || 'AA'
+        };
+        
+        return data;
+    }
+    
+    /**
+     * Handle form submission - update settings
+     */
+    async _updateObject(event, formData) {
+        console.log('Avant | Updating accessibility settings:', formData);
+        
+        // Update each setting individually with proper error handling
+        const settingsToUpdate = [
+            ['accessibility.autoContrast', 'autoContrast'],
+            ['accessibility.highContrast', 'highContrast'], 
+            ['accessibility.reducedMotion', 'reducedMotion'],
+            ['accessibility.contrastLevel', 'contrastLevel']
+        ];
+        
+        for (const [settingKey, formKey] of settingsToUpdate) {
+            try {
+                await game.settings.set('avant', settingKey, formData[formKey]);
+                console.log(`Avant | Successfully updated ${settingKey}: ${formData[formKey]}`);
+            } catch (error) {
+                console.error(`Avant | Failed to update ${settingKey}:`, error);
+                if (ui.notifications) {
+                    ui.notifications.error(`Failed to update ${settingKey}: ${error.message}`);
+                }
+            }
+        }
+        
+        // Show success message
+        if (ui.notifications) {
+            ui.notifications.info('Accessibility settings updated successfully!');
+        }
+    }
+    
+    /**
+     * Activate event listeners for accessibility controls
+     */
+    activateListeners(html) {
+        super.activateListeners(html);
+        
+        // Add any custom event listeners for accessibility controls here
+        html.find('input[type="checkbox"], select').change(event => {
+            // Auto-submit on change for immediate feedback
+            this._onSubmit(event);
+        });
     }
 } 

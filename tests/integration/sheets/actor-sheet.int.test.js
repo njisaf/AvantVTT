@@ -56,8 +56,24 @@ describe('AvantActorSheet Integration Tests', () => {
                 flags: {}
             })),
             getRollData: jest.fn(() => ({ level: 2 })),
-            items: []
+            items: {
+                values: () => [],
+                get: (id) => undefined,
+                size: 0
+            }
         };
+
+        // Wrap mock items in Map and mock Item class
+        const wrapItems = (items) => {
+            const itemMap = new Map(items.map(item => [item._id, new global.Item(item)]));
+            mockActor.items = itemMap;
+            // Mock actor's items getter to return the Map
+            Object.defineProperty(mockActor, 'items', {
+                get: () => itemMap,
+                configurable: true,
+            });
+        };
+        mockActor.wrapItems = wrapItems;
 
         // Create mock HTML element and wrap in jQuery for v13 compatibility
         const htmlElement = document.createElement('div');
@@ -115,8 +131,8 @@ describe('AvantActorSheet Integration Tests', () => {
     });
 
     describe('Data Preparation', () => {
-        test('should prepare context data correctly', () => {
-            const context = actorSheet.getData();
+        test('should prepare context data correctly', async () => {
+            const context = await actorSheet.getData();
             
             // Core data structure tests
             expect(context.actor).toBeDefined();
@@ -136,8 +152,8 @@ describe('AvantActorSheet Integration Tests', () => {
             // The sheet delegates to the template and underlying data for these values
         });
 
-        test('should calculate ability total modifiers correctly', () => {
-            const context = actorSheet.getData();
+        test('should calculate ability total modifiers correctly', async () => {
+            const context = await actorSheet.getData();
             
             // level (2) + ability modifier (2) = 4 for might
             expect(context.abilityTotalModifiers.might).toBe(4);
@@ -145,13 +161,13 @@ describe('AvantActorSheet Integration Tests', () => {
             expect(context.abilityTotalModifiers.intellect).toBe(2);
         });
 
-        test('should handle empty abilities and skills', () => {
+        test('should handle empty abilities and skills', async () => {
             mockActor.toObject.mockReturnValue({
                 system: { level: 1 },
                 flags: {}
             });
             
-            const context = actorSheet.getData();
+            const context = await actorSheet.getData();
             expect(context.abilityTotalModifiers).toBeDefined();
             expect(context.skillTotalModifiers).toBeDefined();
         });
@@ -228,14 +244,14 @@ describe('AvantActorSheet Integration Tests', () => {
     });
 
     describe('Item Management', () => {
-        test('should organize items by type correctly', () => {
-            mockActor.items = [
-                { type: 'weapon', name: 'Sword' },
-                { type: 'action', name: 'Attack' },
-                { type: 'talent', name: 'Skill Focus' }
-            ];
+        test('should organize items by type correctly', async () => {
+            mockActor.wrapItems([
+                { type: 'weapon', name: 'Sword', _id: 'w1' },
+                { type: 'action', name: 'Attack', _id: 'a1' },
+                { type: 'talent', name: 'Skill Focus', _id: 't1' }
+            ]);
             
-            const context = actorSheet.getData();
+            const context = await actorSheet.getData();
             
             expect(context.items).toBeDefined();
             expect(context.items.weapon).toHaveLength(1);
@@ -246,9 +262,9 @@ describe('AvantActorSheet Integration Tests', () => {
         // ===== COMPREHENSIVE INTEGRATION TESTS =====
         // These tests verify complete data flow from getData() to template context
 
-        test('organizes all item types correctly for template consumption', () => {
+        test('organizes all item types correctly for template consumption', async () => {
             // Setup: Actor with all supported item types
-            const mockItems = [
+            mockActor.wrapItems([
                 { type: 'weapon', name: 'Magic Sword', _id: 'w1' },
                 { type: 'armor', name: 'Dragon Scale Armor', _id: 'a1' },
                 { type: 'gear', name: 'Healing Potion', _id: 'g1' },
@@ -256,12 +272,10 @@ describe('AvantActorSheet Integration Tests', () => {
                 { type: 'augment', name: 'Cybernetic Eye', _id: 'au1' },
                 { type: 'feature', name: 'Night Vision', _id: 'f1' },
                 { type: 'action', name: 'Power Attack', _id: 'ac1' }
-            ];
-            
-            mockActor.items = mockItems;
+            ]);
             
             // Execute: Get sheet data
-            const context = actorSheet.getData();
+            const context = await actorSheet.getData();
             
             // Verify: Items are properly organized for template
             expect(context.items).toBeDefined();
@@ -290,10 +304,10 @@ describe('AvantActorSheet Integration Tests', () => {
             expect(context.items.other).toEqual([]);
         });
         
-        test('handles empty item collections gracefully', () => {
-            mockActor.items = [];
+        test('handles empty item collections gracefully', async () => {
+            mockActor.wrapItems([]);
             
-            const context = actorSheet.getData();
+            const context = await actorSheet.getData();
             
             // All categories should exist as empty arrays
             const requiredCategories = [
@@ -306,17 +320,15 @@ describe('AvantActorSheet Integration Tests', () => {
             });
         });
         
-        test('handles items with missing or invalid types', () => {
-            const mockItems = [
+        test('handles items with missing or invalid types', async () => {
+            mockActor.wrapItems([
                 { type: 'weapon', name: 'Valid Weapon', _id: 'valid' },
                 { type: '', name: 'Empty Type', _id: 'empty' },
                 { type: 'invalid-type', name: 'Invalid Type', _id: 'invalid' },
                 { name: 'No Type', _id: 'notype' } // Missing type property
-            ];
+            ]);
             
-            mockActor.items = mockItems;
-            
-            const context = actorSheet.getData();
+            const context = await actorSheet.getData();
             
             expect(context.items.weapon).toHaveLength(1);
             expect(context.items.weapon[0].name).toBe('Valid Weapon');
@@ -328,8 +340,8 @@ describe('AvantActorSheet Integration Tests', () => {
             expect(context.items.other.find(item => item.name === 'No Type')).toBeDefined();
         });
 
-        test('preserves item system data during organization', () => {
-            const mockItems = [
+        test('preserves item system data during organization', async () => {
+            mockActor.wrapItems([
                 { 
                     type: 'weapon', 
                     name: 'Magic Sword', 
@@ -350,11 +362,9 @@ describe('AvantActorSheet Integration Tests', () => {
                         material: 'steel'
                     }
                 }
-            ];
+            ]);
             
-            mockActor.items = mockItems;
-            
-            const context = actorSheet.getData();
+            const context = await actorSheet.getData();
             
             // Verify system data is preserved through getData() flow
             expect(context.items.weapon[0].system.damage).toBe('2d6+3');
@@ -364,7 +374,7 @@ describe('AvantActorSheet Integration Tests', () => {
             expect(context.items.armor[0].system.material).toBe('steel');
         });
 
-        test('handles large item collections efficiently', () => {
+        test('handles large item collections efficiently', async () => {
             // Test with a realistic large collection
             const largeItemCollection = [];
             
@@ -380,9 +390,9 @@ describe('AvantActorSheet Integration Tests', () => {
                 }
             });
             
-            mockActor.items = largeItemCollection;
+            mockActor.wrapItems(largeItemCollection);
             
-            const context = actorSheet.getData();
+            const context = await actorSheet.getData();
             
             // Verify all items are properly organized
             expect(context.items.weapon).toHaveLength(10);
@@ -396,7 +406,7 @@ describe('AvantActorSheet Integration Tests', () => {
             
             // Verify performance: getData() should complete quickly even with many items
             const startTime = performance.now();
-            actorSheet.getData();
+            await actorSheet.getData();
             const endTime = performance.now();
             
             expect(endTime - startTime).toBeLessThan(50); // Should complete in under 50ms
@@ -404,8 +414,8 @@ describe('AvantActorSheet Integration Tests', () => {
     });
 
     describe('Template Context Completeness', () => {
-        test('provides all required context properties for template rendering', () => {
-            const context = actorSheet.getData();
+        test('provides all required context properties for template rendering', async () => {
+            const context = await actorSheet.getData();
             
             // Verify essential context properties exist
             expect(context.system).toBeDefined();
@@ -425,17 +435,17 @@ describe('AvantActorSheet Integration Tests', () => {
             });
         });
 
-        test('maintains data consistency between multiple getData() calls', () => {
+        test('maintains data consistency between multiple getData() calls', async () => {
             // Setup consistent test data
-            mockActor.items = [
-                { type: 'weapon', name: 'Sword' },
-                { type: 'armor', name: 'Shield' }
-            ];
+            mockActor.wrapItems([
+                { type: 'weapon', name: 'Sword', _id: 'w1' },
+                { type: 'armor', name: 'Shield', _id: 'a1' }
+            ]);
             
             // Call getData() multiple times
-            const context1 = actorSheet.getData();
-            const context2 = actorSheet.getData();
-            const context3 = actorSheet.getData();
+            const context1 = await actorSheet.getData();
+            const context2 = await actorSheet.getData();
+            const context3 = await actorSheet.getData();
             
             // Results should be consistent
             expect(context1.items.weapon).toEqual(context2.items.weapon);
@@ -444,14 +454,14 @@ describe('AvantActorSheet Integration Tests', () => {
             expect(context2.items.armor).toEqual(context3.items.armor);
         });
 
-        test('integrates item organization with other sheet data correctly', () => {
+        test('integrates item organization with other sheet data correctly', async () => {
             // Setup: Actor with items and other system data
-            mockActor.items = [
-                { type: 'weapon', name: 'Sword' },
-                { type: 'armor', name: 'Plate' }
-            ];
+            mockActor.wrapItems([
+                { type: 'weapon', name: 'Sword', _id: 'w1' },
+                { type: 'armor', name: 'Plate', _id: 'a1' }
+            ]);
             
-            const context = actorSheet.getData();
+            const context = await actorSheet.getData();
             
             // Test calculated values integration with items
             expect(context.abilityTotalModifiers.might).toBe(4); // level 2 + modifier 2
@@ -463,16 +473,16 @@ describe('AvantActorSheet Integration Tests', () => {
             expect(context.items.armor).toHaveLength(1);
         });
 
-        test('would have caught original bug - missing item categories in template context', () => {
+        test('would have caught original bug - missing item categories in template context', async () => {
             // Setup items that would have been misorganized by the original bug
-            mockActor.items = [
-                { type: 'armor', name: 'Chain Mail' },
-                { type: 'gear', name: 'Rope' },
-                { type: 'augment', name: 'Cyber Arm' },
-                { type: 'feature', name: 'Darkvision' }
-            ];
+            mockActor.wrapItems([
+                { type: 'armor', name: 'Chain Mail', _id: 'a1' },
+                { type: 'gear', name: 'Rope', _id: 'g1' },
+                { type: 'augment', name: 'Cyber Arm', _id: 'au1' },
+                { type: 'feature', name: 'Darkvision', _id: 'f1' }
+            ]);
             
-            const context = actorSheet.getData();
+            const context = await actorSheet.getData();
             
             // These should be properly categorized now (would have failed before fix)
             expect(context.items.armor).toHaveLength(1);
@@ -509,8 +519,8 @@ describe('AvantActorSheet Integration Tests', () => {
     });
 
     describe('Logic Function Integration', () => {
-        test('should use calculated values for display', () => {
-            const context = actorSheet.getData();
+        test('should use calculated values for display', async () => {
+            const context = await actorSheet.getData();
             
             // Verify calculation integration 
             expect(typeof context.abilityTotalModifiers).toBe('object');
@@ -523,7 +533,7 @@ describe('AvantActorSheet Integration Tests', () => {
     });
 
     describe('Error Resilience', () => {
-        test('should handle missing system data', () => {
+        test('should handle missing system data', async () => {
             // Test with minimal actor data
             const minimalActor = new global.Actor({
                 name: "Test Actor",
@@ -532,7 +542,7 @@ describe('AvantActorSheet Integration Tests', () => {
             });
             
             const minimalSheet = new AvantActorSheet(minimalActor, {});
-            const context = minimalSheet.getData();
+            const context = await minimalSheet.getData();
             
             // Should still provide basic structure
             expect(context.system).toBeDefined();

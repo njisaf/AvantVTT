@@ -85,6 +85,12 @@ global.foundry = {
         constructor(fields = {}) {
           this.fields = fields;
         }
+      },
+      ArrayField: class MockArrayField {
+        constructor(field, options = {}) {
+          this.element = field;
+          Object.assign(this, options);
+        }
       }
     }
   },
@@ -387,6 +393,10 @@ global.Actor = class MockActor {
     this._id = data?._id || 'test-actor-id';
   }
   
+  prepareData() {
+    // Mock implementation for testing super() calls
+  }
+
   toObject(source = true) {
     return {
       _id: this._id,
@@ -413,6 +423,10 @@ global.Item = class MockItem {
     this.actor = data?.actor || null;
   }
   
+  prepareData() {
+    // Mock implementation for testing super() calls
+  }
+
   toObject(source = true) {
     return {
       _id: this._id,
@@ -619,6 +633,7 @@ global.jQuery = function(selector) {
     jqObject.length = 1;
     jqObject[0] = selector;
     jqObject.selector = selector.tagName || 'element';
+    jqObject.value = '';
     return jqObject;
   }
   
@@ -627,6 +642,7 @@ global.jQuery = function(selector) {
   jqObject.length = 1;
   jqObject[0] = selector;
   jqObject.selector = selector;
+  jqObject.value = '';
   
   return jqObject;
 };
@@ -639,7 +655,21 @@ global.jQuery.prototype = {
     // Create a new jQuery object for the found elements
     const newObj = Object.create(global.jQuery.prototype);
     newObj.length = 1;
-    newObj[0] = `${this.selector || this[0]} ${sel}`;
+    // Return a mock element with necessary methods
+    newObj[0] = { 
+      value: '',
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      dispatchEvent: jest.fn(),
+      style: {},
+      classList: {
+        add: jest.fn(),
+        remove: jest.fn(),
+        contains: jest.fn()
+      },
+      querySelectorAll: jest.fn().mockReturnValue([]),
+      querySelector: jest.fn().mockReturnValue(null)
+    };
     newObj.selector = sel;
     return newObj;
   },

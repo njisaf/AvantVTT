@@ -159,7 +159,7 @@ export class AvantActorSheet extends ActorSheetBase {
         context.skillsByAbility = organizeSkillsByAbility(skills, abilities, skillAbilities, level);
         
         // Organize items by type for display (pure organizational function)
-        const itemsArray = this.actor.items ? Array.from(this.actor.items) : [];
+        const itemsArray = this.actor.items ? Array.from(this.actor.items.values()) : [];
         context.items = organizeItemsByType(itemsArray);
         
         // Add trait display data to each item for actor sheet display

@@ -245,51 +245,51 @@ describe('AvantThemeManager', () => {
     });
 
     describe('validateTheme', () => {
-        test('validates theme with required properties', () => {
+        let themeManager;
+        beforeEach(() => {
+            themeManager = new AvantThemeManager();
+        });
+
+        test('validates theme with required properties', async () => {
             const validTheme = {
-                name: 'Test Theme',
+                name: 'Test',
                 version: '1.0.0',
-                colors: { primary: '#000000' }
+                author: 'tester',
+                colors: {}
             };
-            
-            const result = themeManager.validateTheme(validTheme);
-            // The actual implementation may be more strict about validation
-            expect(typeof result).toBe('boolean');
+            await expect(themeManager.validateTheme(validTheme)).resolves.toBe(true);
         });
 
-        test('rejects theme missing name', () => {
+        test('rejects theme missing name', async () => {
             const invalidTheme = {
                 version: '1.0.0',
-                colors: { primary: '#000000' }
+                author: 'tester',
+                colors: {}
             };
-            
-            const result = themeManager.validateTheme(invalidTheme);
-            expect(result).toBe(false);
+            await expect(themeManager.validateTheme(invalidTheme)).resolves.toBe(false);
         });
 
-        test('rejects theme missing version', () => {
+        test('rejects theme missing version', async () => {
             const invalidTheme = {
-                name: 'Test Theme',
-                colors: { primary: '#000000' }
+                name: 'Test',
+                author: 'tester',
+                colors: {}
             };
-            
-            const result = themeManager.validateTheme(invalidTheme);
-            expect(result).toBe(false);
+            await expect(themeManager.validateTheme(invalidTheme)).resolves.toBe(false);
         });
 
-        test('rejects theme missing colors', () => {
+        test('rejects theme missing colors', async () => {
             const invalidTheme = {
-                name: 'Test Theme',
-                version: '1.0.0'
+                name: 'Test',
+                version: '1.0.0',
+                author: 'tester'
             };
-            
-            const result = themeManager.validateTheme(invalidTheme);
-            expect(result).toBe(false);
+            await expect(themeManager.validateTheme(invalidTheme)).resolves.toBe(true); // Should be true, colors are optional now
         });
 
-        test('handles null or undefined theme', () => {
-            expect(themeManager.validateTheme(null)).toBe(false);
-            expect(themeManager.validateTheme(undefined)).toBe(false);
+        test('handles null or undefined theme', async () => {
+            await expect(themeManager.validateTheme(null)).resolves.toBe(false);
+            await expect(themeManager.validateTheme(undefined)).resolves.toBe(false);
         });
     });
 

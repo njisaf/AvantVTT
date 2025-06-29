@@ -478,7 +478,9 @@ export class AvantItemSheet extends ItemSheetBase {
             case 'Escape':
                 event.preventDefault();
                 this._hideTraitSuggestions();
-                (event.target as HTMLInputElement).blur();
+                // ✅ PHASE 2.4: Use accessibility module for focus management
+                // Instead of manual blur(), let the hideTraitSuggestions handle focus properly
+                // (event.target as HTMLInputElement).blur(); // Replaced with accessibility-aware focus management
                 break;
         }
     }
@@ -512,11 +514,20 @@ export class AvantItemSheet extends ItemSheetBase {
      * @param event - The click event
      * @private
      */
-    private _onTraitFieldClick(event: Event): void {
+    private async _onTraitFieldClick(event: Event): Promise<void> {
         const field = event.currentTarget as HTMLElement;
         const input = field.querySelector('.trait-chip-input__input') as HTMLInputElement;
         if (input) {
-            input.focus();
+            // ✅ PHASE 2.4: Use accessibility module for enhanced focus management
+            try {
+                const { ensureFocusable } = await import('../accessibility');
+                // Ensure the input is properly focusable with accessibility enhancements
+                ensureFocusable(input, { role: 'textbox', label: 'Trait search input' });
+                input.focus();
+            } catch (error) {
+                console.warn('Accessibility module not available for focus enhancement, using standard focus');
+                input.focus();
+            }
         }
     }
 
@@ -991,6 +1002,11 @@ export class AvantItemSheet extends ItemSheetBase {
         const foundryUtils = (globalThis as any).foundry?.utils;
         const flattenObject = foundryUtils?.flattenObject || ((obj: any) => obj);
         const flatData = flattenObject(processedData);
+        
+        // ✅ CRITICAL FIX: Include _id for FoundryVTT v13 compatibility
+        if (this.item._id) {
+            flatData._id = this.item._id;
+        }
         
         // Call parent method with processed data
         return super._updateObject(event, flatData);

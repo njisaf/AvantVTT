@@ -12,6 +12,7 @@ describe('Tag Button Interaction Integration Tests', () => {
   let itemSheet;
   let mockItem;
   let mockHtml;
+  let tagsInput;
 
   beforeEach(async () => {
     // Create mock trait item
@@ -21,17 +22,18 @@ describe('Tag Button Interaction Integration Tests', () => {
       system: { tags: [] },
       update: jest.fn()
     };
+    
+    // Create a stateful mock input element
+    tagsInput = {
+      value: '',
+      dispatchEvent: jest.fn()
+    };
 
     // Mock HTML structure
-    const createMockInput = (initialValue) => ({
-      value: initialValue,
-      dispatchEvent: jest.fn()
-    });
-
     mockHtml = {
       find: jest.fn((selector) => {
         if (selector === 'input[name="system.tags"]') {
-          return { 0: createMockInput('') };
+          return { 0: tagsInput };
         }
         return { each: jest.fn() };
       })
@@ -45,7 +47,6 @@ describe('Tag Button Interaction Integration Tests', () => {
 
   test('tag button adds single tag correctly', async () => {
     // Arrange
-    const tagsInput = mockHtml.find('input[name="system.tags"]')[0];
     const button = {
       dataset: { tags: 'weapon' },
       classList: { add: jest.fn(), remove: jest.fn() }
@@ -66,7 +67,6 @@ describe('Tag Button Interaction Integration Tests', () => {
 
   test('tag button adds multiple tags correctly', async () => {
     // Arrange
-    const tagsInput = mockHtml.find('input[name="system.tags"]')[0];
     const button = {
       dataset: { tags: 'weapon,armor' },
       classList: { add: jest.fn(), remove: jest.fn() }
@@ -87,7 +87,6 @@ describe('Tag Button Interaction Integration Tests', () => {
 
   test('tag button removes existing tags correctly', async () => {
     // Arrange
-    const tagsInput = mockHtml.find('input[name="system.tags"]')[0];
     tagsInput.value = 'weapon,armor,gear';
     
     const button = {

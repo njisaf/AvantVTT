@@ -577,6 +577,18 @@ export class AvantTraitData extends foundry.abstract.DataModel {
                 },
                 validationError: "Color must be a valid hex color code (e.g., #FF5733 or FF5733)"
             }),
+            textColor: new fields.StringField({
+                required: true,
+                initial: "#000000",
+                blank: false,
+                validate: (value) => {
+                    if (!value || typeof value !== 'string') return false;
+                    // Accept hex colors with or without #
+                    const hexPattern = /^#?[0-9A-Fa-f]{6}$/;
+                    return hexPattern.test(value);
+                },
+                validationError: "Text color must be a valid hex color code (e.g., #000000 or 000000)"
+            }),
             icon: new fields.StringField({
                 required: true,
                 initial: "fas fa-tag",

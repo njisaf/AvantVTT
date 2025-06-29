@@ -233,7 +233,26 @@ export class BulkTraitDialog extends (globalThis as any).Dialog {
       }
       
       // Focus on search input
-      html.find('.trait-search-input').focus();
+              // ✅ PHASE 2.4: Use accessibility module for enhanced focus management
+        const searchInput = html.find('.trait-search-input')[0] as HTMLInputElement;
+        if (searchInput) {
+            try {
+                // Use accessibility module if available for enhanced focus
+                import('../accessibility').then(({ ensureFocusable }) => {
+                    ensureFocusable(searchInput, { 
+                        role: 'searchbox', 
+                        label: 'Search traits for bulk operations' 
+                    });
+                    searchInput.focus();
+                }).catch(() => {
+                    // Fallback to standard focus if accessibility module unavailable
+                    searchInput.focus();
+                });
+            } catch (error) {
+                // Fallback to standard focus
+                searchInput.focus();
+            }
+        }
       
     } catch (error) {
       console.error('Error rendering bulk trait dialog:', error);

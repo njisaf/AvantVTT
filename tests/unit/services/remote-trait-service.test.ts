@@ -6,8 +6,8 @@
  */
 
 import { describe, test, expect, beforeEach, afterEach, jest } from '@jest/globals';
-import { RemoteTraitService, type RemoteSyncResult, type RemoteTraitConfig } from '../../../scripts/services/remote-trait-service.ts';
-import type { TraitExportData } from '../../../scripts/cli/traits.ts';
+import { RemoteTraitService, type RemoteSyncResult, type RemoteTraitConfig } from '@/services/remote-trait-service.ts';
+import type { TraitExportData } from '@/cli/traits.ts';
 
 // Mock fetch globally
 const mockFetch = jest.fn();
@@ -227,7 +227,7 @@ describe('RemoteTraitService', () => {
       });
       
       // Mock TraitProvider.getAll to return empty (no conflicts)
-      jest.doMock('../../../scripts/services/trait-provider.ts', () => ({
+      jest.doMock('@/services/trait-provider.ts', () => ({
         TraitProvider: {
           getInstance: () => ({
             getAll: jest.fn().mockResolvedValue({
@@ -248,13 +248,19 @@ describe('RemoteTraitService', () => {
     });
     
     test('should handle fetch timeout', async () => {
+      jest.useFakeTimers();
       // Mock fetch to hang indefinitely
       mockFetch.mockImplementation(() => new Promise(() => {}));
       
-      const result = await service.syncFromUrl('https://example.com/timeout.json');
+      const promise = service.syncFromUrl('https://example.com/timeout.json');
+      
+      jest.runAllTimers();
+
+      const result = await promise;
       
       expect(result.success).toBe(false);
       expect(result.error).toContain('timeout');
+      jest.useRealTimers();
     });
     
     test('should handle HTTP errors', async () => {
@@ -330,7 +336,7 @@ describe('RemoteTraitService', () => {
       });
       
       // Mock TraitProvider to return existing trait
-      jest.doMock('../../../scripts/services/trait-provider.ts', () => ({
+      jest.doMock('@/services/trait-provider.ts', () => ({
         TraitProvider: {
           getInstance: () => ({
             getAll: jest.fn().mockResolvedValue({
@@ -431,6 +437,7 @@ describe('RemoteTraitService', () => {
     });
     
     test('should handle AbortController timeout', async () => {
+      jest.useFakeTimers();
       // Create a service with short timeout for testing
       const shortTimeoutService = new RemoteTraitService({ fetchTimeout: 1 });
       
@@ -439,10 +446,13 @@ describe('RemoteTraitService', () => {
         new Promise(resolve => setTimeout(resolve, 100))
       );
       
-      const result = await (shortTimeoutService as any)._fetchRemoteData('https://example.com/slow.json');
+      const promise = (shortTimeoutService as any)._fetchRemoteData('https://example.com/slow.json');
+      jest.runAllTimers();
+      const result = await promise;
       
       expect(result.success).toBe(false);
       expect(result.error).toContain('timeout');
+      jest.useRealTimers();
     });
   });
   

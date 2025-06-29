@@ -19,6 +19,9 @@ export interface Trait {
   /** Hex color code for visual representation (e.g., "#FF6B6B") */
   color: string;
   
+  /** Hex color code for text color (e.g., "#000000") */
+  textColor: string;
+  
   /** Path to icon file or FontAwesome class (e.g., "fas fa-fire", "icons/fire.svg") */
   icon: string;
   
@@ -72,6 +75,9 @@ export interface FoundryTraitItem {
 export interface TraitItemSystemData {
   /** Hex color code for the trait */
   color: string;
+  
+  /** Hex color code for text color */
+  textColor: string;
   
   /** Icon path or class for the trait */
   icon: string;

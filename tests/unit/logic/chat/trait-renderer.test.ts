@@ -7,7 +7,6 @@
 
 import { describe, test, expect, beforeEach } from '@jest/globals';
 import {
-  isLightColor,
   escapeHtml,
   renderTraitChips,
   renderSingleTraitChip,
@@ -15,12 +14,16 @@ import {
   extractTraitFromChip
 } from '../../../../scripts/logic/chat/trait-renderer.ts';
 
+// Import accessibility functions from centralized module
+import { isLightColor } from '../../../../scripts/accessibility';
+
 // Mock trait objects for testing
 const mockTraits = [
   {
     id: 'fire',
     name: 'Fire',
     color: '#FF6B6B',
+    textColor: '#000000', // Black text for light color
     icon: 'fas fa-fire',
     localKey: 'AVANT.Trait.Fire',
     description: 'Fire elemental trait',
@@ -31,6 +34,7 @@ const mockTraits = [
       type: 'trait',
       system: {
         color: '#FF6B6B',
+        textColor: '#000000',
         icon: 'fas fa-fire',
         localKey: 'AVANT.Trait.Fire',
         description: 'Fire elemental trait'
@@ -44,6 +48,7 @@ const mockTraits = [
     id: 'ice',
     name: 'Ice',
     color: '#4ECDC4',
+    textColor: '#000000', // Black text for light color
     icon: 'fas fa-snowflake',
     localKey: 'AVANT.Trait.Ice',
     description: 'Ice elemental trait',
@@ -54,6 +59,7 @@ const mockTraits = [
       type: 'trait',
       system: {
         color: '#4ECDC4',
+        textColor: '#000000',
         icon: 'fas fa-snowflake',
         localKey: 'AVANT.Trait.Ice',
         description: 'Ice elemental trait'
@@ -67,6 +73,7 @@ const mockTraits = [
     id: 'bright-yellow',
     name: 'Bright Light',
     color: '#FFEB3B',
+    textColor: '#000000', // Black text for bright yellow
     icon: 'fas fa-sun',
     localKey: 'AVANT.Trait.BrightLight',
     description: 'Very bright yellow trait',
@@ -77,6 +84,7 @@ const mockTraits = [
       type: 'trait',
       system: {
         color: '#FFEB3B',
+        textColor: '#000000',
         icon: 'fas fa-sun',
         localKey: 'AVANT.Trait.BrightLight',
         description: 'Very bright yellow trait'
@@ -117,8 +125,9 @@ describe('isLightColor', () => {
     expect(isLightColor('#FFEB3B')).toBe(true); // Bright yellow
     expect(isLightColor('#E8F5E8')).toBe(true); // Light green
     expect(isLightColor('#FFE0B2')).toBe(true); // Light orange
-    expect(isLightColor('#FF6B6B')).toBe(true); // Light-ish red (luminance > 0.5)
-    expect(isLightColor('#4ECDC4')).toBe(true); // Light teal (luminance > 0.5)
+    // Note: More accurate WCAG luminance calculation shows these are actually dark:
+    expect(isLightColor('#FF6B6B')).toBe(false); // Red - darker than simple calculation suggested
+    expect(isLightColor('#4ECDC4')).toBe(false); // Teal - darker than simple calculation suggested
   });
 
   test('should handle hex colors without # prefix', () => {
@@ -197,17 +206,17 @@ describe('renderTraitChips', () => {
     expect(result.html).toContain('Bright Light');
   });
 
-  test('should apply correct light/dark data attributes', () => {
+  test('should apply correct color data attributes', () => {
     const result = renderTraitChips(mockTraits);
     expect(result.success).toBe(true);
     
-    // Based on actual luminance calculations:
-    // #FF6B6B (Fire) = light color, so data-light="true"
-    // #4ECDC4 (Ice) = light color, so data-light="true"  
-    // #FFEB3B (Bright Light) = light color, so data-light="true"
-    expect(result.html).toMatch(/data-trait="fire"[^>]*data-light="true"/);
-    expect(result.html).toMatch(/data-trait="ice"[^>]*data-light="true"/);
-    expect(result.html).toMatch(/data-trait="bright-yellow"[^>]*data-light="true"/);
+    // Verify color and text color attributes are set correctly
+    expect(result.html).toMatch(/data-trait="fire"[^>]*data-color="#FF6B6B"/);
+    expect(result.html).toMatch(/data-trait="ice"[^>]*data-color="#4ECDC4"/);
+    expect(result.html).toMatch(/data-trait="bright-yellow"[^>]*data-color="#FFEB3B"/);
+    
+    // Verify explicit text colors are applied (current behavior uses explicit textColor)
+    expect(result.html).toMatch(/data-text-color="#000000"/);
   });
 
   test('should respect size option', () => {

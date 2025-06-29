@@ -233,7 +233,7 @@ describe('resolveItemTraitsForChat', () => {
     const result = await resolveItemTraitsForChat(mockItem, mockProvider as any);
     
     expect(result.success).toBe(false);
-    expect(result.error).toContain('Failed to resolve item traits');
+    expect(result.error).toContain('Failed to resolve traits: Provider error');
   });
 });
 

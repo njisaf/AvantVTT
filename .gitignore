@@ -65,3 +65,6 @@ packs/
 # release artifacts
 _releases/
 _sprints/
+_exports/
+_devDocs/
+changelogs/

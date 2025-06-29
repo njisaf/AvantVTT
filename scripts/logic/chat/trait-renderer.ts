@@ -48,45 +48,17 @@ export interface TraitRenderResult {
 }
 
 /**
- * Calculate if a color is light or dark for contrast determination.
+ * @deprecated Use accessibility module instead: import { isLightColor } from '../accessibility'
  * 
- * This function converts a hex color to RGB and calculates the relative
- * luminance to determine if the color appears light or dark to the human eye.
+ * MIGRATION NOTICE: This function has been moved to the centralized accessibility module 
+ * for better organization and enhanced WCAG compliance. The accessibility module provides 
+ * more comprehensive color analysis features including proper gamma correction and 
+ * accessible text color generation.
  * 
- * @param hexColor - Hex color string (e.g., '#FF6B6B' or 'FF6B6B')
- * @returns True if the color is light, false if dark
- * 
- * @example
- * const isLight = isLightColor('#FF6B6B'); // false (dark-ish red)
- * const isLight2 = isLightColor('#FFEB3B'); // true (bright yellow)
+ * @see scripts/accessibility/color-contrast.ts for the new implementation
+ * @see docs/ACCESSIBILITY_MODULE_INTEGRATION_PLAN.md for migration guidance
  */
-export function isLightColor(hexColor: string): boolean {
-  try {
-    // Remove # if present
-    const hex = hexColor.replace('#', '');
-    
-    // Validate hex color format
-    if (!/^[0-9A-Fa-f]{6}$/.test(hex)) {
-      console.warn(`Invalid hex color format: ${hexColor}`);
-      return false; // Default to dark
-    }
-    
-    // Convert to RGB
-    const r = parseInt(hex.substr(0, 2), 16);
-    const g = parseInt(hex.substr(2, 2), 16);
-    const b = parseInt(hex.substr(4, 2), 16);
-    
-    // Calculate relative luminance using WCAG formula
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-    
-    // Colors with luminance > 0.5 are considered light
-    return luminance > 0.5;
-    
-  } catch (error) {
-    console.error('Error calculating color lightness:', error);
-    return false; // Default to dark on error
-  }
-}
+export { isLightColor } from '../../accessibility';
 
 /**
  * Escape HTML special characters to prevent injection.
@@ -95,9 +67,21 @@ export function isLightColor(hexColor: string): boolean {
  * @returns HTML-safe text
  */
 export function escapeHtml(text: string): string {
+  if (typeof text !== 'string') return '';
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+/**
+ * Strip all HTML tags from a string.
+ * @param html - The string to strip
+ * @returns Text with all HTML tags removed
+ */
+function stripHtml(html: string): string {
+    if (typeof html !== 'string') return '';
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    return doc.body.textContent || "";
 }
 
 /**
@@ -166,8 +150,12 @@ export function renderTraitChips(
         continue;
       }
       
-      // Determine if color is light for contrast
-      const isLight = isLightColor(trait.color);
+      // Use explicit text color or fallback to black (disabled auto-contrast calculation)
+      const textColor = trait.textColor || '#000000';
+      
+      // ACCESSIBILITY NOTE: Automatic contrast calculation disabled per user request
+      // For accessibility features, see planned accessibility module
+      // const isLight = isLightColor(trait.color); // DISABLED
       
       // Build chip classes
       const chipClasses = [
@@ -186,13 +174,13 @@ export function renderTraitChips(
         '<button type="button" class="trait-chip__remove" aria-label="Remove trait" tabindex="-1">×</button>' : 
         '';
       
-      // Build chip HTML
+      // Build chip HTML - using explicit text color instead of auto-calculated
       const chipHtml = `<span class="${chipClasses.join(' ')}" 
         data-trait="${escapeHtml(trait.id)}" 
         data-color="${escapeHtml(trait.color)}" 
-        data-light="${isLight}" 
-        style="--trait-color: ${escapeHtml(trait.color)}; --trait-text-color: ${isLight ? '#000000' : '#ffffff'};" 
-        title="${escapeHtml(trait.description || trait.name)}" 
+        data-text-color="${escapeHtml(textColor)}" 
+        style="--trait-color: ${escapeHtml(trait.color)}; --trait-text-color: ${escapeHtml(textColor)};" 
+        title="${escapeHtml(stripHtml(trait.description || trait.name))}" 
         aria-label="Trait: ${escapeHtml(trait.name)}">
         ${iconHtml}
         <span class="trait-chip__text">${escapeHtml(trait.name)}</span>
@@ -281,8 +269,12 @@ export function renderTraitSuggestion(
       return '';
     }
     
-    // Determine if color is light
-    const isLight = isLightColor(trait.color);
+    // Use explicit text color or fallback to black (disabled auto-contrast calculation)
+    const textColor = trait.textColor || '#000000';
+    
+    // ACCESSIBILITY NOTE: Automatic contrast calculation disabled per user request
+    // For accessibility features, see planned accessibility module
+    // const isLight = isLightColor(trait.color); // DISABLED
     
     // Highlight matched text if provided
     let displayName = escapeHtml(trait.name);
@@ -300,8 +292,8 @@ export function renderTraitSuggestion(
     return `<div class="trait-chip-input__suggestion" data-trait-id="${escapeHtml(trait.id)}" role="option">
       <span class="trait-chip trait-chip--preview trait-chip--small" 
         data-color="${escapeHtml(trait.color)}" 
-        data-light="${isLight}" 
-        style="--trait-color: ${escapeHtml(trait.color)}; --trait-text-color: ${isLight ? '#000000' : '#ffffff'};">
+        data-text-color="${escapeHtml(textColor)}" 
+        style="--trait-color: ${escapeHtml(trait.color)}; --trait-text-color: ${escapeHtml(textColor)};">
         ${iconHtml}
         <span class="trait-chip__text">${escapeHtml(trait.name)}</span>
       </span>

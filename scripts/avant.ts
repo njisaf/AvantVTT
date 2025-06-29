@@ -21,16 +21,19 @@ import { AvantActionData, AvantFeatureData, AvantTalentData, AvantAugmentData, A
 
 // Sheet classes
 import { AvantActorSheet } from './sheets/actor-sheet.ts';
-import { AvantItemSheet } from './sheets/item-sheet.ts';
+import { AvantItemSheet } from './sheets/item-sheet';
 
 // Dialog classes
-import { AvantRerollDialog } from './dialogs/reroll-dialog.js';
+import { AvantRerollDialog } from './dialogs/reroll-dialog';
 
 // Chat functionality
 import { AvantChatContextMenu } from './chat/context-menu.ts';
 
 // Theme manager
 import { AvantThemeManager } from './themes/theme-manager.js';
+
+// Commands module
+import { initializeAvantCommands } from './commands/index.ts';
 
 // Services
 import { TraitProvider } from './services/trait-provider.js';
@@ -90,6 +93,10 @@ Hooks.once('init', async function(): Promise<void> {
     // Register settings for theme manager early
     AvantThemeManager.registerSettings();
     console.log("Avant | Theme manager settings registered");
+    
+    // Register accessibility settings early (required for template helpers)
+    AvantThemeManager.registerAccessibilitySettings();
+    console.log("Avant | Accessibility settings registered");
     
     // Create and expose initialization manager immediately
     const initManager = InitializationManager.getInstance();
@@ -167,6 +174,15 @@ Hooks.once('ready', async function(): Promise<void> {
         
         // Set up Custom Traits compendium auto-creation
         setupCustomTraitsCompendiumBehavior();
+        
+        // Initialize commands module (chat commands and macros)
+        const commandsModule = await initializeAvantCommands();
+        
+        // Attempt to create world-level trait macros (may fail in v13 due to timing)
+        await commandsModule.createWorldMacros();
+        
+        // Provide fallback method accessible via console
+        setupMacroFallback();
         
     } catch (error) {
         console.error('Avant | Error during ready phase:', error);
@@ -818,5 +834,32 @@ const avantGlobals: AvantGlobals = {
 
 // Safely assign to globalThis
 Object.assign(globalThis, avantGlobals);
+
+/**
+ * Setup fallback method for creating macros when game.macros is not available during init
+ */
+function setupMacroFallback(): void {
+    // Expose a function to console that users can call manually
+    (globalThis as any).createAvantTraitMacros = async function() {
+        console.log('🏷️ Creating Avant Trait macros...');
+        try {
+            const commandsModule = await initializeAvantCommands();
+            await commandsModule.createWorldMacros();
+            console.log('✅ Avant Trait macros created successfully!');
+            ui.notifications.info('✅ Avant command macros created in your Macro Directory!');
+        } catch (error) {
+            console.error('❌ Failed to create macros:', error);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            ui.notifications.error(`❌ Failed to create macros: ${errorMessage}`);
+        }
+    };
+    
+    // Keep the old function name for backward compatibility
+    (globalThis as any).createAvantTraitMacro = (globalThis as any).createAvantTraitMacros;
+    
+    console.log('🏷️ Avant | Macro fallback available: Run `createAvantTraitMacros()` in console if needed');
+}
+
+// createWorldTraitMacros function removed - replaced by commands module
 
 console.log("Avant | System loaded successfully - all components imported and configured");
