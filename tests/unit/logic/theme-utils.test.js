@@ -7,8 +7,6 @@
 
 import { describe, test, expect, beforeEach } from '@jest/globals';
 import { 
-    validateColor,
-    mixColors,
     generateThemeStyleString,
     clearThemeVariables,
     applyThemeVariables,
@@ -17,59 +15,6 @@ import {
 } from '../../../scripts/logic/theme-utils.js';
 
 describe('Theme Utils - Pure Logic Functions', () => {
-    
-    describe('validateColor', () => {
-        test('should validate hex colors correctly', () => {
-            
-            // Valid hex colors
-            expect(validateColor('#00E0DC')).toBe(true);
-            expect(validateColor('#FFF')).toBe(true);
-            expect(validateColor('#000000')).toBe(true);
-            expect(validateColor('#4CE2E1')).toBe(true);
-            
-            // Invalid hex colors
-            expect(validateColor('00E0DC')).toBe(false); // Missing #
-            expect(validateColor('#GGG')).toBe(false); // Invalid characters
-            expect(validateColor('#12345')).toBe(false); // Wrong length
-            expect(validateColor('')).toBe(false); // Empty string
-            expect(validateColor(null)).toBe(false); // Null
-            expect(validateColor(undefined)).toBe(false); // Undefined
-        });
-
-        test('should validate RGB colors correctly', () => {
-            
-            // Valid RGB colors
-            expect(validateColor('rgb(0, 224, 220)')).toBe(true);
-            expect(validateColor('rgba(76, 226, 225, 0.8)')).toBe(true);
-            expect(validateColor('rgb(255, 255, 255)')).toBe(true);
-            
-            // Invalid RGB colors
-            expect(validateColor('rgb(256, 224, 220)')).toBe(false); // Out of range
-            expect(validateColor('rgb(0, 224)')).toBe(false); // Missing component
-            expect(validateColor('rgba(0, 224, 220)')).toBe(false); // Missing alpha
-        });
-    });
-
-    describe('mixColors', () => {
-        test('should mix two hex colors correctly', () => {
-            
-            // Mix black and white should give gray
-            expect(mixColors('#000000', '#FFFFFF', 0.5)).toBe('#808080');
-            
-            // Mix at different ratios
-            expect(mixColors('#FF0000', '#0000FF', 0.5)).toBe('#800080'); // Red + Blue = Purple
-            expect(mixColors('#FF0000', '#0000FF', 0.0)).toBe('#FF0000'); // All first color
-            expect(mixColors('#FF0000', '#0000FF', 1.0)).toBe('#0000FF'); // All second color
-        });
-
-        test('should handle edge cases for color mixing', () => {
-            // Invalid inputs should return first color or null
-            expect(mixColors('invalid', '#FFFFFF', 0.5)).toBeNull();
-            expect(mixColors('#000000', 'invalid', 0.5)).toBeNull();
-            expect(mixColors('#000000', '#FFFFFF', -0.5)).toBe('#000000'); // Clamp to 0
-            expect(mixColors('#000000', '#FFFFFF', 1.5)).toBe('#FFFFFF'); // Clamp to 1
-        });
-    });
 
     describe('generateThemeStyleString', () => {
         test('should generate CSS style string from theme object', () => {
@@ -178,7 +123,7 @@ describe('Theme Utils - Pure Logic Functions', () => {
     });
 
     describe('validateThemeStructure', () => {
-        test('should validate complete theme objects', () => {
+        test('should validate complete theme objects', async () => {
             const validTheme = {
                 name: 'Valid Theme',
                 version: '1.0.0',
@@ -197,12 +142,12 @@ describe('Theme Utils - Pure Logic Functions', () => {
                 }
             };
 
-            const result = validateThemeStructure(validTheme);
+            const result = await validateThemeStructure(validTheme);
             expect(result.isValid).toBe(true);
             expect(result.errors).toEqual([]);
         });
 
-        test('should identify missing required fields', () => {
+        test('should identify missing required fields', async () => {
             const invalidTheme = {
                 // Missing name, version, author
                 colors: {
@@ -212,7 +157,7 @@ describe('Theme Utils - Pure Logic Functions', () => {
                 }
             };
 
-            const result = validateThemeStructure(invalidTheme);
+            const result = await validateThemeStructure(invalidTheme);
             expect(result.isValid).toBe(false);
             expect(result.errors.length).toBeGreaterThan(0);
             expect(result.errors.some(error => error.includes('name'))).toBe(true);
@@ -220,7 +165,7 @@ describe('Theme Utils - Pure Logic Functions', () => {
             expect(result.errors.some(error => error.includes('author'))).toBe(true);
         });
 
-        test('should validate color format in theme', () => {
+        test('should validate color format in theme', async () => {
             const themeWithInvalidColors = {
                 name: 'Bad Colors Theme',
                 version: '1.0.0',
@@ -235,7 +180,7 @@ describe('Theme Utils - Pure Logic Functions', () => {
                 }
             };
 
-            const result = validateThemeStructure(themeWithInvalidColors);
+            const result = await validateThemeStructure(themeWithInvalidColors);
             expect(result.isValid).toBe(false);
             expect(result.errors.some(error => error.includes('backgrounds.primary'))).toBe(true);
             expect(result.errors.some(error => error.includes('accents.primary'))).toBe(true);
@@ -299,7 +244,7 @@ describe('Theme Utils - Pure Logic Functions', () => {
     });
 
     describe('Theme Utils Integration', () => {
-        test('should work together for complete theme processing', () => {
+        test('should work together for complete theme processing', async () => {
             const theme = {
                 name: 'Integration Test Theme',
                 version: '1.0.0',
@@ -318,7 +263,7 @@ describe('Theme Utils - Pure Logic Functions', () => {
             };
 
             // Validate theme
-            const validation = validateThemeStructure(theme);
+            const validation = await validateThemeStructure(theme);
             expect(validation.isValid).toBe(true);
 
             // Generate CSS variables
@@ -333,7 +278,7 @@ describe('Theme Utils - Pure Logic Functions', () => {
     });
 
     describe('Performance and Edge Cases', () => {
-        test('should handle large theme objects efficiently', () => {
+        test('should handle large theme objects efficiently', async () => {
             // Create large theme with many properties
             const largeTheme = {
                 name: 'Large Theme',
@@ -352,7 +297,7 @@ describe('Theme Utils - Pure Logic Functions', () => {
             }
 
             const start = performance.now();
-            const validation = validateThemeStructure(largeTheme);
+            const validation = await validateThemeStructure(largeTheme);
             const variables = applyThemeVariables(largeTheme);
             const end = performance.now();
 
@@ -361,7 +306,7 @@ describe('Theme Utils - Pure Logic Functions', () => {
             expect(end - start).toBeLessThan(100); // Should complete in < 100ms
         });
 
-        test('should handle malformed data gracefully', () => {
+        test('should handle malformed data gracefully', async () => {
             const malformedInputs = [
                 null,
                 undefined,
@@ -374,10 +319,10 @@ describe('Theme Utils - Pure Logic Functions', () => {
             // Set up circular reference
             malformedInputs[malformedInputs.length - 1].circular = malformedInputs[malformedInputs.length - 1];
 
-            malformedInputs.forEach(input => {
-                expect(() => validateThemeStructure(input)).not.toThrow();
+            for (const input of malformedInputs) {
+                await expect(validateThemeStructure(input)).resolves.not.toThrow();
                 expect(() => applyThemeVariables(input)).not.toThrow();
-            });
+            }
         });
     });
 }); 

@@ -21,9 +21,9 @@ describe('Actor Sheet Wrapper Integration', () => {
         actorSheet = new AvantActorSheet(mockActor, {});
     });
 
-    test('should create actor sheet and exercise getData method', () => {
+    test('should create actor sheet and exercise getData method', async () => {
         // Call getData which delegates to pure functions
-        const data = actorSheet.getData();
+        const data = await actorSheet.getData();
         
         // Verify delegation occurred and returns data
         expect(data).toBeDefined();

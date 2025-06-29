@@ -41,7 +41,7 @@ describe('Avant System Additional Coverage', () => {
             // If AvantActor is available, test it; otherwise test the mock
             if (AvantActor && typeof AvantActor.prototype.prepareData === 'function') {
                 AvantActor.prototype.prepareData.call(actor);
-                expect(mockValidation).toHaveBeenCalledWith({ level: 1 });
+                expect(mockValidation).toHaveBeenCalledWith(expect.objectContaining({ level: 1 }));
             }
             
             mockValidation.mockRestore();

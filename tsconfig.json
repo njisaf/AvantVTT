@@ -10,10 +10,12 @@
     "outDir": "dist",
     "sourceMap": true,
     "baseUrl": ".",
-    "types": ["jest"],
+    "types": ["jest", "node"],
     "paths": {
+      "@/*": ["scripts/*"],
       "@types/*": ["scripts/types/*"],
-      "@logic/*": ["scripts/logic/*"]
+      "@logic/*": ["scripts/logic/*"],
+      "#lib/*": ["scripts/lib/*"]
     },
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,

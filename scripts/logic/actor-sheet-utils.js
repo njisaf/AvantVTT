@@ -262,17 +262,18 @@ export function prepareGenericRoll(dataset) {
 }
 
 /**
- * Extracts item ID from DOM element
+ * Extracts item ID from DOM element looking for both .item parent and direct data-item-id
  * 
- * This function safely extracts the item ID from a DOM element by finding
- * the closest .item parent and reading its dataset. Returns null if no
- * valid item ID is found.
+ * This function safely extracts the item ID from a DOM element by first checking
+ * for a direct data-item-id attribute, then falling back to finding the closest 
+ * .item or .combat-item parent. This handles both gear tab (.item) and combat 
+ * tab (.combat-item) scenarios.
  * 
  * @param {Element} element - The DOM element to search from
  * @returns {string|null} The item ID or null if not found
  * 
  * @example
- * // Extract item ID from button element
+ * // Extract item ID from button element with direct data-item-id
  * const itemId = extractItemIdFromElement(button);
  * // Result: "item-abc123" or null
  */
@@ -281,12 +282,57 @@ export function extractItemIdFromElement(element) {
         return null;
     }
     
+    // First try: Check if the element itself has data-item-id (for combat buttons)
+    if (element.dataset && element.dataset.itemId) {
+        return element.dataset.itemId;
+    }
+    
+    // Second try: Look for closest .item parent (for gear tab)
     const itemElement = element.closest('.item');
-    if (!itemElement || !itemElement.dataset) {
+    if (itemElement && itemElement.dataset && itemElement.dataset.itemId) {
+        return itemElement.dataset.itemId;
+    }
+    
+    // Third try: Look for closest .combat-item parent (for combat tab)
+    const combatItemElement = element.closest('.combat-item');
+    if (combatItemElement && combatItemElement.dataset && combatItemElement.dataset.itemId) {
+        return combatItemElement.dataset.itemId;
+    }
+    
+    return null;
+}
+
+/**
+ * Extracts item ID from combat button elements specifically
+ * 
+ * This function is optimized for combat tab buttons that have direct data-item-id
+ * attributes and doesn't need to search for parent elements. Used as a more 
+ * efficient alternative for combat-specific event handlers.
+ * 
+ * @param {Element} element - The DOM element (typically a button) to extract item ID from
+ * @returns {string|null} The item ID or null if not found
+ * 
+ * @example
+ * // Extract item ID from combat button
+ * const itemId = extractCombatItemId(button);
+ * // Result: "item-abc123" or null
+ */
+export function extractCombatItemId(element) {
+    if (!element) {
         return null;
     }
     
-    return itemElement.dataset.itemId || null;
+    // Combat buttons have data-item-id directly on them
+    if (element.dataset && element.dataset.itemId) {
+        return element.dataset.itemId;
+    }
+    
+    // Fallback: try getAttribute for maximum compatibility
+    if (element.getAttribute && typeof element.getAttribute === 'function') {
+        return element.getAttribute('data-item-id');
+    }
+    
+    return null;
 }
 
 /**

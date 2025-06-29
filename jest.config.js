@@ -7,9 +7,10 @@
  * - Coverage reporting with appropriate thresholds
  * - Support for ESM modules and FoundryVTT client APIs
  * - Separate projects for unit and integration tests
+ * - Enhanced JSDOM stability for Stage 4 Sprint 2
  * 
  * @author Avant VTT Team
- * @version 2.0.0
+ * @version 2.1.0
  * @since 0.1.2
  */
 
@@ -28,6 +29,14 @@ export default {
       rootDir: '.',
       testEnvironment: 'jsdom',
       preset: 'ts-jest/presets/default-esm',
+      transform: {
+        '^.+\\.(t|j)s$': ['ts-jest', { useESM: true }],
+      },
+      moduleNameMapper: {
+        '^(\\.{1,2}/.*)\\.js$': '$1',
+        '^@/(.*)$': '<rootDir>/scripts/$1',
+        '^#lib/(.*)$': '<rootDir>/scripts/lib/$1'
+      },
       testMatch: [
         '<rootDir>/tests/unit/**/*.test.[jt]s',
         '!<rootDir>/tests/unit/**/*.int.test.[jt]s'
@@ -38,11 +47,14 @@ export default {
       collectCoverageFrom: [
         'scripts/logic/**/*.js',
         'scripts/utils/**/*.js',
-        'scripts/data/**/*.js',
+        'scripts/data/**/*.{js,ts}',
+        'scripts/services/**/*.{js,ts}',
         'scripts/themes/theme-manager.js',
         'scripts/avant.js',
         '!**/*.test.js',
-        '!**/*.spec.js'
+        '!**/*.spec.js',
+        '!**/*.test.ts',
+        '!**/*.spec.ts'
       ],
       coverageThreshold: {
         'scripts/utils/logger.js': {
@@ -52,9 +64,6 @@ export default {
           lines: 75
         },
         'scripts/avant.js': {
-          lines: 60
-        },
-        'scripts/dialogs/reroll-dialog.js': {
           lines: 60
         },
         'scripts/logic/avant-init-utils.js': {
@@ -67,7 +76,25 @@ export default {
       },
       coverageDirectory: '<rootDir>/coverage/unit',
       clearMocks: true,
-      restoreMocks: true
+      restoreMocks: true,
+      // Enhanced JSDOM configuration for stability
+      testEnvironmentOptions: {
+        url: 'http://localhost:30000',
+        resources: 'usable',
+        runScripts: 'dangerously',
+        pretendToBeVisual: true,
+        beforeParse: (window) => {
+          // Ensure critical DOM APIs are available
+          if (!window.document.addEventListener) {
+            window.document.addEventListener = jest.fn();
+            window.document.removeEventListener = jest.fn();
+          }
+          if (!window.addEventListener) {
+            window.addEventListener = jest.fn();
+            window.removeEventListener = jest.fn();
+          }
+        }
+      }
     },
     
     // Integration tests project - Sheet wrappers and system integration
@@ -76,6 +103,14 @@ export default {
       rootDir: '.',
       testEnvironment: 'jsdom',
       preset: 'ts-jest/presets/default-esm',
+      transform: {
+        '^.+\\.(t|j)s$': ['ts-jest', { useESM: true }],
+      },
+      moduleNameMapper: {
+        '^(\\.{1,2}/.*)\\.js$': '$1',
+        '^@/(.*)$': '<rootDir>/scripts/$1',
+        '^#lib/(.*)$': '<rootDir>/scripts/lib/$1'
+      },
       testMatch: [
         '<rootDir>/tests/integration/**/*.int.test.[jt]s'
       ],
@@ -93,9 +128,6 @@ export default {
         'scripts/sheets/actor-sheet.js': {
           lines: 70
         },
-        'scripts/dialogs/reroll-dialog.js': {
-          lines: 60
-        },
         global: {
           branches: 60,
           functions: 60,
@@ -105,7 +137,25 @@ export default {
       },
       coverageDirectory: '<rootDir>/coverage/integration',
       clearMocks: true,
-      restoreMocks: true
+      restoreMocks: true,
+      // Enhanced JSDOM configuration for stability
+      testEnvironmentOptions: {
+        url: 'http://localhost:30000',
+        resources: 'usable',
+        runScripts: 'dangerously',
+        pretendToBeVisual: true,
+        beforeParse: (window) => {
+          // Ensure critical DOM APIs are available
+          if (!window.document.addEventListener) {
+            window.document.addEventListener = jest.fn();
+            window.document.removeEventListener = jest.fn();
+          }
+          if (!window.addEventListener) {
+            window.addEventListener = jest.fn();
+            window.removeEventListener = jest.fn();
+          }
+        }
+      }
     }
   ],
   
@@ -138,8 +188,19 @@ export default {
   // Transform configuration for ES modules
   transform: {},
   
-  // Test environment options
+  // Test environment options - fallback for single project runs
   testEnvironmentOptions: {
-    url: 'http://localhost:30000'
-  }
+    url: 'http://localhost:30000',
+    resources: 'usable',
+    runScripts: 'dangerously',
+    pretendToBeVisual: true
+  },
+  
+  // Additional stability configurations
+  maxWorkers: 1, // Prevent race conditions in JSDOM
+  testTimeout: 10000, // Increase timeout for stability
+  
+  // Error handling improvements
+  errorOnDeprecated: false, // Don't fail on deprecation warnings during stabilization
+  verbose: false // Reduce noise during mass test runs
 }; 

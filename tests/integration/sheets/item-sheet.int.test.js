@@ -65,19 +65,19 @@ describe('AvantItemSheet Integration Tests', () => {
     });
 
     describe('Data Preparation', () => {
-        test('should call getData and structure context correctly', () => {
-            const context = itemSheet.getData();
+        test('should call getData and structure context correctly', async () => {
+            const context = await itemSheet.getData();
             
             expect(mockItem.toObject).toHaveBeenCalledWith(false);
-            expect(context.system).toEqual({ damage: '1d8', type: 'weapon' });
+            expect(context.system).toEqual({ damage: '1d8', type: 'weapon', traits: [] });
             expect(context.flags).toEqual({});
         });
 
-        test('should handle missing system data gracefully', () => {
+        test('should handle missing system data gracefully', async () => {
             mockItem.toObject.mockReturnValue({ flags: {} });
             
-            const context = itemSheet.getData();
-            expect(context.system).toEqual({}); // Pure function now returns empty object instead of undefined
+            const context = await itemSheet.getData();
+            expect(context.system).toEqual({ traits: [] }); // Pure function now returns empty object instead of undefined
             expect(context.flags).toEqual({});
         });
     });
@@ -197,14 +197,12 @@ describe('AvantItemSheet Integration Tests', () => {
     });
 
     describe('Error Resilience', () => {
-        test('should handle corrupted item data gracefully', () => {
+        test('should handle corrupted item data gracefully', async () => {
             mockItem.toObject = jest.fn(() => {
                 throw new Error('Data corruption');
             });
 
-            expect(() => {
-                itemSheet.getData();
-            }).toThrow(); // This will throw, but that's expected behavior
+            await expect(itemSheet.getData()).rejects.toThrow('Data corruption');
         });
 
         test('should handle missing getRollData method', async () => {

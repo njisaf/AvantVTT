@@ -44,6 +44,9 @@
         }
       }
     },
+    "accessibilitySettings": {
+      "title": "Avant Accessibility Settings"
+    },
     "settings": {
       "selectedTheme": {
         "name": "Selected Theme",
@@ -53,6 +56,29 @@
         "name": "Theme Manager",
         "label": "Manage Themes",
         "hint": "Switch themes and upload custom themes"
+      },
+      "accessibility": {
+        "autoContrast": {
+          "name": "Auto-Contrast",
+          "hint": "Automatically generate accessible text colors that meet WCAG AA standards for trait chips and UI elements"
+        },
+        "highContrast": {
+          "name": "High Contrast Mode",
+          "hint": "Enable high contrast mode for better visibility"
+        },
+        "reducedMotion": {
+          "name": "Reduced Motion",
+          "hint": "Respect your system's reduced motion preference to minimize animations"
+        },
+        "contrastLevel": {
+          "name": "Contrast Level",
+          "hint": "Choose WCAG compliance level for color contrast (AA for normal use, AAA for high accessibility needs)"
+        }
+      },
+      "accessibilitySettings": {
+        "name": "Accessibility Settings",
+        "label": "Configure Accessibility",
+        "hint": "Configure accessibility features for better usability"
       }
     }
   }

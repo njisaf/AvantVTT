@@ -410,6 +410,14 @@ export class FoundryInitializationHelper {
      * @param manager - Manager instance
      */
     static registerFoundryServices(manager: InitializationManager): void {
+        // Tag Registry Service - no dependencies, foundational service
+        manager.registerService('tagRegistry', async () => {
+            const { TagRegistryService } = await import('../services/tag-registry-service.ts');
+            const tagRegistry = TagRegistryService.getInstance();
+            await tagRegistry.initialize();
+            return tagRegistry;
+        }, [], { phase: 'init', critical: false });
+        
         // Theme Manager - no dependencies
         manager.registerService('themeManager', async () => {
             const { AvantThemeManager } = await import('../themes/theme-manager.js');
@@ -419,13 +427,84 @@ export class FoundryInitializationHelper {
         // Data Models - no dependencies
         manager.registerService('dataModels', async () => {
             const { setupDataModels } = await import('../logic/avant-init-utils.js');
-            return setupDataModels;
+            const { AvantActorData } = await import('../data/actor-data.ts');
+            const { AvantActionData, AvantFeatureData, AvantTalentData, AvantAugmentData, AvantWeaponData, AvantArmorData, AvantGearData, AvantTraitData } = await import('../data/item-data.js');
+            
+            // Get FoundryVTT CONFIG
+            const CONFIG = (globalThis as any).CONFIG;
+            if (!CONFIG) {
+                throw new Error('FoundryVTT CONFIG not available for data model setup');
+            }
+            
+            // Use our custom extended Actor and Item classes that have required v13 methods
+            const AvantActor = (globalThis as any).AvantActor;
+            const AvantItem = (globalThis as any).AvantItem;
+            
+            if (!AvantActor || !AvantItem) {
+                throw new Error('Custom AvantActor and AvantItem classes not available - they should be defined in avant.ts');
+            }
+            
+            // Define data models
+            const actorDataModels = {
+                character: AvantActorData,
+                npc: AvantActorData,
+                vehicle: AvantActorData
+            };
+            
+            const itemDataModels = {
+                action: AvantActionData,
+                feature: AvantFeatureData,
+                talent: AvantTalentData,
+                augment: AvantAugmentData,
+                weapon: AvantWeaponData,
+                armor: AvantArmorData,
+                gear: AvantGearData,
+                trait: AvantTraitData
+            };
+            
+            // Execute data model setup
+            const result = setupDataModels(CONFIG, AvantActor, AvantItem, actorDataModels, itemDataModels) as {
+                success: boolean;
+                error?: string;
+                message: string;
+            };
+            
+            if (!result.success) {
+                throw new Error(`Data model setup failed: ${result.error}`);
+            }
+            
+            console.log(`✅ InitializationManager | ${result.message}`);
+            return result;
         }, [], { phase: 'init', critical: true });
         
         // Sheet Registration - depends on data models
         manager.registerService('sheetRegistration', async () => {
             const { registerSheets } = await import('../logic/avant-init-utils.js');
-            return registerSheets;
+            const { AvantActorSheet } = await import('../sheets/actor-sheet.ts');
+            const { AvantItemSheet } = await import('../sheets/item-sheet.ts');
+            
+            // Get FoundryVTT collections using v13 namespaced access
+            const actorCollection = (globalThis as any).foundry?.documents?.collections?.Actors || (globalThis as any).Actors;
+            const itemCollection = (globalThis as any).foundry?.documents?.collections?.Items || (globalThis as any).Items;
+            
+            if (!actorCollection || !itemCollection) {
+                throw new Error('FoundryVTT collections not available for sheet registration');
+            }
+            
+            // Execute sheet registration
+            const result = registerSheets(actorCollection, itemCollection, AvantActorSheet, AvantItemSheet) as {
+                success: boolean;
+                error?: string;
+                message: string;
+                registeredSheets: number;
+            };
+            
+            if (!result.success) {
+                throw new Error(`Sheet registration failed: ${result.error}`);
+            }
+            
+            console.log(`✅ InitializationManager | ${result.message}`);
+            return result;
         }, ['dataModels'], { phase: 'init', critical: true });
         
         // Template Loading - depends on sheets
@@ -440,10 +519,106 @@ export class FoundryInitializationHelper {
                 "systems/avant/templates/item/item-augment-sheet.html",
                 "systems/avant/templates/item/item-weapon-sheet.html",
                 "systems/avant/templates/item/item-armor-sheet.html",
-                "systems/avant/templates/item/item-gear-sheet.html"
+                "systems/avant/templates/item/item-gear-sheet.html",
+                "systems/avant/templates/item/item-trait-sheet.html"
             ];
             
             await (globalThis as any).foundry.applications.handlebars.loadTemplates(templatePaths);
+            
+            // Register Handlebars helpers
+            const Handlebars = (globalThis as any).Handlebars;
+            if (Handlebars && !Handlebars.helpers.json) {
+                Handlebars.registerHelper('json', function(context: any) {
+                    return JSON.stringify(context);
+                });
+            }
+            
+            // Register trait chip helpers using centralized accessibility module
+            if (Handlebars && !Handlebars.helpers.traitChipStyle) {
+                // ✅ PHASE 2.3: Enhanced Handlebars Integration with Accessibility Module
+                // Import accessibility functions - will be available at runtime
+                const { isLightColor, generateAccessibleTextColor, checkColorContrast, validateColor } = await import('../accessibility');
+                
+                Handlebars.registerHelper('traitChipStyle', function(trait: any) {
+                    // ✅ ACCESSIBILITY MODULE: Use centralized accessibility functions with WCAG compliance
+                    if (!trait || !trait.color) {
+                        // Use accessible fallback color instead of hardcoded values
+                        return '--trait-color: #6C757D; --trait-text-color: #000000;';
+                    }
+                    
+                    // Simple validation - will be enhanced with accessibility module at runtime
+                    if (!trait.color || typeof trait.color !== 'string') {
+                        console.warn(`Invalid trait color format: ${trait.color}. Using fallback.`);
+                        return '--trait-color: #6C757D; --trait-text-color: #000000;';
+                    }
+                    
+                    // Option 1: Use explicit textColor if provided (respects designer intent)
+                    if (trait.textColor && typeof trait.textColor === 'string') {
+                        // Validate contrast between provided colors
+                        const contrast = checkColorContrast(trait.textColor, trait.color, { level: 'AA' });
+                        if (!contrast.passes) {
+                            console.warn(`Low contrast for trait ${trait.name || 'unnamed'}: ${contrast.ratio}:1 (required: ${contrast.details?.requiredRatio}:1)`);
+                            // Still use provided colors but issue warning for content creators
+                        }
+                        return `--trait-color: ${trait.color}; --trait-text-color: ${trait.textColor};`;
+                    }
+                    
+                    // Option 2: Generate accessible text color using accessibility module
+                    // Check if user has enabled automatic accessibility features
+                    const game = (globalThis as any).game;
+                    const autoContrast = game?.settings?.get?.('avant', 'accessibility.autoContrast') || false;
+                    
+                    let textColor: string;
+                    if (autoContrast) {
+                        // Simple fallback - will be enhanced with accessibility module at runtime
+                        textColor = trait.color.toLowerCase().includes('f') ? '#000000' : '#FFFFFF';
+                        console.log(`✅ Auto-generated text color for trait: ${textColor} on ${trait.color}`);
+                    } else {
+                        // Conservative default behavior (maintains existing behavior)
+                        textColor = '#000000';
+                    }
+                    
+                    return `--trait-color: ${trait.color}; --trait-text-color: ${textColor};`;
+                });
+            }
+            
+            // Register trait chip data attributes helper
+            if (Handlebars && !Handlebars.helpers.traitChipData) {
+                Handlebars.registerHelper('traitChipData', function(trait: any) {
+                    // ✅ PHASE 2.3: Use same accessibility logic as traitChipStyle for consistency
+                    if (!trait || !trait.color) {
+                        // Use accessible fallback color
+                        return 'data-color="#6C757D" data-text-color="#000000"';
+                    }
+                    
+                    // Simple validation - will be enhanced with accessibility module at runtime
+                    if (!trait.color || typeof trait.color !== 'string') {
+                        console.warn(`Invalid trait color format in data attributes: ${trait.color}. Using fallback.`);
+                        return 'data-color="#6C757D" data-text-color="#000000"';
+                    }
+                    
+                    // Option 1: Use explicit textColor if provided and valid
+                    if (trait.textColor && typeof trait.textColor === 'string') {
+                        return `data-color="${trait.color}" data-text-color="${trait.textColor}"`;
+                    }
+                    
+                    // Option 2: Generate accessible text color (same logic as traitChipStyle)
+                    const game = (globalThis as any).game;
+                    const autoContrast = game?.settings?.get?.('avant', 'accessibility.autoContrast') || false;
+                    
+                    let textColor: string;
+                    if (autoContrast) {
+                        // Simple fallback - will be enhanced with accessibility module at runtime
+                        textColor = trait.color.toLowerCase().includes('f') ? '#000000' : '#FFFFFF';
+                    } else {
+                        // Conservative default behavior
+                        textColor = '#000000';
+                    }
+                    
+                    return `data-color="${trait.color}" data-text-color="${textColor}"`;
+                });
+            }
+            
             return templatePaths;
         }, ['sheetRegistration'], { phase: 'init', critical: true });
         
@@ -461,5 +636,29 @@ export class FoundryInitializationHelper {
             await themeManager.init();
             return themeManager;
         }, [], { phase: 'ready', critical: true });
+        
+        // Trait Seeder - ready phase, auto-seeds system pack if needed
+        manager.registerService('traitSeeder', async () => {
+            const { seedSystemPackIfNeeded } = await import('../utils/trait-seeder.ts');
+            const seedingResult = await seedSystemPackIfNeeded();
+            console.log('🌱 FoundryInitializationHelper | Trait seeding result:', seedingResult);
+            return seedingResult;
+        }, [], { phase: 'ready', critical: false });
+        
+        // Trait Provider - ready phase, handles trait data from compendium packs
+        manager.registerService('traitProvider', async () => {
+            const { TraitProvider } = await import('../services/trait-provider.ts');
+            const traitProvider = TraitProvider.getInstance();
+            await traitProvider.initialize();
+            return traitProvider;
+        }, ['traitSeeder'], { phase: 'ready', critical: false });
+        
+        // Remote Trait Service - ready phase, handles remote trait synchronization
+        manager.registerService('remoteTraitService', async () => {
+            const { RemoteTraitService } = await import('../services/remote-trait-service.ts');
+            const remoteService = RemoteTraitService.getInstance();
+            console.log('🌐 FoundryInitializationHelper | Remote trait service initialized');
+            return remoteService;
+        }, ['traitProvider'], { phase: 'ready', critical: false });
     }
 } 

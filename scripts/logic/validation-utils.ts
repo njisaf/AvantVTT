@@ -129,7 +129,7 @@ export function validateActorType(actorType: any): string {
  * // Result: "gear"
  */
 export function validateItemType(itemType: any): string {
-    const supportedTypes = ["action", "feature", "talent", "augment", "weapon", "armor", "gear"];
+    const supportedTypes = ["action", "feature", "talent", "augment", "weapon", "armor", "gear", "trait"];
     
     if (!itemType || !supportedTypes.includes(itemType)) {
         return "gear";

@@ -16,113 +16,7 @@
  */
 
 import { ThemeConfigUtil } from '../themes/theme-config-utils.js';
-
-/**
- * Validates if a color string is in a valid format (hex, rgb, rgba)
- * 
- * Supports:
- * - Hex colors: #RGB, #RRGGBB
- * - RGB colors: rgb(r, g, b)
- * - RGBA colors: rgba(r, g, b, a)
- * 
- * @param {string} color - The color string to validate
- * @returns {boolean} True if the color is valid, false otherwise
- * 
- * @example
- * validateColor('#00E0DC'); // true
- * validateColor('rgb(0, 224, 220)'); // true
- * validateColor('invalid'); // false
- */
-export function validateColor(color) {
-    if (!color || typeof color !== 'string') {
-        return false;
-    }
-
-    // Hex color validation
-    const hexPattern = /^#([0-9A-F]{3}){1,2}$/i;
-    if (hexPattern.test(color)) {
-        return true;
-    }
-
-    // RGB color validation
-    const rgbPattern = /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/;
-    const rgbMatch = color.match(rgbPattern);
-    if (rgbMatch) {
-        const [, r, g, b] = rgbMatch;
-        return [r, g, b].every(val => {
-            const num = parseInt(val);
-            return num >= 0 && num <= 255;
-        });
-    }
-
-    // RGBA color validation
-    const rgbaPattern = /^rgba\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(0|1|0?\.\d+)\s*\)$/;
-    const rgbaMatch = color.match(rgbaPattern);
-    if (rgbaMatch) {
-        const [, r, g, b, a] = rgbaMatch;
-        const rgbValid = [r, g, b].every(val => {
-            const num = parseInt(val);
-            return num >= 0 && num <= 255;
-        });
-        const alphaValid = parseFloat(a) >= 0 && parseFloat(a) <= 1;
-        return rgbValid && alphaValid;
-    }
-
-    return false;
-}
-
-/**
- * Mixes two hex colors at a given ratio
- * 
- * Takes two hex colors and returns a new color that is a mix of both.
- * The ratio determines how much of each color to use (0 = all color1, 1 = all color2)
- * 
- * @param {string} color1 - First hex color (e.g., '#FF0000')
- * @param {string} color2 - Second hex color (e.g., '#0000FF')
- * @param {number} ratio - Mixing ratio between 0 and 1
- * @returns {string|null} Mixed hex color or null if inputs are invalid
- * 
- * @example
- * mixColors('#FF0000', '#0000FF', 0.5); // '#800080' (purple)
- * mixColors('#000000', '#FFFFFF', 0.5); // '#808080' (gray)
- */
-export function mixColors(color1, color2, ratio) {
-    // Validate inputs
-    if (!validateColor(color1) || !validateColor(color2)) {
-        return null;
-    }
-
-    // Clamp ratio between 0 and 1
-    ratio = Math.max(0, Math.min(1, ratio));
-
-    // Handle edge cases
-    if (ratio === 0) return color1;
-    if (ratio === 1) return color2;
-
-    // Convert hex to RGB
-    const hexToRgb = (hex) => {
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16)
-        } : null;
-    };
-
-    const rgb1 = hexToRgb(color1);
-    const rgb2 = hexToRgb(color2);
-
-    if (!rgb1 || !rgb2) return null;
-
-    // Mix the colors
-    const mixedR = Math.round(rgb1.r * (1 - ratio) + rgb2.r * ratio);
-    const mixedG = Math.round(rgb1.g * (1 - ratio) + rgb2.g * ratio);
-    const mixedB = Math.round(rgb1.b * (1 - ratio) + rgb2.b * ratio);
-
-    // Convert back to hex
-    const toHex = (num) => num.toString(16).padStart(2, '0').toUpperCase();
-    return `#${toHex(mixedR)}${toHex(mixedG)}${toHex(mixedB)}`;
-}
+import { validateColor } from '../accessibility/color-contrast.ts';
 
 /**
  * Generates a CSS style string from a theme object
@@ -222,7 +116,7 @@ export function applyThemeVariables(theme) {
                     variableMap[cssVar] = value;
                 }
             }
-                }
+        }
         
         // Force fallback for metadata variables until ThemeConfigUtil includes them
         throw new Error('Use fallback for complete variable mapping');
@@ -272,13 +166,13 @@ export function applyThemeVariables(theme) {
  * Returns detailed validation results with specific error messages.
  * 
  * @param {Object} theme - Theme object to validate
- * @returns {Object} Validation result with isValid boolean and errors array
+ * @returns {Promise<Object>} A promise that resolves to a validation result with isValid boolean and errors array
  * 
  * @example
- * validateThemeStructure({ name: 'Test' }); 
+ * await validateThemeStructure({ name: 'Test' }); 
  * // { isValid: false, errors: ['Missing required field: version', 'Missing required field: author'] }
  */
-export function validateThemeStructure(theme) {
+export async function validateThemeStructure(theme) {
     const result = {
         isValid: true,
         errors: []
@@ -293,7 +187,7 @@ export function validateThemeStructure(theme) {
 
     try {
         // Use ThemeConfigUtil if available
-                const validation = ThemeConfigUtil.validateTheme(theme);
+        const validation = ThemeConfigUtil.validateTheme(theme);
         
         // Force fallback for consistent validation
         throw new Error('Use fallback for complete validation');
@@ -312,21 +206,23 @@ export function validateThemeStructure(theme) {
         }
 
         // Recursively validate colors
-        function validateColorsRecursive(obj, path = 'colors') {
+        async function validateColorsRecursive(obj, path = 'colors') {
             for (const [key, value] of Object.entries(obj)) {
                 const currentPath = `${path}.${key}`;
-                if (typeof value === 'string' && !validateColor(value)) {
-                    result.errors.push(`Invalid color format for ${currentPath}: ${value}`);
-                    result.isValid = false;
+                if (typeof value === 'string') {
+                    if (!(await validateColor(value))) {
+                        result.errors.push(`Invalid color format for ${currentPath}: ${value}`);
+                        result.isValid = false;
+                    }
                 } else if (typeof value === 'object' && value !== null) {
-                    validateColorsRecursive(value, currentPath);
+                    await validateColorsRecursive(value, currentPath);
                 }
             }
         }
 
         // Validate colors if present
         if (theme.colors && typeof theme.colors === 'object') {
-            validateColorsRecursive(theme.colors);
+            await validateColorsRecursive(theme.colors);
         }
 
         return result;

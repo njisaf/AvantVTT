@@ -11,6 +11,21 @@
  * @returns {Object} Mock actor object
  */
 export function createMockActor(options = {}) {
+    const baseActor = {
+        prepareData: () => {},
+        prepareDerivedData: () => {},
+        getRollData: function() {
+            return {
+                level: this.system.level,
+                abilities: this.system.abilities
+            };
+        },
+        update: function() { return Promise.resolve(this); },
+        toObject: function() { return this; }
+    };
+
+    const actor = Object.create(baseActor);
+    
     const defaults = {
         name: 'Test Actor',
         type: 'character',
@@ -28,21 +43,11 @@ export function createMockActor(options = {}) {
         flags: {}
     };
 
-    const actor = {
+    Object.assign(actor, {
         ...defaults,
         ...options,
         system: { ...defaults.system, ...(options.system || {}) }
-    };
-
-    // Add methods that wrapper classes expect
-    actor.prepareData = () => {};
-    actor.prepareDerivedData = () => {};
-    actor.getRollData = () => ({
-        level: actor.system.level,
-        abilities: actor.system.abilities
     });
-    actor.update = () => Promise.resolve(actor);
-    actor.toObject = () => actor;
 
     return actor;
 }

@@ -17,6 +17,38 @@ import { TextEncoder, TextDecoder } from 'util';
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
 
+// Fix JSDOM initialization issues before any other setup
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+  // Ensure document has the proper EventTarget methods
+  if (!document.addEventListener) {
+    document.addEventListener = function() {};
+    document.removeEventListener = function() {};
+    document.dispatchEvent = function() { return true; };
+  }
+  
+  // Ensure window has the proper EventTarget methods
+  if (!window.addEventListener) {
+    window.addEventListener = function() {};
+    window.removeEventListener = function() {};
+    window.dispatchEvent = function() { return true; };
+  }
+  
+  // Fix the problematic window.document reference that JSDOM expects
+  if (typeof window.document === 'undefined' || window.document !== document) {
+    Object.defineProperty(window, 'document', {
+      value: document,
+      writable: false,
+      configurable: false
+    });
+  }
+  
+  // Fix Node.js global reference if needed
+  if (typeof global !== 'undefined' && typeof global.window === 'undefined') {
+    global.window = window;
+    global.document = document;
+  }
+}
+
 // Basic foundry namespace
 global.foundry = {
   abstract: {
@@ -52,6 +84,12 @@ global.foundry = {
       SchemaField: class MockSchemaField {
         constructor(fields = {}) {
           this.fields = fields;
+        }
+      },
+      ArrayField: class MockArrayField {
+        constructor(field, options = {}) {
+          this.element = field;
+          Object.assign(this, options);
         }
       }
     }
@@ -355,6 +393,10 @@ global.Actor = class MockActor {
     this._id = data?._id || 'test-actor-id';
   }
   
+  prepareData() {
+    // Mock implementation for testing super() calls
+  }
+
   toObject(source = true) {
     return {
       _id: this._id,
@@ -381,6 +423,10 @@ global.Item = class MockItem {
     this.actor = data?.actor || null;
   }
   
+  prepareData() {
+    // Mock implementation for testing super() calls
+  }
+
   toObject(source = true) {
     return {
       _id: this._id,
@@ -587,6 +633,7 @@ global.jQuery = function(selector) {
     jqObject.length = 1;
     jqObject[0] = selector;
     jqObject.selector = selector.tagName || 'element';
+    jqObject.value = '';
     return jqObject;
   }
   
@@ -595,6 +642,7 @@ global.jQuery = function(selector) {
   jqObject.length = 1;
   jqObject[0] = selector;
   jqObject.selector = selector;
+  jqObject.value = '';
   
   return jqObject;
 };
@@ -607,7 +655,21 @@ global.jQuery.prototype = {
     // Create a new jQuery object for the found elements
     const newObj = Object.create(global.jQuery.prototype);
     newObj.length = 1;
-    newObj[0] = `${this.selector || this[0]} ${sel}`;
+    // Return a mock element with necessary methods
+    newObj[0] = { 
+      value: '',
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      dispatchEvent: jest.fn(),
+      style: {},
+      classList: {
+        add: jest.fn(),
+        remove: jest.fn(),
+        contains: jest.fn()
+      },
+      querySelectorAll: jest.fn().mockReturnValue([]),
+      querySelector: jest.fn().mockReturnValue(null)
+    };
     newObj.selector = sel;
     return newObj;
   },

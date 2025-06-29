@@ -391,49 +391,43 @@ describe('AvantThemeManager Additional Coverage', () => {
     });
 
     describe('Error Handling and Edge Cases', () => {
-        test('should handle missing document in applyTheme', () => {
-            global.document = undefined;
-            
-            expect(() => {
-                themeManager.applyTheme();
-            }).not.toThrow();
+        let themeManager;
+        beforeEach(() => {
+            themeManager = AvantThemeManager.getInstance();
         });
 
-        test('should handle element without classList', () => {
-            const brokenElement = { style: {} };
-            
-            expect(() => {
-                themeManager.applyThemeToElement(brokenElement, 'dark');
-            }).toThrow(); // Should throw since classList is required
+        test('should handle theme validation errors', async () => {
+            const invalidTheme = { name: 'Incomplete' };
+            const result = await themeManager.validateTheme(invalidTheme);
+            expect(result).toBe(false);
         });
 
-        test('should handle theme validation errors', () => {
-            const invalidTheme = { name: 'Invalid' }; // Missing required properties
-            
-            const isValid = themeManager.validateTheme(invalidTheme);
-            
-            expect(isValid).toBe(false);
+        test('should not crash on empty custom themes', async () => {
+            game.settings.get.mockReturnValue({});
+            await expect(themeManager.loadCustomThemes()).resolves.not.toThrow();
         });
 
-        test('should handle missing game object in init', () => {
-            // This test causes worker crashes, skipping for Stage 3
-            // TODO: Fix in Stage 4 with better isolation approach
+        test('should handle non-existent theme selection gracefully', async () => {
+            await expect(themeManager.setTheme('nonexistent')).resolves.not.toThrow();
+            expect(themeManager.getCurrentTheme()).toBe('nonexistent');
         });
 
-        test('should handle theme callback errors gracefully', () => {
-            const errorCallback = jest.fn(() => { throw new Error('Callback error'); });
-            const goodCallback = jest.fn();
-            
-            themeManager.onThemeChange(errorCallback);
-            themeManager.onThemeChange(goodCallback);
-            
-            // Should not throw when callbacks throw
-            expect(() => {
-                themeManager.notifyThemeChange('newTheme', 'oldTheme');
-            }).not.toThrow();
-            
-            expect(errorCallback).toHaveBeenCalled();
-            expect(goodCallback).toHaveBeenCalled();
+        test('should not crash if localStorage is unavailable', () => {
+            // Mock localStorage to throw an error
+            const originalLocalStorage = window.localStorage;
+            Object.defineProperty(window, 'localStorage', {
+                value: {
+                    getItem: () => { throw new Error('SecurityError'); },
+                    setItem: () => { throw new Error('SecurityError'); }
+                },
+                writable: true
+            });
+
+            expect(() => new AvantThemeManager()).not.toThrow();
+            Object.defineProperty(window, 'localStorage', {
+                value: originalLocalStorage,
+                writable: true
+            });
         });
     });
 
