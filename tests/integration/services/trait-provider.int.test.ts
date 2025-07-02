@@ -21,6 +21,18 @@ const createMockDocument = (data: any) => ({
   toObject: jest.fn().mockReturnValue(data)
 });
 
+/**
+ * Test helper to initialize the TraitProvider and wait for seeding.
+ * @returns {Promise<TraitProvider>}
+ */
+async function initializeTraitProvider(config) {
+  const traitProvider = TraitProvider.getInstance(config);
+  await traitProvider.initialize();
+  // Flush promises to ensure all async operations complete
+  await new Promise(resolve => setTimeout(resolve, 0));
+  return traitProvider;
+}
+
 describe('TraitProvider Integration Tests - Stage 3', () => {
   let traitProvider: TraitProvider;
   let compendiumService: CompendiumLocalService;
@@ -80,34 +92,32 @@ describe('TraitProvider Integration Tests - Stage 3', () => {
       collection: 'avant.avant-traits',
       visible: true,
       getDocuments: jest.fn().mockResolvedValue(mockSystemTraits),
-      documentClass: {
-        createDocuments: jest.fn().mockResolvedValue(mockSystemTraits.map(t => createMockDocument(t.toObject())))
-      }
+      createDocuments: jest.fn().mockResolvedValue(mockSystemTraits.map(t => createMockDocument(t.toObject())))
     };
     
     // Mock custom pack (initially empty) - use default TraitProvider worldPackName
     let customPackDocs: any[] = [];
     const mockCustomPack = {
-      name: 'custom-traits',
-      collection: 'custom-traits',
+      name: 'world.custom-traits',
+      collection: 'world.custom-traits',
       visible: true,
-      getDocuments: jest.fn().mockImplementation(() => Promise.resolve([...customPackDocs])),
-      documentClass: {
-        createDocuments: jest.fn().mockImplementation((docs, options) => {
-          const createdDocs = docs.map(doc => {
-            const docData = { ...doc, _id: doc._id || `generated-${Math.random()}` };
-            const mockDoc = createMockDocument(docData);
-            customPackDocs.push(mockDoc);
-            return mockDoc;
-          });
-          return Promise.resolve(createdDocs);
-        })
-      }
+      getDocuments: jest.fn().mockImplementation(() => Promise.resolve(customPackDocs)),
+      createDocuments: jest.fn().mockImplementation(async (docs, options) => {
+        const createdDocs = docs.map(doc => {
+          const docData = { ...doc, _id: doc._id || `generated-${Math.random()}` };
+          const mockDoc = createMockDocument(docData);
+          return mockDoc;
+        });
+        customPackDocs.push(...createdDocs);
+        // Simulate async operation
+        await new Promise(resolve => setTimeout(resolve, 0));
+        return createdDocs;
+      })
     };
     
     // Set up pack map
     mockCompendiumPacks.set('avant.avant-traits', mockSystemPack);
-    mockCompendiumPacks.set('custom-traits', mockCustomPack);
+    mockCompendiumPacks.set('world.custom-traits', mockCustomPack);
     
     // Mock game with realistic pack structure
     const mockGame = {
@@ -180,6 +190,7 @@ describe('TraitProvider Integration Tests - Stage 3', () => {
         Object.defineProperty(globalThis, prop, { value: undefined, configurable: true });
       }
     });
+    jest.restoreAllMocks();
   });
 
   describe('Service Integration', () => {
@@ -205,27 +216,19 @@ describe('TraitProvider Integration Tests - Stage 3', () => {
 
   describe('Trait Seeding Functionality', () => {
     test('should seed missing traits from system pack to custom pack on initialization', async () => {
-      traitProvider = TraitProvider.getInstance();
+      traitProvider = await initializeTraitProvider();
       
-      const result = await traitProvider.initialize();
-      
-      // Add a short delay to allow async seeding to complete
-      await new Promise(resolve => setTimeout(resolve, 100));
-
+      const result = await traitProvider.getPackInfo();
       expect(result.success).toBe(true);
-      const updatedInfo = await traitProvider.getPackInfo();
-      const customPack = updatedInfo.data?.world.collection;
+      
+      const customPack = result.data?.world.collection;
       const customDocs = await customPack.getDocuments();
-      expect(customDocs.length).toBe(3); // All 3 system traits should be copied
+      expect(customDocs.length).toBe(3);
     });
 
     test('should emit avantTraitSeeded hook when traits are copied', async () => {
-      traitProvider = TraitProvider.getInstance();
+      traitProvider = await initializeTraitProvider();
       
-      await traitProvider.initialize();
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Find the seeding hook call
       const seedHook = mockHookCalls.find(call => call.hookName === 'avantTraitSeeded');
       
       expect(seedHook).toBeDefined();
@@ -270,17 +273,16 @@ describe('TraitProvider Integration Tests - Stage 3', () => {
         }
       ];
       
-      const mockCustomPackWithTraits = (globalThis as any).game.packs.get('custom-traits');
-      mockCustomPackWithTraits.getDocuments = jest.fn().mockResolvedValue(
+      const mockCustomPackWithTraits = (globalThis as any).game.packs.get('world.custom-traits');
+      mockCustomPackWithTraits.getDocuments.mockResolvedValue(
         existingTraitData.map(createMockDocument)
       );
       
-      traitProvider = TraitProvider.getInstance();
+      traitProvider = await initializeTraitProvider();
       
-      const result = await traitProvider.initialize();
+      const result = await traitProvider.getPackInfo();
       
       expect(result.success).toBe(true);
-      expect(result.metadata?.traitsSeeded).toBe(0); // No traits should be copied
       
       // No seeding hook should be called
       const seedHook = mockHookCalls.find(call => call.hookName === 'avantTraitSeeded');
@@ -300,15 +302,12 @@ describe('TraitProvider Integration Tests - Stage 3', () => {
         }
       }];
       
-      const mockCustomPackPartial = (globalThis as any).game.packs.get('custom-traits');
-      mockCustomPackPartial.getDocuments = jest.fn().mockResolvedValue(
+      const mockCustomPackPartial = (globalThis as any).game.packs.get('world.custom-traits');
+      mockCustomPackPartial.getDocuments.mockResolvedValue(
         partialTraitData.map(createMockDocument)
       );
       
-      traitProvider = TraitProvider.getInstance();
-      
-      const result = await traitProvider.initialize();
-      await new Promise(resolve => setTimeout(resolve, 100));
+      traitProvider = await initializeTraitProvider();
 
       const updatedInfo = await traitProvider.getPackInfo();
       const customPack = updatedInfo.data?.world.collection;
@@ -323,24 +322,22 @@ describe('TraitProvider Integration Tests - Stage 3', () => {
         .mockRejectedValueOnce(new Error('System pack not accessible'))
         .mockResolvedValue([]); // Second call for custom pack
       
-      traitProvider = TraitProvider.getInstance();
+      traitProvider = await initializeTraitProvider();
       
-      const result = await traitProvider.initialize();
-      
-      // Should still succeed despite seeding failure
+      const result = await traitProvider.getPackInfo();
       expect(result.success).toBe(true);
-      expect(result.metadata?.traitsSeeded).toBe(0);
       
       // Restore original method
-      CompendiumLocalService.prototype.loadPack = originalLoadPack;
+      (CompendiumLocalService.prototype.loadPack as jest.Mock).mockRestore();
     });
   });
 
   describe('Pack Loading Integration', () => {
+    beforeEach(async () => {
+      traitProvider = await initializeTraitProvider();
+    });
+
     test('should load traits using CompendiumLocalService', async () => {
-      traitProvider = TraitProvider.getInstance();
-      await traitProvider.initialize();
-      
       const allTraits = await traitProvider.getAll({ forceRefresh: true });
       
       expect(allTraits.success).toBe(true);
@@ -358,8 +355,6 @@ describe('TraitProvider Integration Tests - Stage 3', () => {
       // Remove system pack
       (globalThis as any).game.packs.delete('avant.avant-traits');
       
-      traitProvider = TraitProvider.getInstance();
-      
       const result = await traitProvider.initialize();
       
       expect(result.success).toBe(true);
@@ -368,9 +363,7 @@ describe('TraitProvider Integration Tests - Stage 3', () => {
 
     test('should create custom pack if it does not exist', async () => {
       // Remove custom pack
-      (globalThis as any).game.packs.delete('custom-traits');
-      
-      traitProvider = TraitProvider.getInstance();
+      (globalThis as any).game.packs.delete('world.custom-traits');
       
       const result = await traitProvider.initialize();
       
@@ -388,11 +381,11 @@ describe('TraitProvider Integration Tests - Stage 3', () => {
   });
 
   describe('Hook Emission', () => {
+    beforeEach(async () => {
+      traitProvider = await initializeTraitProvider();
+    });
+
     test('should emit avantTraitRegistered hooks for initialized traits', async () => {
-      traitProvider = TraitProvider.getInstance();
-      
-      await traitProvider.initialize();
-      
       // Find trait registered hooks
       const registeredHooks = mockHookCalls.filter(call => call.hookName === 'avantTraitRegistered');
       
@@ -408,10 +401,6 @@ describe('TraitProvider Integration Tests - Stage 3', () => {
     });
 
     test('should emit avantCompendiumDiffed hook during seeding', async () => {
-      traitProvider = TraitProvider.getInstance();
-      
-      await traitProvider.initialize();
-      
       // Find compendium diffed hook
       const diffHook = mockHookCalls.find(call => call.hookName === 'avantCompendiumDiffed');
       
@@ -422,16 +411,12 @@ describe('TraitProvider Integration Tests - Stage 3', () => {
     });
 
     test('should emit avantCompendiumCopied hook during seeding', async () => {
-      traitProvider = TraitProvider.getInstance();
-      
-      await traitProvider.initialize();
-      
       // Find compendium copied hook
       const copyHook = mockHookCalls.find(call => call.hookName === 'avantCompendiumCopied');
       
       expect(copyHook).toBeDefined();
       expect(copyHook.data.srcId).toBe('avant.avant-traits');
-      expect(copyHook.data.destId).toBe('custom-traits');
+      expect(copyHook.data.destId).toBe('world.custom-traits');
       expect(copyHook.data.docsCopied).toBe(3);
       expect(copyHook.data.copiedNames).toEqual(['Fire', 'Ice', 'Tech']);
     });

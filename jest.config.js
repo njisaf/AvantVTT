@@ -202,5 +202,9 @@ export default {
   
   // Error handling improvements
   errorOnDeprecated: false, // Don't fail on deprecation warnings during stabilization
-  verbose: false // Reduce noise during mass test runs
+  verbose: false, // Reduce noise during mass test runs
+  fakeTimers: {
+    enableGlobally: true,
+    legacyFakeTimers: false
+  }
 }; 

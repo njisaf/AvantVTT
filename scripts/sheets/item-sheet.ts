@@ -1,8 +1,8 @@
 /**
  * @fileoverview Item Sheet for Avant Native System
- * @version 2.0.0 - FoundryVTT v13+ Only
+ * @version 2.0.0 - FoundryVTT v13+ ApplicationV2
  * @author Avant Development Team
- * @description Item sheet handling with form validation for v13-only implementation and trait support
+ * @description Item sheet using ApplicationV2 framework for native v13 implementation
  */
 
 import { ValidationUtils } from '../utils/validation.js';
@@ -20,14 +20,25 @@ import { createTraitHtmlForChat, itemHasTraits } from '../logic/chat/trait-resol
 // Import local foundry UI adapter for safe notifications
 import { FoundryUI } from '../types/adapters/foundry-ui.ts';
 
-// Access FoundryVTT ItemSheet class - prioritize v13 namespaced class
-const ItemSheetBase = (globalThis as any).foundry?.appv1?.sheets?.ItemSheet || 
-                      (globalThis as any).ItemSheet ||
-                      class {
-                          static get defaultOptions() { return {}; }
-                          _renderHTML() { throw new Error('ItemSheet base class not available'); }
-                          _replaceHTML() { throw new Error('ItemSheet base class not available'); }
-                      };
+/**
+ * Get FoundryVTT v13 ApplicationV2 classes safely
+ * @returns The required base classes for ApplicationV2
+ */
+function getFoundryV13Classes() {
+    const foundryGlobal = (globalThis as any).foundry;
+    
+    if (!foundryGlobal?.applications?.api) {
+        throw new Error('FoundryVTT v13 ApplicationV2 classes not available - ensure you are running FoundryVTT v13+ and that Foundry has finished loading');
+    }
+    
+    const { ApplicationV2, HandlebarsApplicationMixin, DocumentSheetV2 } = foundryGlobal.applications.api;
+    
+    if (!ApplicationV2 || !HandlebarsApplicationMixin || !DocumentSheetV2) {
+        throw new Error('Required ApplicationV2 classes not found - ensure you are running FoundryVTT v13+');
+    }
+    
+    return { ApplicationV2, HandlebarsApplicationMixin, DocumentSheetV2 };
+}
 
 /**
  * Item Sheet Context interface for template rendering
@@ -37,17 +48,28 @@ interface ItemSheetContext {
     system: any;
     flags: any;
     editable: boolean;
+    owner: boolean;
+    enrichedDescription: string;
+    displayTraits: any[];
 }
 
 /**
- * Item Sheet for Avant Native System - FoundryVTT v13+
- * @class AvantItemSheet
- * @extends {ItemSheetBase}
- * @description Handles item sheet functionality with validation, roll handling, and trait management
+ * Factory function to create the AvantItemSheet class when Foundry is ready
+ * @returns The AvantItemSheet class
  */
-export class AvantItemSheet extends ItemSheetBase {
+export function createAvantItemSheet() {
+    // Get the base classes when they're available
+    const { HandlebarsApplicationMixin, DocumentSheetV2 } = getFoundryV13Classes();
+    
+    /**
+     * Item Sheet for Avant Native System - FoundryVTT v13+ ApplicationV2
+     * @class AvantItemSheet
+     * @extends {HandlebarsApplicationMixin(DocumentSheetV2)}
+     * @description Modern ApplicationV2 implementation with native v13 support
+     */
+    class AvantItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
     /** The item document associated with this sheet */
-    declare item: any;
+    declare document: any;
     
     /** Current trait input state */
     private traitInputState: {
@@ -63,58 +85,161 @@ export class AvantItemSheet extends ItemSheetBase {
     };
     
     /**
-     * Define default options for the item sheet
+     * ApplicationV2 default options configuration
      * @static
-     * @returns Sheet configuration options
+     */
+    static DEFAULT_OPTIONS = {
+        classes: ["avant", "sheet", "item"],
+        // Essential ApplicationV2 configuration
+        tag: "form",
+        hasFrame: true,
+        resizable: true,
+        positioned: true,
+        position: {
+            width: 520,
+            height: 480
+        },
+        window: {
+            icon: "fas fa-cog",
+            title: "Item Sheet",
+            controls: []
+        },
+        form: {
+            handler: (event: Event, form: HTMLFormElement, formData: any) => {
+                const sheet = (form.closest('.app') as any)?.app as AvantItemSheet;
+                if (sheet) {
+                    return sheet._onSubmitForm(event, form, formData);
+                }
+                return Promise.resolve();
+            },
+            submitOnChange: true,
+            closeOnSubmit: false
+        },
+        actions: {
+            roll: (event: Event, target: HTMLElement) => {
+                const sheet = (target.closest('.app') as any)?.app as AvantItemSheet;
+                return sheet?.onRoll(event, target);
+            },
+            removeTrait: (event: Event, target: HTMLElement) => {
+                const sheet = (target.closest('.app') as any)?.app as AvantItemSheet;
+                return sheet?.onRemoveTrait(event, target);
+            },
+            traitFieldClick: (event: Event, target: HTMLElement) => {
+                const sheet = (target.closest('.app') as any)?.app as AvantItemSheet;
+                return sheet?.onTraitFieldClick(event, target);
+            },
+            traitSuggestionClick: (event: Event, target: HTMLElement) => {
+                const sheet = (target.closest('.app') as any)?.app as AvantItemSheet;
+                return sheet?.onTraitSuggestionClick(event, target);
+            },
+            tagExampleClick: (event: Event, target: HTMLElement) => {
+                const sheet = (target.closest('.app') as any)?.app as AvantItemSheet;
+                return sheet?.onTagExampleClick(event, target);
+            }
+        }
+    };
+
+    /**
+     * ApplicationV2 parts configuration for templates
+     * Static template will be overridden by get template
+     * @static
+     */
+    static PARTS = {
+        form: {
+            template: "systems/avant/templates/item/item-gear-sheet.html" // Default fallback
+        }
+    };
+    
+    /**
+     * Dynamic parts configuration based on item type
      * @override
      */
-    static get defaultOptions(): any {
-        const foundryUtils = (globalThis as any).foundry?.utils;
-        const mergeObject = foundryUtils?.mergeObject || Object.assign;
+    get parts() {
+        const type = this.document?.type || 'gear';
+        const templatePath = `systems/avant/templates/item/item-${type}-sheet.html`;
         
-        return mergeObject(super.defaultOptions, {
-            classes: ["avant", "sheet", "item"],
-            width: 520,
-            height: 480,
-            tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "description" }]
+        logger.debug('AvantItemSheet | Parts getter called - Dynamic template path:', {
+            itemType: type,
+            templatePath: templatePath,
+            documentId: this.document?.id || 'unknown'
         });
+        
+        return {
+            form: {
+                template: templatePath
+            }
+        };
     }
 
     /**
-     * Check if this sheet is editable
+     * Tab configuration for the item sheet
      */
-    get isEditable(): boolean {
-        return (this as any).options?.editable !== false;
+    tabGroups = {
+        sheet: "description"
+    };
+
+    /**
+     * Get the item document (compatibility accessor)
+     */
+    get item() {
+        return this.document;
     }
 
     /**
-     * Get the template path for this item type
-     * @returns The template path
+     * Get the sheet title
+     */
+    get title() {
+        const game = (globalThis as any).game;
+        const title = this.document?.name || game?.i18n?.localize("SHEETS.ItemSheet") || "Item Sheet";
+        return `${title} [${this.document?.type || "Item"}]`;
+    }
+
+    /**
+     * Get the template path for this item type - Dynamic template selection
      * @override
      */
     get template(): string {
-        const path = "systems/avant/templates/item";
-        return `${path}/item-${this.item.type}-sheet.html`;
+        const type = this.document?.type || 'gear';
+        const templatePath = `systems/avant/templates/item/item-${type}-sheet.html`;
+        
+        logger.debug('AvantItemSheet | Using template path:', templatePath);
+        
+        return templatePath;
     }
 
     /**
-     * Prepare data for rendering the item sheet
+     * Prepare context data for rendering the item sheet
+     * @param options - Rendering options
      * @returns The context data for template rendering
      * @override
      */
-    async getData(): Promise<ItemSheetContext> {
-        const context = super.getData() as any;
-        const itemData = this.item.toObject(false);
+    async _prepareContext(options: any): Promise<ItemSheetContext> {
+        logger.debug('AvantItemSheet | _prepareContext called', {
+            itemId: this.document?.id,
+            itemType: this.document?.type,
+            itemName: this.document?.name
+        });
+        
+        const context = await super._prepareContext(options) as any;
+        const itemData = this.document.toObject(false);
+        
+        logger.debug('AvantItemSheet | Super context prepared:', {
+            contextKeys: Object.keys(context),
+            hasForm: !!context.form,
+            hasTemplate: !!context.template
+        });
         
         // Use pure function to prepare template data
         const templateData = prepareTemplateData(itemData);
         if (templateData) {
             // Merge with existing context
             Object.assign(context, templateData);
+            logger.debug('AvantItemSheet | Template data merged successfully');
         } else {
             // Fallback to basic data structure
             context.system = itemData.system || {};
             context.flags = itemData.flags || {};
+            logger.debug('AvantItemSheet | Using fallback basic data structure');
         }
         
         // Ensure traits array exists
@@ -123,18 +248,43 @@ export class AvantItemSheet extends ItemSheetBase {
         }
         
         // For trait items, convert tags array to string for template
-        if (this.item.type === 'trait' && context.system.tags) {
+        if (this.document.type === 'trait' && context.system.tags) {
             context.system.tagsString = Array.isArray(context.system.tags) 
                 ? context.system.tags.join(',')
                 : (context.system.tags || '');
-        } else if (this.item.type === 'trait') {
+        } else if (this.document.type === 'trait') {
             context.system.tagsString = '';
         }
         
+        // Add ApplicationV2 required fields
         context.editable = this.isEditable;
+        context.owner = this.document.isOwner;
         
-        // Prepare trait display data for template (now async)
+        // Pre-enrich description content for the editor helper (FoundryVTT v13 requirement)
+        if (context.system.description) {
+            try {
+                const TextEditor = (globalThis as any).TextEditor;
+                if (TextEditor && TextEditor.enrichHTML) {
+                    context.enrichedDescription = await TextEditor.enrichHTML(context.system.description, {async: true});
+                } else {
+                    context.enrichedDescription = context.system.description;
+                }
+            } catch (error) {
+                console.warn('Failed to enrich description content:', error);
+                context.enrichedDescription = context.system.description;
+            }
+        } else {
+            context.enrichedDescription = '';
+        }
+        
+        // Prepare trait display data for template
         await this._prepareTraitDisplayData(context);
+        
+        logger.debug('AvantItemSheet | Context preparation complete:', {
+            finalContextKeys: Object.keys(context),
+            systemKeys: Object.keys(context.system || {}),
+            traitsCount: context.displayTraits?.length || 0
+        });
         
         return context;
     }
@@ -149,40 +299,30 @@ export class AvantItemSheet extends ItemSheetBase {
         context.displayTraits = [];
         
         const traitIds = context.system?.traits || [];
-        console.log('🏷️ TRAIT DEBUG | _prepareTraitDisplayData called with trait IDs:', traitIds);
-        console.log('🏷️ TRAIT DEBUG | Item name:', context.item?.name || 'Unknown');
-        console.log('🏷️ TRAIT DEBUG | Item type:', context.item?.type || 'Unknown');
+        logger.debug('AvantItemSheet | Preparing trait display data', {
+            itemName: context.item?.name || 'Unknown',
+            itemType: context.item?.type || 'Unknown',
+            traitIds
+        });
         
         if (traitIds.length === 0) {
-            console.log('🏷️ TRAIT DEBUG | No traits found on this item, displayTraits will be empty');
             return;
         }
 
-        // Try to get actual trait data from the TraitProvider
         try {
-            // Check if we have access to the TraitProvider through the initialization manager
+            // Get trait data from the TraitProvider
             const game = (globalThis as any).game;
             if (game?.avant?.initializationManager) {
                 const traitProvider = game.avant.initializationManager.getService('traitProvider');
                 if (traitProvider) {
-                    console.log('🏷️ TRAIT DEBUG | TraitProvider available, looking up trait data...');
-                    
-                    // Get all traits from the provider (properly await the async call)
                     const result = await traitProvider.getAll();
-                    console.log('🏷️ TRAIT DEBUG | TraitProvider getAll() result:', result);
-                    console.log('🏷️ TRAIT DEBUG | Result success:', result?.success);
-                    console.log('🏷️ TRAIT DEBUG | Result data type:', typeof result?.data);
-                    console.log('🏷️ TRAIT DEBUG | Result data length:', result?.data?.length);
-                    
                     if (result.success && result.data) {
                         const allTraits = result.data;
-                        console.log('🏷️ TRAIT DEBUG | Successfully loaded', allTraits.length, 'traits from provider');
                         
                         // Map trait IDs to actual trait data
                         context.displayTraits = traitIds.map((traitId: string) => {
                             const trait = allTraits.find((t: any) => t.id === traitId);
                             if (trait) {
-                                console.log('🏷️ TRAIT DEBUG | Found trait data for ID', traitId, ':', trait.name);
                                 return {
                                     id: traitId,
                                     name: trait.name,
@@ -192,45 +332,31 @@ export class AvantItemSheet extends ItemSheetBase {
                                     displayId: traitId
                                 };
                             } else {
-                                console.log('🏷️ TRAIT DEBUG | No trait data found for ID', traitId, ', using fallback name generation');
                                 return {
                                     id: traitId,
                                     name: this._generateFallbackTraitName(traitId),
                                     displayId: traitId,
-                                    // Provide default styling for missing traits
-                                    color: '#6C757D', // Bootstrap secondary gray
-                                    icon: 'fas fa-tag'  // Generic tag icon
+                                    color: '#6C757D',
+                                    icon: 'fas fa-tag'
                                 };
                             }
                         });
-                        
-                        console.log('🏷️ TRAIT DEBUG | Prepared trait display data with provider lookup for', context.item?.name || 'item', ':', context.displayTraits);
                         return;
-                    } else {
-                        console.log('🏷️ TRAIT DEBUG | TraitProvider getAll() failed, falling back to name generation. Error:', result?.error);
                     }
-                } else {
-                    console.log('🏷️ TRAIT DEBUG | TraitProvider service not available, falling back to name generation');
                 }
-            } else {
-                console.log('🏷️ TRAIT DEBUG | InitializationManager not available, falling back to name generation');
             }
         } catch (error) {
-            console.warn('🏷️ TRAIT DEBUG | Error accessing TraitProvider, falling back to name generation:', error);
+            console.warn('AvantItemSheet | Error accessing TraitProvider:', error);
         }
 
-        // Fallback: create basic display data using ID parsing with default colors/icons
-        console.log('🏷️ TRAIT DEBUG | Using fallback name generation for trait display');
+        // Fallback: create basic display data using ID parsing
         context.displayTraits = traitIds.map((traitId: string) => ({
             id: traitId,
             name: this._generateFallbackTraitName(traitId),
             displayId: traitId,
-            // Provide default styling for missing traits
-            color: '#6C757D', // Bootstrap secondary gray
-            icon: 'fas fa-tag'  // Generic tag icon
+            color: '#6C757D',
+            icon: 'fas fa-tag'
         }));
-
-        console.log('🏷️ TRAIT DEBUG | Prepared trait display data for', context.item?.name || 'item', ':', context.displayTraits);
     }
 
     /**
@@ -239,7 +365,6 @@ export class AvantItemSheet extends ItemSheetBase {
      * @private
      */
     private _generateFallbackTraitName(traitId: string): string {
-        // For system traits like "system_trait_fire_1750695472058", extract "fire"
         if (traitId.startsWith('system_trait_')) {
             return traitId
                 .replace(/^system_trait_/, '')
@@ -247,174 +372,366 @@ export class AvantItemSheet extends ItemSheetBase {
                 .replace(/_/g, ' ')
                 .replace(/\b\w/g, l => l.toUpperCase());
         }
-        
-        // For other IDs, just return as-is (this will show the raw ID for custom traits)
         return traitId;
     }
 
     /**
-     * Handle core listener activation for v13 compatibility
-     * @param html - The rendered HTML
+     * Override HTML rendering to add debug logging
+     * @param context - The prepared context data
+     * @param options - Rendering options
      * @override
      */
-    _activateCoreListeners(html: any): void {
-        // FoundryVTT v13 compatibility fix for core listeners
-        // Handle various types of HTML input that FoundryVTT might pass
-        let element = html;
+    async _renderHTML(context: any, options: any): Promise<object> {
+        const templatePath = this.parts.form.template;
         
-        // Handle jQuery objects by extracting the DOM element
-        if (html instanceof jQuery) {
-            if (html.length > 0) {
-                element = html[0];
-            } else {
-                console.error('AvantItemSheet._activateCoreListeners: Empty jQuery object received', html);
+        logger.debug('AvantItemSheet | _renderHTML called', {
+            itemType: this.document?.type,
+            contextKeys: Object.keys(context || {}),
+            partsConfig: this.parts,
+            templatePath: templatePath
+        });
+        
+        // Let's also test if we can manually render the template
+
+        
+        try {
+            const result = await super._renderHTML(context, options);
+            
+            // Detailed investigation of the form content
+            const form = (result as any)?.form;
+            logger.debug('AvantItemSheet | _renderHTML result investigation:', {
+                resultKeys: Object.keys(result || {}),
+                hasForm: !!form,
+                formType: typeof form,
+                formConstructor: form?.constructor?.name || 'unknown',
+                formIsElement: form instanceof Element,
+                formIsDocumentFragment: form instanceof DocumentFragment,
+                formInnerHTML: form?.innerHTML?.substring(0, 200) || 'no innerHTML',
+                formTextContent: form?.textContent?.substring(0, 200) || 'no textContent',
+                formOuterHTML: form?.outerHTML?.substring(0, 200) || 'no outerHTML'
+            });
+            
+            return result;
+        } catch (error) {
+            logger.error('AvantItemSheet | _renderHTML failed:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Override _replaceHTML to properly handle content insertion for ApplicationV2
+     * @param result - The rendered HTML result
+     * @param content - The content element to insert into  
+     * @param options - Rendering options
+     * @override
+     */
+    _replaceHTML(result: any, content: HTMLElement, options: any): void {
+        logger.debug('AvantItemSheet | _replaceHTML called', {
+            resultKeys: Object.keys(result || {}),
+            contentType: content?.tagName,
+            contentClass: content?.className,
+            contentChildren: content?.children?.length || 0,
+            hasFormInResult: !!(result as any)?.form,
+            formElementDetails: {
+                tagName: (result as any)?.form?.tagName,
+                className: (result as any)?.form?.className,
+                hasContent: !!((result as any)?.form?.innerHTML),
+                contentLength: (result as any)?.form?.innerHTML?.length || 0
+            }
+        });
+
+        try {
+            // ApplicationV2 expects result.form to be the rendered content
+            const formElement = (result as any)?.form;
+            
+            if (!formElement) {
+                logger.error('AvantItemSheet | No form element in render result');
                 return;
             }
+
+            // Clear existing content
+            content.innerHTML = '';
+            
+            // Insert the form content directly
+            content.appendChild(formElement);
+            
+            logger.debug('AvantItemSheet | After _replaceHTML', {
+                contentChildren: content.children.length,
+                hasForm: !!content.querySelector('div[data-application-part="form"]'),
+                contentHTML: content.innerHTML.substring(0, 200) + '...'
+            });
+            
+        } catch (error) {
+            logger.error('AvantItemSheet | _replaceHTML failed:', error);
+            
+            // Fallback: try the super method
+            try {
+                super._replaceHTML(result, content, options);
+            } catch (fallbackError) {
+                logger.error('AvantItemSheet | Fallback _replaceHTML also failed:', fallbackError);
+            }
         }
-        
-        // Handle comment nodes or other non-element nodes
-        if (element && element.nodeType === Node.COMMENT_NODE) {
-            console.warn('AvantItemSheet._activateCoreListeners: Received comment node, looking for next element');
-            // Try to find the next element sibling
-            element = element.nextElementSibling;
-        }
-        
-        // Handle document fragments or other container types
-        if (element && element.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
-            // Look for the first element child
-            element = element.querySelector('form') || element.firstElementChild;
-        }
-        
-        // Final validation - ensure we have a valid DOM element
-        if (!element || !element.querySelectorAll || typeof element.querySelectorAll !== 'function') {
-            console.error('AvantItemSheet._activateCoreListeners: Could not find valid DOM element', html);
-            return;
-        }
-        
-        // FoundryVTT core expects jQuery objects, so wrap the DOM element back into jQuery
-        const jQueryElement = $(element);
-        
-        // Call parent with jQuery-wrapped element
-        super._activateCoreListeners(jQueryElement);
     }
 
-    /**
-     * Create a new AvantItemSheet instance
-     */
-    constructor(object: any, options: any = {}) {
-        super(object, options);
-        
-        // Add debug logging to check game.avant availability during construction
-        const game = (globalThis as any).game;
-        console.log("🏷️ ITEM SHEET DEBUG | Constructor - game.avant exists:", !!game?.avant);
-        console.log("🏷️ ITEM SHEET DEBUG | Constructor - initializationManager exists:", !!game?.avant?.initializationManager);
-    }
+
 
     /**
-     * Activate event listeners for the item sheet
-     * @param html - The rendered HTML
+     * Handle rendering completion - replaces activateListeners
+     * @param context - The prepared context data
+     * @param options - Rendering options
      * @override
      */
-    activateListeners(html: any): void {
-        super.activateListeners(html);
+    _onRender(context: ItemSheetContext, options: any): void {
+        super._onRender(context, options);
         
-        // Add debug logging to check game.avant availability when listeners are activated
-        const game = (globalThis as any).game;
-        console.log("🏷️ ITEM SHEET DEBUG | activateListeners - game.avant exists:", !!game?.avant);
-        console.log("🏷️ ITEM SHEET DEBUG | activateListeners - initializationManager exists:", !!game?.avant?.initializationManager);
-
-        if (!this.isEditable) return;
-
-        // Rollable abilities
-        html.find('.rollable').click(this._onRoll.bind(this));
+        // Detailed debugging of actual DOM content
+        const windowContent = this.element?.querySelector('.window-content');
+        const formElement = this.element?.querySelector('.item-sheet');
+        const divForm = this.element?.querySelector('div[data-application-part="form"]');
         
-        // Trait management event listeners
-        this._activateTraitListeners(html);
+        logger.debug('AvantItemSheet | _onRender - DETAILED DOM ANALYSIS', {
+            itemId: this.document.id,
+            itemType: this.document.type,
+            
+            // Element structure
+            elementExists: !!this.element,
+            elementChildren: this.element?.children.length || 0,
+            elementTagName: this.element?.tagName,
+            elementClasses: this.element?.className,
+            
+            // Window content investigation  
+            windowContentExists: !!windowContent,
+            windowContentChildren: windowContent?.children.length || 0,
+            windowContentHTML: windowContent ? windowContent.innerHTML.substring(0, 500) + '...' : 'no window-content',
+            windowContentClasses: windowContent?.className || 'no window-content',
+            
+            // Form element investigation
+            hasItemSheetDiv: !!formElement,
+            hasApplicationPartForm: !!divForm,
+            formElementClass: formElement?.className || 'not found',
+            formElementTag: formElement?.tagName || 'not found',
+            
+            // Content validation
+            actualContentPresent: windowContent && windowContent.children.length > 0,
+            firstChildTag: windowContent?.children[0]?.tagName || 'no first child',
+            firstChildClass: windowContent?.children[0]?.className || 'no first child',
+            
+            // Visibility check
+            windowContentStyle: windowContent ? getComputedStyle(windowContent).display : 'no element',
+            formElementStyle: formElement ? getComputedStyle(formElement).display : 'no element'
+        });
+        
+        // Set up trait-specific listeners if editable
+        if (this.isEditable) {
+            this._activateTraitListeners();
+        }
+        
+        logger.debug('AvantItemSheet | ApplicationV2 render completed', {
+            itemId: this.document.id,
+            itemType: this.document.type,
+            editable: this.isEditable
+        });
     }
 
     /**
      * Activate trait-specific event listeners
-     * @param html - The rendered HTML
      * @private
      */
-    private _activateTraitListeners(html: any): void {
-        console.log('🏷️ TRAIT DEBUG | Setting up trait event listeners...');
-        
-        // Trait chip removal (existing trait chips)
-        html.find('.trait-chip__remove').click(this._onRemoveTrait.bind(this));
-        
+    private _activateTraitListeners(): void {
         // Trait input field events
-        const traitInput = html.find('.trait-chip-input__input')[0];
+        const traitInput = this.element.querySelector('.trait-chip-input__input') as HTMLInputElement;
         if (traitInput) {
             traitInput.addEventListener('input', this._onTraitInput.bind(this));
             traitInput.addEventListener('keydown', this._onTraitInputKeydown.bind(this));
             traitInput.addEventListener('focus', this._onTraitInputFocus.bind(this));
             traitInput.addEventListener('blur', this._onTraitInputBlur.bind(this));
-            console.log('🏷️ TRAIT DEBUG | Input field event listeners attached');
         }
         
-        // ✅ FIX: Use event delegation for dynamically created suggestion elements
-        // Listen on the dropdown container instead of individual suggestions
-        const dropdown = html.find('.trait-chip-input__dropdown')[0];
+        // Event delegation for dynamically created suggestion elements
+        const dropdown = this.element.querySelector('.trait-chip-input__dropdown');
         if (dropdown) {
             dropdown.addEventListener('click', (event: Event) => {
                 const suggestion = (event.target as HTMLElement).closest('.trait-chip-input__suggestion') as HTMLElement;
                 if (suggestion) {
-                    console.log('🏷️ TRAIT DEBUG | Suggestion clicked via event delegation:', suggestion.dataset.traitId);
                     event.preventDefault();
                     this._onTraitSuggestionClick(event);
                 }
             });
-            console.log('🏷️ TRAIT DEBUG | Event delegation set up for suggestion clicks');
-        } else {
-            console.warn('🏷️ TRAIT DEBUG | Dropdown container not found for event delegation');
         }
         
-        // Trait input field clicks (for focus)
-        html.find('.trait-chip-input__field').click(this._onTraitFieldClick.bind(this));
-        
-        // ✅ NEW: Tag example button click handlers for trait sheets
-        html.find('.tag-example').click(this._onTagExampleClick.bind(this));
-        
-        // ✅ NEW: Initialize tag button states on render
-        if (this.item.type === 'trait') {
+        // Update tag button states for trait sheets
+        if (this.document.type === 'trait') {
             this._updateTagButtonStates();
         }
-        
-        console.log('🏷️ TRAIT DEBUG | All trait event listeners set up successfully');
     }
 
     /**
-     * Handle removing a trait chip
-     * @param event - The click event
-     * @private
+     * Handle form submission - instance method for ApplicationV2 compatibility
+     * @param event - The form submission event
+     * @param form - The form element
+     * @param formData - The form data
      */
-    private async _onRemoveTrait(event: Event): Promise<void> {
+    async _onSubmitForm(event: Event, form: HTMLFormElement, formData: any): Promise<void> {
+        if (!this.document) return;
+
+        try {
+            // Use pure function to extract and process form data
+            const processedData = processFormData(formData.object, this.document.type);
+            
+            // Expand the form data object for nested field handling
+            const foundryUtils = (globalThis as any).foundry?.utils;
+            const updateData = foundryUtils?.expandObject ? foundryUtils.expandObject(processedData) : processedData;
+            
+            // Update the item document
+            await this.document.update(updateData);
+            
+            logger.debug('AvantItemSheet | Form submitted successfully', {
+                itemId: this.document.id,
+                updateData
+            });
+        } catch (error) {
+            logger.error('AvantItemSheet | Form submission failed:', error);
+            FoundryUI.notify(`Failed to update item: ${(error as Error).message}`, 'error');
+        }
+    }
+
+    /**
+     * Handle roll action - instance method
+     * @param event - The triggering event
+     * @param target - The target element
+     */
+    async onRoll(event: Event, target: HTMLElement): Promise<void> {
+        event.preventDefault();
+        if (!this.document) return;
+
+        const rollType = target.dataset.rollType;
+        if (!rollType) {
+            logger.warn('AvantItemSheet | No roll type specified');
+            return;
+        }
+
+        try {
+            // Use pure function to execute the roll
+            const rollResult = await executeRoll(this.document, { rollType, name: this.document.name } as any) as any;
+            if (rollResult?.success) {
+                logger.log(`AvantItemSheet | ${rollType} roll executed for ${this.document.name}`);
+            } else {
+                FoundryUI.notify(rollResult?.error || 'Roll failed', 'error');
+            }
+        } catch (error) {
+            logger.error('AvantItemSheet | Roll execution failed:', error);
+            FoundryUI.notify('Roll failed', 'error');
+        }
+    }
+
+    /**
+     * Handle trait removal action - instance method
+     * @param event - The triggering event
+     * @param target - The target element
+     */
+    async onRemoveTrait(event: Event, target: HTMLElement): Promise<void> {
         event.preventDefault();
         event.stopPropagation();
         
-        const button = event.currentTarget as HTMLElement;
-        const chip = button.closest('.trait-chip') as HTMLElement;
+        if (!this.document) return;
         
+        const chip = target.closest('.trait-chip') as HTMLElement;
         if (!chip) return;
         
         const traitId = chip.dataset.trait;
         if (!traitId) return;
         
-        // Get current traits
-        const currentTraits = this.item.system.traits || [];
-        
-        // Use pure function to remove trait
-        const { removeTraitFromList } = await import('../logic/trait-utils.ts');
-        const result = removeTraitFromList(currentTraits, traitId);
-        
-        if (result.success && result.changed) {
-            // Update the item
-            await this.item.update({ 'system.traits': result.traits });
+        try {
+            // Get current traits
+            const currentTraits = this.document.system.traits || [];
             
-            // Update the UI immediately
-            chip.remove();
-            this._updateTraitHiddenInput(result.traits);
+            // Use pure function to remove trait
+            const result = removeTraitFromList(currentTraits, traitId);
+            
+            if (result.success && result.changed) {
+                // Update the item
+                await this.document.update({ 'system.traits': result.traits });
+                logger.log(`AvantItemSheet | Removed trait ${traitId} from ${this.document.name}`);
+            }
+        } catch (error) {
+            logger.error('AvantItemSheet | Trait removal failed:', error);
+            FoundryUI.notify('Failed to remove trait', 'error');
+        }
+    }
+
+    /**
+     * Handle trait field click action - instance method
+     * @param event - The triggering event
+     * @param target - The target element
+     */
+    async onTraitFieldClick(event: Event, target: HTMLElement): Promise<void> {
+        event.preventDefault();
+
+        const input = this.element.querySelector('.trait-chip-input__input') as HTMLInputElement;
+        if (input) {
+            input.focus();
+            if (input.value.trim()) {
+                this._showTraitSuggestions(input.value.trim());
+            }
+        }
+    }
+
+    /**
+     * Handle trait suggestion click action - instance method
+     * @param event - The triggering event
+     * @param target - The target element
+     */
+    async onTraitSuggestionClick(event: Event, target: HTMLElement): Promise<void> {
+        event.preventDefault();
+        if (!this.document) return;
+
+        const suggestion = target.closest('.trait-chip-input__suggestion') as HTMLElement;
+        if (!suggestion) return;
+
+        const traitId = suggestion.dataset.traitId;
+        if (!traitId) return;
+
+        try {
+            await this._addTraitById(traitId);
+        } catch (error) {
+            logger.error('AvantItemSheet | Trait selection failed:', error);
+            FoundryUI.notify('Failed to add trait', 'error');
+        }
+    }
+
+    /**
+     * Handle tag example click action - instance method
+     * @param event - The triggering event
+     * @param target - The target element
+     */
+    onTagExampleClick(event: Event, target: HTMLElement): void {
+        event.preventDefault();
+        if (!this.document) return;
+
+        const tagValue = target.dataset.tag;
+        if (!tagValue) return;
+
+        // Toggle tag in the tags string
+        const tagsInput = this.element.querySelector('input[name="system.tags"]') as HTMLInputElement;
+        if (tagsInput) {
+            const currentTags = tagsInput.value.split(',').map(t => t.trim()).filter(t => t);
+            const tagIndex = currentTags.indexOf(tagValue);
+            
+            if (tagIndex >= 0) {
+                // Remove tag
+                currentTags.splice(tagIndex, 1);
+                target.classList.remove('selected');
+            } else {
+                // Add tag
+                currentTags.push(tagValue);
+                target.classList.add('selected');
+            }
+            
+            tagsInput.value = currentTags.join(', ');
+            
+            // Trigger change event
+            const changeEvent = new Event('change', { bubbles: true });
+            tagsInput.dispatchEvent(changeEvent);
         }
     }
 
@@ -442,7 +759,7 @@ export class AvantItemSheet extends ItemSheetBase {
      * @private
      */
     private async _onTraitInputKeydown(event: KeyboardEvent): Promise<void> {
-        const dropdown = this.element.find('.trait-chip-input__dropdown')[0];
+        const dropdown = this.element.querySelector('.trait-chip-input__dropdown');
         const suggestions = dropdown?.querySelectorAll('.trait-chip-input__suggestion') || [];
         
         switch (event.key) {
@@ -470,7 +787,6 @@ export class AvantItemSheet extends ItemSheetBase {
                     const suggestion = suggestions[this.traitInputState.selectedIndex] as HTMLElement;
                     await this._addTraitFromSuggestion(suggestion);
                 } else if (this.traitInputState.currentInput.trim()) {
-                    // Try to add the typed trait as-is
                     await this._addTraitById(this.traitInputState.currentInput.trim());
                 }
                 break;
@@ -478,9 +794,7 @@ export class AvantItemSheet extends ItemSheetBase {
             case 'Escape':
                 event.preventDefault();
                 this._hideTraitSuggestions();
-                // ✅ PHASE 2.4: Use accessibility module for focus management
-                // Instead of manual blur(), let the hideTraitSuggestions handle focus properly
-                // (event.target as HTMLInputElement).blur(); // Replaced with accessibility-aware focus management
+                (event.target as HTMLElement).blur();
                 break;
         }
     }
@@ -492,173 +806,21 @@ export class AvantItemSheet extends ItemSheetBase {
      */
     private async _onTraitInputFocus(event: Event): Promise<void> {
         const input = event.target as HTMLInputElement;
-        if (input.value.trim().length >= 1) {
+        if (input.value.trim()) {
             await this._showTraitSuggestions(input.value.trim());
         }
     }
 
     /**
-     * Handle trait input blur (with delay to allow suggestion clicks)
+     * Handle trait input blur
      * @param event - The blur event
      * @private
      */
     private _onTraitInputBlur(event: Event): void {
-        // Delay hiding to allow suggestion clicks
+        // Delay hiding to allow for suggestion clicks
         setTimeout(() => {
             this._hideTraitSuggestions();
-        }, 150);
-    }
-
-    /**
-     * Handle clicking on trait field to focus input
-     * @param event - The click event
-     * @private
-     */
-    private async _onTraitFieldClick(event: Event): Promise<void> {
-        const field = event.currentTarget as HTMLElement;
-        const input = field.querySelector('.trait-chip-input__input') as HTMLInputElement;
-        if (input) {
-            // ✅ PHASE 2.4: Use accessibility module for enhanced focus management
-            try {
-                const { ensureFocusable } = await import('../accessibility');
-                // Ensure the input is properly focusable with accessibility enhancements
-                ensureFocusable(input, { role: 'textbox', label: 'Trait search input' });
-                input.focus();
-            } catch (error) {
-                console.warn('Accessibility module not available for focus enhancement, using standard focus');
-                input.focus();
-            }
-        }
-    }
-
-    /**
-     * Handle clicking on a trait suggestion
-     * @param event - The click event
-     * @private
-     */
-    private async _onTraitSuggestionClick(event: Event): Promise<void> {
-        console.log('🏷️ TRAIT DEBUG | _onTraitSuggestionClick called');
-        event.preventDefault();
-        
-        // Find the suggestion element from the event target
-        const suggestion = (event.target as HTMLElement).closest('.trait-chip-input__suggestion') as HTMLElement;
-        if (!suggestion) {
-            console.warn('🏷️ TRAIT DEBUG | Could not find suggestion element from click event');
-            return;
-        }
-        
-        console.log('🏷️ TRAIT DEBUG | Found suggestion element:', suggestion.dataset.traitId);
-        await this._addTraitFromSuggestion(suggestion);
-    }
-
-    /**
-     * Handle clicking on tag example buttons
-     * @param event - The click event
-     * @private
-     */
-    private _onTagExampleClick(event: Event): void {
-        console.log('🏷️ TAG DEBUG | Tag example button clicked');
-        event.preventDefault();
-        event.stopPropagation();
-        
-        const button = event.currentTarget as HTMLElement;
-        const tags = button.dataset.tags;
-        
-        if (!tags) {
-            console.warn('🏷️ TAG DEBUG | No tags data attribute found on button');
-            return;
-        }
-        
-        console.log('🏷️ TAG DEBUG | Button tags:', tags);
-        
-        // Find the tags input field
-        const tagsInput = this.element.find('input[name="system.tags"]')[0] as HTMLInputElement;
-        
-        if (!tagsInput) {
-            console.warn('🏷️ TAG DEBUG | Tags input field not found');
-            return;
-        }
-        
-        const currentValue = tagsInput.value.trim();
-        console.log('🏷️ TAG DEBUG | Current input value:', currentValue);
-        
-        // Parse current tags and new tags
-        const currentTags = currentValue ? currentValue.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : [];
-        const newTags = tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
-        
-        console.log('🏷️ TAG DEBUG | Current tags:', currentTags);
-        console.log('🏷️ TAG DEBUG | New tags to add:', newTags);
-        
-        // Determine if we're adding or removing
-        const isRemoving = newTags.every(tag => currentTags.includes(tag));
-        
-        let updatedTags: string[];
-        
-        if (isRemoving) {
-            // Remove the tags
-            updatedTags = currentTags.filter(tag => !newTags.includes(tag));
-            button.classList.remove('selected');
-            console.log('🏷️ TAG DEBUG | Removing tags, button deselected');
-        } else {
-            // Add the tags (avoid duplicates)
-            updatedTags = [...currentTags];
-            for (const newTag of newTags) {
-                if (!updatedTags.includes(newTag)) {
-                    updatedTags.push(newTag);
-                }
-            }
-            button.classList.add('selected');
-            console.log('🏷️ TAG DEBUG | Adding tags, button selected');
-        }
-        
-        // Update the input field
-        const newValue = updatedTags.join(',');
-        tagsInput.value = newValue;
-        console.log('🏷️ TAG DEBUG | Updated input value:', newValue);
-        
-        // Trigger change event for FoundryVTT form handling
-        tagsInput.dispatchEvent(new Event('change', { bubbles: true }));
-        
-        // Update button states for all buttons
-        this._updateTagButtonStates();
-    }
-
-    /**
-     * Update the visual state of all tag example buttons based on current input
-     * @private
-     */
-    private _updateTagButtonStates(): void {
-        console.log('🏷️ TAG DEBUG | Updating tag button states');
-        
-        const tagsInput = this.element.find('input[name="system.tags"]')[0] as HTMLInputElement;
-        if (!tagsInput) {
-            console.warn('🏷️ TAG DEBUG | Tags input not found for state update');
-            return;
-        }
-        
-        const currentValue = tagsInput.value.trim();
-        const currentTags = currentValue ? currentValue.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : [];
-        
-        console.log('🏷️ TAG DEBUG | Current tags for state update:', currentTags);
-        
-        // Update each tag button
-        this.element.find('.tag-example').each((index: number, element: HTMLElement) => {
-            const button = element as HTMLElement;
-            const buttonTags = button.dataset.tags;
-            
-            if (!buttonTags) return;
-            
-            const tags = buttonTags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
-            const isSelected = tags.every(tag => currentTags.includes(tag));
-            
-            if (isSelected) {
-                button.classList.add('selected');
-            } else {
-                button.classList.remove('selected');
-            }
-            
-            console.log(`🏷️ TAG DEBUG | Button "${button.textContent}" with tags [${tags.join(', ')}] is ${isSelected ? 'selected' : 'not selected'}`);
-        });
+        }, 200);
     }
 
     /**
@@ -667,103 +829,26 @@ export class AvantItemSheet extends ItemSheetBase {
      * @private
      */
     private async _showTraitSuggestions(query: string): Promise<void> {
-        console.log('🏷️ TRAIT DEBUG | _showTraitSuggestions called with query:', query);
-        
         try {
-            // Get available traits from the trait provider
-            const game = (globalThis as any).game;
-            console.log('🏷️ TRAIT DEBUG | Game object exists:', !!game);
-            console.log('🏷️ TRAIT DEBUG | game.avant exists:', !!game?.avant);
-            console.log('🏷️ TRAIT DEBUG | game.avant properties:', Object.keys(game?.avant || {}));
+            const suggestions = await generateTraitSuggestions(this.document.system.traits || [], query);
             
-            const initManager = game?.avant?.initializationManager;
-            console.log('🏷️ TRAIT DEBUG | InitializationManager exists:', !!initManager);
-            
-            if (!initManager) {
-                console.warn('🏷️ TRAIT DEBUG | InitializationManager not available for trait suggestions');
-                console.log('🏷️ TRAIT DEBUG | Available on game.avant:', game?.avant);
-                return;
-            }
-            
-            console.log('🏷️ TRAIT DEBUG | InitializationManager found, waiting for traitProvider service...');
-            const traitProvider = await initManager.waitForService('traitProvider');
-            console.log('🏷️ TRAIT DEBUG | TraitProvider service result:', !!traitProvider);
-            
-            if (!traitProvider) {
-                console.warn('🏷️ TRAIT DEBUG | TraitProvider not available for trait suggestions');
-                console.log('🏷️ TRAIT DEBUG | Service status:', initManager.getStatusReport());
-                return;
-            }
-            
-            console.log('🏷️ TRAIT DEBUG | TraitProvider found, calling getAll() with force refresh...');
-            const traitsResult = await traitProvider.getAll({ forceRefresh: true });
-            console.log('🏷️ TRAIT DEBUG | getAll() result:', traitsResult);
-            console.log('🏷️ TRAIT DEBUG | Result success:', traitsResult?.success);
-            console.log('🏷️ TRAIT DEBUG | Result data length:', traitsResult?.data?.length);
-            
-            if (!traitsResult.success || !traitsResult.data) {
-                console.warn('🏷️ TRAIT DEBUG | Failed to load traits for suggestions:', traitsResult.error);
-                return;
-            }
-            
-            console.log('🏷️ TRAIT DEBUG | Traits loaded successfully, sample:', traitsResult.data.slice(0, 3).map((t: any) => ({ id: t.id, name: t.name })));
-            
-            // Generate suggestions using pure function
-            const { generateTraitSuggestions } = await import('../logic/trait-utils.ts');
-            console.log('🏷️ TRAIT DEBUG | Generating suggestions for query:', query);
-            const suggestions = generateTraitSuggestions(traitsResult.data, query, 10);
-            console.log('🏷️ TRAIT DEBUG | Generated suggestions:', suggestions.length, 'items');
-            
-            // Render suggestions
-            const dropdown = this.element.find('.trait-chip-input__dropdown')[0];
-            console.log('🏷️ TRAIT DEBUG | Dropdown element found:', !!dropdown);
+            const dropdown = this.element.querySelector('.trait-chip-input__dropdown');
             if (!dropdown) return;
             
             if (suggestions.length === 0) {
-                console.log('🏷️ TRAIT DEBUG | No suggestions found, showing no results message');
                 dropdown.innerHTML = '<div class="trait-chip-input__no-results">No matching traits found</div>';
             } else {
-                console.log('🏷️ TRAIT DEBUG | Rendering', suggestions.length, 'suggestions');
-                const { renderTraitSuggestion } = await import('../logic/chat/trait-renderer.ts');
-                const html = suggestions
-                    .map(suggestion => {
-                        console.log('🏷️ TRAIT DEBUG | Looking for trait with suggestion ID:', suggestion.id);
-                        console.log('🏷️ TRAIT DEBUG | Available trait IDs:', traitsResult.data.map((t: any) => t.id));
-                        console.log('🏷️ TRAIT DEBUG | Suggestion object:', { id: suggestion.id, name: suggestion.name });
-                        
-                        const trait = traitsResult.data.find((t: any) => t.id === suggestion.id);
-                        if (!trait) {
-                            console.warn('🏷️ TRAIT DEBUG | Could not find trait for suggestion:', suggestion);
-                            console.warn('🏷️ TRAIT DEBUG | Trying to find by name instead...');
-                            const traitByName = traitsResult.data.find((t: any) => t.name === suggestion.name);
-                            if (traitByName) {
-                                console.log('🏷️ TRAIT DEBUG | Found trait by name:', traitByName.name);
-                                const renderedHtml = renderTraitSuggestion(traitByName, suggestion.matchedText);
-                                console.log(`🏷️ TRAIT DEBUG | Rendered suggestion for '${traitByName.name}':`, renderedHtml.length, 'characters');
-                                return renderedHtml;
-                            }
-                            return '';
-                        }
-                        const renderedHtml = renderTraitSuggestion(trait, suggestion.matchedText);
-                        console.log(`🏷️ TRAIT DEBUG | Rendered suggestion for '${trait.name}':`, renderedHtml.length, 'characters');
-                        return renderedHtml;
-                    })
-                    .filter(html => html.length > 0) // Remove empty HTML strings
-                    .join('');
-                dropdown.innerHTML = html;
-                console.log('🏷️ TRAIT DEBUG | Total HTML rendered for suggestions:', html.length, 'characters');
-                console.log('🏷️ TRAIT DEBUG | Sample HTML:', html.substring(0, 200));
+                dropdown.innerHTML = suggestions.map((trait: any) => 
+                    renderTraitSuggestion(trait as any)
+                ).join('');
             }
             
-            // Show dropdown
-            dropdown.classList.add('trait-chip-input__dropdown--open');
+            dropdown.classList.add('visible');
             this.traitInputState.isDropdownOpen = true;
             this.traitInputState.selectedIndex = -1;
-            console.log('🏷️ TRAIT DEBUG | Dropdown shown successfully');
             
         } catch (error) {
-            console.error('🏷️ TRAIT DEBUG | Error showing trait suggestions:', error);
-            console.error('🏷️ TRAIT DEBUG | Error stack:', (error as Error)?.stack || 'No stack trace');
+            console.warn('AvantItemSheet | Failed to generate trait suggestions:', error);
         }
     }
 
@@ -772,33 +857,28 @@ export class AvantItemSheet extends ItemSheetBase {
      * @private
      */
     private _hideTraitSuggestions(): void {
-        const dropdown = this.element.find('.trait-chip-input__dropdown')[0];
+        const dropdown = this.element.querySelector('.trait-chip-input__dropdown');
         if (dropdown) {
-            dropdown.classList.remove('trait-chip-input__dropdown--open');
+            dropdown.classList.remove('visible');
+            dropdown.innerHTML = '';
         }
         this.traitInputState.isDropdownOpen = false;
         this.traitInputState.selectedIndex = -1;
     }
 
     /**
-     * Update suggestion highlighting
+     * Update suggestion highlight
      * @private
      */
     private _updateSuggestionHighlight(): void {
-        const dropdown = this.element.find('.trait-chip-input__dropdown')[0];
-        const suggestions = dropdown?.querySelectorAll('.trait-chip-input__suggestion') || [];
-        
-        // Remove existing highlights
-        suggestions.forEach((s: Element) => s.classList.remove('trait-chip-input__suggestion--highlighted'));
-        
-        // Add highlight to selected suggestion
-        if (this.traitInputState.selectedIndex >= 0 && suggestions[this.traitInputState.selectedIndex]) {
-            suggestions[this.traitInputState.selectedIndex].classList.add('trait-chip-input__suggestion--highlighted');
-        }
+        const suggestions = this.element.querySelectorAll('.trait-chip-input__suggestion');
+        suggestions.forEach((suggestion: Element, index: number) => {
+            suggestion.classList.toggle('highlighted', index === this.traitInputState.selectedIndex);
+        });
     }
 
     /**
-     * Add a trait from a suggestion element
+     * Add trait from suggestion element
      * @param suggestion - The suggestion element
      * @private
      */
@@ -810,205 +890,59 @@ export class AvantItemSheet extends ItemSheetBase {
     }
 
     /**
-     * Add a trait by ID
+     * Add trait by ID
      * @param traitId - The trait ID to add
      * @private
      */
     private async _addTraitById(traitId: string): Promise<void> {
         try {
-            console.log('🏷️ TRAIT DEBUG | _addTraitById called with:', traitId);
-            
-            // Get current traits
-            const currentTraits = this.item.system.traits || [];
-            console.log('🏷️ TRAIT DEBUG | Current traits before adding:', currentTraits);
-            
-            // Use pure function to add trait
-            const { addTraitToList } = await import('../logic/trait-utils.ts');
+            const currentTraits = this.document.system.traits || [];
             const result = addTraitToList(currentTraits, traitId);
-            console.log('🏷️ TRAIT DEBUG | addTraitToList result:', result);
             
             if (result.success && result.changed) {
-                console.log('🏷️ TRAIT DEBUG | Updating item with new traits:', result.traits);
+                await this.document.update({ 'system.traits': result.traits });
                 
-                // Update the item
-                await this.item.update({ 'system.traits': result.traits });
-                console.log('🏷️ TRAIT DEBUG | Item updated successfully');
-                
-                // Clear the input
-                const input = this.element.find('.trait-chip-input__input')[0] as HTMLInputElement;
+                // Clear input and hide dropdown
+                const input = this.element.querySelector('.trait-chip-input__input') as HTMLInputElement;
                 if (input) {
                     input.value = '';
-                    this.traitInputState.currentInput = '';
                 }
-                
-                // Hide suggestions
                 this._hideTraitSuggestions();
                 
-                console.log('🏷️ TRAIT DEBUG | Trait addition complete, sheet should re-render');
-                
-                // Force re-render to show the new trait
-                this.render(false);
-                
+                logger.log(`AvantItemSheet | Added trait ${traitId} to ${this.document.name}`);
             } else if (!result.success) {
-                console.error('🏷️ TRAIT DEBUG | Failed to add trait:', result.error);
-                FoundryUI.notify(`Failed to add trait: ${result.error}`, 'error');
-            } else {
-                console.log('🏷️ TRAIT DEBUG | Trait was not added (possibly duplicate)');
+                FoundryUI.notify(result.error || 'Failed to add trait', 'warn');
             }
-            
         } catch (error) {
-            console.error('🏷️ TRAIT DEBUG | Error adding trait:', error);
+            logger.error('AvantItemSheet | Failed to add trait:', error);
             FoundryUI.notify('Failed to add trait', 'error');
         }
     }
 
     /**
-     * Update the hidden input field with current trait data
-     * @param traits - Array of trait IDs
+     * Update tag button states for trait items
      * @private
      */
-    private _updateTraitHiddenInput(traits: string[]): void {
-        const hiddenInput = this.element.find('[data-trait-data="true"]')[0] as HTMLInputElement;
-        if (hiddenInput) {
-            hiddenInput.value = JSON.stringify(traits);
-        }
-    }
-
-    /**
-     * Handle rolls from the item sheet
-     * @param event - The triggering event
-     * @returns The executed roll or void
-     * @private
-     */
-    async _onRoll(event: Event): Promise<any | void> {
-        event.preventDefault();
-        const element = event.currentTarget as HTMLElement;
-        const dataset = element.dataset;
-
-        // Use pure function to prepare roll configuration
-        const game = (globalThis as any).game;
-        const rollMode = game?.settings?.get?.('core', 'rollMode') || 'publicroll';
-        const rollConfig = executeRoll(
-            dataset as any,  // Cast to any to handle DOMStringMap typing
-            { name: this.item.name },
-            rollMode
-        ) as any;  // Cast result to any to access properties
-
-        if (rollConfig) {
-            try {
-                const Roll = (globalThis as any).Roll;
-                const ChatMessage = (globalThis as any).ChatMessage;
-                
-                const roll = new Roll(rollConfig.rollExpression, this.item.getRollData());
-                await roll.evaluate();
-                
-                const speaker = ChatMessage.getSpeaker({ actor: this.item.actor });
-                
-                // Stage 4: Add trait chips to chat message
-                let flavor = rollConfig.message.flavor;
-                if (itemHasTraits(this.item)) {
-                    try {
-                        console.log('🏷️ TRAIT DEBUG | Item roll - attempting to add traits for item:', this.item.name);
-                        console.log('🏷️ TRAIT DEBUG | Item roll - item traits:', this.item.system.traits);
-                        
-                        // Get TraitProvider service from initialization manager
-                        const { getInitializationManager } = await import('../utils/initialization-manager.js');
-                        const manager = getInitializationManager();
-                        console.log('🏷️ TRAIT DEBUG | Item roll - manager exists:', !!manager);
-                        
-                        const traitProvider = manager.getService('traitProvider'); // Fixed: lowercase 't'
-                        console.log('🏷️ TRAIT DEBUG | Item roll - traitProvider service exists:', !!traitProvider);
-                        
-                        if (traitProvider) {
-                            const traitHtml = await createTraitHtmlForChat(
-                                this.item.system.traits, 
-                                traitProvider, 
-                                'small'
-                            );
-                            console.log('🏷️ TRAIT DEBUG | Item roll - generated trait HTML:', traitHtml);
-                            if (traitHtml) {
-                                flavor += `<br/>${traitHtml}`;
-                                console.log('🏷️ TRAIT DEBUG | Item roll - added traits to flavor, final flavor:', flavor);
-                            }
-                        } else {
-                            console.warn('🏷️ TRAIT DEBUG | Item roll - TraitProvider service not available');
-                            const statusReport = manager.getStatusReport();
-                            console.log('🏷️ TRAIT DEBUG | Item roll - service status:', statusReport);
-                        }
-                    } catch (traitError) {
-                        logger.warn('Avant | Failed to add traits to item roll:', traitError);
-                        console.error('🏷️ TRAIT DEBUG | Item roll - trait error details:', traitError);
-                        // Continue with roll even if trait display fails
-                    }
-                }
-                
-                await roll.toMessage({
-                    speaker: speaker,
-                    flavor: flavor,
-                    rollMode: rollConfig.message.rollMode,
-                });
-                
-                return roll;
-            } catch (error) {
-                logger.error('Avant | Error in item sheet roll:', error);
-                FoundryUI.notify(`Roll failed: ${(error as Error).message}`, 'error');
-                return null;
-            }
-        }
+    private _updateTagButtonStates(): void {
+        const tagsInput = this.element.querySelector('input[name="system.tags"]') as HTMLInputElement;
+        if (!tagsInput) return;
         
-        return undefined;
-    }
-
-    /**
-     * Override the default update object method to ensure proper data type conversion
-     * @param event - The form submission event
-     * @param formData - The form data to process
-     * @returns The processed update data
-     * @override
-     */
-    async _updateObject(event: Event, formData: any): Promise<any> {
-        // Use pure function to extract and process the form data
-        const processedData = extractItemFormData(formData) as any;
+        const currentTags = tagsInput.value.split(',').map(t => t.trim()).filter(t => t);
+        const tagButtons = this.element.querySelectorAll('.tag-example');
         
-        // Handle trait item tags conversion (string to array)
-        if (this.item.type === 'trait' && formData['system.tags']) {
-            processedData.system = processedData.system || {};
-            const tagsString = formData['system.tags'].trim();
-            if (tagsString) {
-                // Convert comma-separated string to array
-                processedData.system.tags = tagsString.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag.length > 0);
+        tagButtons.forEach((button: Element) => {
+            const tagValue = (button as HTMLElement).dataset.tag;
+            if (tagValue && currentTags.includes(tagValue)) {
+                button.classList.add('active');
             } else {
-                processedData.system.tags = [];
+                button.classList.remove('active');
             }
-        }
-        
-        // Handle trait data specially
-        if (formData['system.traits']) {
-            try {
-                const traitsData = JSON.parse(formData['system.traits']);
-                if (Array.isArray(traitsData)) {
-                    processedData.system = processedData.system || {};
-                    processedData.system.traits = traitsData;
-                }
-            } catch (error) {
-                console.warn('Failed to parse trait data:', error);
-                // Keep existing traits if parsing fails
-                processedData.system = processedData.system || {};
-                processedData.system.traits = this.item.system.traits || [];
-            }
-        }
-        
-        // Convert back to flat object for FoundryVTT
-        const foundryUtils = (globalThis as any).foundry?.utils;
-        const flattenObject = foundryUtils?.flattenObject || ((obj: any) => obj);
-        const flatData = flattenObject(processedData);
-        
-        // ✅ CRITICAL FIX: Include _id for FoundryVTT v13 compatibility
-        if (this.item._id) {
-            flatData._id = this.item._id;
-        }
-        
-        // Call parent method with processed data
-        return super._updateObject(event, flatData);
+        });
     }
-} 
+    }
+    
+    return AvantItemSheet;
+}
+
+// Note: The actual AvantItemSheet class is created by the createAvantItemSheet() factory function
+// when called by the initialization system. This ensures Foundry classes are available.

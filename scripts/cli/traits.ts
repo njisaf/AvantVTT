@@ -10,6 +10,7 @@ import { join, dirname, resolve } from 'path';
 import { TraitProvider } from '../services/trait-provider.ts';
 import { RemoteTraitService, createRemoteTraitCommands } from '../services/remote-trait-service.ts';
 import type { Trait, TraitItemSystemData } from '../types/domain/trait.ts';
+import { Command } from 'commander';
 
 /**
  * Export format for trait data
@@ -752,55 +753,60 @@ function getTraitProvider(): any {
 }
 
 /**
- * Main CLI execution function
  * @param traitProvider - An instance of the TraitProvider service
+ * @returns A configured commander program
  */
-export async function main(traitProvider: TraitProvider): Promise<void> {
-  try {
-    const args = process.argv.slice(2);
-    
-    // Show help if requested or no command provided
-    if (args.length === 0 || args.includes('--help') || args.includes('-h')) {
-      showHelp();
-      process.exit(0);
-    }
-    
-    const command = args[0];
-    const commandArgs = args.slice(1);
-    
-    // Commands are created with the provided traitProvider
+function setupProgram(traitProvider: TraitProvider) {
+    const program = new Command();
+    program
+        .name('traits')
+        .description('CLI tool for managing traits in the Avant VTT system')
+        .version('1.0.0');
+
     const commands = createTraitCommands(traitProvider);
+
+    program
+        .command('export')
+        .description('Export all traits to a JSON file')
+        .option('-o, --output <file>', 'Output file path', 'traits.json')
+        .action(commands.export);
+
+    program
+        .command('import')
+        .description('Import traits from a JSON file')
+        .argument('<file>', 'File path to import from')
+        .action(commands.import);
+        
+    program
+        .command('integrity')
+        .description('Check data integrity of all traits')
+        .action(commands.integrity);
+
+    return program;
+}
+
+/**
+ * Main CLI entry point
+ */
+async function mainCLI(traitProvider: TraitProvider) {
+  try {
+    const program = setupProgram(traitProvider);
     
-    switch (command) {
-      case 'export':
-        await commands.export(commandArgs);
-        break;
-        
-      case 'import':
-        await commands.import(commandArgs);
-        break;
-        
-      case 'sync':
-        await commands.sync(commandArgs);
-        break;
-        
-      case 'remote':
-        await commands.remote(commandArgs);
-        break;
-        
-      case 'integrity':
-        await commands.integrity();
-        break;
-        
-      default:
-        console.error(`❌ Unknown command: ${command}`);
-        console.log('Run with --help to see available commands');
+    // Override default help behavior to prevent process.exit
+    program.exitOverride();
+
+    program.parse(process.argv);
+
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('process.exit')) {
+        // Suppress process.exit errors during testing
+    } else if (error instanceof Error) {
+        console.error(`❌ An unexpected error occurred: ${error.message}`);
+        process.exit(1);
+    } else {
+        console.error('❌ An unknown error occurred');
         process.exit(1);
     }
-    
-  } catch (error) {
-    console.error('❌ CLI execution failed:', error);
-    process.exit(1);
   }
 }
 
@@ -808,7 +814,7 @@ export async function main(traitProvider: TraitProvider): Promise<void> {
 async function run(): Promise<void> {
     // Get the appropriate TraitProvider (real or mock) when run directly
     const traitProvider = getTraitProvider();
-    await main(traitProvider);
+    await mainCLI(traitProvider);
 }
 
 // Run main function if this file is executed directly

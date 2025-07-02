@@ -140,13 +140,9 @@ describe('Compendium CLI Integration Tests', () => {
     test('should compare two packs and display results', async () => {
       const options = { json: false };
       
-      try {
-        await diffCommand('world.pack1', 'world.pack2', options);
-      } catch (error) {
-        // Expected due to process.exit mock
-      }
+      const exitCode = await diffCommand('world.pack1', 'world.pack2', options);
       
-      expect(processExitCode).toBe(0);
+      expect(exitCode).toBe(0);
       expect(consoleLogOutput.some(line => line.includes('Comparing packs'))).toBe(true);
       expect(consoleLogOutput.some(line => line.includes('Compendium Comparison'))).toBe(true);
       expect(consoleLogOutput.some(line => line.includes('Added documents'))).toBe(true);
@@ -155,13 +151,9 @@ describe('Compendium CLI Integration Tests', () => {
     test('should output JSON format when --json flag is used', async () => {
       const options = { json: true };
       
-      try {
-        await diffCommand('world.pack1', 'world.pack2', options);
-      } catch (error) {
-        // Expected due to process.exit mock
-      }
+      const exitCode = await diffCommand('world.pack1', 'world.pack2', options);
       
-      expect(processExitCode).toBe(0);
+      expect(exitCode).toBe(0);
       
       // Should contain JSON output
       const jsonOutput = consoleLogOutput.find(line => {
@@ -191,13 +183,9 @@ describe('Compendium CLI Integration Tests', () => {
       
       const options = { json: false };
       
-      try {
-        await diffCommand('invalid.pack1', 'invalid.pack2', options);
-      } catch (error) {
-        // Expected due to process.exit mock
-      }
+      const exitCode = await diffCommand('invalid.pack1', 'invalid.pack2', options);
       
-      expect(processExitCode).toBe(1);
+      expect(exitCode).toBe(1);
       expect(consoleErrorOutput.some(line => line.includes('Error'))).toBe(true);
     });
   });
@@ -206,13 +194,9 @@ describe('Compendium CLI Integration Tests', () => {
     test('should copy documents between packs', async () => {
       const options = { json: false };
       
-      try {
-        await copyCommand('world.pack1', 'world.pack2', options);
-      } catch (error) {
-        // Expected due to process.exit mock
-      }
+      const exitCode = await copyCommand('world.pack1', 'world.pack2', options);
       
-      expect(processExitCode).toBe(0);
+      expect(exitCode).toBe(0);
       expect(consoleLogOutput.some(line => line.includes('Copying documents'))).toBe(true);
       expect(consoleLogOutput.some(line => line.includes('Documents copied successfully'))).toBe(true);
     });
@@ -223,13 +207,9 @@ describe('Compendium CLI Integration Tests', () => {
         filter: 'name:/Test Document 1/'
       };
       
-      try {
-        await copyCommand('world.pack1', 'world.pack2', options);
-      } catch (error) {
-        // Expected due to process.exit mock
-      }
+      const exitCode = await copyCommand('world.pack1', 'world.pack2', options);
       
-      expect(processExitCode).toBe(0);
+      expect(exitCode).toBe(0);
       expect(consoleLogOutput.some(line => line.includes('Using filter'))).toBe(true);
       expect(consoleLogOutput.some(line => line.includes('Filter applied'))).toBe(true);
     });
@@ -237,13 +217,9 @@ describe('Compendium CLI Integration Tests', () => {
     test('should output JSON format for copy operations', async () => {
       const options = { json: true };
       
-      try {
-        await copyCommand('world.pack1', 'world.pack2', options);
-      } catch (error) {
-        // Expected due to process.exit mock
-      }
+      const exitCode = await copyCommand('world.pack1', 'world.pack2', options);
       
-      expect(processExitCode).toBe(0);
+      expect(exitCode).toBe(0);
       
       const jsonOutput = consoleLogOutput.find(line => {
         try {
@@ -270,13 +246,9 @@ describe('Compendium CLI Integration Tests', () => {
       
       const options = { json: true };
       
-      try {
-        await copyCommand('invalid.pack1', 'invalid.pack2', options);
-      } catch (error) {
-        // Expected due to process.exit mock
-      }
+      const exitCode = await copyCommand('invalid.pack1', 'invalid.pack2', options);
       
-      expect(processExitCode).toBe(1);
+      expect(exitCode).toBe(1);
       
       const jsonOutput = consoleLogOutput.find(line => {
         try {
@@ -295,13 +267,9 @@ describe('Compendium CLI Integration Tests', () => {
     test('should list all available compendium packs', async () => {
       const options = { json: false };
       
-      try {
-        await listCommand(options);
-      } catch (error) {
-        // Expected due to process.exit mock
-      }
+      const exitCode = await listCommand(options);
       
-      expect(processExitCode).toBe(0);
+      expect(exitCode).toBe(0);
       expect(consoleLogOutput.some(line => line.includes('Listing available compendium packs'))).toBe(true);
       expect(consoleLogOutput.some(line => line.includes('Found 2 compendium packs'))).toBe(true);
       expect(consoleLogOutput.some(line => line.includes('world.pack1'))).toBe(true);
@@ -311,13 +279,9 @@ describe('Compendium CLI Integration Tests', () => {
     test('should output pack information in JSON format', async () => {
       const options = { json: true };
       
-      try {
-        await listCommand(options);
-      } catch (error) {
-        // Expected due to process.exit mock
-      }
+      const exitCode = await listCommand(options);
       
-      expect(processExitCode).toBe(0);
+      expect(exitCode).toBe(0);
       
       const jsonOutput = consoleLogOutput.find(line => {
         try {
@@ -359,13 +323,9 @@ describe('Compendium CLI Integration Tests', () => {
       
       const options = { json: false };
       
-      try {
-        await listCommand(options);
-      } catch (error) {
-        // Expected due to process.exit mock
-      }
+      const exitCode = await listCommand(options);
       
-      expect(processExitCode).toBe(0);
+      expect(exitCode).toBe(0);
       expect(consoleLogOutput.some(line => line.includes('world.errorpack'))).toBe(true);
       expect(consoleLogOutput.some(line => line.includes('Error loading'))).toBe(true);
     });
@@ -375,13 +335,9 @@ describe('Compendium CLI Integration Tests', () => {
     test('should exit with code 1 when FoundryVTT is not available', async () => {
       Object.defineProperty(globalThis, 'game', { value: null, configurable: true });
       
-      try {
-        await diffCommand('pack1', 'pack2', { json: false });
-      } catch (error) {
-        // Expected due to process.exit mock
-      }
+      const exitCode = await diffCommand('pack1', 'pack2', { json: false });
       
-      expect(processExitCode).toBe(1);
+      expect(exitCode).toBe(1);
       expect(consoleErrorOutput.some(line => line.includes('FoundryVTT context'))).toBe(true);
     });
 
@@ -391,13 +347,9 @@ describe('Compendium CLI Integration Tests', () => {
         filter: 'invalid-filter-format'
       };
       
-      try {
-        await copyCommand('world.pack1', 'world.pack2', options);
-      } catch (error) {
-        // Expected due to process.exit mock
-      }
+      const exitCode = await copyCommand('world.pack1', 'world.pack2', options);
       
-      expect(processExitCode).toBe(1);
+      expect(exitCode).toBe(1);
       expect(consoleErrorOutput.some(line => line.includes('Invalid filter format'))).toBe(true);
     });
   });
@@ -406,11 +358,7 @@ describe('Compendium CLI Integration Tests', () => {
     test('should complete operations within reasonable time', async () => {
       const startTime = Date.now();
       
-      try {
-        await listCommand({ json: true });
-      } catch (error) {
-        // Expected due to process.exit mock
-      }
+      await listCommand({ json: true });
       
       const endTime = Date.now();
       const duration = endTime - startTime;
@@ -435,18 +383,14 @@ describe('Compendium CLI Integration Tests', () => {
       
       const startTime = Date.now();
       
-      try {
-        await listCommand({ json: true });
-      } catch (error) {
-        // Expected due to process.exit mock
-      }
+      const exitCode = await listCommand({ json: true });
       
       const endTime = Date.now();
       const duration = endTime - startTime;
       
       // Should still complete quickly even with many packs
       expect(duration).toBeLessThan(5000);
-      expect(processExitCode).toBe(0);
+      expect(exitCode).toBe(0);
     });
   });
 }); 

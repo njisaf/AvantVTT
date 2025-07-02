@@ -88,6 +88,27 @@ export type {
   PermissionChecker
 } from './chat-context';
 
+// Chat integration types (talents & augments)
+export type {
+  PostFeatureCardResult,
+  BuildFeatureCardResult,
+  ChatAPI,
+  ChatIntegrationResult,
+  FeatureCardMetadata,
+  FeatureCardTemplateData,
+  PowerPointValidationResult,
+  PowerPointSpendResult,
+  PowerPointButtonData,
+  PowerPointButtonTemplateData,
+  PowerPointHandlerOptions,
+  FeatureCardStyleOptions,
+  FeatureCardChatOptions,
+  FeatureCardExportData,
+  BatchFeatureCardResult,
+  FeatureCardValidation,
+  ChatIntegrationConfig
+} from './chat';
+
 // Trait system types
 export type {
   Trait,

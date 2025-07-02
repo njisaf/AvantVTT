@@ -31,19 +31,33 @@
       "path": "lang/en.json"
     }
   ],
-  "packs": [
+    "packs": [
     {
       "name": "avant-traits",
-      "label": "Avant Traits", 
-      "path": "./packs/avant-traits",
+      "label": "Avant Traits",
+      "path": "./packs/avant-traits.db",
       "type": "Item",
       "system": "avant"
     },
     {
       "name": "avant-macros",
       "label": "Avant Macros",
-      "path": "./packs/avant-macros",
+      "path": "./packs/avant-macros.db",
       "type": "Macro"
+    },
+    {
+      "name": "avant-talents",
+      "label": "Avant Talents",
+      "path": "./packs/avant-talents.db",
+      "type": "Item",
+      "system": "avant"
+    },
+    {
+      "name": "avant-augments",
+      "label": "Avant Augments",
+      "path": "./packs/avant-augments.db",
+      "type": "Item",
+      "system": "avant"
     }
   ],
   "documentTypes": {

@@ -4,35 +4,38 @@
  */
 
 import { describe, test, expect, jest, beforeEach, afterEach } from '@jest/globals';
-import { main as mainCLI } from '../../../scripts/cli/traits.ts';
-import type { TraitProvider } from '../../../scripts/services/trait-provider.ts';
+import { main as mainCLI } from '../../../scripts/cli/traits';
+import type { TraitProvider } from '../../../scripts/services/trait-provider';
+import type { Trait, FoundryTraitItem, TraitProviderResult } from '../../../scripts/types/domain/trait';
 
 describe('Traits CLI Logic', () => {
-  let mockTraitProvider: Partial<TraitProvider>;
-  let logSpy: jest.SpyInstance<void, [message?: any, ...optionalParams: any[]], any>;
-  let errorSpy: jest.SpyInstance<void, [message?: any, ...optionalParams: any[]], any>;
-  let argvSpy: jest.SpyInstance<string[], [], any>;
+  let mockTraitProvider: TraitProvider;
+  let logSpy: any;
+  let errorSpy: any;
 
   beforeEach(() => {
-    // Mock the trait provider for controlled testing
+    // A more robust way to mock the provider to satisfy TypeScript
     mockTraitProvider = {
-      getAll: jest.fn().mockResolvedValue({
-        success: true,
-        data: [{ id: 'fire', name: 'Fire', color: '#F00', icon: 'fa-fire' }]
-      }),
-      // Add other methods with default mock implementations
-      get: jest.fn().mockResolvedValue({ success: true, data: null }),
-      createTrait: jest.fn().mockResolvedValue({ success: true }),
-      updateTrait: jest.fn().mockResolvedValue({ success: true }),
-      deleteTrait: jest.fn().mockResolvedValue({ success: true }),
-    };
+      getAll: jest.fn(),
+      get: jest.fn(),
+      createTrait: jest.fn(),
+      updateTrait: jest.fn(),
+      deleteTrait: jest.fn(),
+    } as unknown as TraitProvider;
+
+    (mockTraitProvider.getAll as jest.Mock).mockResolvedValue({
+      success: true,
+      data: [{ id: 'fire', name: 'Fire', color: '#F00', icon: 'fa-fire' }] as Trait[],
+    });
+    (mockTraitProvider.get as jest.Mock).mockResolvedValue({ success: true, data: null });
+    (mockTraitProvider.createTrait as jest.Mock).mockResolvedValue({ success: true, data: {} as Trait });
+    (mockTraitProvider.updateTrait as jest.Mock).mockResolvedValue({ success: true, data: {} as Trait });
+    (mockTraitProvider.deleteTrait as jest.Mock).mockResolvedValue({ success: true });
+
 
     // Spy on console outputs
     logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    
-    // Spy on process.argv to simulate CLI arguments
-    argvSpy = jest.spyOn(process, 'argv', 'get');
   });
 
   afterEach(() => {
@@ -40,18 +43,23 @@ describe('Traits CLI Logic', () => {
   });
 
   const runCliWithArgs = async (args: string[]) => {
-    argvSpy.mockReturnValue(['node', 'traits.ts', ...args]);
-    await mainCLI(mockTraitProvider as TraitProvider);
+    const originalArgv = process.argv;
+    try {
+      process.argv = ['node', 'traits.ts', ...args];
+      await mainCLI(mockTraitProvider);
+    } finally {
+      process.argv = originalArgv;
+    }
   };
 
   describe('Help Command', () => {
     test('should show help with --help flag', async () => {
-      await runCliWithArgs(['--help']);
+      await expect(runCliWithArgs(['--help'])).rejects.toThrow('process.exit called');
       expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('USAGE:'));
     });
 
     test('should show help with no arguments', async () => {
-      await runCliWithArgs([]);
+      await expect(runCliWithArgs([])).rejects.toThrow('process.exit called');
       expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('USAGE:'));
     });
   });

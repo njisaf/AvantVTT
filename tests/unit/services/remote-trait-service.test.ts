@@ -6,8 +6,8 @@
  */
 
 import { describe, test, expect, beforeEach, afterEach, jest } from '@jest/globals';
-import { RemoteTraitService, type RemoteSyncResult, type RemoteTraitConfig } from '@/services/remote-trait-service.ts';
-import type { TraitExportData } from '@/cli/traits.ts';
+import { RemoteTraitService, type RemoteSyncResult, type RemoteTraitConfig } from '../../../scripts/services/remote-trait-service';
+import type { TraitExportData } from '../../../scripts/cli/traits';
 
 // Mock fetch globally
 const mockFetch = jest.fn();
@@ -29,6 +29,17 @@ Object.defineProperty(globalThis, 'AbortController', {
   writable: true,
   configurable: true
 });
+
+jest.unstable_mockModule('@/services/trait-provider', () => ({
+  TraitProvider: {
+    getInstance: () => ({
+      getAll: jest.fn().mockResolvedValue({
+        success: true,
+        data: []
+      })
+    })
+  }
+}));
 
 describe('RemoteTraitService', () => {
   let service: RemoteTraitService;
@@ -179,6 +190,13 @@ describe('RemoteTraitService', () => {
     });
     
     test('should successfully sync traits from valid URL', async () => {
+      const { TraitProvider } = await import('@/services/trait-provider');
+      const mockTraitProvider = TraitProvider.getInstance();
+      (mockTraitProvider.getAll as jest.Mock).mockResolvedValue({
+        success: true,
+        data: []
+      });
+
       const mockTraitData: TraitExportData = {
         metadata: {
           timestamp: new Date().toISOString(),
@@ -199,6 +217,7 @@ describe('RemoteTraitService', () => {
               color: '#FF0000',
               icon: 'fas fa-fire',
               localKey: 'AVANT.Trait.Fire',
+              textColor: '#FFFFFF',
               traitMetadata: {}
             },
             exportedAt: new Date().toISOString()
@@ -214,6 +233,7 @@ describe('RemoteTraitService', () => {
               color: '#0000FF',
               icon: 'fas fa-snowflake',
               localKey: 'AVANT.Trait.Ice',
+              textColor: '#FFFFFF',
               traitMetadata: {}
             },
             exportedAt: new Date().toISOString()
@@ -224,19 +244,7 @@ describe('RemoteTraitService', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: jest.fn().mockResolvedValue(mockTraitData)
-      });
-      
-      // Mock TraitProvider.getAll to return empty (no conflicts)
-      jest.doMock('@/services/trait-provider.ts', () => ({
-        TraitProvider: {
-          getInstance: () => ({
-            getAll: jest.fn().mockResolvedValue({
-              success: true,
-              data: []
-            })
-          })
-        }
-      }));
+      } as any);
       
       const result = await service.syncFromUrl('https://example.com/traits.json');
       
@@ -248,13 +256,17 @@ describe('RemoteTraitService', () => {
     });
     
     test('should handle fetch timeout', async () => {
+      // Configure a shorter timeout for this specific test
+      service = new RemoteTraitService({ fetchTimeout: 100 });
       jest.useFakeTimers();
+      
       // Mock fetch to hang indefinitely
       mockFetch.mockImplementation(() => new Promise(() => {}));
       
       const promise = service.syncFromUrl('https://example.com/timeout.json');
       
-      jest.runAllTimers();
+      // Advance timers to trigger the timeout
+      jest.advanceTimersByTime(150);
 
       const result = await promise;
       
@@ -323,6 +335,7 @@ describe('RemoteTraitService', () => {
               color: '#FF0000',
               icon: 'fas fa-fire',
               localKey: 'AVANT.Trait.Existing',
+              textColor: '#FFFFFF',
               traitMetadata: {}
             },
             exportedAt: new Date().toISOString()
@@ -333,19 +346,10 @@ describe('RemoteTraitService', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: jest.fn().mockResolvedValue(mockTraitData)
-      });
+      } as any);
       
-      // Mock TraitProvider to return existing trait
-      jest.doMock('@/services/trait-provider.ts', () => ({
-        TraitProvider: {
-          getInstance: () => ({
-            getAll: jest.fn().mockResolvedValue({
-              success: true,
-              data: [{ id: 'existing-trait', name: 'Existing Trait' }]
-            })
-          })
-        }
-      }));
+      // Mock _getExistingTraitIds to return a set with the conflicting ID
+      jest.spyOn(service as any, '_getExistingTraitIds').mockResolvedValue(new Set(['existing-trait']));
       
       const result = await service.syncFromUrl('https://example.com/conflicts.json', {
         skipConflicts: true
@@ -443,11 +447,11 @@ describe('RemoteTraitService', () => {
       
       // Mock fetch to delay longer than timeout
       mockFetch.mockImplementation(() => 
-        new Promise(resolve => setTimeout(resolve, 100))
+        new Promise(resolve => setTimeout(() => resolve({ ok: true, json: () => Promise.resolve({}) }), 100))
       );
       
       const promise = (shortTimeoutService as any)._fetchRemoteData('https://example.com/slow.json');
-      jest.runAllTimers();
+      jest.advanceTimersByTime(150);
       const result = await promise;
       
       expect(result.success).toBe(false);
@@ -481,7 +485,8 @@ describe('RemoteTraitService', () => {
             systemData: {
               color: '#FF0000',
               icon: 'fas fa-test',
-              localKey: 'AVANT.Trait.Test'
+              localKey: 'AVANT.Trait.Test',
+              textColor: '#FFFFFF'
             },
             exportedAt: new Date().toISOString()
           }
@@ -570,6 +575,7 @@ describe('RemoteTraitService', () => {
             color: '#FF0000',
             icon: 'fas fa-test',
             localKey: 'AVANT.Trait.Test',
+            textColor: '#FFFFFF',
             traitMetadata: {
               remoteUrl: 'https://example.com',
               syncedAt: new Date().toISOString()
@@ -581,7 +587,7 @@ describe('RemoteTraitService', () => {
       const result = await (service as any)._updateCompendiumPack(mockTraits);
       
       expect(result.success).toBe(true);
-      expect(mockFoundry.documents.collections.CompendiumCollection.createCompendium).toHaveBeenCalled();
+      expect((mockFoundry.documents.collections.CompendiumCollection.createCompendium as jest.Mock)).toHaveBeenCalled();
     });
     
     test('should handle game not ready', async () => {
@@ -628,6 +634,7 @@ describe('RemoteTraitService', () => {
             color: '#FF0000',
             icon: 'fas fa-new',
             localKey: 'AVANT.Trait.New',
+            textColor: '#FFFFFF',
             traitMetadata: {
               remoteUrl: 'https://example.com',
               syncedAt: new Date().toISOString()
@@ -639,8 +646,8 @@ describe('RemoteTraitService', () => {
       const result = await (service as any)._updateCompendiumPack(mockTraits);
       
       expect(result.success).toBe(true);
-      expect(mockExistingPack.deleteDocuments).toHaveBeenCalledWith(['old1']);
-      expect(mockExistingPack.createDocuments).toHaveBeenCalled();
+      expect((mockExistingPack.deleteDocuments as jest.Mock)).toHaveBeenCalledWith(['old1']);
+      expect((mockExistingPack.createDocuments as jest.Mock)).toHaveBeenCalled();
     });
   });
   
@@ -816,6 +823,7 @@ describe('RemoteTraitService', () => {
               color: '#FF0000',
               icon: 'fas fa-check',
               localKey: 'AVANT.Trait.Valid',
+              textColor: '#FFFFFF',
               traitMetadata: {}
             },
             exportedAt: new Date().toISOString()
@@ -828,12 +836,14 @@ describe('RemoteTraitService', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: jest.fn().mockResolvedValue(mockTraitData)
-      });
+      } as any);
       
       const result = await service.syncFromUrl('https://example.com/partial.json');
       
       expect(result.success).toBe(false); // Should fail due to processing errors
-      expect(result.failed).toBeGreaterThan(0);
+      expect(result.failed).toBe(1);
+      expect(result.synced).toBe(1);
+      expect(result.details.find(d => d.action === 'failed')?.error).toContain('Trait data is null or undefined');
     });
   });
 }); 

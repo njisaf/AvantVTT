@@ -479,19 +479,54 @@ export class FoundryInitializationHelper {
         
         // Sheet Registration - depends on data models
         manager.registerService('sheetRegistration', async () => {
+            console.log('🚨 SHEET REGISTRATION | Starting sheet registration service...');
+            
             const { registerSheets } = await import('../logic/avant-init-utils.js');
-            const { AvantActorSheet } = await import('../sheets/actor-sheet.ts');
-            const { AvantItemSheet } = await import('../sheets/item-sheet.ts');
+            console.log('🚨 SHEET REGISTRATION | Imported registerSheets function');
+            
+            // Create actor sheet class when Foundry is ready
+            console.log('🚨 SHEET REGISTRATION | Importing createAvantActorSheet...');
+            const { createAvantActorSheet } = await import('../sheets/actor-sheet.ts');
+            console.log('🚨 SHEET REGISTRATION | createAvantActorSheet imported successfully');
+            
+            console.log('🚨 SHEET REGISTRATION | Creating AvantActorSheet class...');
+            const AvantActorSheet = createAvantActorSheet();
+            console.log('🚨 SHEET REGISTRATION | AvantActorSheet created:', {
+                name: AvantActorSheet.name,
+                hasDefaultOptions: !!AvantActorSheet.DEFAULT_OPTIONS,
+                actionsCount: Object.keys(AvantActorSheet.DEFAULT_OPTIONS?.actions || {}).length
+            });
+            
+            // Create item sheet class when Foundry is ready
+            console.log('🚨 SHEET REGISTRATION | Importing createAvantItemSheet...');
+            const { createAvantItemSheet } = await import('../sheets/item-sheet.ts');
+            console.log('🚨 SHEET REGISTRATION | createAvantItemSheet imported successfully');
+            
+            console.log('🚨 SHEET REGISTRATION | Creating AvantItemSheet class...');
+            const AvantItemSheet = createAvantItemSheet();
+            console.log('🚨 SHEET REGISTRATION | AvantItemSheet created:', {
+                name: AvantItemSheet.name,
+                hasDefaultOptions: !!AvantItemSheet.DEFAULT_OPTIONS
+            });
             
             // Get FoundryVTT collections using v13 namespaced access
+            console.log('🚨 SHEET REGISTRATION | Getting FoundryVTT collections...');
             const actorCollection = (globalThis as any).foundry?.documents?.collections?.Actors || (globalThis as any).Actors;
             const itemCollection = (globalThis as any).foundry?.documents?.collections?.Items || (globalThis as any).Items;
+            
+            console.log('🚨 SHEET REGISTRATION | Collections found:', {
+                actorCollection: !!actorCollection,
+                itemCollection: !!itemCollection,
+                actorCollectionName: actorCollection?.constructor?.name,
+                itemCollectionName: itemCollection?.constructor?.name
+            });
             
             if (!actorCollection || !itemCollection) {
                 throw new Error('FoundryVTT collections not available for sheet registration');
             }
             
             // Execute sheet registration
+            console.log('🚨 SHEET REGISTRATION | Executing registerSheets...');
             const result = registerSheets(actorCollection, itemCollection, AvantActorSheet, AvantItemSheet) as {
                 success: boolean;
                 error?: string;
@@ -499,11 +534,13 @@ export class FoundryInitializationHelper {
                 registeredSheets: number;
             };
             
+            console.log('🚨 SHEET REGISTRATION | Registration result:', result);
+            
             if (!result.success) {
                 throw new Error(`Sheet registration failed: ${result.error}`);
             }
             
-            console.log(`✅ InitializationManager | ${result.message}`);
+            console.log(`✅ InitializationManager | ${result.message} (ApplicationV2)`);
             return result;
         }, ['dataModels'], { phase: 'init', critical: true });
         

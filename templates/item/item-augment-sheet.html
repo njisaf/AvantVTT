@@ -1,22 +1,36 @@
-<form class="{{cssClass}} flexcol" autocomplete="off">
+<div class="item-sheet augment-sheet flexcol" autocomplete="off" data-application-part="form">
     <header class="sheet-header">
-        <img class="profile-img" src="{{#if item.img}}{{item.img}}{{else}}icons/svg/clockwork.svg{{/if}}" data-edit="img" title="{{item.name}}" height="64" width="64"/>
+        <img class="profile-img" src="{{#if item.img}}{{item.img}}{{else}}icons/svg/item-bag.svg{{/if}}" data-edit="img" title="{{item.name}}" height="64" width="64"/>
         <div class="header-fields">
             <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Augment Name"/></h1>
             <div class="resource-row">
                 <div class="resource">
-                    <label for="system.rarity">Rarity</label>
-                    <select name="system.rarity">
-                        <option value="common" {{#if (eq system.rarity "common")}}selected{{/if}}>Common</option>
-                        <option value="uncommon" {{#if (eq system.rarity "uncommon")}}selected{{/if}}>Uncommon</option>
-                        <option value="rare" {{#if (eq system.rarity "rare")}}selected{{/if}}>Rare</option>
-                        <option value="epic" {{#if (eq system.rarity "epic")}}selected{{/if}}>Epic</option>
-                        <option value="legendary" {{#if (eq system.rarity "legendary")}}selected{{/if}}>Legendary</option>
-                    </select>
+                    <label for="system.apCost">Action Points</label>
+                    <div class="ap-selector" data-ap-cost="{{system.apCost}}" role="group" aria-label="Action Point cost: {{system.apCost}}">
+                        <div class="ap-selector__icons">
+                            <button type="button" class="ap-icon ap-icon--empty" data-ap-value="0" title="Set AP cost to 0" aria-label="Set Action Point cost to 0">
+                                <i class="fas fa-circle" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" class="ap-icon ap-icon--empty" data-ap-value="1" title="Set AP cost to 1" aria-label="Set Action Point cost to 1">
+                                <i class="fas fa-circle" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" class="ap-icon ap-icon--empty" data-ap-value="2" title="Set AP cost to 2" aria-label="Set Action Point cost to 2">
+                                <i class="fas fa-circle" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" class="ap-icon ap-icon--empty" data-ap-value="3" title="Set AP cost to 3" aria-label="Set Action Point cost to 3">
+                                <i class="fas fa-circle" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <input type="hidden" name="system.apCost" value="{{system.apCost}}" data-dtype="Number">
+                    </div>
                 </div>
                 <div class="resource">
-                    <label for="system.isActive">Is Active</label>
-                    <input type="checkbox" name="system.isActive" {{#if system.isActive}}checked{{/if}}/>
+                    <label for="system.ppCost">Power Points</label>
+                    <input type="number" name="system.ppCost" value="{{system.ppCost}}" data-dtype="Number" min="0"/>
+                </div>
+                <div class="resource">
+                    <label for="system.levelRequirement">Level Required</label>
+                    <input type="number" name="system.levelRequirement" value="{{system.levelRequirement}}" data-dtype="Number" min="1"/>
                 </div>
             </div>
         </div>
@@ -31,7 +45,12 @@
         <div class="tab" data-group="primary" data-tab="description">
             <div class="form-group">
                 <label>Description</label>
-                <textarea name="system.description" rows="10">{{system.description}}</textarea>
+                {{editor enrichedDescription target="system.description" button=true editable=editable}}
+            </div>
+            
+            <div class="form-group">
+                <label>Requirements</label>
+                <textarea name="system.requirements" rows="3" placeholder="Enter any requirements or prerequisites...">{{system.requirements}}</textarea>
             </div>
             
             <!-- Trait Management Section -->
@@ -78,9 +97,26 @@
         </div>
 
         <div class="tab" data-group="primary" data-tab="details">
-            <div class="form-group">
-                <label>Prerequisites</label>
-                <input type="text" name="system.prerequisites" value="{{system.prerequisites}}" placeholder="Any prerequisites for this augment"/>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Rarity</label>
+                    <select name="system.rarity">
+                        <option value="common" {{#if (eq system.rarity "common")}}selected{{/if}}>Common</option>
+                        <option value="uncommon" {{#if (eq system.rarity "uncommon")}}selected{{/if}}>Uncommon</option>
+                        <option value="rare" {{#if (eq system.rarity "rare")}}selected{{/if}}>Rare</option>
+                        <option value="epic" {{#if (eq system.rarity "epic")}}selected{{/if}}>Epic</option>
+                        <option value="legendary" {{#if (eq system.rarity "legendary")}}selected{{/if}}>Legendary</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Augment Type</label>
+                    <select name="system.augmentType">
+                        <option value="enhancement" {{#if (eq system.augmentType "enhancement")}}selected{{/if}}>Enhancement</option>
+                        <option value="modification" {{#if (eq system.augmentType "modification")}}selected{{/if}}>Modification</option>
+                        <option value="implant" {{#if (eq system.augmentType "implant")}}selected{{/if}}>Implant</option>
+                        <option value="symbiotic" {{#if (eq system.augmentType "symbiotic")}}selected{{/if}}>Symbiotic</option>
+                    </select>
+                </div>
             </div>
             
             <div class="form-row">
@@ -95,19 +131,15 @@
             </div>
             
             <div class="form-group">
-                <label>Augment Type</label>
-                <select name="system.augmentType">
-                    <option value="enhancement" {{#if (eq system.augmentType "enhancement")}}selected{{/if}}>Enhancement</option>
-                    <option value="modification" {{#if (eq system.augmentType "modification")}}selected{{/if}}>Modification</option>
-                    <option value="implant" {{#if (eq system.augmentType "implant")}}selected{{/if}}>Implant</option>
-                    <option value="symbiotic" {{#if (eq system.augmentType "symbiotic")}}selected{{/if}}>Symbiotic</option>
-                </select>
+                <label for="system.isActive">Is Active</label>
+                <input type="checkbox" name="system.isActive" {{#if system.isActive}}checked{{/if}}/>
             </div>
             
+            <!-- Legacy field for backwards compatibility -->
             <div class="form-group">
-                <label>Power Point Cost</label>
+                <label>Legacy Power Point Cost</label>
                 <input type="number" name="system.powerPointCost" value="{{system.powerPointCost}}" data-dtype="Number" min="0"/>
             </div>
         </div>
     </section>
-</form> 
+</div> 

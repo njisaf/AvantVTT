@@ -19,15 +19,15 @@ import { registerSheets, setupConfigDebug, setupDataModels } from './logic/avant
 import { AvantActorData } from './data/actor-data.ts';
 import { AvantActionData, AvantFeatureData, AvantTalentData, AvantAugmentData, AvantWeaponData, AvantArmorData, AvantGearData, AvantTraitData } from './data/item-data.js';
 
-// Sheet classes
-import { AvantActorSheet } from './sheets/actor-sheet.ts';
-import { AvantItemSheet } from './sheets/item-sheet';
+// Sheet classes are now created by factory functions in the initialization manager
+// No direct imports needed - classes are created when Foundry is ready
 
 // Dialog classes
 import { AvantRerollDialog } from './dialogs/reroll-dialog';
 
 // Chat functionality
 import { AvantChatContextMenu } from './chat/context-menu.ts';
+import { initializeChatIntegration } from './logic/chat/chat-integration.js';
 
 // Theme manager
 import { AvantThemeManager } from './themes/theme-manager.js';
@@ -180,6 +180,16 @@ Hooks.once('ready', async function(): Promise<void> {
         
         // Attempt to create world-level trait macros (may fail in v13 due to timing)
         await commandsModule.createWorldMacros();
+        
+        // Initialize chat integration for talents and augments
+        console.log("Avant | Initializing chat integration for talents and augments");
+        const chatResult = initializeChatIntegration(game) as { success: boolean; api?: any; error?: string };
+        if (chatResult.success) {
+            console.log("✅ Avant | Chat integration initialized successfully");
+            console.log("✅ Avant | Available chat API:", Object.keys(chatResult.api || {}));
+        } else {
+            console.error("❌ Avant | Chat integration failed:", chatResult.error);
+        }
         
         // Provide fallback method accessible via console
         setupMacroFallback();
@@ -801,8 +811,9 @@ interface AvantGlobals {
     AvantArmorData: typeof AvantArmorData;
     AvantGearData: typeof AvantGearData;
     AvantTraitData: typeof AvantTraitData;
-    AvantActorSheet: typeof AvantActorSheet;
-    AvantItemSheet: typeof AvantItemSheet;
+    // AvantActorSheet and AvantItemSheet are now created by factory functions
+    // AvantActorSheet: typeof AvantActorSheet;
+    // AvantItemSheet: typeof AvantItemSheet;
     AvantRerollDialog: typeof AvantRerollDialog;
     AvantChatContextMenu: typeof AvantChatContextMenu;
     AvantThemeManager: typeof AvantThemeManager;
@@ -820,8 +831,9 @@ const avantGlobals: AvantGlobals = {
     AvantArmorData,
     AvantGearData,
     AvantTraitData,
-    AvantActorSheet,
-    AvantItemSheet,
+    // AvantActorSheet and AvantItemSheet are now created by factory functions
+    // AvantActorSheet,
+    // AvantItemSheet,
     AvantRerollDialog,
     AvantChatContextMenu,
     AvantThemeManager,

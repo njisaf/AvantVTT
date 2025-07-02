@@ -4,6 +4,9 @@
 
 // Import styles using @use (SCSS-first methodology) - must be first
 @use 'components/chips';
+@use 'components/cards';
+@use 'components/forms';
+@use 'components/applicationv2-item-sheets';
 @use 'themes/base';
 @use 'themes/dark';
 @use 'themes/light';
@@ -200,18 +203,23 @@ $spacing-xxl: 30px;
     @include box-sizing-border-box;
   }
 
-  // Window Container - Fixed height with proper border visibility
+  // Window Container - ApplicationV2 compatible styling
   .window-app {
     background: var(--theme-bg-primary, $bg-primary);
     border: 2px solid var(--theme-border-primary, $border-primary);
     border-radius: 0;
     box-shadow: var(--theme-shadow-deep, $shadow-deep);
     position: relative;
-    height: 630px; // Fixed height matching the default
-    max-height: 630px; // Prevent growing beyond default
-    overflow: hidden; // Prevent window-level scrolling
     display: flex;
     flex-direction: column;
+    
+    // For ApplicationV2, allow natural window frame behavior
+    // Only apply constraints for specific legacy compatibility cases
+    &.legacy-height-constraint {
+      height: 630px;
+      max-height: 630px;
+      overflow: hidden;
+    }
   }
 
   // FoundryVTT Window Content - Account for 8px padding and fit within window height
@@ -230,6 +238,47 @@ $spacing-xxl: 30px;
     @include orbitron-header(700);
     letter-spacing: 2px;
     flex-shrink: 0; // Prevent header from shrinking
+    
+    // Ensure ApplicationV2 window controls are visible and functional
+    .header-control {
+      width: auto !important;
+      height: auto !important;
+      padding: 4px 8px !important;
+      background: transparent !important;
+      border: 1px solid transparent !important;
+      color: var(--theme-text-primary, $text-primary) !important;
+      cursor: pointer !important;
+      @include transition-standard;
+      
+      // CRITICAL: FontAwesome font-family for window header controls
+      font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 5 Free", "FontAwesome" !important;
+      font-weight: 900 !important;
+      font-style: normal !important;
+      display: inline-block !important;
+      line-height: 1 !important;
+      text-rendering: auto !important;
+      -webkit-font-smoothing: antialiased !important;
+      -moz-osx-font-smoothing: grayscale !important;
+      
+      &:hover {
+        background: rgba(0, 224, 220, 0.2) !important;
+        border-color: var(--theme-accent-primary, $accent-cyan) !important;
+      }
+    }
+    
+    // Fallback for any nested controls structure
+    .window-controls {
+      display: flex !important;
+      align-items: center;
+      gap: 4px;
+      
+      .header-button,
+      .header-control {
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 5 Free", "FontAwesome" !important;
+        font-weight: 900 !important;
+        font-style: normal !important;
+      }
+    }
   }
 
   // Custom Sheet Header - Compact and controlled height
@@ -382,7 +431,7 @@ $spacing-xxl: 30px;
     background: var(--theme-bg-secondary, $bg-secondary);
     border-right: 2px solid var(--theme-border-primary, $border-primary);
     padding: $spacing-lg; // Reduced from 20px
-    overflow-y: auto; // Allow sidebar to scroll if needed
+    overflow-y: visible; // Remove sidebar scroll - let main content scroll
     overflow-x: hidden; // Prevent horizontal scrolling
     flex-shrink: 0; // Don't shrink width
   }
@@ -807,6 +856,7 @@ $spacing-xxl: 30px;
     overflow-y: auto; // ONLY the tab content should scroll
     overflow-x: hidden; // Prevent horizontal scrolling
     min-height: 0; // Allow flexbox to shrink
+    max-height: calc(100vh - 200px); // Ensure proper height constraints
   }
 
   .tab {
@@ -1279,7 +1329,13 @@ $spacing-xxl: 30px;
     gap: $spacing-xs; // Reduced from 10px
   }
 
-  .item {
+  .item,
+  .gear-item,
+  .action-item,
+  .feature-item,
+  .talent-item,
+  .augment-item,
+  .combat-item {
     background: var(--theme-bg-tertiary, $bg-tertiary);
     border: 1px solid var(--theme-border-primary, $border-primary);
     border-left: 2px solid var(--theme-accent-primary, $accent-cyan); // Thinner accent border
@@ -1296,7 +1352,13 @@ $spacing-xxl: 30px;
     }
   }
 
-  .item-name {
+  .item-name,
+  .gear-item h4,
+  .action-item .action-name,
+  .feature-item .feature-name,
+  .talent-item .talent-name,
+  .augment-item .augment-name,
+  .combat-item .combat-item-name {
     flex: 1;
     @include exo-body(13px, 600); // Reduced from 14px
     cursor: pointer;
@@ -1307,7 +1369,13 @@ $spacing-xxl: 30px;
     }
   }
 
-  .item-controls {
+  .item-controls,
+  .gear-item .item-controls,
+  .action-item .action-controls,
+  .feature-item .feature-controls,
+  .talent-item .talent-controls,
+  .augment-item .augment-controls,
+  .combat-item .combat-item-actions {
     display: flex;
     gap: $spacing-xs; // Reduced from 8px
     align-items: center;
@@ -1704,14 +1772,448 @@ $spacing-xxl: 30px;
     letter-spacing: 0.3px;
     margin-top: 2px;
   }
+
+  // ITEM SHEET STYLES - ApplicationV2 Compatible
+  // Item sheet styling - match actual DOM structure
+  &.sheet.item,
+  &.item.sheet {
+    height: 100%;
+    
+    .window-content {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      padding: 0;
+      overflow: hidden;
+    }
+    
+    .item-sheet {
+      display: flex !important;
+      flex-direction: column !important;
+      height: 100% !important;
+      padding: $spacing-md;
+      background: var(--theme-bg-primary, $bg-primary);
+      color: var(--theme-text-primary, $text-primary);
+      overflow-y: auto;
+      
+      // Flexcol layout support - CRITICAL for ApplicationV2
+      &.flexcol {
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100% !important;
+      }
+      
+      // Item type specific styling
+      &.talent-sheet,
+      &.augment-sheet,
+      &.action-sheet,
+      &.feature-sheet,
+      &.gear-sheet,
+      &.weapon-sheet,
+      &.armor-sheet {
+        background: var(--theme-bg-primary, $bg-primary);
+        border: none;
+      }
+      
+      // Header styling
+      .sheet-header {
+        display: flex;
+        align-items: center;
+        gap: $spacing-md;
+        padding: $spacing-md;
+        background: var(--theme-bg-secondary, $bg-secondary);
+        border-bottom: 1px solid var(--theme-border-primary, $border-primary);
+        flex-shrink: 0;
+        
+        .profile-img {
+          width: 64px;
+          height: 64px;
+          border: 2px solid var(--theme-accent-primary, $accent-cyan);
+          cursor: pointer;
+        }
+        
+        .header-fields {
+          flex: 1;
+          
+          .charname input {
+            @include form-input-base;
+            @include orbitron-header(16px, 700);
+            background: transparent;
+            border: none;
+            color: var(--theme-text-primary, $text-primary);
+            width: 100%;
+            padding: 0;
+            
+            &:focus {
+              outline: 1px solid var(--theme-accent-primary, $accent-cyan);
+            }
+          }
+        }
+      }
+      
+      // Tab content area
+      .sheet-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        
+        .tab {
+          padding: $spacing-md;
+          
+          &.active {
+            display: block;
+          }
+        }
+      }
+      
+      // Tab navigation
+      .sheet-tabs {
+        background: var(--theme-bg-secondary, $bg-secondary);
+        border-bottom: 1px solid var(--theme-border-primary, $border-primary);
+        display: flex;
+        flex-shrink: 0;
+        
+        .item {
+          padding: $spacing-sm $spacing-md;
+          background: transparent;
+          border: none;
+          color: var(--theme-text-secondary, $text-secondary);
+          @include orbitron-header(10px, 600);
+          text-transform: uppercase;
+          cursor: pointer;
+          
+          &:hover {
+            background: rgba(0, 224, 220, 0.1);
+            color: var(--theme-accent-primary, $accent-cyan);
+          }
+          
+          &.active {
+            background: var(--theme-bg-primary, $bg-primary);
+            color: var(--theme-text-primary, $text-primary);
+            border-bottom: 2px solid var(--theme-accent-primary, $accent-cyan);
+          }
+        }
+      }
+    }
+  }
+
+  // ApplicationV2 ITEM SHEET STYLES - Fixed selectors for actual class structure
+  // Target: <form class="application sheet avant item">
+  &.item,
+  &.application.item {
+    height: 100%;
+    
+    .window-content {
+      display: flex !important;
+      flex-direction: column !important;
+      height: 100% !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+    }
+    
+    .item-sheet {
+      display: flex !important;
+      flex-direction: column !important;
+      height: 100% !important;
+      min-height: 100% !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      background: var(--theme-bg-primary, $bg-primary) !important;
+      color: var(--theme-text-primary, $text-primary) !important;
+      overflow: visible !important;
+      
+      // Flexcol layout support - CRITICAL for ApplicationV2
+      &.flexcol {
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100% !important;
+        min-height: 100% !important;
+      }
+      
+      // Item type specific styling - force visibility
+      &.talent-sheet,
+      &.augment-sheet,
+      &.action-sheet,
+      &.feature-sheet,
+      &.gear-sheet,
+      &.weapon-sheet,
+      &.armor-sheet {
+        background: var(--theme-bg-primary, $bg-primary) !important;
+        border: none !important;
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100% !important;
+        min-height: 100% !important;
+      }
+      
+      // Header styling - ensure visibility
+      .sheet-header {
+        display: flex !important;
+        align-items: center !important;
+        gap: $spacing-md !important;
+        padding: $spacing-md !important;
+        background: var(--theme-bg-secondary, $bg-secondary) !important;
+        border-bottom: 1px solid var(--theme-border-primary, $border-primary) !important;
+        flex-shrink: 0 !important;
+        height: 80px !important;
+        min-height: 80px !important;
+        max-height: 80px !important;
+        
+        .profile-img {
+          width: 64px !important;
+          height: 64px !important;
+          border: 2px solid var(--theme-accent-primary, $accent-cyan) !important;
+          cursor: pointer !important;
+          flex-shrink: 0 !important;
+        }
+        
+        .header-fields {
+          flex: 1 !important;
+          display: flex !important;
+          flex-direction: column !important;
+          gap: $spacing-sm !important;
+          
+          .charname {
+            margin: 0 !important;
+            
+            input {
+              @include form-input-base;
+              @include orbitron-header(16px, 700);
+              background: transparent !important;
+              border: 1px solid var(--theme-border-primary, $border-primary) !important;
+              color: var(--theme-text-primary, $text-primary) !important;
+              width: 100% !important;
+              padding: $spacing-xs $spacing-sm !important;
+              
+              &:focus {
+                outline: none !important;
+                border-color: var(--theme-accent-primary, $accent-cyan) !important;
+                box-shadow: 0 0 8px rgba(0, 224, 220, 0.3) !important;
+              }
+            }
+          }
+          
+          .resource-row {
+            display: flex !important;
+            gap: $spacing-md !important;
+            align-items: center !important;
+            
+            .resource {
+              display: flex !important;
+              flex-direction: column !important;
+              gap: 2px !important;
+              
+              label {
+                @include orbitron-header(9px, 600);
+                color: var(--theme-text-secondary, $text-secondary) !important;
+                text-transform: uppercase !important;
+                letter-spacing: 0.5px !important;
+              }
+              
+              input, select {
+                @include form-input-base;
+                padding: 4px 8px !important;
+                width: 80px !important;
+              }
+            }
+          }
+        }
+      }
+      
+      // Tab navigation - ensure visibility
+      .sheet-tabs {
+        background: var(--theme-bg-secondary, $bg-secondary) !important;
+        border-bottom: 1px solid var(--theme-border-primary, $border-primary) !important;
+        display: flex !important;
+        flex-shrink: 0 !important;
+        height: 36px !important;
+        min-height: 36px !important;
+        max-height: 36px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        
+        .item {
+          padding: $spacing-sm $spacing-md !important;
+          background: transparent !important;
+          border: none !important;
+          color: var(--theme-text-secondary, $text-secondary) !important;
+          @include orbitron-header(10px, 600);
+          text-transform: uppercase !important;
+          cursor: pointer !important;
+          text-decoration: none !important;
+          display: flex !important;
+          align-items: center !important;
+          height: 36px !important;
+          
+          &:hover {
+            background: rgba(0, 224, 220, 0.1) !important;
+            color: var(--theme-accent-primary, $accent-cyan) !important;
+          }
+          
+          &.active {
+            background: var(--theme-bg-primary, $bg-primary) !important;
+            color: var(--theme-text-primary, $text-primary) !important;
+            border-bottom: 2px solid var(--theme-accent-primary, $accent-cyan) !important;
+          }
+        }
+      }
+      
+      // Tab content area - ensure proper layout
+      .sheet-body {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        min-height: 0 !important;
+        background: var(--theme-bg-primary, $bg-primary) !important;
+        
+        .tab {
+          padding: $spacing-md !important;
+          display: none !important;
+          flex-direction: column !important;
+          gap: $spacing-md !important;
+          
+          &.active {
+            display: flex !important;
+          }
+          
+          .form-group {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: $spacing-xs !important;
+            margin-bottom: $spacing-md !important;
+            
+            label {
+              @include orbitron-header(10px, 600);
+              color: var(--theme-text-secondary, $text-secondary) !important;
+              text-transform: uppercase !important;
+              letter-spacing: 0.5px !important;
+            }
+            
+            input, select, textarea {
+              @include form-input-base;
+              padding: $spacing-sm !important;
+              
+              &:focus {
+                border-color: var(--theme-accent-primary, $accent-cyan) !important;
+                box-shadow: 0 0 8px rgba(0, 224, 220, 0.3) !important;
+              }
+            }
+          }
+          
+          .form-row {
+            display: flex !important;
+            gap: $spacing-md !important;
+            
+            .form-group {
+              flex: 1 !important;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Item sheet tab content and form styling
+  &.item .sheet-body .tab,
+  &.application.item .sheet-body .tab {
+    display: block;
+    min-height: 200px;
+  }
+
+  // Form group styling for item sheets
+  &.item .form-group,
+  &.application.item .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 12px;
+    padding: 8px;
+    
+    label {
+      display: block;
+      @include orbitron-header(10px, 600);
+      color: var(--theme-accent-primary, $accent-cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    
+    input, select, textarea {
+      @include form-input-base;
+      display: block;
+      width: 100%;
+      min-height: 32px;
+      padding: 8px;
+      background: var(--theme-bg-tertiary, $bg-tertiary);
+      border: 1px solid var(--theme-border-primary, $border-primary);
+      color: var(--theme-text-primary, $text-primary);
+      
+      &:focus {
+        border-color: var(--theme-accent-primary, $accent-cyan);
+        box-shadow: 0 0 8px rgba(0, 224, 220, 0.3);
+      }
+    }
+    
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+  }
+
+  // Flexcol utility class - Essential for ApplicationV2 layouts
+  .flexcol {
+    display: flex;
+    flex-direction: column;
+    min-height: 0; // Prevent flex items from overflowing
+    
+    &.full-height {
+      height: 100%;
+    }
+  }
+
+  // Item sheet tabs - Ensure proper styling for both selector variants
+  &.sheet.item .sheet-tabs,
+  &.item.sheet .sheet-tabs {
+    background: var(--theme-bg-secondary, $bg-secondary);
+    border-bottom: 1px solid var(--theme-border-primary, $border-primary);
+    display: flex;
+    padding: 0;
+    margin: 0;
+    flex-shrink: 0;
+    
+    .item {
+      @include orbitron-header(10px, 600);
+      color: var(--theme-text-secondary, $text-secondary);
+      padding: $spacing-sm $spacing-md;
+      border-right: 1px solid var(--theme-border-primary, $border-primary);
+      cursor: pointer;
+      @include transition-standard;
+      text-decoration: none;
+      background: transparent;
+      
+      &:hover {
+        background: var(--theme-bg-tertiary, $bg-tertiary);
+        color: var(--theme-text-primary, $text-primary);
+      }
+      
+      &.active {
+        background: var(--theme-bg-primary, $bg-primary);
+        color: var(--theme-accent-primary, $accent-cyan);
+        border-bottom: 2px solid var(--theme-accent-primary, $accent-cyan);
+      }
+    }
+  }
 }
 
 // Responsive Design
 @media (max-width: 1024px) {
   .avant {
     .window-app {
-      width: 100% !important;
-      height: 100% !important;
+      width: 100%;
+      height: 100%;
     }
     
     .stats-sidebar {
@@ -1796,7 +2298,7 @@ $spacing-xxl: 30px;
     }
     
     .tab {
-      display: block !important;
+      display: block;
     }
     
     .item-controls {
@@ -2135,4 +2637,7 @@ $spacing-xxl: 30px;
       text-align: center;
     }
   }
-} 
+}
+
+
+

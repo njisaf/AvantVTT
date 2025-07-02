@@ -1,0 +1,579 @@
+/**
+ * @fileoverview Chat Card Component Styles
+ * @version 1.0.0 - Phase 3: TypeScript Conversion & UX Polish
+ * @description SCSS styling for talent and augment chat cards with accessibility and responsive design
+ * @author Avant VTT Team
+ */
+
+@import '../themes/base';
+
+/* ==========================================================================
+   Feature Card Component
+   ========================================================================== */
+
+/**
+ * Main feature card container
+ * Uses CSS Grid for responsive layout
+ */
+.avant-feature-card {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: var(--space-sm, 8px);
+  
+  // Theme-aware styling
+  background: var(--theme-surface, #1a1a1a);
+  border: 1px solid var(--theme-border, #333);
+  border-radius: var(--border-radius-md, 6px);
+  
+  // Spacing and typography
+  padding: var(--space-md, 16px);
+  font-family: var(--font-primary, 'Exo 2', sans-serif);
+  font-size: var(--font-size-sm, 12px);
+  line-height: 1.4;
+  
+  // Accessibility: Ensure good focus visibility
+  &:focus-within {
+    outline: 2px solid var(--theme-primary, #00E0DC);
+    outline-offset: 2px;
+  }
+  
+  // Error state styling
+  &.error {
+    border-color: var(--color-error, #ff4444);
+    background: var(--color-error-bg, rgba(255, 68, 68, 0.1));
+    
+    .feature-name {
+      color: var(--color-error, #ff4444);
+    }
+  }
+  
+  // Responsive design: Smaller screens
+  @media (max-width: 768px) {
+    padding: var(--space-sm, 8px);
+    font-size: var(--font-size-xs, 11px);
+  }
+}
+
+/* Card Header
+   ========================================================================== */
+
+.avant-feature-card__header,
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-sm, 8px);
+  
+  // Ensure header content doesn't overflow
+  min-width: 0;
+}
+
+.avant-feature-card__name,
+.feature-name {
+  // Typography
+  font-family: var(--font-display, 'Orbitron', monospace);
+  font-size: var(--font-size-md, 14px);
+  font-weight: 600;
+  color: var(--theme-primary, #00E0DC);
+  
+  // Layout
+  margin: 0;
+  flex: 1;
+  min-width: 0; // Allow text to truncate
+  
+  // Accessibility: Ensure sufficient contrast
+  @media (prefers-contrast: high) {
+    font-weight: 700;
+  }
+}
+
+.avant-feature-card__type,
+.feature-type {
+  // Styling
+  background: var(--theme-secondary, #4CE2E1);
+  color: var(--theme-text-on-secondary, #000);
+  padding: 2px 6px;
+  border-radius: var(--border-radius-sm, 3px);
+  
+  // Typography
+  font-size: var(--font-size-xs, 10px);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  
+  // Layout
+  flex-shrink: 0;
+  align-self: flex-start;
+  
+  // Ensure readable contrast through CSS custom properties
+}
+
+/* Card Content
+   ========================================================================== */
+
+.avant-feature-card__content,
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm, 8px);
+}
+
+.avant-feature-card__description,
+.feature-description {
+  color: var(--theme-text, #e0e0e0);
+  line-height: 1.5;
+  
+  // Handle long text gracefully
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  
+  // Limit height on very long descriptions
+  max-height: 200px;
+  overflow-y: auto;
+  
+  // Custom scrollbar for WebKit browsers
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: var(--theme-surface-variant, #2a2a2a);
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: var(--theme-primary, #00E0DC);
+    border-radius: 2px;
+  }
+}
+
+/* Feature Traits
+   ========================================================================== */
+
+.avant-feature-card__traits,
+.feature-traits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: var(--space-xs, 4px);
+  
+  // Integrate with existing trait chip styles
+  .trait-chip {
+    font-size: var(--font-size-xs, 10px);
+    
+    // Ensure traits are readable in cards
+    &[aria-hidden="true"] {
+      // Screen reader friendly traits
+      position: relative;
+      
+      &::after {
+        content: attr(data-trait-name);
+        position: absolute;
+        left: -9999px;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+      }
+    }
+  }
+}
+
+/* Feature Metadata
+   ========================================================================== */
+
+.avant-feature-card__metadata,
+.feature-metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm, 8px);
+  margin-top: var(--space-xs, 4px);
+}
+
+.avant-feature-card__metadata-item,
+.metadata-item {
+  font-size: var(--font-size-xs, 10px);
+  color: var(--theme-text-muted, #999);
+  
+  strong {
+    color: var(--theme-text, #e0e0e0);
+    font-weight: 500;
+  }
+  
+  // Responsive: Stack on very small screens
+  @media (max-width: 480px) {
+    flex-basis: 100%;
+  }
+}
+
+/* Card Footer / Power Points Section
+   ========================================================================== */
+
+.avant-feature-card__footer,
+.card-footer {
+  border-top: 1px solid var(--theme-border, #333);
+  padding-top: var(--space-sm, 8px);
+  margin-top: var(--space-xs, 4px);
+}
+
+.avant-feature-card__power-points,
+.power-point-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm, 8px);
+  
+  // Responsive: Stack button below text on small screens
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.no-pp-cost {
+  color: var(--theme-text-muted, #999);
+  font-style: italic;
+  font-size: var(--font-size-xs, 10px);
+}
+
+/* Power Point Button
+   ========================================================================== */
+
+.pp-spend {
+  // Layout
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 6px 12px;
+  
+  // Styling
+  background: transparent;
+  border: 1px solid var(--theme-primary, #00E0DC);
+  border-radius: var(--border-radius-sm, 4px);
+  color: var(--theme-primary, #00E0DC);
+  
+  // Typography
+  font-family: var(--font-display, 'Orbitron', monospace);
+  font-size: var(--font-size-xs, 10px);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  
+  // Interaction
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  
+  // Focus state for accessibility
+  &:focus {
+    outline: 2px solid var(--theme-primary, #00E0DC);
+    outline-offset: 2px;
+  }
+  
+  // Hover state
+  &:hover:not(:disabled) {
+    background: var(--theme-primary, #00E0DC);
+    color: var(--theme-text-on-primary, #000);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 224, 220, 0.3);
+  }
+  
+  // Active state
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(0, 224, 220, 0.2);
+  }
+  
+  // Disabled state
+  &:disabled,
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    border-color: var(--theme-text-muted, #666);
+    color: var(--theme-text-muted, #666);
+    
+    &:hover {
+      background: transparent;
+      color: var(--theme-text-muted, #666);
+      transform: none;
+      box-shadow: none;
+    }
+  }
+  
+  // Success state (after spending)
+  &.spent {
+    background: var(--color-success, #22c55e);
+    border-color: var(--color-success, #22c55e);
+    color: var(--color-success-text, #000);
+    
+    &:hover {
+      background: var(--color-success, #22c55e);
+      color: var(--color-success-text, #000);
+      transform: none;
+      cursor: default;
+    }
+  }
+  
+  // High contrast mode support
+  @media (prefers-contrast: high) {
+    border-width: 2px;
+    font-weight: 600;
+  }
+  
+  // Reduced motion support
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    
+    &:hover:not(:disabled) {
+      transform: none;
+    }
+    
+    &:active:not(:disabled) {
+      transform: none;
+    }
+  }
+}
+
+/* Screen Reader Only Content
+   ========================================================================== */
+
+.sr-only {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  
+  // Ensure content is available to screen readers
+  &:focus {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+}
+
+/* ==========================================================================
+   Utility Mixins
+   ========================================================================== */
+
+/**
+ * Ensure sufficient color contrast for accessibility
+ * @param {Color} $bg-color - Background color
+ * @param {Color} $text-color - Text color
+ */
+@mixin ensure-contrast($bg-color, $text-color) {
+  // Calculate contrast ratio (simplified)
+  $contrast: contrast-ratio($bg-color, $text-color);
+  
+  @if $contrast < 4.5 {
+    // If contrast is insufficient, use high contrast colors
+    @media (prefers-contrast: high) {
+      background: if(lightness($bg-color) > 50%, #000, #fff);
+      color: if(lightness($bg-color) > 50%, #fff, #000);
+    }
+  }
+}
+
+/**
+ * Calculate contrast ratio between two colors
+ * Simplified implementation for basic contrast checking
+ * @param {Color} $color1 - First color
+ * @param {Color} $color2 - Second color
+ * @returns {Number} Contrast ratio
+ */
+@function contrast-ratio($color1, $color2) {
+  $l1: lightness($color1);
+  $l2: lightness($color2);
+  
+  @if $l1 > $l2 {
+    @return ($l1 + 5) / ($l2 + 5);
+  } @else {
+    @return ($l2 + 5) / ($l1 + 5);
+  }
+}
+
+/* ==========================================================================
+   Dark Theme Overrides
+   ========================================================================== */
+
+.theme-dark {
+  .avant-feature-card {
+    --theme-surface: #1a1a1a;
+    --theme-border: #333;
+    --theme-text: #e0e0e0;
+    --theme-text-muted: #999;
+    --theme-surface-variant: #2a2a2a;
+  }
+}
+
+/* ==========================================================================
+   Light Theme Overrides
+   ========================================================================== */
+
+.theme-light {
+  .avant-feature-card {
+    --theme-surface: #ffffff;
+    --theme-border: #d1d5db;
+    --theme-text: #1f2937;
+    --theme-text-muted: #6b7280;
+    --theme-surface-variant: #f3f4f6;
+    
+    // Adjust primary colors for light theme
+    --theme-primary: #0891b2;
+    --theme-secondary: #06b6d4;
+    --theme-text-on-primary: #ffffff;
+    --theme-text-on-secondary: #ffffff;
+  }
+}
+
+/* ==========================================================================
+   Post Chat Card Button (Actor Sheet Integration)
+   ========================================================================== */
+
+.post-chat-card {
+  // Layout
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: var(--space-xs, 4px) var(--space-sm, 8px);
+  
+  // Styling - Using theme variables for consistency
+  background: rgba(76, 226, 225, 0.2);
+  border: 1px solid var(--theme-secondary, #4CE2E1);
+  border-radius: var(--border-radius-sm, 3px);
+  color: var(--theme-secondary, #4CE2E1);
+  
+  // Typography
+  font-family: var(--font-display, 'Orbitron', monospace);
+  font-size: var(--font-size-xs, 10px);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  
+  // Interaction
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  
+  // Icon spacing
+  i {
+    margin-right: var(--space-xs, 4px);
+    font-size: 11px;
+  }
+  
+  // Focus state for accessibility
+  &:focus {
+    outline: 2px solid var(--theme-secondary, #4CE2E1);
+    outline-offset: 2px;
+  }
+  
+  // Hover state
+  &:hover:not(:disabled) {
+    background: var(--theme-secondary, #4CE2E1);
+    color: var(--theme-text-on-secondary, #000);
+    box-shadow: 0 0 8px rgba(76, 226, 225, 0.4);
+    transform: translateY(-1px);
+  }
+  
+  // Active state
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 0 4px rgba(76, 226, 225, 0.2);
+  }
+  
+  // Disabled state
+  &:disabled,
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    
+    &:hover {
+      background: rgba(76, 226, 225, 0.2);
+      color: var(--theme-secondary, #4CE2E1);
+      transform: none;
+      box-shadow: none;
+    }
+  }
+  
+  // High contrast mode support
+  @media (prefers-contrast: high) {
+    border-width: 2px;
+    font-weight: 700;
+  }
+  
+  // Reduced motion support
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    
+    &:hover:not(:disabled) {
+      transform: none;
+    }
+    
+    &:active:not(:disabled) {
+      transform: none;
+    }
+  }
+}
+
+/* ==========================================================================
+   Actor Sheet Item Styling Integration
+   ========================================================================== */
+
+.avant {
+  .talents-container,
+  .features-container {
+    .item-description {
+      color: var(--theme-text, #e0e0e0);
+      font-size: var(--font-size-sm, 12px);
+      line-height: 1.4;
+      margin: var(--space-xs, 4px) 0;
+      
+      // Truncate long descriptions
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .item-traits {
+      margin: var(--space-xs, 4px) 0;
+      
+      .trait-chip {
+        margin-right: var(--space-xs, 4px);
+        margin-bottom: 2px;
+      }
+    }
+  }
+}
+
+/* ==========================================================================
+   Print Styles
+   ========================================================================== */
+
+@media print {
+  .avant-feature-card {
+    background: white !important;
+    border: 1px solid #000 !important;
+    color: #000 !important;
+    
+    .pp-spend {
+      display: none !important;
+    }
+    
+    .feature-name {
+      color: #000 !important;
+    }
+    
+    .feature-type {
+      background: #f0f0f0 !important;
+      color: #000 !important;
+    }
+  }
+} 

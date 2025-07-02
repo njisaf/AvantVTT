@@ -234,6 +234,16 @@ export class RemoteTraitService {
       
       for (const remoteTrait of remoteData.traits) {
         try {
+          if (!remoteTrait) {
+            failed++;
+            syncDetails.push({
+              traitId: 'unknown',
+              traitName: 'Invalid Trait Data',
+              action: 'failed',
+              error: 'Trait data is null or undefined'
+            });
+            continue;
+          }
           // Check for conflicts
           if (existingTraits.has(remoteTrait.id)) {
             if (opts.skipConflicts) {
@@ -274,8 +284,8 @@ export class RemoteTraitService {
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : String(error);
           syncDetails.push({
-            traitId: remoteTrait.id,
-            traitName: remoteTrait.name,
+            traitId: remoteTrait?.id || 'unknown',
+            traitName: remoteTrait?.name || 'Unknown Trait',
             action: 'failed',
             error: errorMessage
           });

@@ -74,7 +74,7 @@ function copySystemFiles() {
 export default defineConfig({
   build: {
     lib: {
-      entry: 'scripts/avant.js',
+      entry: 'scripts/avant.ts',
       formats: ['es']
     },
     rollupOptions: {

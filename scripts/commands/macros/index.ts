@@ -9,6 +9,9 @@ import type { MacroCommand, MacroSeed } from '../base/types';
 import { createCustomTraitMacro } from './create-custom-trait';
 import { exportCustomTraitsMacro } from './export-custom-traits';
 import { importTraitsMacro } from './import-traits';
+import { importTalentsMacro } from './import-talents';
+import { exportTalentsMacro } from './export-talents';
+import { importAugmentsMacro } from './import-augments';
 
 /**
  * All available macro commands
@@ -17,7 +20,10 @@ import { importTraitsMacro } from './import-traits';
 export const macroCommands: MacroCommand[] = [
     createCustomTraitMacro,
     exportCustomTraitsMacro,
-    importTraitsMacro
+    importTraitsMacro,
+    importTalentsMacro,
+    exportTalentsMacro,
+    importAugmentsMacro
     // Add new macro commands here as they are created
 ];
 
@@ -73,6 +79,9 @@ export function getMacroSeeds(): MacroSeed[] {
 export { createCustomTraitMacro } from './create-custom-trait';
 export { exportCustomTraitsMacro } from './export-custom-traits';
 export { importTraitsMacro } from './import-traits';
+export { importTalentsMacro } from './import-talents';
+export { exportTalentsMacro } from './export-talents';
+export { importAugmentsMacro } from './import-augments';
 
 /**
  * Export macro count for reporting

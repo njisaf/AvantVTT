@@ -29,9 +29,9 @@
     <section class="sheet-body">
         {{!-- Description Tab --}}
         <div class="tab" data-group="primary" data-tab="description">
-            <div class="resource">
-                <label class="resource-label">Description</label>
-                {{editor content=system.description target="system.description" button=true owner=owner editable=editable}}
+            <div class="form-group">
+                <label>Description</label>
+                {{editor enrichedDescription target="system.description" button=true editable=editable}}
             </div>
         </div>
 
