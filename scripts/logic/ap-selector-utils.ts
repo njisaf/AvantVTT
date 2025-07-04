@@ -10,6 +10,7 @@
  * 
  * This function takes any input and converts it to a valid AP cost.
  * AP costs represent action points spent to use abilities, shown as filled circles.
+ * Progressive system: 0=none, 1=first, 2=first+second, 3=all three.
  * 
  * @param {any} value - The value to validate (can be number, string, or other)
  * @returns {number} A valid AP cost between 0 and 3 (inclusive)
@@ -46,22 +47,23 @@ export function validateApCost(value: any): number {
 /**
  * Generates HTML for an AP icon selector showing circles that can be clicked.
  * 
- * This creates a visual selector with 4 circles (0-3 AP cost) where filled circles
- * show the current cost and empty circles can be clicked to change it.
+ * This creates a visual selector with 3 circles (1-3 AP cost) where filled circles
+ * show the current cost progressively. 0 AP = no buttons lit, 1 AP = first button,
+ * 2 AP = first+second buttons, 3 AP = all three buttons.
  * 
  * @param {number} currentApCost - The current AP cost to display (0-3)
  * @returns {string} HTML string for the AP selector component
  * 
  * @example
  * const html = getApIconsHtml(2);
- * // Returns HTML with 2 filled circles and 2 empty circles
+ * // Returns HTML with first 2 circles filled, third empty
  */
 export function getApIconsHtml(currentApCost: number): string {
     const validCost = validateApCost(currentApCost);
     
     const icons = [];
-    for (let i = 0; i <= 3; i++) {
-        const isFilled = i > 0 && i <= validCost;
+    for (let i = 1; i <= 3; i++) {
+        const isFilled = i <= validCost;
         const iconClass = isFilled ? 'ap-icon ap-icon--filled' : 'ap-icon ap-icon--empty';
         
         icons.push(`

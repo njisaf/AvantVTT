@@ -155,8 +155,6 @@ export interface RerollDialogOptions {
   height?: number;
   /** Whether dialog is resizable */
   resizable?: boolean;
-  /** Whether to apply theme immediately */
-  applyTheme?: boolean;
   /** Additional CSS classes */
   classes?: string[];
 }
@@ -229,14 +227,4 @@ export interface ChatMessageData {
   content?: string;
 }
 
-/**
- * Theme application result for dialogs
- */
-export interface ThemeApplicationResult {
-  /** Whether theme was applied successfully */
-  success: boolean;
-  /** Theme name that was applied */
-  themeName?: string;
-  /** Any errors during application */
-  errors?: string[];
-} 
+ 

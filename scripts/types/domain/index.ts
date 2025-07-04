@@ -27,15 +27,7 @@ export type {
   ItemData
 } from './item';
 
-// Theme-related types
-export type {
-  ColorPalette,
-  ThemeVariables,
-  ThemeConfig,
-  ThemeValidationResult,
-  ThemeManagerState,
-  ContextMenuEntry
-} from './theme';
+
 
 // Sheet-related types
 export type {
@@ -71,7 +63,7 @@ export type {
   RollTerm,
   DieResult,
   ChatMessageData,
-  ThemeApplicationResult as DialogThemeApplicationResult
+
 } from './dialog';
 
 // Chat context menu types

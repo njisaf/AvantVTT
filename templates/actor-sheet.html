@@ -469,6 +469,14 @@
 
                 <!-- Talents & Augments Tab -->
                 <div class="tab" data-group="sheet" data-tab="talents">
+                    <!-- Power Points Section -->
+                    {{!-- PARTIAL TEMPLATE INCLUSION SYNTAX:
+                          - Use double-brace-gt "full-system-path" syntax to include partial templates
+                          - Path must match exactly what's registered in initialization-manager.ts
+                          - Template must be loaded during system initialization or it won't be found
+                          - No need for file extension in some contexts, but .hbs is explicit and clear --}}
+                    {{> "systems/avant/templates/actor/power-points-section.hbs"}}
+                    
                     <!-- Talents Section -->
                     <div class="items-header">
                         <h3>Talents</h3>
@@ -476,29 +484,9 @@
                             <i class="fas fa-plus"></i> Add
                         </button>
                     </div>
-                    <div class="items-list">
+                    <div class="items-list talent-rows">
                         {{#each items.talent as |item id|}}
-                        <div class="talent-item" data-item-id="{{item._id}}">
-                            <div class="talent-header">
-                                <div class="talent-name">{{item.name}}</div>
-                                <div class="talent-controls">
-                                    {{#if item.system.usable}}
-                                    <button type="button" class="talent-use-btn" data-action="useTalent" data-item-id="{{item._id}}" title="Use Talent">
-                                        <i class="fas fa-magic"></i>
-                                        Use
-                                    </button>
-                                    {{/if}}
-                                    <a class="item-control item-edit" title="Edit Item" data-action="editItem"><i class="fas fa-edit"></i></a>
-                                    <a class="item-control item-delete" title="Delete Item" data-action="deleteItem"><i class="fas fa-trash"></i></a>
-                                </div>
-                            </div>
-                            <div class="talent-details">
-                                {{#if item.system.apCost}}<span class="talent-cost">AP: {{item.system.apCost}}</span>{{/if}}
-                                {{#if item.system.ppCost}}<span class="talent-cost">PP: {{item.system.ppCost}}</span>{{/if}}
-                                {{#if item.system.levelRequirement}}<span class="talent-requirement">Lvl {{item.system.levelRequirement}}</span>{{/if}}
-                                {{#if item.system.description}}<div class="talent-description">{{item.system.description}}</div>{{/if}}
-                            </div>
-                        </div>
+                            {{> "systems/avant/templates/actor/row-talent-augment.hbs" item=item}}
                         {{/each}}
                     </div>
 
@@ -509,29 +497,9 @@
                             <i class="fas fa-plus"></i> Add
                         </button>
                     </div>
-                    <div class="items-list">
+                    <div class="items-list augment-rows">
                         {{#each items.augment as |item id|}}
-                        <div class="augment-item" data-item-id="{{item._id}}">
-                            <div class="augment-header">
-                                <div class="augment-name">{{item.name}}</div>
-                                <div class="augment-controls">
-                                    {{#if item.system.usable}}
-                                    <button type="button" class="augment-use-btn" data-action="useAugment" data-item-id="{{item._id}}" title="Use Augment">
-                                        <i class="fas fa-cog"></i>
-                                        Use
-                                    </button>
-                                    {{/if}}
-                                    <a class="item-control item-edit" title="Edit Item" data-action="editItem"><i class="fas fa-edit"></i></a>
-                                    <a class="item-control item-delete" title="Delete Item" data-action="deleteItem"><i class="fas fa-trash"></i></a>
-                                </div>
-                            </div>
-                            <div class="augment-details">
-                                {{#if item.system.apCost}}<span class="augment-cost">AP: {{item.system.apCost}}</span>{{/if}}
-                                {{#if item.system.ppCost}}<span class="augment-cost">PP: {{item.system.ppCost}}</span>{{/if}}
-                                {{#if item.system.levelRequirement}}<span class="augment-requirement">Lvl {{item.system.levelRequirement}}</span>{{/if}}
-                                {{#if item.system.description}}<div class="augment-description">{{item.system.description}}</div>{{/if}}
-                            </div>
-                        </div>
+                            {{> "systems/avant/templates/actor/row-talent-augment.hbs" item=item}}
                         {{/each}}
                     </div>
                 </div>

@@ -30,7 +30,7 @@
                             {{#each displayTraits as |trait|}}
                                 <span class="trait-chip trait-chip--removable" data-trait="{{trait.id}}">
                                     <span class="trait-chip__text">{{trait.name}}</span>
-                                    <button type="button" class="trait-chip__remove" aria-label="Remove trait">×</button>
+                                    <button type="button" class="trait-chip__remove" data-action="removeTrait" aria-label="Remove trait">×</button>
                                 </span>
                             {{/each}}
                             <!-- Input field for adding new traits -->
@@ -40,8 +40,10 @@
                         <div class="trait-chip-input__dropdown" data-trait-dropdown="true">
                             <div class="trait-chip-input__no-results">No matching traits found</div>
                         </div>
-                        <!-- Hidden input to store actual trait data -->
-                        <input type="hidden" name="system.traits" value="{{json system.traits}}" data-trait-data="true" />
+                        <!-- Hidden inputs to store actual trait data -->
+                        {{#each system.traits as |traitId|}}
+                        <input type="hidden" name="system.traits[]" value="{{traitId}}" />
+                        {{/each}}
                     </div>
                 {{else}}
                     <!-- View mode: Display trait chips -->

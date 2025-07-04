@@ -5,7 +5,7 @@
  * @author Avant VTT Team
  */
 
-@import '../themes/base';
+@use '../themes/base';
 
 /* ==========================================================================
    Feature Card Component
@@ -234,6 +234,11 @@
   font-size: var(--font-size-xs, 10px);
 }
 
+/* PP Spent Confirmation - Now handled by shared-states.scss
+   ========================================================================== */
+
+// .pp-spent-confirmation styling is consolidated in components/shared-states.scss
+
 /* Power Point Button
    ========================================================================== */
 
@@ -299,25 +304,8 @@
     }
   }
   
-  // Success state (after spending)
-  &.spent {
-    background: var(--color-success, #22c55e);
-    border-color: var(--color-success, #22c55e);
-    color: var(--color-success-text, #000);
-    
-    &:hover {
-      background: var(--color-success, #22c55e);
-      color: var(--color-success-text, #000);
-      transform: none;
-      cursor: default;
-    }
-  }
-  
-  // High contrast mode support
-  @media (prefers-contrast: high) {
-    border-width: 2px;
-    font-weight: 600;
-  }
+  // Success state (after spending) - Now handled by shared-states.scss
+  // &.spent styling is consolidated in components/shared-states.scss
   
   // Reduced motion support
   @media (prefers-reduced-motion: reduce) {
@@ -411,25 +399,7 @@
   }
 }
 
-/* ==========================================================================
-   Light Theme Overrides
-   ========================================================================== */
 
-.theme-light {
-  .avant-feature-card {
-    --theme-surface: #ffffff;
-    --theme-border: #d1d5db;
-    --theme-text: #1f2937;
-    --theme-text-muted: #6b7280;
-    --theme-surface-variant: #f3f4f6;
-    
-    // Adjust primary colors for light theme
-    --theme-primary: #0891b2;
-    --theme-secondary: #06b6d4;
-    --theme-text-on-primary: #ffffff;
-    --theme-text-on-secondary: #ffffff;
-  }
-}
 
 /* ==========================================================================
    Post Chat Card Button (Actor Sheet Integration)

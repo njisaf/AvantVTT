@@ -287,22 +287,16 @@ export function initializeChatIntegration(game: GameObject): ChatIntegrationResu
             // Define the hook handler function so we can properly clean it up later
             const renderChatMessageHandler = (message: any, html: HTMLElement) => {
                 try {
-                    console.log('🎴 Avant | renderChatMessageHTML hook triggered', { messageId: message?.id, htmlType: typeof html });
-                    
                     // Check if this message contains Avant feature cards using native DOM
                     const featureCards = html.querySelectorAll('.avant-feature-card');
-                    console.log('🎴 Avant | Found feature cards:', featureCards.length);
                     
                     if (featureCards.length > 0) {
-                        console.log('🎴 Avant | Feature card detected in chat message, ensuring PP handlers are active');
-                        
                         // Power point handlers are already set up via document event delegation
                         // But we can add additional validation here if needed
-                        featureCards.forEach((card: Element, cardIndex: number) => {
+                        featureCards.forEach((card: Element) => {
                             const ppButtons = card.querySelectorAll('.pp-spend');
-                            console.log(`🎴 Avant | Feature card ${cardIndex} has ${ppButtons.length} PP buttons`);
                             
-                            ppButtons.forEach((button: Element, buttonIndex: number) => {
+                            ppButtons.forEach((button: Element) => {
                                 const htmlButton = button as HTMLButtonElement;
                                 const actorId = htmlButton.getAttribute('data-actor-id') || 
                                                htmlButton.dataset?.actorId ||
@@ -312,8 +306,6 @@ export function initializeChatIntegration(game: GameObject): ChatIntegrationResu
                                                '0';
                                 const cost = parseInt(costStr);
                                 
-                                console.log(`🎴 Avant | PP Button ${buttonIndex} data:`, { actorId, cost, buttonHTML: htmlButton.outerHTML });
-                                
                                 // Validate button data and update disabled state if needed
                                 if (actorId && cost > 0) {
                                     const actor = game.actors.get(actorId);
@@ -321,19 +313,16 @@ export function initializeChatIntegration(game: GameObject): ChatIntegrationResu
                                         const currentPP = (actor.system as any)?.powerPoints?.value || 0;
                                         const insufficient = currentPP < cost;
                                         
-                                        console.log(`🎴 Avant | PP validation for ${actor.name}:`, { currentPP, cost, insufficient });
-                                        
                                         if (insufficient && !htmlButton.disabled) {
                                             htmlButton.disabled = true;
                                             htmlButton.textContent = 'Insufficient PP';
                                             htmlButton.setAttribute('title', `Requires ${cost} PP, but only ${currentPP} available`);
-                                            console.log('🎴 Avant | Disabled PP button due to insufficient points');
                                         }
                                     } else {
-                                        console.warn('🎴 Avant | Actor not found for PP button:', actorId);
+                                        console.warn('Avant | Actor not found for PP button:', actorId);
                                     }
                                 } else {
-                                    console.warn('🎴 Avant | Invalid PP button data:', { actorId, cost });
+                                    console.warn('Avant | Invalid PP button data:', { actorId, cost });
                                 }
                             });
                         });

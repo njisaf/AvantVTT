@@ -81,6 +81,92 @@
             }
           }
         }
+        
+        // AP Selector in Item Sheet Header
+        .header-costs {
+          display: flex !important;
+          align-items: center !important;
+          gap: 12px !important;
+          flex-shrink: 0 !important;
+          
+          .ap-selector {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 4px !important;
+            
+            .ap-selector__label {
+              font-family: var(--theme-font-display, "Orbitron", monospace) !important;
+              font-size: 10px !important;
+              font-weight: 600 !important;
+              color: var(--theme-text-secondary, #BFBFBF) !important;
+              text-transform: uppercase !important;
+              letter-spacing: 0.5px !important;
+            }
+            
+            .ap-selector__icons {
+              display: flex !important;
+              gap: 3px !important;
+              
+              .ap-icon {
+                width: 16px !important;
+                height: 16px !important;
+                border-radius: 50% !important;
+                background: transparent !important;
+                border: 1px solid var(--theme-accent-primary, #00E0DC) !important;
+                color: var(--theme-accent-primary, #00E0DC) !important;
+                cursor: pointer !important;
+                transition: all 0.3s ease !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                padding: 0 !important;
+                
+                &:hover {
+                  background: var(--theme-accent-primary, #00E0DC) !important;
+                  color: var(--theme-bg-primary, #1C1C1C) !important;
+                }
+                
+                // Filled state (progressive system)
+                &.ap-icon--filled {
+                  background: var(--theme-accent-primary, #00E0DC) !important;
+                  color: var(--theme-bg-primary, #1C1C1C) !important;
+                }
+                
+                // Empty state
+                &.ap-icon--empty {
+                  background: transparent !important;
+                  color: var(--theme-accent-primary, #00E0DC) !important;
+                  opacity: 0.5 !important;
+                }
+                
+                // Selected state (for the highest active button)
+                &.ap-icon--selected {
+                  background: var(--theme-accent-primary, #00E0DC) !important;
+                  color: var(--theme-bg-primary, #1C1C1C) !important;
+                  box-shadow: 0 0 8px rgba(0, 224, 220, 0.5) !important;
+                }
+                
+                i {
+                  font-size: 8px !important;
+                }
+              }
+            }
+          }
+          
+          // PP cost display for augments
+          .pp-cost {
+            background: var(--theme-accent-secondary, #4CE2E1) !important;
+            color: var(--theme-bg-primary, #1C1C1C) !important;
+            font-family: var(--theme-font-display, "Orbitron", monospace) !important;
+            font-size: 10px !important;
+            font-weight: 600 !important;
+            padding: 3px 8px !important;
+            border-radius: 12px !important;
+            white-space: nowrap !important;
+            letter-spacing: 0.5px !important;
+          }
+        }
       }
       
       // Tab navigation system

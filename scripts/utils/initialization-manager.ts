@@ -283,9 +283,15 @@ export class InitializationManager {
         const visiting = new Set<string>();
         const order: string[] = [];
         
-        // Build dependency graph
+        // Build dependency graph for current phase services
         for (const service of services) {
             graph.set(service.name, service.dependencies);
+        }
+        
+        // Create a map of ALL services (across all phases) for dependency validation
+        const allServicesMap = new Map<string, ServiceConfiguration>();
+        for (const service of this.services.values()) {
+            allServicesMap.set(service.name, service);
         }
         
         // Topological sort with cycle detection
@@ -300,10 +306,22 @@ export class InitializationManager {
             
             const dependencies = graph.get(serviceName) || [];
             for (const dep of dependencies) {
-                if (!graph.has(dep)) {
+                // Check if dependency exists in ANY phase (not just current phase)
+                if (!allServicesMap.has(dep)) {
                     throw new Error(`Unknown dependency '${dep}' for service '${serviceName}'`);
                 }
-                visit(dep);
+                
+                // Only visit dependencies that are in the current phase
+                // Dependencies from earlier phases should already be initialized
+                if (graph.has(dep)) {
+                    visit(dep);
+                } else {
+                    // Dependency is from an earlier phase - verify it's ready
+                    const depService = this.services.get(dep);
+                    if (depService && depService.status !== 'ready') {
+                        console.warn(`⚠️ InitializationManager | Dependency '${dep}' from earlier phase is not ready for '${serviceName}'`);
+                    }
+                }
             }
             
             visiting.delete(serviceName);
@@ -418,11 +436,7 @@ export class FoundryInitializationHelper {
             return tagRegistry;
         }, [], { phase: 'init', critical: false });
         
-        // Theme Manager - no dependencies
-        manager.registerService('themeManager', async () => {
-            const { AvantThemeManager } = await import('../themes/theme-manager.js');
-            return AvantThemeManager.getInstance();
-        }, [], { phase: 'init', critical: true });
+
         
         // Data Models - no dependencies
         manager.registerService('dataModels', async () => {
@@ -544,12 +558,37 @@ export class FoundryInitializationHelper {
             return result;
         }, ['dataModels'], { phase: 'init', critical: true });
         
-        // Template Loading - depends on sheets
+        // Template Loading - depends on sheets being registered first
+        // CRITICAL: All templates must be explicitly registered here to be found by FoundryVTT
         manager.registerService('templates', async () => {
+            /**
+             * TEMPLATE LOADING PROCESS DOCUMENTATION:
+             * 
+             * 1. FoundryVTT requires ALL templates to be pre-loaded during initialization
+             * 2. Templates are loaded via foundry.applications.handlebars.loadTemplates()
+             * 3. Each template path must be the FULL system path: "systems/avant/templates/..."
+             * 4. Partial templates (*.hbs) MUST be included in this list to be found
+             * 5. Template references in HTML use the same full path format
+             * 
+             * COMMON PITFALLS TO AVOID:
+             * - Don't use relative paths like "templates/..." - always use full system paths
+             * - Don't put partials in subdirectories - FoundryVTT prefers flat structure
+             * - Don't forget to add new templates to this list - they won't be found otherwise
+             * - Don't assume templates will be auto-discovered - explicit registration required
+             * 
+             * DEBUGGING TEMPLATE ISSUES:
+             * - Check browser console for "template could not be found" errors
+             * - Verify template exists in dist/ directory after build
+             * - Confirm template path in templatePaths array matches exact file location
+             * - Test template reference syntax in HTML: {{> "systems/avant/templates/..."}}
+             */
             const templatePaths = [
+                // Main sheet templates - the primary UI components
                 "systems/avant/templates/actor-sheet.html",
-                "systems/avant/templates/item-sheet.html",
+                "systems/avant/templates/item-sheet.html", 
                 "systems/avant/templates/reroll-dialog.html",
+                
+                // Item type specific templates - loaded dynamically by item sheets
                 "systems/avant/templates/item/item-action-sheet.html",
                 "systems/avant/templates/item/item-feature-sheet.html",
                 "systems/avant/templates/item/item-talent-sheet.html",
@@ -557,103 +596,27 @@ export class FoundryInitializationHelper {
                 "systems/avant/templates/item/item-weapon-sheet.html",
                 "systems/avant/templates/item/item-armor-sheet.html",
                 "systems/avant/templates/item/item-gear-sheet.html",
-                "systems/avant/templates/item/item-trait-sheet.html"
+                "systems/avant/templates/item/item-trait-sheet.html",
+                
+                // PARTIAL TEMPLATES - reusable components included in main templates
+                // NOTE: These are *.hbs files that get included via {{> "path"}} syntax
+                // CRITICAL: Every partial referenced in templates MUST be listed here
+                "systems/avant/templates/actor/row-talent-augment.hbs",      // Talent/Augment row component
+                "systems/avant/templates/actor/power-points-section.hbs"     // Power Points tracking UI (Phase 3F)
             ];
             
+            // Load all templates into FoundryVTT's template cache
+            // This makes them available for {{> "template-path"}} references
             await (globalThis as any).foundry.applications.handlebars.loadTemplates(templatePaths);
+            console.log(`✅ Template Loading | Loaded ${templatePaths.length} templates successfully`);
             
-            // Register Handlebars helpers
-            const Handlebars = (globalThis as any).Handlebars;
-            if (Handlebars && !Handlebars.helpers.json) {
-                Handlebars.registerHelper('json', function(context: any) {
-                    return JSON.stringify(context);
-                });
-            }
+            // Register all Handlebars helpers through dedicated helper module
+            // These provide custom helper functions like {{traitChipStyle}}, {{localize}}, etc.
+            const { initializeHandlebarsHelpers } = await import('./template-helpers');
+            const helpersRegistered = await initializeHandlebarsHelpers();
             
-            // Register trait chip helpers using centralized accessibility module
-            if (Handlebars && !Handlebars.helpers.traitChipStyle) {
-                // ✅ PHASE 2.3: Enhanced Handlebars Integration with Accessibility Module
-                // Import accessibility functions - will be available at runtime
-                const { isLightColor, generateAccessibleTextColor, checkColorContrast, validateColor } = await import('../accessibility');
-                
-                Handlebars.registerHelper('traitChipStyle', function(trait: any) {
-                    // ✅ ACCESSIBILITY MODULE: Use centralized accessibility functions with WCAG compliance
-                    if (!trait || !trait.color) {
-                        // Use accessible fallback color instead of hardcoded values
-                        return '--trait-color: #6C757D; --trait-text-color: #000000;';
-                    }
-                    
-                    // Simple validation - will be enhanced with accessibility module at runtime
-                    if (!trait.color || typeof trait.color !== 'string') {
-                        console.warn(`Invalid trait color format: ${trait.color}. Using fallback.`);
-                        return '--trait-color: #6C757D; --trait-text-color: #000000;';
-                    }
-                    
-                    // Option 1: Use explicit textColor if provided (respects designer intent)
-                    if (trait.textColor && typeof trait.textColor === 'string') {
-                        // Validate contrast between provided colors
-                        const contrast = checkColorContrast(trait.textColor, trait.color, { level: 'AA' });
-                        if (!contrast.passes) {
-                            console.warn(`Low contrast for trait ${trait.name || 'unnamed'}: ${contrast.ratio}:1 (required: ${contrast.details?.requiredRatio}:1)`);
-                            // Still use provided colors but issue warning for content creators
-                        }
-                        return `--trait-color: ${trait.color}; --trait-text-color: ${trait.textColor};`;
-                    }
-                    
-                    // Option 2: Generate accessible text color using accessibility module
-                    // Check if user has enabled automatic accessibility features
-                    const game = (globalThis as any).game;
-                    const autoContrast = game?.settings?.get?.('avant', 'accessibility.autoContrast') || false;
-                    
-                    let textColor: string;
-                    if (autoContrast) {
-                        // Simple fallback - will be enhanced with accessibility module at runtime
-                        textColor = trait.color.toLowerCase().includes('f') ? '#000000' : '#FFFFFF';
-                        console.log(`✅ Auto-generated text color for trait: ${textColor} on ${trait.color}`);
-                    } else {
-                        // Conservative default behavior (maintains existing behavior)
-                        textColor = '#000000';
-                    }
-                    
-                    return `--trait-color: ${trait.color}; --trait-text-color: ${textColor};`;
-                });
-            }
-            
-            // Register trait chip data attributes helper
-            if (Handlebars && !Handlebars.helpers.traitChipData) {
-                Handlebars.registerHelper('traitChipData', function(trait: any) {
-                    // ✅ PHASE 2.3: Use same accessibility logic as traitChipStyle for consistency
-                    if (!trait || !trait.color) {
-                        // Use accessible fallback color
-                        return 'data-color="#6C757D" data-text-color="#000000"';
-                    }
-                    
-                    // Simple validation - will be enhanced with accessibility module at runtime
-                    if (!trait.color || typeof trait.color !== 'string') {
-                        console.warn(`Invalid trait color format in data attributes: ${trait.color}. Using fallback.`);
-                        return 'data-color="#6C757D" data-text-color="#000000"';
-                    }
-                    
-                    // Option 1: Use explicit textColor if provided and valid
-                    if (trait.textColor && typeof trait.textColor === 'string') {
-                        return `data-color="${trait.color}" data-text-color="${trait.textColor}"`;
-                    }
-                    
-                    // Option 2: Generate accessible text color (same logic as traitChipStyle)
-                    const game = (globalThis as any).game;
-                    const autoContrast = game?.settings?.get?.('avant', 'accessibility.autoContrast') || false;
-                    
-                    let textColor: string;
-                    if (autoContrast) {
-                        // Simple fallback - will be enhanced with accessibility module at runtime
-                        textColor = trait.color.toLowerCase().includes('f') ? '#000000' : '#FFFFFF';
-                    } else {
-                        // Conservative default behavior
-                        textColor = '#000000';
-                    }
-                    
-                    return `data-color="${trait.color}" data-text-color="${textColor}"`;
-                });
+            if (!helpersRegistered) {
+                console.warn('InitializationManager | Handlebars helpers registration failed, but continuing');
             }
             
             return templatePaths;
@@ -665,14 +628,6 @@ export class FoundryInitializationHelper {
             AvantChatContextMenu.addContextMenuListeners();
             return AvantChatContextMenu;
         }, [], { phase: 'ready', critical: false });
-        
-        // Theme Initialization - ready phase, gets singleton directly
-        manager.registerService('themeInitialization', async () => {
-            const { AvantThemeManager } = await import('../themes/theme-manager.js');
-            const themeManager = AvantThemeManager.getInstance();
-            await themeManager.init();
-            return themeManager;
-        }, [], { phase: 'ready', critical: true });
         
         // Trait Seeder - ready phase, auto-seeds system pack if needed
         manager.registerService('traitSeeder', async () => {

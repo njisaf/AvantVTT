@@ -3,6 +3,43 @@
  * @version 1.0.0 - Phase 3: TypeScript Conversion
  * @description Pure functions for validating and handling power point spending from chat
  * @author Avant VTT Team
+ * 
+ * 🔋 POWER POINT SYSTEM OVERVIEW
+ * 
+ * This module handles the interactive Power Point (PP) spending system that allows players
+ * to spend PP directly from chat cards. The system includes validation, spending, and
+ * user feedback with comprehensive error handling.
+ * 
+ * SYSTEM FEATURES:
+ * 1. Ownership Validation: Only owners/GMs can spend character PP
+ * 2. Availability Checking: Prevents spending more PP than available
+ * 3. Interactive Buttons: Real-time PP spending from chat cards
+ * 4. User Feedback: Clear notifications for success/failure
+ * 5. Error Recovery: Graceful handling of edge cases
+ * 
+ * EVENT HANDLING ARCHITECTURE:
+ * - Uses document-level event delegation for performance
+ * - Captures button data immediately to prevent DOM timing issues
+ * - Handles FoundryVTT's dynamic chat message system
+ * - Prevents interference with other button systems
+ * 
+ * CRITICAL BUG FIX HISTORY:
+ * - Originally had global click handler that captured EVERY click
+ * - This interfered with ApplicationV2 action delegation system
+ * - Fixed by adding early return for non-PP buttons
+ * - Now only processes clicks on .pp-spend elements
+ * 
+ * INTEGRATION POINTS:
+ * - Called by feature-card-builder.ts for button generation
+ * - Initialized by avant.ts chat integration system
+ * - Connects to FoundryVTT actor update system
+ * - Provides user feedback through notifications
+ * 
+ * TECHNICAL DETAILS:
+ * - Pure functions for validation and data processing
+ * - Immediate data capture to prevent DOM changes
+ * - Comprehensive error handling with user feedback
+ * - TypeScript interfaces for type safety
  */
 
 import type { Item, Actor } from '../../types/foundry/index';
@@ -208,7 +245,9 @@ export async function handlePowerPointSpend(
  */
 export function getPowerPointButtonData(item: Item, actor: Actor, user: User): PowerPointButtonData {
     try {
-        const cost = (item.system as any)?.powerPointCost || 0;
+        // Check both ppCost (augments) and powerPointCost (actions/features) for backwards compatibility
+        const system = (item.system as any);
+        const cost = system?.ppCost || system?.powerPointCost || 0;
         
         if (cost === 0) {
             return {
@@ -303,8 +342,10 @@ export function initializePowerPointHandlers(options: PowerPointHandlerOptions =
             const result = await handlePowerPointSpend(actor, cost);
             
             if (result.success) {
-                // Update button to show success
-                buttonElement.textContent = `Spent ${cost} PP`;
+                // Update button to show success with consistent styling - matching template structure
+                // 🎓 LESSON: This HTML MUST match feature-card-builder.ts and actor-sheet.ts exactly!
+                // We learned that even small differences cause visual inconsistencies.
+                buttonElement.innerHTML = `<i class="fas fa-check-circle" aria-hidden="true"></i>Spent ${cost} PP`;
                 buttonElement.classList.add('spent');
                 
                 // Show notification

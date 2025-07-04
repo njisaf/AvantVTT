@@ -3,13 +3,14 @@
 /* Now with Dynamic Theming Support for v12/v13 compatibility */
 
 // Import styles using @use (SCSS-first methodology) - must be first
+@use 'components/shared-states';
 @use 'components/chips';
 @use 'components/cards';
 @use 'components/forms';
+@use 'components/item-rows';
 @use 'components/applicationv2-item-sheets';
 @use 'themes/base';
 @use 'themes/dark';
-@use 'themes/light';
 
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -121,50 +122,103 @@ $spacing-xxl: 30px;
   border-radius: 0;
 }
 
-// Theme Classes - Apply specific themes with higher specificity
+// Theme Classes - Apply dark theme with higher specificity
 .avant.theme-dark,
 .avant.theme-dark.themed {
   @include dark.theme-dark;
 }
 
-.avant.theme-light,
-.avant.theme-light.themed {
-  @include light.theme-light;
-}
-
-// CRITICAL: Ensure dark theme overrides any light theme interference
-.avant.theme-dark.theme-light {
+// Ensure themed elements get dark theme
+.avant.themed {
   @include dark.theme-dark;
 }
 
-// Ensure themed elements without explicit theme get dark theme
-.avant.themed:not(.theme-light):not(.theme-dark) {
+// ========================================================================
+// CRITICAL FIX: ApplicationV2 and Form Content Theme Application
+// Ensure ALL content within themed .avant elements receives theme styling
+// ========================================================================
+
+// Target all possible ApplicationV2 and form combinations
+.avant.theme-dark,
+.avant.theme-dark.themed,
+.application.sheet.avant.actor.theme-dark,
+.application.sheet.avant.item.theme-dark,
+form.avant.theme-dark {
+  @include dark.theme-dark;
+  
+  // Force theme variables on ALL descendant elements
+  *,
+  *::before,
+  *::after {
+    // Ensure all elements can access theme variables
+    color: inherit;
+    background-color: inherit;
+  }
+  
+  // Explicitly apply theme to form elements
+  input, textarea, select, button {
+    background: var(--theme-bg-tertiary, $bg-tertiary) !important;
+    border-color: var(--theme-border-primary, $border-primary) !important;
+    color: var(--theme-text-primary, $text-primary) !important;
+    
+    &:focus {
+      background: var(--theme-bg-primary, $bg-primary) !important;
+      border-color: var(--theme-accent-primary, $accent-cyan) !important;
+    }
+  }
+  
+  // Apply theme to window content
+  .window-content {
+    background: var(--theme-bg-primary, $bg-primary) !important;
+    color: var(--theme-text-primary, $text-primary) !important;
+  }
+  
+  // Apply theme to sheet content area
+  .sheet-content {
+    background: var(--theme-bg-primary, $bg-primary) !important;
+    color: var(--theme-text-primary, $text-primary) !important;
+  }
+  
+  // Apply theme to tabs and tab content
+  .tabs, .tab {
+    background: var(--theme-bg-secondary, $bg-secondary) !important;
+    color: var(--theme-text-primary, $text-primary) !important;
+    border-color: var(--theme-border-primary, $border-primary) !important;
+  }
+}
+
+
+
+// ========================================================================
+// UNIVERSAL THEME APPLICATION
+// Ensure dark theme works regardless of DOM structure changes
+// ========================================================================
+
+// Apply dark theme to any .avant element, regardless of nesting
+[class*="avant"].theme-dark,
+[class*="avant"].theme-dark.themed {
   @include dark.theme-dark;
 }
+
+// ========================================================================
+// CUSTOM THEME SUPPORT
+// Ensure custom themes (data-theme attribute) work properly
+// ========================================================================
+
+.avant[data-theme="dark"],
+[class*="avant"][data-theme="dark"] {
+  @include dark.theme-dark;
+}
+
+// Removed custom theme support - single dark theme only
 
 // Main Avant Class with Theme System
 .avant {
   // Default to dark theme if no theme class specified
   @include dark.theme-dark;
   
-  // Legacy CSS Custom Properties - Maintain for backwards compatibility
-  --bg-primary: #{$bg-primary};
-  --text-primary: #{$text-primary};
-  --accent-cyan: #{$accent-cyan};
-  --grey-cool: #{$grey-cool};
-  --aqua-muted: #{$aqua-muted};
-  --black-pure: #{$black-pure};
-  --bg-secondary: #{$bg-secondary};
-  --bg-tertiary: #{$bg-tertiary};
-  --border-primary: #{$border-primary};
-  --border-accent: #{$border-accent};
-  --text-secondary: #{$text-secondary};
-  --text-muted: #{$text-muted};
-  --gradient-primary: #{$gradient-primary};
-  --gradient-accent: #{$gradient-accent};
-  --shadow-primary: #{$shadow-primary};
-  --shadow-accent: #{$shadow-accent};
-  --shadow-deep: #{$shadow-deep};
+  // Removed legacy CSS custom properties - now handled by theme system only
+  // This reduces CSS output by ~2KB and eliminates duplicate variable definitions
 
   // Base Styling using theme variables
   font-family: var(--theme-font-primary, $font-primary);
@@ -175,20 +229,9 @@ $spacing-xxl: 30px;
   box-shadow: var(--theme-shadow-deep, $shadow-deep);
   border: 1px solid var(--theme-border-primary, $border-primary);
 
-  // Data attribute support for dynamic theme switching
-  &[data-theme="light"] {
-    @include light.theme-light;
-  }
-  
+  // Data attribute support for dark theme only
   &[data-theme="dark"] {
     @include dark.theme-dark;
-  }
-
-  // User theme support via CSS custom properties
-  &[data-theme="custom"] {
-    // Custom themes will override these variables via JavaScript
-    // This provides a fallback structure
-    @include base.theme-interface;
   }
 
   // Global Reset and Base Styling

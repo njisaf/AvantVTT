@@ -811,6 +811,29 @@ async function createNeDBPack(packPath, items) {
 }
 
 /**
+ * Generate a 16-character alphanumeric ID for FoundryVTT v13
+ * @param {string} seed - A seed string to help make it reproducible
+ * @returns {string} 16-character alphanumeric ID
+ */
+function generateFoundryId(seed = '') {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  
+  // Use seed + timestamp for uniqueness
+  const seedValue = seed + Date.now();
+  
+  for (let i = 0; i < 16; i++) {
+    // Use a combination of the seed and random values
+    const seedIndex = (seedValue.charCodeAt(i % seedValue.length) + i) % chars.length;
+    const randomIndex = Math.floor(Math.random() * chars.length);
+    const charIndex = (seedIndex + randomIndex) % chars.length;
+    result += chars[charIndex];
+  }
+  
+  return result;
+}
+
+/**
  * Generate FoundryVTT item data with proper IDs and validation
  * 
  * @param {Array} seeds - Item seed data
@@ -819,6 +842,9 @@ async function createNeDBPack(packPath, items) {
  */
 function generateItemDocuments(seeds, itemType = 'trait') {
   console.log(`🏗️ Generating ${itemType} documents with validation...`);
+  
+  // Generate a consistent user ID for build script
+  const buildUserId = generateFoundryId('buildsystem');
   
   return seeds.map((seed, index) => {
     // Validate item data based on type
@@ -834,9 +860,8 @@ function generateItemDocuments(seeds, itemType = 'trait') {
       validatedSystemData = seed.system;
     }
     
-    // Generate a unique ID using type + name + timestamp + index
-    const cleanName = seed.name.toLowerCase().replace(/\s+/g, '_');
-    const id = `${itemType}_${cleanName}_${Date.now()}_${index}`;
+    // Generate a proper 16-character alphanumeric ID
+    const id = generateFoundryId(`${itemType}-${seed.name}-${index}`);
     console.log(`📝 Generated ID for ${seed.name}: ${id}`);
     
     return {
@@ -858,7 +883,7 @@ function generateItemDocuments(seeds, itemType = 'trait') {
         coreVersion: '13.344',
         createdTime: Date.now(),
         modifiedTime: Date.now(),
-        lastModifiedBy: 'build-script'
+        lastModifiedBy: buildUserId
       }
     };
   });
@@ -871,9 +896,12 @@ function generateItemDocuments(seeds, itemType = 'trait') {
  * @returns {Array} FoundryVTT macro documents
  */
 function generateMacroDocuments(seeds) {
+  // Generate a consistent user ID for build script
+  const buildUserId = generateFoundryId('buildsystem');
+  
   return seeds.map((seed, index) => {
-    // Generate a unique ID using name + timestamp + index
-    const id = `macro_${seed.name.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}_${index}`;
+    // Generate a proper 16-character alphanumeric ID
+    const id = generateFoundryId(`macro-${seed.name}-${index}`);
     console.log(`📝 Generated ID for ${seed.name}: ${id}`);
     
     return {
@@ -895,7 +923,7 @@ function generateMacroDocuments(seeds) {
         coreVersion: '13.344',
         createdTime: Date.now(),
         modifiedTime: Date.now(),
-        lastModifiedBy: 'build-script'
+        lastModifiedBy: buildUserId
       }
     };
   });

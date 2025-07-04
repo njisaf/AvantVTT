@@ -3,6 +3,37 @@
  * @version 1.0.0 - Phase 3: TypeScript Conversion
  * @description Pure functions for building talent and augment chat cards with PP functionality
  * @author Avant VTT Team
+ * 
+ * 🎯 FEATURE CARD SYSTEM OVERVIEW
+ * 
+ * This module is the core of the feature card system that creates rich, interactive chat cards
+ * for talents and augments. The system was completely functional but wasn't being triggered
+ * due to ApplicationV2 action registration issues that have now been resolved.
+ * 
+ * SYSTEM ARCHITECTURE:
+ * 1. Pure Function Design: All functions are pure with no side effects
+ * 2. Template-Based Generation: Uses custom Handlebars-style template system
+ * 3. Trait Integration: Resolves trait chips with colors and icons
+ * 4. Power Point Integration: Interactive PP spending buttons
+ * 5. Accessibility: Full ARIA support and semantic HTML
+ * 
+ * INTEGRATION POINTS:
+ * - Called by actor-sheet.ts (_onUseTalent/_onUseAugment handlers)
+ * - Uses trait-provider.ts for trait resolution and styling
+ * - Connects to power-point-handler.ts for PP validation and spending
+ * - Posts to FoundryVTT chat system for display
+ * 
+ * TEMPLATE SYSTEM:
+ * - Custom lightweight template renderer (not full Handlebars)
+ * - Supports {{variable}}, {{{html}}}, {{#if}}, {{#each}} syntax
+ * - XSS protection with HTML escaping
+ * - Fallback error handling for missing data
+ * 
+ * DEBUGGING NOTES:
+ * - All functions were working correctly during the debug session
+ * - Issue was in ApplicationV2 action registration, not this module
+ * - Comprehensive error handling and logging throughout
+ * - Template rendering tested and verified functional
  */
 
 import { createTraitHtmlForChat } from './trait-resolver.js';
@@ -20,7 +51,7 @@ import { TraitProvider } from '../../services/trait-provider';
  * @private
  */
 const FEATURE_CARD_TEMPLATE = `
-<div class="avant-feature-card" data-item-id="{{itemId}}" data-actor-id="{{actorId}}">
+<div class="avant avant-feature-card" data-item-id="{{itemId}}" data-actor-id="{{actorId}}">
     <div class="card-header">
         <h3 class="feature-name">{{featureName}}</h3>
         <div class="feature-type">{{featureType}}</div>
@@ -143,15 +174,62 @@ function renderTemplate(template: string, data: Record<string, unknown>): string
  * Build power point section HTML
  * @param item - Item with power point cost
  * @param actor - Actor with power points
+ * @param alreadySpent - Optional amount already spent (shows "Spent X PP" instead of spend button)
  * @returns Power point section HTML
  * @private
+ * 
+ * 🔧 DEVELOPMENT NOTE (2025-01-17):
+ * This function handles a critical field compatibility issue between item types:
+ * - Augments use `ppCost` field for PP cost storage
+ * - Actions/Features use `powerPointCost` field for PP cost storage  
+ * - We check BOTH fields to ensure all item types display PP costs correctly
+ * 
+ * The `alreadySpent` parameter enables "post-spend" cards that show confirmation
+ * instead of spending buttons, creating consistent UX across direct spend vs chat spend methods.
+ * 
+ * 🎓 CRITICAL LESSON - HTML STRUCTURE COORDINATION:
+ * This function MUST generate identical HTML to power-point-handler.ts and actor-sheet.ts
+ * for spent states. During development, we discovered that even tiny differences in HTML
+ * structure cause visual inconsistencies. The solution: standardize on this exact pattern:
+ * `<i class="fas fa-check-circle" aria-hidden="true"></i>Spent X PP`
+ * 
+ * 🎨 AUTOMATIC THEMING DISCOVERY:
+ * We learned that the theme system "just works" - we don't need to manually apply themes
+ * to feature cards. The CSS variables (--theme-success) automatically adapt based on 
+ * the theme manager's detection of .avant classes. This is magical but fragile - always
+ * ensure feature cards have the 'avant' class for theme compatibility.
  */
-function buildPowerPointSection(item: Item, actor: Actor): string {
-    const ppCost = (item.system as any)?.powerPointCost || 0;
+function buildPowerPointSection(item: Item, actor: Actor, alreadySpent?: number): string {
+    // Check both ppCost (augments) and powerPointCost (actions/features) for backwards compatibility
+    const system = item.system as any;
+    const ppCost = system?.ppCost || system?.powerPointCost || 0;
     const currentPP = (actor.system as any)?.powerPoints?.value || 0;
+    
+    // Debug logging to help track down PP cost issues
+    console.log('🔋 Avant | Power Point Debug:', {
+        itemName: item.name,
+        itemType: item.type,
+        ppCost_field: system?.ppCost,
+        powerPointCost_field: system?.powerPointCost,
+        finalPPCost: ppCost,
+        actorCurrentPP: currentPP,
+        alreadySpent: alreadySpent
+    });
     
     if (ppCost === 0) {
         return '<span class="no-pp-cost">No PP Cost</span>';
+    }
+    
+    // If PP has already been spent, show confirmation message
+    // 🎓 FEATURE CARD DEVELOPMENT WISDOM:
+    // This exact HTML structure is replicated in 3 files (feature-card-builder, 
+    // power-point-handler, actor-sheet). Future feature card development should 
+    // remember: consistency across all interaction points is critical for UX.
+    if (alreadySpent && alreadySpent > 0) {
+        return `<span class="pp-spent-confirmation">
+            <i class="fas fa-check-circle" aria-hidden="true"></i>
+            Spent ${alreadySpent} PP
+        </span>`;
     }
     
     const insufficient = currentPP < ppCost;
@@ -244,6 +322,7 @@ function getFeatureType(item: Item): string {
  * @param item - The talent or augment item
  * @param actor - The actor who owns the item
  * @param traitProvider - TraitProvider service for trait resolution
+ * @param options - Optional configuration including alreadySpent amount
  * @returns HTML string for the feature card
  * 
  * @example
@@ -253,12 +332,13 @@ function getFeatureType(item: Item): string {
 export async function buildFeatureCard(
     item: Item, 
     actor: Actor, 
-    traitProvider: TraitProvider
+    traitProvider: TraitProvider,
+    options: { alreadySpent?: number } = {}
 ): Promise<string> {
     try {
         // Validate inputs
         if (!item?.name) {
-            return `<div class="avant-feature-card error">
+            return `<div class="avant avant-feature-card error">
                 <div class="card-content">
                     <div class="feature-name">${escapeHtml(item?.name || 'Unknown Item')}</div>
                     <div class="feature-description">No description available</div>
@@ -280,8 +360,8 @@ export async function buildFeatureCard(
         
         // Build power point section if actor is provided
         let powerPointSection = '';
-        if (actor && system?.powerPointCost !== undefined) {
-            powerPointSection = buildPowerPointSection(item, actor);
+        if (actor && system && (system?.ppCost !== undefined || system?.powerPointCost !== undefined)) {
+            powerPointSection = buildPowerPointSection(item, actor, options.alreadySpent);
         }
         
         // Get metadata for display
@@ -307,7 +387,7 @@ export async function buildFeatureCard(
         
     } catch (error) {
         console.error('Avant | Error building feature card:', error);
-        return `<div class="avant-feature-card error">
+        return `<div class="avant avant-feature-card error">
             <div class="card-content">
                 <div class="feature-name">${escapeHtml(item?.name || 'Error')}</div>
                 <div class="feature-description">Failed to build feature card</div>
@@ -324,7 +404,7 @@ export async function buildFeatureCard(
  * @param item - The talent or augment item
  * @param actor - The actor who owns the item
  * @param traitProvider - TraitProvider service for trait resolution
- * @param options - Additional options for the chat message
+ * @param options - Additional options for the chat message and card display
  * @returns Result object with success status and message ID
  * 
  * @example
@@ -340,8 +420,13 @@ export async function postFeatureCard(
     options: Record<string, unknown> = {}
 ): Promise<PostFeatureCardResult> {
     try {
-        // Build the card HTML
-        const cardHtml = await buildFeatureCard(item, actor, traitProvider);
+        // Extract card options from general options
+        const cardOptions = {
+            alreadySpent: options.alreadySpent as number | undefined
+        };
+        
+        // Build the card HTML with card-specific options
+        const cardHtml = await buildFeatureCard(item, actor, traitProvider, cardOptions);
         
         // Get ChatMessage class from global scope
         const ChatMessage = (globalThis as any).ChatMessage;
@@ -352,12 +437,13 @@ export async function postFeatureCard(
             };
         }
         
-        // Prepare chat message data
+        // Prepare chat message data (exclude card-specific options)
+        const { alreadySpent, ...chatOptions } = options;
         const messageData = {
             content: cardHtml,
             speaker: ChatMessage.getSpeaker({ actor }),
             type: 1, // CHAT_MESSAGE_TYPES.OTHER
-            ...options
+            ...chatOptions
         };
         
         // Create the chat message

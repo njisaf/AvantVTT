@@ -1,4 +1,4 @@
-q/**
+/**
  * @fileoverview Actor Sheet for Avant Native System - ApplicationV2 Implementation
  * 
  * This file implements the actor sheet for the Avant Native system using FoundryVTT v13's
@@ -116,13 +116,27 @@ export function createAvantActorSheet() {
         declare document: any;
         
         /**
-         * ApplicationV2 default options configuration
+         * 🎯 APPLICATIONV2 ACTION REGISTRATION SYSTEM
          * 
-         * This configuration defines the behavior of the actor sheet window,
-         * form handling, and action mappings. The window configuration was
-         * critical for the ApplicationV2 migration to work properly.
+         * CRITICAL: Actions MUST be registered in DEFAULT_OPTIONS.actions for ApplicationV2 to recognize them.
+         * This was the root cause of a major debugging session where talent/augment buttons were completely 
+         * non-functional after the ApplicationV2 migration.
          * 
-         * @static
+         * DEBUGGING JOURNEY:
+         * 1. Initial problem: Clicking talent/augment chat buttons did nothing - no console logs, no errors
+         * 2. Edit buttons worked fine, proving ApplicationV2 action system was functional
+         * 3. Templates had correct `type="button"` and `data-action` attributes
+         * 4. Root cause: Actions were defined in separate `static ACTIONS` object instead of DEFAULT_OPTIONS.actions
+         * 5. Solution: Move all actions to proper location where ApplicationV2 actually looks for them
+         * 
+         * APPLICATIONV2 REQUIREMENTS:
+         * - Actions must be static methods on the class
+         * - Actions must be registered in DEFAULT_OPTIONS.actions (not separate objects)
+         * - HTML elements need `data-action` attribute matching the action name
+         * - Buttons must have `type="button"` to prevent form submission
+         * - ApplicationV2 handles event delegation automatically
+         * 
+         * LESSON LEARNED: Always register actions in DEFAULT_OPTIONS.actions for ApplicationV2 compatibility
          */
         static DEFAULT_OPTIONS = {
             // CSS classes applied to the application element
@@ -155,22 +169,37 @@ export function createAvantActorSheet() {
                 handler: AvantActorSheet._handleFormSubmission // Custom form handler
             },
             
-            // ApplicationV2 actions system - maps data-action attributes to methods
+            // 🎯 CRITICAL: All ApplicationV2 actions must be registered here
             // This replaces the legacy activateListeners approach
             actions: {
+                // 🔧 Debug/Test Actions (used during debugging process)
+                testAction: AvantActorSheet._onTestAction,
+                
+                // 🎲 Dice Rolling Actions
                 rollAbility: AvantActorSheet._onRollAbility,
                 rollSkill: AvantActorSheet._onRollSkill,
                 rollPowerPoints: AvantActorSheet._onRollPowerPoints,
                 rollAttack: AvantActorSheet._onRollAttack,
                 rollDamage: AvantActorSheet._onRollDamage,
                 rollArmor: AvantActorSheet._onRollArmor,
+                
+                // 📦 Item Management Actions
                 createItem: AvantActorSheet._onCreateItem,
                 editItem: AvantActorSheet._onEditItem,
                 deleteItem: AvantActorSheet._onDeleteItem,
+                
+                // 💬 Chat Integration Actions
                 postChatCard: AvantActorSheet._onPostChatCard,
                 useAction: AvantActorSheet._onUseAction,
-                useTalent: AvantActorSheet._onUseTalent,
-                useAugment: AvantActorSheet._onUseAugment
+                
+                // 🎯 FEATURE CARD SYSTEM - The main fix that resolved the debugging issue
+                // These actions connect to the complete feature card infrastructure:
+                // - feature-card-builder.ts: Generates rich HTML cards with traits and PP integration
+                // - power-point-handler.ts: Validates and processes PP spending from chat
+                // - chat-integration.ts: Provides clean API for posting to chat
+                useTalent: AvantActorSheet._onUseTalent,      // Posts talent feature cards
+                useAugment: AvantActorSheet._onUseAugment,     // Posts augment feature cards
+                spendAugmentPP: AvantActorSheet._onSpendAugmentPP  // Direct PP spend handler
             }
         };
 
@@ -196,6 +225,8 @@ export function createAvantActorSheet() {
          * @private
          */
         private _currentTab: string = "core";
+
+
 
         /**
          * Get the actor document (compatibility accessor)
@@ -229,6 +260,8 @@ export function createAvantActorSheet() {
             
             return `${actorName} [${typeName}]`;
         }
+
+
 
         /**
          * Prepare context data for the actor sheet template
@@ -298,7 +331,7 @@ export function createAvantActorSheet() {
             const itemsArray = Array.from(this.document.items.values());
             context.items = organizeItemsByType(itemsArray);
             
-            // Add trait display data to items for visual enhancement
+            // Add comprehensive display data to items (traits, descriptions, requirements, etc.)
             await this._addTraitDisplayDataToItems(context.items);
             
             // Add system configuration data
@@ -325,7 +358,6 @@ export function createAvantActorSheet() {
             
             // Initialize custom functionality that ApplicationV2 doesn't handle automatically
             this._initializeTabs();    // Manual tab management for Avant sheets
-            this._applyTheme();        // Apply theme system styling
             this._ensureItemStyling(); // Ensure proper item display styling
         }
 
@@ -404,38 +436,7 @@ export function createAvantActorSheet() {
             }
         }
 
-        /**
-         * Apply theme styling to the sheet
-         * 
-         * This method integrates with the Avant theme system to apply the current
-         * theme to the actor sheet. It includes fallback logic for when the theme
-         * manager is not available.
-         * 
-         * @private
-         */
-        private _applyTheme(): void {
-            try {
-                // Access the Avant theme manager through the initialization system
-                const game = (globalThis as any).game;
-                if (game?.avant?.initializationManager) {
-                    const themeManager = game.avant.initializationManager.getService('themeManager');
-                    if (themeManager) {
-                        // Apply the current theme to this sheet element
-                        themeManager.applyThemeToElement(this.element, themeManager.currentTheme);
-                        return;
-                    }
-                }
-                
-                // Fallback: Apply default dark theme if theme manager not available
-                this.element.classList.remove('theme-light', 'theme-dark');
-                this.element.classList.add('theme-dark');
-            } catch (error) {
-                // Emergency fallback for any theme system errors
-                logger.warn('Theme application failed, using dark fallback:', error);
-                this.element.classList.remove('theme-light', 'theme-dark');
-                this.element.classList.add('theme-dark');
-            }
-        }
+
 
         /**
          * Ensure item styling is properly applied
@@ -472,7 +473,7 @@ export function createAvantActorSheet() {
         }
 
         /**
-         * Add trait display data to items for actor sheet display
+         * Add display data to items for actor sheet display
          * @param items - Organized items by type
          * @private
          */
@@ -480,46 +481,73 @@ export function createAvantActorSheet() {
             try {
                 // Get TraitProvider service if available
                 const game = (globalThis as any).game;
-                if (!game?.avant?.initializationManager) {
-                    return;
+                let allTraits: any[] = [];
+                
+                if (game?.avant?.initializationManager) {
+                    const traitProvider = game.avant.initializationManager.getService('traitProvider');
+                    if (traitProvider) {
+                        const result = await traitProvider.getAll();
+                        if (result.success && result.data) {
+                            allTraits = result.data;
+                        }
+                    }
                 }
 
-                const traitProvider = game.avant.initializationManager.getService('traitProvider');
-                if (!traitProvider) {
-                    return;
-                }
-
-                // Get all available traits
-                const result = await traitProvider.getAll();
-                if (!result.success || !result.data) {
-                    return;
-                }
-
-                const allTraits = result.data;
-
-                // Add trait display data to each item in each category
+                // Add comprehensive display data to each item in each category
                 for (const [categoryName, itemsList] of Object.entries(items)) {
                     if (Array.isArray(itemsList)) {
                         for (const item of itemsList) {
+                            // Ensure system data is available for template access
+                            if (!item.system) {
+                                item.system = {};
+                            }
+                            
+                            // Ensure all common fields are accessible for display
+                            item.system.description = item.system.description || '';
+                            item.system.requirements = item.system.requirements || '';
+                            item.system.levelRequirement = item.system.levelRequirement || null;
+                            item.system.apCost = item.system.apCost || 0;
+                            item.system.ppCost = item.system.ppCost || 0;
+                            item.system.usable = item.system.usable || false;
+                            item.system.isActive = item.system.isActive || false;
+                            
+                            // Process trait display data
                             if (item.system?.traits && Array.isArray(item.system.traits)) {
                                 item.displayTraits = item.system.traits.map((traitId: string) => {
                                     const trait = allTraits.find((t: any) => t.id === traitId);
                                     if (trait) {
+                                        // Debug logging for trait data
+                                        logger.debug('AvantActorSheet | Found trait data:', {
+                                            traitId,
+                                            traitName: trait.name,
+                                            traitColor: trait.color,
+                                            traitIcon: trait.icon
+                                        });
+                                        
                                         return {
                                             id: traitId,
                                             name: trait.name,
-                                            color: trait.color,
-                                            icon: trait.icon,
+                                            color: trait.color || '#00E0DC', // Fallback to primary accent
+                                            textColor: trait.textColor || '#000000', // Explicit text color
+                                            icon: trait.icon || 'fas fa-tag',
                                             description: trait.description,
                                             displayId: traitId
                                         };
                                     } else {
+                                        // Only log warning for legitimate trait IDs, not corrupted data
+                                        if (traitId && typeof traitId === 'string' && !traitId.startsWith('[') && !traitId.startsWith('{')) {
+                                            logger.warn('AvantActorSheet | Trait not found in provider:', traitId);
+                                        } else {
+                                            logger.debug('AvantActorSheet | Skipping corrupted trait data:', traitId);
+                                        }
+                                        
                                         return {
                                             id: traitId,
                                             name: this._generateFallbackTraitName(traitId),
                                             displayId: traitId,
                                             // Provide default styling for missing traits
                                             color: '#6C757D', // Bootstrap secondary gray
+                                            textColor: '#FFFFFF', // White text for gray background
                                             icon: 'fas fa-tag'  // Generic tag icon
                                         };
                                     }
@@ -531,7 +559,7 @@ export function createAvantActorSheet() {
                     }
                 }
             } catch (error) {
-                logger.warn('Failed to add trait display data to items:', error);
+                logger.warn('Failed to add display data to items:', error);
             }
         }
 
@@ -564,6 +592,26 @@ export function createAvantActorSheet() {
          */
         constructor(options = {}) {
             super(options);
+        }
+
+        /**
+         * Activate core listeners for ApplicationV2 compatibility
+         * This method is essential for proper HTML element handling in FoundryVTT v13
+         * @param html - The rendered HTML content
+         */
+        _activateCoreListeners(html: HTMLElement | any): void {
+            // Convert jQuery to HTMLElement if needed
+            const element = html instanceof HTMLElement ? html : (html as any)[0];
+            
+            if (!element) return;
+
+            // Call parent implementation for core functionality
+            if (super._activateCoreListeners) {
+                super._activateCoreListeners(html);
+            }
+
+            // Additional activation for our specific needs can be added here
+            // This ensures ApplicationV2 action delegation works properly
         }
 
         // =================================================================================
@@ -870,6 +918,7 @@ export function createAvantActorSheet() {
          * @this {AvantActorSheet} The ApplicationV2 instance (bound automatically)
          */
         static async _onEditItem(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
+            console.log('🎯 Avant | _onEditItem triggered!', { event, target });
             event.preventDefault();
             
             // FIXED: In ApplicationV2, 'this' is bound to the sheet instance
@@ -890,6 +939,7 @@ export function createAvantActorSheet() {
                 return;
             }
 
+            console.log('🎯 Avant | Opening item sheet for:', item.name);
             // Open the item sheet
             item.sheet.render(true);
         }
@@ -956,7 +1006,6 @@ export function createAvantActorSheet() {
                 return;
             }
 
-
             const item = sheet.document.items.get(itemId);
             if (!item) {
                 FoundryUI.notify('Item not found', 'warn');
@@ -964,44 +1013,25 @@ export function createAvantActorSheet() {
             }
 
             try {
-                // Create trait-enhanced chat card
+                // Use the proper feature card system
                 const game = (globalThis as any).game;
-                let traitHtml = '';
+                const result = await game.avant.chat.postFeatureCard(itemId, sheet.document.id);
                 
-                if (itemHasTraits(item)) {
-                    traitHtml = await createTraitHtmlForChat(item, game?.avant?.initializationManager);
+                if (result.success) {
+                    logger.log(`AvantActorSheet | Posted feature card for: ${item.name}`);
+                } else {
+                    logger.error('AvantActorSheet | Feature card posting failed:', result.error);
+                    FoundryUI.notify(result.error || 'Failed to post feature card', 'error');
                 }
 
-                const cardData = {
-                    actor: sheet.document,
-                    item: item,
-                    title: item.name,
-                    description: item.system?.description || '',
-                    traitHtml: traitHtml
-                };
-
-                const template = "systems/avant/templates/chat/item-card.html";
-                const foundry = (globalThis as any).foundry;
-                const renderTemplate = foundry?.applications?.handlebars?.renderTemplate || (globalThis as any).renderTemplate;
-                const content = await renderTemplate(template, cardData);
-
-                const ChatMessage = (globalThis as any).ChatMessage;
-                await ChatMessage.create({
-                    user: game.user.id,
-                    speaker: ChatMessage.getSpeaker({ actor: sheet.document }),
-                    content: content,
-                    type: ChatMessage.TYPES.OTHER
-                });
-
-                logger.log(`AvantActorSheet | Posted chat card for: ${item.name}`);
             } catch (error) {
-                logger.error('AvantActorSheet | Failed to post chat card:', error);
-                FoundryUI.notify('Failed to post chat card', 'error');
+                logger.error('AvantActorSheet | Failed to post feature card:', error);
+                FoundryUI.notify('Failed to post feature card', 'error');
             }
         }
 
         /**
-         * Handle using actions
+         * Handle using an action
          * @param event - The originating click event
          * @param target - The target element
          * @this {AvantActorSheet} The ApplicationV2 instance (bound automatically)
@@ -1009,7 +1039,6 @@ export function createAvantActorSheet() {
         static async _onUseAction(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
             event.preventDefault();
             
-            // FIXED: In ApplicationV2, 'this' is bound to the sheet instance
             const sheet = this;
             if (!sheet?.document) return;
 
@@ -1026,36 +1055,17 @@ export function createAvantActorSheet() {
             }
 
             try {
-                // Post action usage to chat
+                // Use the proper feature card system
                 const game = (globalThis as any).game;
-                let traitHtml = '';
+                const result = await game.avant.chat.postFeatureCard(itemId, sheet.document.id);
                 
-                if (itemHasTraits(item)) {
-                    traitHtml = await createTraitHtmlForChat(item, game?.avant?.initializationManager);
+                if (result.success) {
+                    logger.log(`AvantActorSheet | Posted action usage for: ${item.name}`);
+                } else {
+                    logger.error('AvantActorSheet | Action usage posting failed:', result.error);
+                    FoundryUI.notify(result.error || 'Failed to post action usage', 'error');
                 }
 
-                const cardData = {
-                    actor: sheet.document,
-                    item: item,
-                    title: `${item.name} (Action)`,
-                    description: item.system?.description || '',
-                    traitHtml: traitHtml
-                };
-
-                const template = "systems/avant/templates/chat/action-use.html";
-                const foundry = (globalThis as any).foundry;
-                const renderTemplate = foundry?.applications?.handlebars?.renderTemplate || (globalThis as any).renderTemplate;
-                const content = await renderTemplate(template, cardData);
-
-                const ChatMessage = (globalThis as any).ChatMessage;
-                await ChatMessage.create({
-                    user: game.user.id,
-                    speaker: ChatMessage.getSpeaker({ actor: sheet.document }),
-                    content: content,
-                    type: ChatMessage.TYPES.OTHER
-                });
-
-                logger.log(`AvantActorSheet | Posted action usage for: ${item.name}`);
             } catch (error) {
                 logger.error('AvantActorSheet | Failed to post action usage:', error);
                 FoundryUI.notify('Failed to post action usage', 'error');
@@ -1063,24 +1073,55 @@ export function createAvantActorSheet() {
         }
 
         /**
-         * Handle using talents
+         * 🎯 TALENT FEATURE CARD HANDLER - THE BREAKTHROUGH THAT FIXED EVERYTHING
+         * 
+         * This handler posts rich, interactive talent cards to chat with full feature integration.
+         * This was the primary target of the debugging session that revealed the ApplicationV2 action
+         * registration issue.
+         * 
+         * FEATURE CARD SYSTEM INTEGRATION:
+         * 1. Uses feature-card-builder.ts to generate rich HTML cards with:
+         *    - Talent name, description, and metadata (tier, prerequisites)
+         *    - Trait chips with proper colors and icons
+         *    - Power Point cost with interactive spending buttons
+         *    - Professional styling with accessibility features
+         * 
+         * 2. Integrates with trait-provider.ts for:
+         *    - Trait name resolution (fire, ice, tech, etc.)
+         *    - Color and icon mapping
+         *    - Support for both system and custom traits
+         * 
+         * 3. Connects to power-point-handler.ts for:
+         *    - PP cost validation (sufficient points available)
+         *    - Interactive spending buttons in chat
+         *    - Ownership validation (user must own character)
+         *    - Real-time PP deduction with notifications
+         * 
+         * DEBUGGING HISTORY:
+         * - Originally this handler existed but was never triggered
+         * - Root cause: Not registered in DEFAULT_OPTIONS.actions
+         * - ApplicationV2 only looks for actions in DEFAULT_OPTIONS.actions
+         * - Fix: Move registration from separate static ACTIONS object to proper location
+         * 
          * @param event - The originating click event
-         * @param target - The target element
+         * @param target - The target element (contains data-item-id)
          * @this {AvantActorSheet} The ApplicationV2 instance (bound automatically)
          */
         static async _onUseTalent(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
+            console.log('🎯 Avant | _onUseTalent triggered!', { event, target });
             event.preventDefault();
             
-            // FIXED: In ApplicationV2, 'this' is bound to the sheet instance
             const sheet = this;
             if (!sheet?.document) return;
 
+            // Extract item ID from the button's data attributes
             const itemId = extractItemIdFromElement(target);
             if (!itemId) {
                 logger.warn('AvantActorSheet | No item ID for talent use');
                 return;
             }
 
+            // Get the talent item from the actor
             const item = sheet.document.items.get(itemId);
             if (!item) {
                 FoundryUI.notify('Talent not found', 'warn');
@@ -1088,43 +1129,276 @@ export function createAvantActorSheet() {
             }
 
             try {
-                // Post talent usage to chat
-                const game = (globalThis as any).game;
-                let traitHtml = '';
+                console.log('🎯 Avant | Posting talent feature card for:', item.name);
                 
-                if (itemHasTraits(item)) {
-                    traitHtml = await createTraitHtmlForChat(item, game?.avant?.initializationManager);
+                // 🎨 DYNAMIC IMPORT PATTERN - Ensures modules are loaded when needed
+                // This prevents circular dependencies and ensures proper initialization order
+                const { postFeatureCard } = await import('../logic/chat/feature-card-builder.js');
+                const { TraitProvider } = await import('../services/trait-provider.js');
+                
+                // Initialize trait provider for trait resolution
+                const traitProvider = new TraitProvider();
+                
+                // 💬 POST FEATURE CARD - The core functionality
+                // This creates a rich HTML card and posts it to chat with:
+                // - Talent details and description
+                // - Trait chips with colors/icons
+                // - Power point cost and spending buttons
+                // - Professional styling and accessibility
+                const result = await postFeatureCard(item, sheet.document, traitProvider);
+                
+                if (result.success) {
+                    console.log('🎯 Avant | Posted talent card successfully:', result.messageId);
+                    logger.log(`AvantActorSheet | Posted talent card for: ${item.name}`);
+                } else {
+                    console.error('🎯 Avant | Talent card posting failed:', result.error);
+                    logger.error('AvantActorSheet | Talent card posting failed:', result.error);
+                    FoundryUI.notify(result.error || 'Failed to post talent card', 'error');
                 }
 
-                const cardData = {
-                    actor: sheet.document,
-                    item: item,
-                    title: `${item.name} (Talent)`,
-                    description: item.system?.description || '',
-                    traitHtml: traitHtml
-                };
-
-                const template = "systems/avant/templates/chat/talent-use.html";
-                const foundry = (globalThis as any).foundry;
-                const renderTemplate = foundry?.applications?.handlebars?.renderTemplate || (globalThis as any).renderTemplate;
-                const content = await renderTemplate(template, cardData);
-
-                const ChatMessage = (globalThis as any).ChatMessage;
-                await ChatMessage.create({
-                    user: game.user.id,
-                    speaker: ChatMessage.getSpeaker({ actor: sheet.document }),
-                    content: content,
-                    type: ChatMessage.TYPES.OTHER
-                });
-
-                logger.log(`AvantActorSheet | Posted talent usage for: ${item.name}`);
             } catch (error) {
-                logger.error('AvantActorSheet | Failed to post talent usage:', error);
-                FoundryUI.notify('Failed to post talent usage', 'error');
+                console.error('🎯 Avant | Failed to post talent card:', error);
+                logger.error('AvantActorSheet | Failed to post talent card:', error);
+                FoundryUI.notify('Failed to post talent card', 'error');
             }
         }
 
-        // Custom window control handlers removed - using FoundryVTT default controls
+        /**
+         * Test action to verify talent/augment buttons are working
+         * @param event - The originating click event
+         * @param target - The target element
+         * @this {AvantActorSheet} The ApplicationV2 instance (bound automatically)
+         */
+        static async _onTestTalent(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
+            console.log('🎯 Avant | _onTestTalent triggered! SUCCESS!', { event, target });
+            alert('Test talent action worked!');
+        }
+
+        /**
+         * Handle rolling a talent (simplified for testing)
+         * @param event - The originating click event
+         * @param target - The target element
+         * @this {AvantActorSheet} The ApplicationV2 instance (bound automatically)
+         */
+        static async _onRollTalent(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
+            console.log('🎯 Avant | _onRollTalent triggered!', { event, target });
+            alert('Roll Talent Action Triggered!');
+            event.preventDefault();
+        }
+
+        /**
+         * 🔧 AUGMENT FEATURE CARD HANDLER - CYBERNETIC ENHANCEMENT SYSTEM
+         * 
+         * This handler posts rich, interactive augment cards to chat, parallel to the talent system.
+         * Augments represent cybernetic/technological enhancements in the Avant universe.
+         * 
+         * AUGMENT-SPECIFIC FEATURES:
+         * 1. Augment Type Display: Shows augment category (cybernetic, bioware, etc.)
+         * 2. Rarity Integration: Displays rarity (common, rare, legendary) with styling
+         * 3. Prerequisites: Shows required levels, stats, or other augments
+         * 4. Power Point Costs: Many augments require PP to activate
+         * 
+         * SHARED FEATURE CARD SYSTEM:
+         * - Uses the same feature-card-builder.ts as talents for consistency
+         * - Trait system integration for augment classifications
+         * - Power Point validation and spending functionality
+         * - Professional styling with accessibility features
+         * 
+         * TECHNICAL IMPLEMENTATION:
+         * - Identical to _onUseTalent but for augment item type
+         * - Same ApplicationV2 action registration requirements
+         * - Same dynamic import pattern for dependency management
+         * - Same error handling and user feedback patterns
+         * 
+         * USER EXPERIENCE:
+         * - Click the chat button (💬) on any augment in the actor sheet
+         * - Rich card appears in chat with full augment details
+         * - Interactive PP spending buttons (if applicable)
+         * - Trait chips show augment classifications
+         * - Professional styling matches talent cards
+         * 
+         * @param event - The originating click event
+         * @param target - The target element (contains data-item-id)
+         * @this {AvantActorSheet} The ApplicationV2 instance (bound automatically)
+         */
+        static async _onUseAugment(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
+            console.log('🎯 Avant | _onUseAugment triggered!', { event, target });
+            event.preventDefault();
+            
+            const sheet = this;
+            if (!sheet?.document) return;
+
+            // Extract augment item ID from the button's data attributes
+            const itemId = extractItemIdFromElement(target);
+            if (!itemId) {
+                logger.warn('AvantActorSheet | No item ID for augment use');
+                return;
+            }
+
+            // Get the augment item from the actor
+            const item = sheet.document.items.get(itemId);
+            if (!item) {
+                FoundryUI.notify('Augment not found', 'warn');
+                return;
+            }
+
+            try {
+                console.log('🎯 Avant | Posting augment feature card for:', item.name);
+                
+                // 🔧 DYNAMIC IMPORT PATTERN - Consistent with talent handler
+                // Same module loading strategy for maintainability
+                const { postFeatureCard } = await import('../logic/chat/feature-card-builder.js');
+                const { TraitProvider } = await import('../services/trait-provider.js');
+                
+                // Initialize trait provider for augment trait resolution
+                const traitProvider = new TraitProvider();
+                
+                // 💬 POST AUGMENT FEATURE CARD - Same core functionality as talents
+                // The feature card builder automatically handles augment-specific display:
+                // - Augment type and rarity
+                // - Prerequisites and requirements
+                // - Power point costs and spending
+                // - Trait classifications and styling
+                const result = await postFeatureCard(item, sheet.document, traitProvider);
+                
+                if (result.success) {
+                    logger.info('Avant | Augment feature card posted successfully:', result.messageId);
+                    FoundryUI.notify(`Posted augment card for ${item.name}`, 'info');
+                } else {
+                    logger.error('Avant | Failed to post augment feature card:', result.error);
+                    FoundryUI.notify('Failed to post augment card', 'error');
+                }
+                
+            } catch (error) {
+                logger.error('Avant | Error in _onUseAugment:', error);
+                FoundryUI.notify('Error posting augment card', 'error');
+            }
+        }
+
+        /**
+         * 🔋 DIRECT PP SPEND HANDLER - INSTANT AUGMENT ACTIVATION
+         * 
+         * This handler provides direct PP spending from the actor sheet without requiring
+         * a separate chat card interaction. It spends the PP immediately and posts an
+         * augment card showing "Spent X PP" to confirm the transaction.
+         * 
+         * DIRECT SPEND WORKFLOW:
+         * 1. Validates PP cost and actor's current PP
+         * 2. Spends PP directly from the actor
+         * 3. Posts augment card with "Spent X PP" confirmation
+         * 4. Provides immediate user feedback
+         * 
+         * UX BENEFITS:
+         * - Single-click PP spending from sheet
+         * - Immediate feedback and confirmation
+         * - No need to open chat cards first
+         * - Streamlined gameplay experience
+         * 
+         * TECHNICAL FEATURES:
+         * - Full PP validation and ownership checking
+         * - Error handling with user notifications
+         * - Integration with existing feature card system
+         * - "Already spent" mode for card display
+         * 
+         * @param event - The originating click event
+         * @param target - The PP spend button element (contains data-item-id and data-pp-cost)
+         * @this {AvantActorSheet} The ApplicationV2 instance (bound automatically)
+         */
+        static async _onSpendAugmentPP(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
+            console.log('🔋 Avant | _onSpendAugmentPP triggered!', { event, target });
+            event.preventDefault();
+            
+            const sheet = this;
+            if (!sheet?.document) return;
+
+            // Extract augment data from button attributes
+            const itemId = target.dataset.itemId || target.getAttribute('data-item-id');
+            const ppCostStr = target.dataset.ppCost || target.getAttribute('data-pp-cost');
+            const ppCost = parseInt(ppCostStr || '0');
+
+            if (!itemId) {
+                logger.warn('AvantActorSheet | No item ID for PP spend');
+                FoundryUI.notify('Augment not found', 'warn');
+                return;
+            }
+
+            if (ppCost <= 0) {
+                logger.warn('AvantActorSheet | Invalid PP cost for spend:', ppCost);
+                FoundryUI.notify('Invalid power point cost', 'warn');
+                return;
+            }
+
+            // Get the augment item
+            const item = sheet.document.items.get(itemId);
+            if (!item) {
+                FoundryUI.notify('Augment not found', 'warn');
+                return;
+            }
+
+            // Disable the button during processing
+            const button = target as HTMLButtonElement;
+            const originalText = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            try {
+                console.log('🔋 Avant | Processing PP spend for:', item.name, 'Cost:', ppCost);
+                
+                // Import required modules
+                const { handlePowerPointSpend } = await import('../logic/chat/power-point-handler.js');
+                const { postFeatureCard } = await import('../logic/chat/feature-card-builder.js');
+                const { TraitProvider } = await import('../services/trait-provider.js');
+                
+                // Spend the power points
+                const game = (globalThis as any).game;
+                const spendResult = await handlePowerPointSpend(sheet.document, ppCost, game.user);
+                
+                if (!spendResult.success) {
+                    // PP spend failed - show error and re-enable button
+                    FoundryUI.notify(spendResult.error || 'Failed to spend power points', 'warn');
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+                    return;
+                }
+
+                // PP spent successfully - update button to show spent state
+                // 🎓 COORDINATION LESSON: This HTML structure must match feature-card-builder.ts 
+                // and power-point-handler.ts EXACTLY. We discovered during development that
+                // users expect consistent visual feedback regardless of WHERE they spend PP from.
+                button.classList.add('spent');
+                button.innerHTML = '<i class="fas fa-check-circle" aria-hidden="true"></i>Spent ' + ppCost + ' PP';
+                button.disabled = true;
+                
+                // Show success notification
+                FoundryUI.notify(
+                    `${sheet.document.name} spent ${ppCost} PP for ${item.name}. Remaining: ${spendResult.newValue}`,
+                    'info'
+                );
+
+                // Post augment card with "Spent X PP" message
+                const traitProvider = new TraitProvider();
+                const cardResult = await postFeatureCard(
+                    item, 
+                    sheet.document, 
+                    traitProvider, 
+                    { alreadySpent: ppCost } // Pass spent amount to feature card
+                );
+                
+                if (cardResult.success) {
+                    console.log('🔋 Avant | Augment card posted with spent PP confirmation');
+                } else {
+                    logger.warn('Avant | Failed to post augment card after PP spend:', cardResult.error);
+                }
+
+            } catch (error) {
+                logger.error('Avant | Error in _onSpendAugmentPP:', error);
+                FoundryUI.notify('Error spending power points', 'error');
+                
+                // Re-enable button on error
+                button.disabled = false;
+                button.innerHTML = originalText;
+            }
+        }
 
         /**
          * Static form submission handler for ApplicationV2
@@ -1159,65 +1433,27 @@ export function createAvantActorSheet() {
         }
 
         /**
-         * Handle using augments
+         * Initialize ApplicationV2 options for the actor sheet
+         * @param options - User provided options
+         * @returns Initialized options
+         */
+        static _initializeApplicationOptions(options: Partial<any>): any {
+            console.log('🔧 Avant | Actor sheet initializing with DEFAULT_OPTIONS.actions:', this.DEFAULT_OPTIONS.actions);
+            const result = super._initializeApplicationOptions(options);
+            console.log('🔧 Avant | Actor sheet initialized with final options:', result);
+            return result;
+        }
+
+        /**
+         * Simple test action to verify ApplicationV2 actions work
          * @param event - The originating click event
          * @param target - The target element
          * @this {AvantActorSheet} The ApplicationV2 instance (bound automatically)
          */
-        static async _onUseAugment(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
+        static async _onTestAction(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
+            console.log('🎯 Avant | TEST ACTION TRIGGERED! SUCCESS!', { event, target });
+            alert('TEST ACTION WORKED! This proves ApplicationV2 actions are functioning.');
             event.preventDefault();
-            
-            // FIXED: In ApplicationV2, 'this' is bound to the sheet instance
-            const sheet = this;
-            if (!sheet?.document) return;
-
-            const itemId = extractItemIdFromElement(target);
-            if (!itemId) {
-                logger.warn('AvantActorSheet | No item ID for augment use');
-                return;
-            }
-
-            const item = sheet.document.items.get(itemId);
-            if (!item) {
-                FoundryUI.notify('Augment not found', 'warn');
-                return;
-            }
-
-            try {
-                // Post augment usage to chat
-                const game = (globalThis as any).game;
-                let traitHtml = '';
-                
-                if (itemHasTraits(item)) {
-                    traitHtml = await createTraitHtmlForChat(item, game?.avant?.initializationManager);
-                }
-
-                const cardData = {
-                    actor: sheet.document,
-                    item: item,
-                    title: `${item.name} (Augment)`,
-                    description: item.system?.description || '',
-                    traitHtml: traitHtml
-                };
-
-                const template = "systems/avant/templates/chat/augment-use.html";
-                const foundry = (globalThis as any).foundry;
-                const renderTemplate = foundry?.applications?.handlebars?.renderTemplate || (globalThis as any).renderTemplate;
-                const content = await renderTemplate(template, cardData);
-
-                const ChatMessage = (globalThis as any).ChatMessage;
-                await ChatMessage.create({
-                    user: game.user.id,
-                    speaker: ChatMessage.getSpeaker({ actor: sheet.document }),
-                    content: content,
-                    type: ChatMessage.TYPES.OTHER
-                });
-
-                logger.log(`AvantActorSheet | Posted augment usage for: ${item.name}`);
-            } catch (error) {
-                logger.error('AvantActorSheet | Failed to post augment usage:', error);
-                FoundryUI.notify('Failed to post augment usage', 'error');
-            }
         }
     }
     

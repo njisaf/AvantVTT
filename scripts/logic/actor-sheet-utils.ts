@@ -936,6 +936,180 @@ export function extractCombatItemId(element: unknown): string | null {
 }
 
 /**
+ * Handles keyboard navigation for talent and augment rows
+ * 
+ * This function manages up/down arrow navigation through talent and augment rows,
+ * with space to activate/roll and proper focus management following WCAG guidelines.
+ * 
+ * @param event - The keyboard event 
+ * @param currentElement - The currently focused element
+ * @returns True if the event was handled, false otherwise
+ * 
+ * @example
+ * ```typescript
+ * // Handle keyboard navigation in talent rows
+ * const handled = handleRowKeyboardNavigation(keyEvent, focusedElement);
+ * if (handled) {
+ *     keyEvent.preventDefault();
+ * }
+ * ```
+ */
+export function handleRowKeyboardNavigation(event: unknown, currentElement: unknown): boolean {
+    if (!event || !currentElement || typeof event !== 'object' || typeof currentElement !== 'object') {
+        return false;
+    }
+    
+    const keyboardEvent = event as KeyboardEvent;
+    const element = currentElement as HTMLElement;
+    
+    // Only handle specific keys
+    if (!['ArrowUp', 'ArrowDown', 'Space', 'Enter'].includes(keyboardEvent.key)) {
+        return false;
+    }
+    
+    const currentRow = element.closest('.talent-item, .augment-item');
+    if (!currentRow) {
+        return false;
+    }
+    
+    const allRows = Array.from(document.querySelectorAll('.talent-item, .augment-item'));
+    const currentIndex = allRows.indexOf(currentRow as Element);
+    
+    if (currentIndex === -1) {
+        return false;
+    }
+    
+    switch (keyboardEvent.key) {
+        case 'ArrowUp':
+            if (currentIndex > 0) {
+                const previousRow = allRows[currentIndex - 1] as HTMLElement;
+                const focusTarget = previousRow.querySelector('.row-title, .chat-roll-btn, .activate-toggle-btn') as HTMLElement;
+                focusTarget?.focus();
+                return true;
+            }
+            break;
+            
+        case 'ArrowDown':
+            if (currentIndex < allRows.length - 1) {
+                const nextRow = allRows[currentIndex + 1] as HTMLElement;
+                const focusTarget = nextRow.querySelector('.row-title, .chat-roll-btn, .activate-toggle-btn') as HTMLElement;
+                focusTarget?.focus();
+                return true;
+            }
+            break;
+            
+        case 'Space':
+        case 'Enter':
+            // Activate the primary action (roll or activate)
+            const actionButton = currentRow.querySelector('.chat-roll-btn, .activate-toggle-btn') as HTMLElement;
+            if (actionButton) {
+                actionButton.click();
+                return true;
+            }
+            break;
+    }
+    
+    return false;
+}
+
+/**
+ * Manages focus for AP selector radiogroup
+ * 
+ * This function handles keyboard navigation within the AP selector, ensuring
+ * proper radiogroup behavior with arrow keys and space/enter activation.
+ * 
+ * @param event - The keyboard event
+ * @param selectorElement - The AP selector container element
+ * @returns True if the event was handled, false otherwise
+ * 
+ * @example
+ * ```typescript
+ * // Handle AP selector keyboard navigation
+ * const handled = handleAPSelectorNavigation(keyEvent, apSelector);
+ * if (handled) {
+ *     keyEvent.preventDefault();
+ * }
+ * ```
+ */
+export function handleAPSelectorNavigation(event: unknown, selectorElement: unknown): boolean {
+    if (!event || !selectorElement || typeof event !== 'object' || typeof selectorElement !== 'object') {
+        return false;
+    }
+    
+    const keyboardEvent = event as KeyboardEvent;
+    const selector = selectorElement as HTMLElement;
+    
+    // Only handle arrow keys and space/enter within radiogroup
+    if (!['ArrowLeft', 'ArrowRight', 'Space', 'Enter'].includes(keyboardEvent.key)) {
+        return false;
+    }
+    
+    const apIcons = Array.from(selector.querySelectorAll('.ap-icon')) as HTMLElement[];
+    const currentFocused = apIcons.find(icon => icon === document.activeElement);
+    const currentIndex = currentFocused ? apIcons.indexOf(currentFocused) : -1;
+    
+    switch (keyboardEvent.key) {
+        case 'ArrowLeft':
+            if (currentIndex > 0) {
+                apIcons[currentIndex - 1].focus();
+                return true;
+            }
+            break;
+            
+        case 'ArrowRight':
+            if (currentIndex < apIcons.length - 1) {
+                apIcons[currentIndex + 1].focus();
+                return true;
+            }
+            break;
+            
+        case 'Space':
+        case 'Enter':
+            if (currentFocused) {
+                currentFocused.click();
+                return true;
+            }
+            break;
+    }
+    
+    return false;
+}
+
+/**
+ * Calculates trait overflow count for display
+ * 
+ * This function determines how many traits are hidden when there are too many
+ * to display in the available space (limited to ~2 rows or 4 traits).
+ * 
+ * @param traits - Array of trait objects
+ * @param maxVisible - Maximum number of traits to show (default: 4)
+ * @returns Object with visible traits and overflow count
+ * 
+ * @example
+ * ```typescript
+ * // Calculate trait overflow
+ * const result = calculateTraitOverflow(traits, 4);
+ * // Result: { visibleTraits: [...], overflowCount: 2 }
+ * ```
+ */
+export function calculateTraitOverflow(traits: unknown, maxVisible: number = 4): { visibleTraits: any[], overflowCount: number } {
+    if (!Array.isArray(traits)) {
+        return { visibleTraits: [], overflowCount: 0 };
+    }
+    
+    const maxTraits = Math.max(1, Math.floor(maxVisible));
+    
+    if (traits.length <= maxTraits) {
+        return { visibleTraits: traits, overflowCount: 0 };
+    }
+    
+    return {
+        visibleTraits: traits.slice(0, maxTraits),
+        overflowCount: traits.length - maxTraits
+    };
+}
+
+/**
  * Formats flavor text for rolls with proper capitalization
  * 
  * This function creates properly formatted flavor text for rolls by

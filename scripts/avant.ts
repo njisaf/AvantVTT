@@ -29,9 +29,6 @@ import { AvantRerollDialog } from './dialogs/reroll-dialog';
 import { AvantChatContextMenu } from './chat/context-menu.ts';
 import { initializeChatIntegration } from './logic/chat/chat-integration.js';
 
-// Theme manager
-import { AvantThemeManager } from './themes/theme-manager.js';
-
 // Commands module
 import { initializeAvantCommands } from './commands/index.ts';
 
@@ -90,13 +87,7 @@ interface UtilityResult {
 Hooks.once('init', async function(): Promise<void> {
     console.log("Avant | Initializing Avant Native system with robust initialization manager");
     
-    // Register settings for theme manager early
-    AvantThemeManager.registerSettings();
-    console.log("Avant | Theme manager settings registered");
-    
-    // Register accessibility settings early (required for template helpers)
-    AvantThemeManager.registerAccessibilitySettings();
-    console.log("Avant | Accessibility settings registered");
+
     
     // Create and expose initialization manager immediately
     const initManager = InitializationManager.getInstance();
@@ -159,15 +150,7 @@ Hooks.once('ready', async function(): Promise<void> {
             const finalStatus = initManager.getStatusReport();
             console.log('Avant | Final Initialization Status:', finalStatus);
             
-            // Validate critical services are ready
-            const criticalServices = ['themeManager', 'themeInitialization'];
-            for (const serviceName of criticalServices) {
-                if (initManager.isServiceReady(serviceName)) {
-                    console.log(`✅ Avant | Critical service '${serviceName}' is ready`);
-                } else {
-                    console.warn(`❌ Avant | Critical service '${serviceName}' is NOT ready`);
-                }
-            }
+
         } else {
             console.error('Avant | Ready phase failed:', readyResult.error);
         }
@@ -816,7 +799,6 @@ interface AvantGlobals {
     // AvantItemSheet: typeof AvantItemSheet;
     AvantRerollDialog: typeof AvantRerollDialog;
     AvantChatContextMenu: typeof AvantChatContextMenu;
-    AvantThemeManager: typeof AvantThemeManager;
     ValidationUtils: typeof ValidationUtils;
 }
 
@@ -836,7 +818,6 @@ const avantGlobals: AvantGlobals = {
     // AvantItemSheet,
     AvantRerollDialog,
     AvantChatContextMenu,
-    AvantThemeManager,
     ValidationUtils
 };
 

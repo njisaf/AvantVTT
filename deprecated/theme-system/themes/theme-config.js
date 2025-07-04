@@ -37,6 +37,21 @@ export const THEME_CONFIG = {
                 category: 'backgrounds',
                 required: true,
                 example: '#333333'
+            },
+            // SCSS compatibility variables
+            surface: {
+                cssVar: '--theme-surface',
+                description: 'Surface/background color for feature cards (SCSS compatibility)',
+                category: 'backgrounds',
+                required: true,
+                example: '#1a1a1a'
+            },
+            surfaceVariant: {
+                cssVar: '--theme-surface-variant',
+                description: 'Variant surface color for UI elements (SCSS compatibility)',
+                category: 'backgrounds',
+                required: false,
+                example: '#2a2a2a'
             }
         },
         text: {
@@ -60,6 +75,28 @@ export const THEME_CONFIG = {
                 category: 'text',
                 required: false,
                 example: '#808080'
+            },
+            // SCSS compatibility variables
+            main: {
+                cssVar: '--theme-text',
+                description: 'Main text color for feature cards (SCSS compatibility)',
+                category: 'text',
+                required: true,
+                example: '#e0e0e0'
+            },
+            onPrimary: {
+                cssVar: '--theme-text-on-primary',
+                description: 'Text color on primary background (SCSS compatibility)',
+                category: 'text',
+                required: false,
+                example: '#000'
+            },
+            onSecondary: {
+                cssVar: '--theme-text-on-secondary',
+                description: 'Text color on secondary background (SCSS compatibility)',
+                category: 'text',
+                required: false,
+                example: '#000'
             }
         },
         accents: {
@@ -83,6 +120,21 @@ export const THEME_CONFIG = {
                 category: 'accents',
                 required: false,
                 example: '#00B8B5'
+            },
+            // SCSS compatibility variables  
+            themePrimary: {
+                cssVar: '--theme-primary',
+                description: 'Primary theme color for feature cards (SCSS compatibility)',
+                category: 'accents',
+                required: true,
+                example: '#00E0DC'
+            },
+            themeSecondary: {
+                cssVar: '--theme-secondary',
+                description: 'Secondary theme color for feature cards (SCSS compatibility)',
+                category: 'accents',
+                required: true,
+                example: '#4CE2E1'
             }
         },
         borders: {
@@ -99,6 +151,14 @@ export const THEME_CONFIG = {
                 category: 'borders',
                 required: false,
                 example: '#00E0DC'
+            },
+            // SCSS compatibility variables
+            main: {
+                cssVar: '--theme-border',
+                description: 'Main border color for feature cards (SCSS compatibility)',
+                category: 'borders',
+                required: true,
+                example: '#333'
             }
         },
         states: {
@@ -129,6 +189,35 @@ export const THEME_CONFIG = {
                 category: 'states',
                 required: false,
                 example: '#3B82F6'
+            },
+            // SCSS compatibility variables
+            colorSuccess: {
+                cssVar: '--color-success',
+                description: 'Success color for PP buttons (SCSS compatibility)',
+                category: 'states',
+                required: false,
+                example: '#22c55e'
+            },
+            colorSuccessText: {
+                cssVar: '--color-success-text',
+                description: 'Success text color (SCSS compatibility)',
+                category: 'states',
+                required: false,
+                example: '#000'
+            },
+            colorError: {
+                cssVar: '--color-error',
+                description: 'Error color for invalid states (SCSS compatibility)',
+                category: 'states',
+                required: false,
+                example: '#ff4444'
+            },
+            colorErrorBg: {
+                cssVar: '--color-error-bg',
+                description: 'Error background color (SCSS compatibility)',
+                category: 'states',
+                required: false,
+                example: 'rgba(255, 68, 68, 0.1)'
             }
         }
     },

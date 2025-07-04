@@ -1,145 +1,137 @@
 <div class="item-sheet augment-sheet flexcol" autocomplete="off" data-application-part="form">
+    <!-- Simplified header with just name input, AP selector (3 bubbles), and PP cost -->
     <header class="sheet-header">
-        <img class="profile-img" src="{{#if item.img}}{{item.img}}{{else}}icons/svg/item-bag.svg{{/if}}" data-edit="img" title="{{item.name}}" height="64" width="64"/>
-        <div class="header-fields">
+        <div class="header-main">
             <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Augment Name"/></h1>
-            <div class="resource-row">
-                <div class="resource">
-                    <label for="system.apCost">Action Points</label>
-                    <div class="ap-selector" data-ap-cost="{{system.apCost}}" role="group" aria-label="Action Point cost: {{system.apCost}}">
-                        <div class="ap-selector__icons">
-                            <button type="button" class="ap-icon ap-icon--empty" data-ap-value="0" title="Set AP cost to 0" aria-label="Set Action Point cost to 0">
-                                <i class="fas fa-circle" aria-hidden="true"></i>
-                            </button>
-                            <button type="button" class="ap-icon ap-icon--empty" data-ap-value="1" title="Set AP cost to 1" aria-label="Set Action Point cost to 1">
-                                <i class="fas fa-circle" aria-hidden="true"></i>
-                            </button>
-                            <button type="button" class="ap-icon ap-icon--empty" data-ap-value="2" title="Set AP cost to 2" aria-label="Set Action Point cost to 2">
-                                <i class="fas fa-circle" aria-hidden="true"></i>
-                            </button>
-                            <button type="button" class="ap-icon ap-icon--empty" data-ap-value="3" title="Set AP cost to 3" aria-label="Set Action Point cost to 3">
-                                <i class="fas fa-circle" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                        <input type="hidden" name="system.apCost" value="{{system.apCost}}" data-dtype="Number">
-                    </div>
+        </div>
+        
+        <div class="header-costs">
+            <!-- AP Selector - 3 bubbles with progressive toggle functionality -->
+            <div class="ap-selector" data-ap-cost="{{system.apCost}}" role="radiogroup" aria-label="Action Point cost: {{system.apCost}}">
+                <label class="ap-selector__label">AP</label>
+                <div class="ap-selector__icons">
+                    <button type="button" class="ap-icon" data-ap-value="1" title="Set AP cost to 1" aria-label="Set Action Point cost to 1" role="radio">
+                        <i class="fas fa-circle" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" class="ap-icon" data-ap-value="2" title="Set AP cost to 2" aria-label="Set Action Point cost to 2" role="radio">
+                        <i class="fas fa-circle" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" class="ap-icon" data-ap-value="3" title="Set AP cost to 3" aria-label="Set Action Point cost to 3" role="radio">
+                        <i class="fas fa-circle" aria-hidden="true"></i>
+                    </button>
                 </div>
-                <div class="resource">
-                    <label for="system.ppCost">Power Points</label>
-                    <input type="number" name="system.ppCost" value="{{system.ppCost}}" data-dtype="Number" min="0"/>
-                </div>
-                <div class="resource">
-                    <label for="system.levelRequirement">Level Required</label>
-                    <input type="number" name="system.levelRequirement" value="{{system.levelRequirement}}" data-dtype="Number" min="1"/>
-                </div>
+                <input type="hidden" name="system.apCost" value="{{#if system.apCost}}{{system.apCost}}{{else}}0{{/if}}" data-dtype="Number">
+            </div>
+            
+            <!-- PP Cost Input -->
+            <div class="pp-cost-input">
+                <label for="system.ppCost">PP</label>
+                <input type="number" name="system.ppCost" value="{{system.ppCost}}" data-dtype="Number" min="0" placeholder="0"/>
             </div>
         </div>
     </header>
 
-    <nav class="sheet-tabs tabs" data-group="primary">
-        <a class="item" data-tab="description">Description</a>
-        <a class="item" data-tab="details">Details</a>
-    </nav>
-
+    <!-- Single content section without tabs - ordered as requested -->
     <section class="sheet-body">
-        <div class="tab" data-group="primary" data-tab="description">
+        <!-- Description - simple textarea instead of editor -->
+        <div class="form-group">
+            <label>Description</label>
+            <textarea name="system.description" rows="6" placeholder="Enter augment description...">{{system.description}}</textarea>
+        </div>
+        
+        <!-- Requirements - reduced to one line -->
+        <div class="form-group">
+            <label>Requirements</label>
+            <input type="text" name="system.requirements" value="{{system.requirements}}" placeholder="Enter any requirements or prerequisites..."/>
+        </div>
+        
+        <!-- Additional detail fields in a compact layout -->
+        <div class="form-row">
             <div class="form-group">
-                <label>Description</label>
-                {{editor enrichedDescription target="system.description" button=true editable=editable}}
+                <label for="system.levelRequirement">Level Required</label>
+                <input type="number" name="system.levelRequirement" value="{{system.levelRequirement}}" data-dtype="Number" min="1"/>
             </div>
-            
             <div class="form-group">
-                <label>Requirements</label>
-                <textarea name="system.requirements" rows="3" placeholder="Enter any requirements or prerequisites...">{{system.requirements}}</textarea>
-            </div>
-            
-            <!-- Trait Management Section -->
-            <div class="form-group">
-                <label>Traits</label>
-                {{#if editable}}
-                    <!-- Edit mode: Trait chip input -->
-                    <div class="trait-chip-input" data-trait-input="true">
-                        <div class="trait-chip-input__field" tabindex="0">
-                            <!-- Existing trait chips -->
-                            {{#each displayTraits as |trait|}}
-                                <span class="trait-chip trait-chip--removable" data-trait="{{trait.id}}" 
-                                      {{traitChipData trait}}
-                                      style="{{traitChipStyle trait}}"
-                                      title="{{#if trait.description}}{{trait.description}}{{else}}{{trait.name}}{{/if}}">
-                                    {{#if trait.icon}}<i class="trait-chip__icon {{trait.icon}}" aria-hidden="true"></i>{{/if}}
-                                    <span class="trait-chip__text">{{trait.name}}</span>
-                                    <button type="button" class="trait-chip__remove" aria-label="Remove trait">×</button>
-                                </span>
-                            {{/each}}
-                            <!-- Input field for adding new traits -->
-                            <input type="text" class="trait-chip-input__input" placeholder="Add trait..." autocomplete="off" />
-                        </div>
-                        <!-- Dropdown for autocomplete suggestions (hidden by default) -->
-                        <div class="trait-chip-input__dropdown" data-trait-dropdown="true">
-                            <div class="trait-chip-input__no-results">No matching traits found</div>
-                        </div>
-                        <!-- Hidden input to store actual trait data -->
-                        <input type="hidden" name="system.traits" value="{{json system.traits}}" data-trait-data="true" />
-                    </div>
-                {{else}}
-                    <!-- View mode: Display trait chips -->
-                    <div class="trait-chips trait-chips--readonly">
-                        {{#each displayTraits as |trait|}}
-                            <span class="trait-chip" data-trait="{{trait.id}}">
-                                <span class="trait-chip__text">{{trait.name}}</span>
-                            </span>
-                        {{else}}
-                            <span class="trait-chips__empty">No traits assigned</span>
-                        {{/each}}
-                    </div>
-                {{/if}}
+                <label>Rarity</label>
+                <select name="system.rarity">
+                    <option value="common" {{#if (eq system.rarity "common")}}selected{{/if}}>Common</option>
+                    <option value="uncommon" {{#if (eq system.rarity "uncommon")}}selected{{/if}}>Uncommon</option>
+                    <option value="rare" {{#if (eq system.rarity "rare")}}selected{{/if}}>Rare</option>
+                    <option value="epic" {{#if (eq system.rarity "epic")}}selected{{/if}}>Epic</option>
+                    <option value="legendary" {{#if (eq system.rarity "legendary")}}selected{{/if}}>Legendary</option>
+                </select>
             </div>
         </div>
-
-        <div class="tab" data-group="primary" data-tab="details">
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Rarity</label>
-                    <select name="system.rarity">
-                        <option value="common" {{#if (eq system.rarity "common")}}selected{{/if}}>Common</option>
-                        <option value="uncommon" {{#if (eq system.rarity "uncommon")}}selected{{/if}}>Uncommon</option>
-                        <option value="rare" {{#if (eq system.rarity "rare")}}selected{{/if}}>Rare</option>
-                        <option value="epic" {{#if (eq system.rarity "epic")}}selected{{/if}}>Epic</option>
-                        <option value="legendary" {{#if (eq system.rarity "legendary")}}selected{{/if}}>Legendary</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Augment Type</label>
-                    <select name="system.augmentType">
-                        <option value="enhancement" {{#if (eq system.augmentType "enhancement")}}selected{{/if}}>Enhancement</option>
-                        <option value="modification" {{#if (eq system.augmentType "modification")}}selected{{/if}}>Modification</option>
-                        <option value="implant" {{#if (eq system.augmentType "implant")}}selected{{/if}}>Implant</option>
-                        <option value="symbiotic" {{#if (eq system.augmentType "symbiotic")}}selected{{/if}}>Symbiotic</option>
-                    </select>
-                </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label>Augment Type</label>
+                <select name="system.augmentType">
+                    <option value="enhancement" {{#if (eq system.augmentType "enhancement")}}selected{{/if}}>Enhancement</option>
+                    <option value="modification" {{#if (eq system.augmentType "modification")}}selected{{/if}}>Modification</option>
+                    <option value="implant" {{#if (eq system.augmentType "implant")}}selected{{/if}}>Implant</option>
+                    <option value="symbiotic" {{#if (eq system.augmentType "symbiotic")}}selected{{/if}}>Symbiotic</option>
+                </select>
             </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="system.uses.value">Current Uses</label>
-                    <input type="number" name="system.uses.value" value="{{system.uses.value}}" data-dtype="Number" min="0"/>
-                </div>
-                <div class="form-group">
-                    <label for="system.uses.max">Maximum Uses</label>
-                    <input type="number" name="system.uses.max" value="{{system.uses.max}}" data-dtype="Number" min="0"/>
-                </div>
-            </div>
-            
             <div class="form-group">
                 <label for="system.isActive">Is Active</label>
                 <input type="checkbox" name="system.isActive" {{#if system.isActive}}checked{{/if}}/>
             </div>
-            
-            <!-- Legacy field for backwards compatibility -->
+        </div>
+        
+        <div class="form-row">
             <div class="form-group">
-                <label>Legacy Power Point Cost</label>
-                <input type="number" name="system.powerPointCost" value="{{system.powerPointCost}}" data-dtype="Number" min="0"/>
+                <label for="system.uses.value">Current Uses</label>
+                <input type="number" name="system.uses.value" value="{{system.uses.value}}" data-dtype="Number" min="0"/>
             </div>
+            <div class="form-group">
+                <label for="system.uses.max">Maximum Uses</label>
+                <input type="number" name="system.uses.max" value="{{system.uses.max}}" data-dtype="Number" min="0"/>
+            </div>
+        </div>
+
+        <!-- Traits at the bottom as requested -->
+        <div class="form-group">
+            <label>Traits</label>
+            {{#if editable}}
+                <!-- Edit mode: Trait chip input -->
+                <div class="trait-chip-input" data-trait-input="true">
+                    <div class="trait-chip-input__field" tabindex="0">
+                        <!-- Existing trait chips -->
+                        {{#each displayTraits as |trait|}}
+                            <span class="trait-chip trait-chip--removable" data-trait="{{trait.id}}" 
+                                  {{traitChipData trait}}
+                                  style="{{traitChipStyle trait}}"
+                                  title="{{#if trait.description}}{{trait.description}}{{else}}{{trait.name}}{{/if}}">
+                                {{#if trait.icon}}<i class="trait-chip__icon {{trait.icon}}" aria-hidden="true"></i>{{/if}}
+                                <span class="trait-chip__text">{{trait.name}}</span>
+                                <button type="button" class="trait-chip__remove" data-action="removeTrait" aria-label="Remove trait">×</button>
+                            </span>
+                        {{/each}}
+                        <!-- Input field for adding new traits -->
+                        <input type="text" class="trait-chip-input__input" placeholder="Add trait..." autocomplete="off" />
+                    </div>
+                    <!-- Dropdown for autocomplete suggestions (hidden by default) -->
+                    <div class="trait-chip-input__dropdown" data-trait-dropdown="true">
+                        <div class="trait-chip-input__no-results" aria-live="polite">No matching traits found</div>
+                    </div>
+                    <!-- Hidden inputs to store actual trait data -->
+                    {{#each system.traits as |traitId index|}}
+                    <input type="hidden" name="system.traits.{{index}}" value="{{traitId}}" />
+                    {{/each}}
+                </div>
+            {{else}}
+                <!-- View mode: Display trait chips -->
+                <div class="trait-chips trait-chips--readonly">
+                    {{#each displayTraits as |trait|}}
+                        <span class="trait-chip" data-trait="{{trait.id}}">
+                            <span class="trait-chip__text">{{trait.name}}</span>
+                        </span>
+                    {{else}}
+                        <span class="trait-chips__empty">No traits assigned</span>
+                    {{/each}}
+                </div>
+            {{/if}}
         </div>
     </section>
 </div> 
