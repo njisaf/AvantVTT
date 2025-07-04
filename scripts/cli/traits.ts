@@ -8,8 +8,7 @@
 import { promises as fs } from 'fs';
 import { join, dirname, resolve } from 'path';
 import { TraitProvider } from '../services/trait-provider.ts';
-// DEPRECATED: RemoteTraitService removed in Phase 2
-// import { RemoteTraitService, createRemoteTraitCommands } from '../services/remote-trait-service.ts';
+// RemoteTraitService removed in Phase 3 - see deprecated/remote-trait-service/README.md
 import type { Trait, TraitItemSystemData } from '../types/domain/trait.ts';
 import { Command } from 'commander';
 
@@ -578,9 +577,7 @@ export class TraitCLI {
  */
 export function createTraitCommands(traitProvider: TraitProvider) {
   const cli = new TraitCLI(traitProvider);
-  // DEPRECATED: RemoteTraitService removed in Phase 2
-  // const remoteService = RemoteTraitService.getInstance();
-  // const remoteCommands = createRemoteTraitCommands(remoteService);
+      // Remote trait commands removed in Phase 3 - see deprecated/remote-trait-service/README.md
   
   return {
     /**

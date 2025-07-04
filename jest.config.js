@@ -40,7 +40,7 @@ export default {
       testMatch: [
         '<rootDir>/tests/unit/**/*.test.[jt]s',
         '!<rootDir>/tests/unit/**/*.int.test.[jt]s',
-        '!<rootDir>/deprecated/**/*.test.[jt]s'
+        '!<rootDir>/deprecated/**/*.test.[jt]s' // Deprecated features — do not run
       ],
       setupFilesAfterEnv: [
         '<rootDir>/tests/setup.js'
@@ -110,7 +110,7 @@ export default {
       },
       testMatch: [
         '<rootDir>/tests/integration/**/*.int.test.[jt]s',
-        '!<rootDir>/deprecated/**/*.int.test.[jt]s'
+        '!<rootDir>/deprecated/**/*.int.test.[jt]s' // Deprecated features — do not run
       ],
       setupFilesAfterEnv: [
         '<rootDir>/tests/setup.js'
