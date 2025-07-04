@@ -8,7 +8,8 @@
 import { promises as fs } from 'fs';
 import { join, dirname, resolve } from 'path';
 import { TraitProvider } from '../services/trait-provider.ts';
-import { RemoteTraitService, createRemoteTraitCommands } from '../services/remote-trait-service.ts';
+// DEPRECATED: RemoteTraitService removed in Phase 2
+// import { RemoteTraitService, createRemoteTraitCommands } from '../services/remote-trait-service.ts';
 import type { Trait, TraitItemSystemData } from '../types/domain/trait.ts';
 import { Command } from 'commander';
 
@@ -577,8 +578,9 @@ export class TraitCLI {
  */
 export function createTraitCommands(traitProvider: TraitProvider) {
   const cli = new TraitCLI(traitProvider);
-  const remoteService = RemoteTraitService.getInstance();
-  const remoteCommands = createRemoteTraitCommands(remoteService);
+  // DEPRECATED: RemoteTraitService removed in Phase 2
+  // const remoteService = RemoteTraitService.getInstance();
+  // const remoteCommands = createRemoteTraitCommands(remoteService);
   
   return {
     /**
@@ -628,21 +630,21 @@ export function createTraitCommands(traitProvider: TraitProvider) {
     },
     
     /**
-     * Sync traits from remote repository
+     * Sync traits from remote repository (DEPRECATED)
      */
     async sync(args: string[]): Promise<void> {
-      await remoteCommands.sync(args);
+      console.error('❌ Remote trait sync has been deprecated.');
+      console.error('📖 See deprecated/remote-trait-service/README.md for more information.');
+      process.exit(1);
     },
     
     /**
-     * Get remote trait information
+     * Get remote trait information (DEPRECATED)
      */
     async remote(args: string[]): Promise<void> {
-      if (args.includes('info') || args.length === 0) {
-        await remoteCommands.info();
-      } else {
-        console.error('❌ Unknown remote command. Use: traits remote info');
-      }
+      console.error('❌ Remote trait functionality has been deprecated.');
+      console.error('📖 See deprecated/remote-trait-service/README.md for more information.');
+      process.exit(1);
     },
     
     /**
@@ -674,8 +676,8 @@ function showHelp(): void {
 USAGE:
   npm run traits:export [output.json] [options]      Export traits to JSON file (mock data)
   npm run traits:import <input.json> [options]       Import traits from JSON file
-  npm run traits:sync [options]                      Sync traits from remote repository
-  npm run traits:remote [info]                       Get remote trait information
+  npm run traits:sync [options]                      [DEPRECATED] Sync traits from remote repository
+  npm run traits:remote [info]                       [DEPRECATED] Get remote trait information
   npm run traits:integrity                           Check data integrity
 
 RECOMMENDED WORKFLOW:

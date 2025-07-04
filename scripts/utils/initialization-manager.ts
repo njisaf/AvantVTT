@@ -645,12 +645,8 @@ export class FoundryInitializationHelper {
             return traitProvider;
         }, ['traitSeeder'], { phase: 'ready', critical: false });
         
-        // Remote Trait Service - ready phase, handles remote trait synchronization
-        manager.registerService('remoteTraitService', async () => {
-            const { RemoteTraitService } = await import('../services/remote-trait-service.ts');
-            const remoteService = RemoteTraitService.getInstance();
-            console.log('🌐 FoundryInitializationHelper | Remote trait service initialized');
-            return remoteService;
-        }, ['traitProvider'], { phase: 'ready', critical: false });
+        // Remote Trait Service - DEPRECATED in Phase 2
+        // Service registration removed to eliminate runtime references
+        // See deprecated/remote-trait-service/README.md for more information
     }
 } 
