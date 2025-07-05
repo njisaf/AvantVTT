@@ -2,8 +2,6 @@
 
 A narrative RPG system for FoundryVTT.
 
-[![RemoteTraitService](https://img.shields.io/badge/RemoteTraitService-🗄️_Archived-orange)](deprecated/remote-trait-service/README.md) [![Deprecation Policy](https://img.shields.io/badge/Deprecation-Policy_Available-blue)](docs/DEPRECATION_POLICY.md)
-
 ## What is Avant?
 Avant is a modular, narrative-focused game system for Foundry Virtual Tabletop (FoundryVTT v13+). It provides a modern, themeable, and extensible ruleset for digital tabletop play.
 
