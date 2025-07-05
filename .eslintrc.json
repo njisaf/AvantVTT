@@ -19,7 +19,7 @@
   },
   "overrides": [
     {
-      "files": ["*.ts", "*.js"],
+      "files": ["**/*.ts", "**/*.js"],
       "parser": "@typescript-eslint/parser",
       "plugins": ["@typescript-eslint"],
       "extends": [
