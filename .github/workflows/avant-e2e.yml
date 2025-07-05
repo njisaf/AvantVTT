@@ -40,7 +40,7 @@ jobs:
         with:
           repository: njisaf/slopcore
           path: .slopcore
-          token: ${{ secrets.SLOPCORE_TOKEN }}
+          token: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -141,9 +141,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const { context } = require('@actions/github');
-
-            // Trigger DevBot self-heal workflow with trace attachment
+            // context and github are already injected by github-script
             await github.rest.actions.createWorkflowDispatch({
               owner: 'njisaf',
               repo: 'slopcore',
