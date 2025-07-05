@@ -45,7 +45,7 @@ async function validateTemplateMapping() {
         };
         
         for (const itemType of declaredItemTypes) {
-            const templatePath = path.join(templatesDir, `item-${itemType}-sheet.html`);
+            const templatePath = path.join(templatesDir, `item-${itemType}-new.html`);
             const exists = fs.existsSync(templatePath);
             
             if (exists) {
@@ -60,8 +60,8 @@ async function validateTemplateMapping() {
         
         // Check for extra templates (informational)
         const templateFiles = fs.readdirSync(templatesDir)
-            .filter(file => file.startsWith('item-') && file.endsWith('-sheet.html'))
-            .map(file => file.replace('item-', '').replace('-sheet.html', ''));
+                    .filter(file => file.startsWith('item-') && file.endsWith('-new.html'))
+        .map(file => file.replace('item-', '').replace('-new.html', ''));
         
         const extraTemplates = templateFiles.filter(type => !declaredItemTypes.includes(type));
         if (extraTemplates.length > 0) {
@@ -89,13 +89,13 @@ async function validateTemplateMapping() {
 }
 
 /**
- * Validates specific template content for common issues.
+ * Validates specific template content for component-based architecture.
  * 
  * @param {string} itemType - The item type to validate
  * @returns {Object} Validation result for the template
  */
 function validateTemplateContent(itemType) {
-    const templatePath = path.join(__dirname, '..', 'templates', 'item', `item-${itemType}-sheet.html`);
+    const templatePath = path.join(__dirname, '..', 'templates', 'item', `item-${itemType}-new.html`);
     
     if (!fs.existsSync(templatePath)) {
         return { valid: false, error: 'Template file not found' };
@@ -105,21 +105,41 @@ function validateTemplateContent(itemType) {
         const content = fs.readFileSync(templatePath, 'utf8');
         const issues = [];
         
-        // Check for common issues
-        if (!content.includes('data-action')) {
-            issues.push('Missing data-action attributes for buttons');
+        // Check for component-based architecture features
+        if (!content.includes('data-application-part="form"')) {
+            issues.push('Missing FoundryVTT v13 form application part');
         }
         
-        if (!content.includes('data-dtype')) {
-            issues.push('Missing data-dtype attributes for form fields');
+        // Check for proper component usage
+        if (!content.includes('templates/shared/partials/')) {
+            issues.push('Not using component-based architecture');
         }
         
-        if (itemType === 'talent' && !content.includes('apCost')) {
-            issues.push('Talent template missing AP cost field');
+        // Check for specific field requirements
+        if (itemType === 'talent') {
+            if (!content.includes('apCost')) {
+                issues.push('Talent template missing AP cost field');
+            }
+            if (!content.includes('ap-selector.hbs')) {
+                issues.push('Talent template missing AP selector component');
+            }
         }
         
-        if (itemType === 'augment' && !content.includes('ppCost')) {
-            issues.push('Augment template missing PP cost field');
+        if (itemType === 'augment') {
+            if (!content.includes('ppCost') && !content.includes('apCost')) {
+                issues.push('Augment template missing cost fields (AP/PP)');
+            }
+            if (!content.includes('ap-selector.hbs')) {
+                issues.push('Augment template missing AP selector component');
+            }
+        }
+        
+        // Check for required components
+        const requiredComponents = ['image-upload.hbs', 'text-field.hbs', 'traits-field.hbs'];
+        for (const component of requiredComponents) {
+            if (!content.includes(component)) {
+                issues.push(`Missing required component: ${component}`);
+            }
         }
         
         return {

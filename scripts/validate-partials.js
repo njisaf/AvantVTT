@@ -72,8 +72,16 @@ function validatePartialExists(partialPath, templateFile) {
     if (partialPath.startsWith('systems/avant/')) {
         // Full system path format - should work with proper template loading
         actualPath = partialPath.replace('systems/avant/', '');
-        const fullPath = path.join(DIST_DIR, actualPath);
+        
+        // Check with .hbs extension first (most common case for partials)
+        let fullPath = path.join(DIST_DIR, actualPath + '.hbs');
         exists = fs.existsSync(fullPath);
+        
+        // If not found with .hbs, try without extension (for .html templates)
+        if (!exists) {
+            fullPath = path.join(DIST_DIR, actualPath);
+            exists = fs.existsSync(fullPath);
+        }
         
         if (!exists) {
             suggestions.push(`Check if file exists at: ${fullPath}`);
@@ -82,8 +90,16 @@ function validatePartialExists(partialPath, templateFile) {
     } else if (partialPath.startsWith('templates/')) {
         // Relative path format - check if it exists and suggest fix
         actualPath = partialPath;
-        const fullPath = path.join(DIST_DIR, actualPath);
+        
+        // Check with .hbs extension first
+        let fullPath = path.join(DIST_DIR, actualPath + '.hbs');
         exists = fs.existsSync(fullPath);
+        
+        // If not found with .hbs, try without extension
+        if (!exists) {
+            fullPath = path.join(DIST_DIR, actualPath);
+            exists = fs.existsSync(fullPath);
+        }
         
         if (exists) {
             // File exists but path format is inconsistent
@@ -99,8 +115,16 @@ function validatePartialExists(partialPath, templateFile) {
     } else {
         // Assume it's a relative path that should be in templates/
         actualPath = `templates/${partialPath}`;
-        const fullPath = path.join(DIST_DIR, actualPath);
+        
+        // Check with .hbs extension first
+        let fullPath = path.join(DIST_DIR, actualPath + '.hbs');
         exists = fs.existsSync(fullPath);
+        
+        // If not found with .hbs, try without extension
+        if (!exists) {
+            fullPath = path.join(DIST_DIR, actualPath);
+            exists = fs.existsSync(fullPath);
+        }
         
         if (!exists) {
             suggestions.push(`Check if file exists at: ${fullPath}`);

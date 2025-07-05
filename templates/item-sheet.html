@@ -1,9 +1,21 @@
 <form class="{{cssClass}} avant flexcol" autocomplete="off">
     {{!-- Dynamic Content Based on Item Type --}}
     {{#if (eq item.type "talent")}}
-        {{> "systems/avant/templates/item/item-talent-sheet.html"}}
+        {{> "systems/avant/templates/item/item-talent-new.html"}}
     {{else if (eq item.type "augment")}}
-        {{> "systems/avant/templates/item/item-augment-sheet.html"}}
+        {{> "systems/avant/templates/item/item-augment-new.html"}}
+    {{else if (eq item.type "weapon")}}
+        {{> "systems/avant/templates/item/item-weapon-new.html"}}
+    {{else if (eq item.type "armor")}}
+        {{> "systems/avant/templates/item/item-armor-new.html"}}
+    {{else if (eq item.type "action")}}
+        {{> "systems/avant/templates/item/item-action-new.html"}}
+    {{else if (eq item.type "gear")}}
+        {{> "systems/avant/templates/item/item-gear-new.html"}}
+    {{else if (eq item.type "feature")}}
+        {{> "systems/avant/templates/item/item-feature-new.html"}}
+    {{else if (eq item.type "trait")}}
+        {{> "systems/avant/templates/item/item-trait-new.html"}}
     {{else}}
         {{!-- Sheet Header for other item types --}}
         <header class="sheet-header">
@@ -29,18 +41,18 @@
                 </div>
             </div>
 
-            {{!-- Details Tab - Dynamic Content Based on Item Type --}}
+            {{!-- Details Tab - Component-based templates --}}
             <div class="tab" data-group="primary" data-tab="details">
                 {{#if (eq item.type "action")}}
-                    {{> "systems/avant/templates/item/item-action-sheet.html"}}
+                    {{> "systems/avant/templates/item/item-action-new.html"}}
                 {{else if (eq item.type "feature")}}
-                    {{> "systems/avant/templates/item/item-feature-sheet.html"}}
+                    {{> "systems/avant/templates/item/item-feature-new.html"}}
                 {{else if (eq item.type "weapon")}}
-                    {{> "systems/avant/templates/item/item-weapon-sheet.html"}}
+                    {{> "systems/avant/templates/item/item-weapon-new.html"}}
                 {{else if (eq item.type "armor")}}
-                    {{> "systems/avant/templates/item/item-armor-sheet.html"}}
+                    {{> "systems/avant/templates/item/item-armor-new.html"}}
                 {{else}}
-                    {{> "systems/avant/templates/item/item-gear-sheet.html"}}
+                    {{> "systems/avant/templates/item/item-gear-new.html"}}
                 {{/if}}
             </div>
         </section>

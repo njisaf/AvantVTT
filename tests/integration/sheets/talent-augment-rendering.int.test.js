@@ -59,7 +59,7 @@ describe('Talent and Augment Sheet Rendering Integration', () => {
             isEditable: true,
             get template() {
                 const type = this.document?.type || 'gear';
-                return `systems/avant/templates/item/item-${type}-sheet.html`;
+                return `systems/avant/templates/item/item-${type}-new.html`;
             },
             async _prepareContext(options) {
                 const itemData = this.document.toObject(false);
@@ -83,7 +83,7 @@ describe('Talent and Augment Sheet Rendering Integration', () => {
             mockItemSheet.document = mockTalentItem;
             const templatePath = mockItemSheet.template;
             
-            expect(templatePath).toBe('systems/avant/templates/item/item-talent-sheet.html');
+            expect(templatePath).toBe('systems/avant/templates/item/item-talent-new.html');
         });
 
         test('should prepare context with talent-specific data', async () => {
@@ -145,7 +145,7 @@ describe('Talent and Augment Sheet Rendering Integration', () => {
             mockItemSheet.document = mockAugmentItem;
             const templatePath = mockItemSheet.template;
             
-            expect(templatePath).toBe('systems/avant/templates/item/item-augment-sheet.html');
+            expect(templatePath).toBe('systems/avant/templates/item/item-augment-new.html');
         });
 
         test('should prepare context with augment-specific data', async () => {

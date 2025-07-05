@@ -452,6 +452,12 @@ export function createAvantItemSheet() {
         
         // Use pure function to prepare template data
         const templateData = prepareTemplateData(itemData);
+        
+        // Prepare augment-specific option data for Phase 3 component library
+        if (itemData.type === 'augment') {
+            context.rarityOptions = this._prepareRarityOptions();
+            context.augmentTypeOptions = this._prepareAugmentTypeOptions();
+        }
         if (templateData) {
             // Merge with existing context
             Object.assign(context, templateData);
@@ -600,42 +606,49 @@ export function createAvantItemSheet() {
     }
 
     /**
-     * Override HTML rendering to add debug logging
-     * @param context - The prepared context data
-     * @param options - Rendering options
-     * @override
+     * Render the inner HTML content
+     * @param context - Template context
+     * @param options - Render options
+     * @returns Rendered HTML content
      */
-    async _renderHTML(context: any, options: any): Promise<object> {
-        const templatePath = this.parts.form.template;
-        
+    async _renderHTML(context: any, options: any): Promise<string> {
         logger.debug('AvantItemSheet | _renderHTML called', {
-            itemType: this.document?.type,
+            itemType: context.item?.type,
             contextKeys: Object.keys(context || {}),
-            partsConfig: this.parts,
-            templatePath: templatePath
+            templatePath: this.options.template
         });
-        
-        // Let's also test if we can manually render the template
 
-        
         try {
-            const result = await super._renderHTML(context, options);
-            
-            // Detailed investigation of the form content
-            const form = (result as any)?.form;
-            logger.debug('AvantItemSheet | _renderHTML result investigation:', {
-                resultKeys: Object.keys(result || {}),
-                hasForm: !!form,
-                formType: typeof form,
-                formConstructor: form?.constructor?.name || 'unknown',
-                formIsElement: form instanceof Element,
-                formIsDocumentFragment: form instanceof DocumentFragment,
-                formInnerHTML: form?.innerHTML?.substring(0, 200) || 'no innerHTML',
-                formTextContent: form?.textContent?.substring(0, 200) || 'no textContent',
-                formOuterHTML: form?.outerHTML?.substring(0, 200) || 'no outerHTML'
-            });
-            
-            return result;
+            // DEBUGGING: Check what partials are available in Handlebars before rendering
+            const handlebars = (globalThis as any).Handlebars;
+            if (handlebars && handlebars.partials) {
+                console.log('🔧 RENDER DEBUG | Available Handlebars partials:', Object.keys(handlebars.partials));
+                
+                // Check specifically for image-upload partial
+                const imageUploadKeys = Object.keys(handlebars.partials).filter(key => 
+                    key.includes('image-upload')
+                );
+                console.log('🔧 RENDER DEBUG | Image-upload partials found:', imageUploadKeys);
+                
+                // Check exactly what we're looking for
+                const expectedKey = 'systems/avant/templates/shared/partials/image-upload';
+                console.log('🔧 RENDER DEBUG | Looking for partial:', expectedKey);
+                console.log('🔧 RENDER DEBUG | Partial exists?', !!handlebars.partials[expectedKey]);
+                
+                if (handlebars.partials[expectedKey]) {
+                    console.log('🔧 RENDER DEBUG | Partial content type:', typeof handlebars.partials[expectedKey]);
+                } else {
+                    console.log('🔧 RENDER DEBUG | Checking alternative patterns...');
+                    const alternatives = Object.keys(handlebars.partials).filter(key => 
+                        key.endsWith('image-upload') || key.includes('image-upload')
+                    );
+                    console.log('🔧 RENDER DEBUG | Alternative matches:', alternatives);
+                }
+            } else {
+                console.warn('🔧 RENDER DEBUG | Handlebars partials registry not accessible');
+            }
+
+            return await super._renderHTML(context, options);
         } catch (error) {
             logger.error('AvantItemSheet | _renderHTML failed:', error);
             throw error;
@@ -696,8 +709,6 @@ export function createAvantItemSheet() {
             }
         }
     }
-
-
 
     /**
      * Handle rendering completion - replaces activateListeners
@@ -1175,6 +1186,34 @@ export function createAvantItemSheet() {
                 ppCost: system.ppCost !== undefined ? typeof system.ppCost : 'not applicable'
             });
         }
+    }
+    
+    /**
+     * Prepare rarity options for the select component
+     * 
+     * @returns Array of option objects for the select component
+     * @private
+     */
+    private _prepareRarityOptions(): Array<{value: string, label: string}> {
+        const rarityValues = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
+        return rarityValues.map(rarity => ({
+            value: rarity,
+            label: rarity.charAt(0).toUpperCase() + rarity.slice(1)
+        }));
+    }
+    
+    /**
+     * Prepare augment type options for the select component
+     * 
+     * @returns Array of option objects for the select component
+     * @private
+     */
+    private _prepareAugmentTypeOptions(): Array<{value: string, label: string}> {
+        const augmentTypeValues = ['enhancement', 'modification', 'implant', 'symbiotic'];
+        return augmentTypeValues.map(type => ({
+            value: type,
+            label: type.charAt(0).toUpperCase() + type.slice(1)
+        }));
     }
 
     /**

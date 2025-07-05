@@ -54,13 +54,13 @@ describe('AvantItemSheet Integration Tests', () => {
     describe('Template Resolution', () => {
         test('should correctly resolve template path for item type', () => {
             const templatePath = itemSheet.template;
-            expect(templatePath).toBe('systems/avant/templates/item/item-weapon-sheet.html');
+            expect(templatePath).toBe('systems/avant/templates/item/item-weapon-new.html');
         });
 
         test('should handle different item types', () => {
-            mockItem.type = 'spell';
+            mockItem.type = 'gear';
             const templatePath = itemSheet.template;
-            expect(templatePath).toBe('systems/avant/templates/item/item-spell-sheet.html');
+            expect(templatePath).toBe('systems/avant/templates/item/item-gear-new.html');
         });
     });
 

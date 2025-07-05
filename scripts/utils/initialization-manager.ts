@@ -588,27 +588,87 @@ export class FoundryInitializationHelper {
                 "systems/avant/templates/item-sheet.html", 
                 "systems/avant/templates/reroll-dialog.html",
                 
-                // Item type specific templates - loaded dynamically by item sheets
-                "systems/avant/templates/item/item-action-sheet.html",
-                "systems/avant/templates/item/item-feature-sheet.html",
-                "systems/avant/templates/item/item-talent-sheet.html",
-                "systems/avant/templates/item/item-augment-sheet.html",
-                "systems/avant/templates/item/item-weapon-sheet.html",
-                "systems/avant/templates/item/item-armor-sheet.html",
-                "systems/avant/templates/item/item-gear-sheet.html",
-                "systems/avant/templates/item/item-trait-sheet.html",
+                // Legacy templates removed - replaced by component-based architecture
+                // See templates/item/*-new.html for current implementations
+                
+                // Phase 3-5 Component Library Templates - NEW unified architecture
+                "systems/avant/templates/item/item-talent-new.html",         // Phase 3 talent sheet
+                "systems/avant/templates/item/item-augment-new.html",        // Phase 3 augment sheet
+                "systems/avant/templates/item/item-weapon-new.html",         // Phase 4 weapon sheet
+                "systems/avant/templates/item/item-armor-new.html",          // Phase 4 armor sheet
+                "systems/avant/templates/item/item-action-new.html",         // Phase 5 action sheet
+                "systems/avant/templates/item/item-gear-new.html",           // Phase 5 gear sheet
+                "systems/avant/templates/item/item-feature-new.html",        // Phase 5 feature sheet
+                "systems/avant/templates/item/item-trait-new.html",          // Phase 5 trait sheet
                 
                 // PARTIAL TEMPLATES - reusable components included in main templates
                 // NOTE: These are *.hbs files that get included via {{> "path"}} syntax
                 // CRITICAL: Every partial referenced in templates MUST be listed here
                 "systems/avant/templates/actor/row-talent-augment.hbs",      // Talent/Augment row component
-                "systems/avant/templates/actor/power-points-section.hbs"     // Power Points tracking UI (Phase 3F)
+                "systems/avant/templates/actor/power-points-section.hbs",    // Power Points tracking UI (Phase 3F)
+                
+                // Phase 2-5 Component Library - Form field partials
+                "systems/avant/templates/shared/partials/form-row.hbs",
+                "systems/avant/templates/shared/partials/number-field.hbs",
+                "systems/avant/templates/shared/partials/checkbox-field.hbs",
+                "systems/avant/templates/shared/partials/select-field.hbs",
+                "systems/avant/templates/shared/partials/text-field.hbs",
+                "systems/avant/templates/shared/partials/ap-selector.hbs",
+                "systems/avant/templates/shared/partials/image-upload.hbs",
+                "systems/avant/templates/shared/partials/textarea-field.hbs",
+                "systems/avant/templates/shared/partials/traits-field.hbs",
+                
+                // Phase 5 Additional Components
+                "systems/avant/templates/shared/partials/category-select.hbs",
+                "systems/avant/templates/shared/partials/uses-counter.hbs",
+                
+                // Phase 3 Layout Partials - NEW layout components
+                "systems/avant/templates/shared/partials/single-content.hbs",
+                "systems/avant/templates/shared/partials/description-tab.hbs",
+                "systems/avant/templates/shared/partials/details-tab.hbs"
             ];
             
             // Load all templates into FoundryVTT's template cache
             // This makes them available for {{> "template-path"}} references
+            console.log('🔧 Template Loading | About to load templates:', templatePaths);
+            
             await (globalThis as any).foundry.applications.handlebars.loadTemplates(templatePaths);
             console.log(`✅ Template Loading | Loaded ${templatePaths.length} templates successfully`);
+            
+            // DEBUGGING: Check what's actually registered in Handlebars partials
+            const handlebars = (globalThis as any).Handlebars;
+            if (handlebars && handlebars.partials) {
+                console.log('🔍 Debug | Handlebars partials registry keys:', Object.keys(handlebars.partials));
+                
+                // Specifically check for our problematic partial
+                const imageUploadKey = 'systems/avant/templates/shared/partials/image-upload';
+                const imageUploadRegistered = handlebars.partials[imageUploadKey];
+                console.log(`🔍 Debug | image-upload partial registered:`, !!imageUploadRegistered);
+                
+                if (imageUploadRegistered) {
+                    console.log(`🔍 Debug | image-upload partial type:`, typeof imageUploadRegistered);
+                } else {
+                    console.log('🔍 Debug | Checking alternative partial names...');
+                    // Check if it's registered under a different name
+                    const alternativeKeys = Object.keys(handlebars.partials).filter(key => 
+                        key.includes('image-upload')
+                    );
+                    console.log('🔍 Debug | Found image-upload alternatives:', alternativeKeys);
+                }
+            } else {
+                console.warn('🔍 Debug | Handlebars partials registry not accessible');
+            }
+            
+            // DEBUGGING: Also check FoundryVTT's template cache
+            const foundryTemplates = (globalThis as any).foundry?.applications?.handlebars;
+            if (foundryTemplates && foundryTemplates.getTemplate) {
+                try {
+                    const imageUploadTemplate = foundryTemplates.getTemplate('systems/avant/templates/shared/partials/image-upload');
+                    console.log('🔍 Debug | FoundryVTT template cache has image-upload:', !!imageUploadTemplate);
+                } catch (error) {
+                    console.log('🔍 Debug | FoundryVTT template cache error:', (error as Error).message);
+                }
+            }
             
             // Register all Handlebars helpers through dedicated helper module
             // These provide custom helper functions like {{traitChipStyle}}, {{localize}}, etc.

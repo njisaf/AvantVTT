@@ -1,0 +1,22 @@
+{{!-- 
+  Single Content Layout Partial
+  
+  This layout is used for item sheets that don't need tabs (like Talents and Augments).
+  It provides a clean, single-column layout with proper accessibility and responsive design.
+  
+  Usage:
+    {{#> "systems/avant/templates/shared/partials/single-content.hbs" class="talent-content"}}
+        {{> "systems/avant/templates/shared/partials/textarea-field.hbs" name="system.description" value=system.description label="Description" rows=6}}
+        {{> "systems/avant/templates/shared/partials/text-field.hbs" name="system.requirements" value=system.requirements label="Requirements"}}
+        {{> "systems/avant/templates/shared/partials/number-field.hbs" name="system.levelRequirement" value=system.levelRequirement label="Level Required" min=1}}
+        {{> "systems/avant/templates/shared/partials/traits-field.hbs" name="system.traits" displayTraits=displayTraits label="Traits"}}
+    {{/"systems/avant/templates/shared/partials/single-content.hbs"}}
+  
+  Optional: class - Additional CSS classes for the content area
+--}}
+
+<section class="sheet-body single-content {{#if class}}{{class}}{{/if}}" 
+         role="main" 
+         aria-label="Item details">
+    {{> @partial-block}}
+</section> 

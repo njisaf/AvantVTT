@@ -1,0 +1,38 @@
+{{!-- 
+  Category Select Component
+  
+  Usage:
+    {{> "systems/avant/templates/shared/partials/category-select.hbs"
+        name="system.category"
+        value=system.category
+        label="Category"
+        options=categoryOptions
+        hint="Select the category for this feature"
+        class="custom-class"
+    }}
+  
+  Required: name, label, options
+  Optional: value, hint, class
+--}}
+
+<div class="form-group {{#if class}}{{class}}{{/if}}">
+    <label for="{{name}}" class="form-label">
+        {{label}}
+    </label>
+    
+    <select id="{{name}}" 
+            name="{{name}}" 
+            class="form-select category-select"
+            {{#if hint}}aria-describedby="{{name}}-hint"{{/if}}>
+        {{#each options as |option|}}
+            <option value="{{option.value}}" 
+                    {{#if (eq ../value option.value)}}selected{{/if}}>
+                {{option.label}}
+            </option>
+        {{/each}}
+    </select>
+    
+    {{#if hint}}
+        <div id="{{name}}-hint" class="form-hint" role="note">{{hint}}</div>
+    {{/if}}
+</div> 

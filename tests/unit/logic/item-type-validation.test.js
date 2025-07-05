@@ -55,7 +55,7 @@ describe('Item Type Validation', () => {
 
             const config = createItemSheetConfig(item);
             
-            expect(config.template).toBe('systems/avant/templates/item/item-talent-sheet.html');
+            expect(config.template).toBe('systems/avant/templates/item/item-talent-new.html');
             expect(config.itemType).toBe('talent');
             expect(config.classes).toContain('talent');
         });
@@ -74,7 +74,7 @@ describe('Item Type Validation', () => {
 
             const config = createItemSheetConfig(item);
             
-            expect(config.template).toBe('systems/avant/templates/item/item-augment-sheet.html');
+            expect(config.template).toBe('systems/avant/templates/item/item-augment-new.html');
             expect(config.itemType).toBe('augment');
             expect(config.classes).toContain('augment');
         });
@@ -92,7 +92,7 @@ describe('Item Sheet Configuration', () => {
             const config = createItemSheetConfig(talentItem);
             
             expect(config).not.toBeNull();
-            expect(config.template).toBe('systems/avant/templates/item/item-talent-sheet.html');
+            expect(config.template).toBe('systems/avant/templates/item/item-talent-new.html');
             expect(config.classes).toEqual(['avant', 'sheet', 'item', 'talent']);
             expect(config.itemType).toBe('talent');
             expect(config.title).toBe('Test Talent');
@@ -107,7 +107,7 @@ describe('Item Sheet Configuration', () => {
             const config = createItemSheetConfig(augmentItem);
             
             expect(config).not.toBeNull();
-            expect(config.template).toBe('systems/avant/templates/item/item-augment-sheet.html');
+            expect(config.template).toBe('systems/avant/templates/item/item-augment-new.html');
             expect(config.classes).toEqual(['avant', 'sheet', 'item', 'augment']);
             expect(config.itemType).toBe('augment');
             expect(config.title).toBe('Test Augment');
@@ -120,7 +120,7 @@ describe('Item Sheet Configuration', () => {
                 const item = { type, name: `Test ${type}` };
                 const config = createItemSheetConfig(item);
                 
-                expect(config.template).toBe(`systems/avant/templates/item/item-${type}-sheet.html`);
+                expect(config.template).toBe(`systems/avant/templates/item/item-${type}-new.html`);
                 expect(config.itemType).toBe(type);
             });
         });
@@ -180,7 +180,7 @@ describe('Item Sheet Configuration', () => {
                 
                 if (validateItemType(type)) {
                     // Valid types should get specific templates
-                    expect(config.template).toBe(`systems/avant/templates/item/item-${type}-sheet.html`);
+                    expect(config.template).toBe(`systems/avant/templates/item/item-${type}-new.html`);
                 } else {
                     // Invalid types should get fallback template
                     expect(config.template).toBe('systems/avant/templates/item/item-sheet.html');
@@ -193,7 +193,7 @@ describe('Item Sheet Configuration', () => {
             const config = createItemSheetConfig(talentItem);
             
             // Template path should point to talent-specific template
-            expect(config.template).toContain('talent-sheet.html');
+            expect(config.template).toContain('talent-new.html');
             expect(config.itemType).toBe('talent');
         });
 
@@ -202,7 +202,7 @@ describe('Item Sheet Configuration', () => {
             const config = createItemSheetConfig(augmentItem);
             
             // Template path should point to augment-specific template
-            expect(config.template).toContain('augment-sheet.html');
+            expect(config.template).toContain('augment-new.html');
             expect(config.itemType).toBe('augment');
         });
     });
@@ -223,7 +223,7 @@ describe('Item Type System Integration', () => {
         const talentItem = { type: 'talent', name: 'Fireball' };
         const config = createItemSheetConfig(talentItem);
         
-        expect(config.template).toBe('systems/avant/templates/item/item-talent-sheet.html');
+        expect(config.template).toBe('systems/avant/templates/item/item-talent-new.html');
         expect(config.template).not.toContain('gear');
     });
 
@@ -231,7 +231,7 @@ describe('Item Type System Integration', () => {
         const augmentItem = { type: 'augment', name: 'Enhanced Vision' };
         const config = createItemSheetConfig(augmentItem);
         
-        expect(config.template).toBe('systems/avant/templates/item/item-augment-sheet.html');
+        expect(config.template).toBe('systems/avant/templates/item/item-augment-new.html');
         expect(config.template).not.toContain('gear');
     });
 }); 

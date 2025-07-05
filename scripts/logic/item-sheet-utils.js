@@ -363,7 +363,7 @@ export function extractItemFormData(formData) {
  * });
  * // Result: {
  * //   classes: ['avant', 'sheet', 'item', 'weapon'],
- * //   template: 'systems/avant/templates/item/item-weapon-sheet.html',
+ * //   template: 'systems/avant/templates/item/item-weapon-new.html',
  * //   ...
  * // }
  */
@@ -381,7 +381,7 @@ export function createItemSheetConfig(item) {
         // Determine template based on type
     let template;
     if (validateItemType(itemType)) {
-        template = `systems/avant/templates/item/item-${itemType}-sheet.html`;
+        template = `systems/avant/templates/item/item-${itemType}-new.html`;
         
         // Validate template exists (development warning)
         if (typeof console !== 'undefined' && validateItemType(itemType)) {
