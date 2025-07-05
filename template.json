@@ -192,18 +192,23 @@
     },
     "talent": {
       "description": "",
+      "apCost": 1,
+      "levelRequirement": 1,
       "tier": 1,
+      "requirements": "",
       "prerequisites": "",
       "uses": {
         "value": 0,
         "max": 0
       },
-      "powerPointCost": 1,
       "isActive": false,
       "traits": []
     },
     "augment": {
       "description": "",
+      "apCost": 0,
+      "ppCost": 0,
+      "levelRequirement": 1,
       "uses": {
         "value": 0,
         "max": 0
@@ -212,6 +217,7 @@
       "powerPointCost": 0,
       "isActive": false,
       "rarity": "common",
+      "requirements": "",
       "traits": []
     },
     "weapon": {

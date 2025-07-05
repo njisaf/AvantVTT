@@ -2,7 +2,7 @@
   "id": "avant",
   "title": "Avant",
   "description": "A cutting-edge narrative RPG system focused on experimental storytelling, collaborative worldbuilding, and innovative narrative mechanics",
-  "version": "0.2.2",
+  "version": "0.4.0",
   "compatibility": {
     "minimum": "13.344",
     "verified": "13.344",
@@ -31,19 +31,33 @@
       "path": "lang/en.json"
     }
   ],
-  "packs": [
+    "packs": [
     {
       "name": "avant-traits",
-      "label": "Avant Traits", 
-      "path": "./packs/avant-traits",
+      "label": "Avant Traits",
+      "path": "./packs/avant-traits.db",
       "type": "Item",
       "system": "avant"
     },
     {
       "name": "avant-macros",
       "label": "Avant Macros",
-      "path": "./packs/avant-macros",
+      "path": "./packs/avant-macros.db",
       "type": "Macro"
+    },
+    {
+      "name": "avant-talents",
+      "label": "Avant Talents",
+      "path": "./packs/avant-talents.db",
+      "type": "Item",
+      "system": "avant"
+    },
+    {
+      "name": "avant-augments",
+      "label": "Avant Augments",
+      "path": "./packs/avant-augments.db",
+      "type": "Item",
+      "system": "avant"
     }
   ],
   "documentTypes": {
@@ -70,6 +84,6 @@
   "primaryTokenAttribute": "health",
   "secondaryTokenAttribute": "powerPoints",
   "url": "https://github.com/njisaf/AvantVTT",
-  "manifest": "https://github.com/njisaf/AvantVTT/releases/download/v0.2.1/system.json",
-  "download": "https://github.com/njisaf/AvantVTT/releases/download/v0.2.1/avant-v0.2.1.zip"
+  "manifest": "https://github.com/njisaf/AvantVTT/releases/download/v0.3.0/system.json",
+  "download": "https://github.com/njisaf/AvantVTT/releases/download/v0.3.0/avant-v0.3.0.zip"
 } 

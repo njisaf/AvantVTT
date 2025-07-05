@@ -150,7 +150,7 @@ export class AvantFeatureData extends foundry.abstract.DataModel {
  * Talent Item Data Model
  * @class AvantTalentData
  * @extends {foundry.abstract.DataModel}
- * @description Data model for talents with power point costs and tiers
+ * @description Data model for talents with action point costs and level requirements
  */
 export class AvantTalentData extends foundry.abstract.DataModel {
     /**
@@ -166,6 +166,19 @@ export class AvantTalentData extends foundry.abstract.DataModel {
                 initial: "",
                 blank: true
             }),
+            apCost: new fields.NumberField({
+                required: true,
+                initial: 1,
+                integer: true,
+                min: 0,
+                max: 3
+            }),
+            levelRequirement: new fields.NumberField({
+                required: true,
+                initial: 1,
+                integer: true,
+                min: 1
+            }),
             tier: new fields.NumberField({
                 required: true,
                 initial: 1,
@@ -173,18 +186,18 @@ export class AvantTalentData extends foundry.abstract.DataModel {
                 min: 1,
                 max: 6
             }),
-            powerPointCost: new fields.NumberField({
-                required: true,
-                initial: 1,
-                integer: true,
-                min: 0
-            }),
             isActive: new fields.BooleanField({
                 required: true,
                 initial: false
             }),
+            requirements: new fields.StringField({
+                required: false,
+                initial: "",
+                blank: true
+            }),
+            // Legacy field for backwards compatibility
             prerequisites: new fields.StringField({
-                required: true,
+                required: false,
                 initial: "",
                 blank: true
             }),
@@ -234,13 +247,33 @@ export class AvantAugmentData extends foundry.abstract.DataModel {
                 initial: "",
                 blank: true
             }),
+            apCost: new fields.NumberField({
+                required: true,
+                initial: 0,
+                integer: true,
+                min: 0,
+                max: 3
+            }),
+            ppCost: new fields.NumberField({
+                required: true,
+                initial: 0,
+                integer: true,
+                min: 0
+            }),
+            levelRequirement: new fields.NumberField({
+                required: true,
+                initial: 1,
+                integer: true,
+                min: 1
+            }),
             augmentType: new fields.StringField({
                 required: true,
                 initial: "enhancement",
                 choices: ["enhancement", "cybernetic", "biological", "magical", "psionic"]
             }),
+            // Legacy field for backwards compatibility
             powerPointCost: new fields.NumberField({
-                required: true,
+                required: false,
                 initial: 0,
                 integer: true,
                 min: 0
@@ -253,6 +286,11 @@ export class AvantAugmentData extends foundry.abstract.DataModel {
                 required: true,
                 initial: "common",
                 choices: ["common", "uncommon", "rare", "epic", "legendary", "artifact"]
+            }),
+            requirements: new fields.StringField({
+                required: false,
+                initial: "",
+                blank: true
             }),
             uses: new fields.SchemaField({
                 value: new fields.NumberField({

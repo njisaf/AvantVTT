@@ -28,20 +28,37 @@ export function registerSheets(actorCollection, itemCollection, actorSheetClass,
     let registeredSheets = 0;
     
     try {
-        // Unregister core actor sheet and register custom one (v13 namespaced)
-        actorCollection.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);
+        // For v13 - only use namespaced classes, avoid deprecated global access
+        try {
+            // Only try v13 namespaced classes - no fallback to globals to avoid deprecation warnings
+            if (foundry?.appv1?.sheets?.ActorSheet) {
+                actorCollection.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);
+                console.log('✅ Unregistered core ActorSheet (v13 namespaced)');
+            }
+            if (foundry?.appv1?.sheets?.ItemSheet) {
+                itemCollection.unregisterSheet("core", foundry.appv1.sheets.ItemSheet);
+                console.log('✅ Unregistered core ItemSheet (v13 namespaced)');
+            }
+        } catch (error) {
+            console.warn('Could not unregister v13 namespaced sheets:', error.message);
+            // In v13, if we can't access namespaced classes, something is wrong
+            throw new Error(`FoundryVTT v13 classes not available: ${error.message}`);
+        }
+        
+        // Register custom actor sheet (ApplicationV2)
         actorCollection.registerSheet("avant", actorSheetClass, { makeDefault: true });
         registeredSheets++;
+        console.log(`✅ Registered ApplicationV2 actor sheet: ${actorSheetClass.name}`);
         
-        // Unregister core item sheet and register custom one (v13 namespaced)  
-        itemCollection.unregisterSheet("core", foundry.appv1.sheets.ItemSheet);
+        // Register custom item sheet (ApplicationV2)
         itemCollection.registerSheet("avant", itemSheetClass, { makeDefault: true });
         registeredSheets++;
+        console.log(`✅ Registered ApplicationV2 item sheet: ${itemSheetClass.name}`);
         
         return {
             success: true,
             registeredSheets,
-            message: `Successfully registered ${registeredSheets} sheet types`
+            message: `Successfully registered ${registeredSheets} ApplicationV2 sheet types`
         };
         
     } catch (error) {

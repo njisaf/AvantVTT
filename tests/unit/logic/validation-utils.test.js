@@ -18,7 +18,9 @@ import {
     validatePowerPointsData,
     validateUsesData,
     isValidDocumentId,
-    sanitizeHtml
+    sanitizeHtml,
+    validateTalent,
+    validateAugment
 } from '../../../scripts/logic/validation-utils.js';
 
 describe('Validation Utils Pure Functions', () => {
@@ -502,6 +504,187 @@ describe('Validation Utils Pure Functions', () => {
             const dangerous = '<div><script type="text/javascript">alert("bad")</script><p onclick="evil()">Text</p></div>';
             const expected = '<div><p>Text</p></div>';
             expect(sanitizeHtml(dangerous)).toBe(expected);
+        });
+    });
+
+    describe('validateTalent', () => {
+        test('should validate complete talent data', () => {
+            const input = {
+                type: "talent",
+                name: "Test Talent",
+                apCost: 2,
+                levelRequirement: 3,
+                traits: ["Fire", "Attack"],
+                requirements: "Must have fire affinity",
+                description: "A powerful fire-based attack talent"
+            };
+            
+            const result = validateTalent(input);
+            
+            expect(result.type).toBe("talent");
+            expect(result.name).toBe("Test Talent");
+            expect(result.apCost).toBe(2);
+            expect(result.levelRequirement).toBe(3);
+            expect(result.traits).toEqual(["Fire", "Attack"]);
+            expect(result.requirements).toBe("Must have fire affinity");
+            expect(result.description).toBe("A powerful fire-based attack talent");
+        });
+
+        test('should validate and fix invalid values', () => {
+            const input = {
+                type: "invalid",
+                name: null,
+                apCost: "3",
+                levelRequirement: "invalid",
+                traits: "not an array",
+                requirements: 123,
+                description: undefined
+            };
+            
+            const result = validateTalent(input);
+            
+            expect(result.type).toBe("talent");
+            expect(result.name).toBe("");
+            expect(result.apCost).toBe(3);
+            expect(result.levelRequirement).toBe(1);
+            expect(result.traits).toEqual([]);
+            expect(result.requirements).toBe("123");
+            expect(result.description).toBe("");
+        });
+
+        test('should handle missing values with defaults', () => {
+            const input = {};
+            
+            const result = validateTalent(input);
+            
+            expect(result.type).toBe("talent");
+            expect(result.name).toBe("");
+            expect(result.apCost).toBe(1);
+            expect(result.levelRequirement).toBe(1);
+            expect(result.traits).toEqual([]);
+            expect(result.requirements).toBe("");
+            expect(result.description).toBe("");
+        });
+
+        test('should validate traits array and filter invalid entries', () => {
+            const input = {
+                traits: ["Fire", null, "Ice", "", "Lightning", undefined, 123]
+            };
+            
+            const result = validateTalent(input);
+            
+            expect(result.traits).toEqual(["Fire", "Ice", "Lightning"]);
+        });
+
+        test('should enforce minimum values for costs and requirements', () => {
+            const input = {
+                apCost: -1,
+                levelRequirement: 0
+            };
+            
+            const result = validateTalent(input);
+            
+            expect(result.apCost).toBe(1);
+            expect(result.levelRequirement).toBe(1);
+        });
+    });
+
+    describe('validateAugment', () => {
+        test('should validate complete augment data', () => {
+            const input = {
+                type: "augment",
+                name: "Test Augment", 
+                apCost: 1,
+                ppCost: 3,
+                levelRequirement: 2,
+                traits: ["Tech", "Enhancement"],
+                requirements: "Must have cybernetic implant",
+                description: "A technological enhancement augment"
+            };
+            
+            const result = validateAugment(input);
+            
+            expect(result.type).toBe("augment");
+            expect(result.name).toBe("Test Augment");
+            expect(result.apCost).toBe(1);
+            expect(result.ppCost).toBe(3);
+            expect(result.levelRequirement).toBe(2);
+            expect(result.traits).toEqual(["Tech", "Enhancement"]);
+            expect(result.requirements).toBe("Must have cybernetic implant");
+            expect(result.description).toBe("A technological enhancement augment");
+        });
+
+        test('should validate and fix invalid values', () => {
+            const input = {
+                type: "invalid",
+                name: null,
+                apCost: "2",
+                ppCost: "invalid",
+                levelRequirement: "-1",
+                traits: "not an array",
+                requirements: 456,
+                description: undefined
+            };
+            
+            const result = validateAugment(input);
+            
+            expect(result.type).toBe("augment");
+            expect(result.name).toBe("");
+            expect(result.apCost).toBe(2);
+            expect(result.ppCost).toBe(0);
+            expect(result.levelRequirement).toBe(1);
+            expect(result.traits).toEqual([]);
+            expect(result.requirements).toBe("456");
+            expect(result.description).toBe("");
+        });
+
+        test('should handle missing values with defaults', () => {
+            const input = {};
+            
+            const result = validateAugment(input);
+            
+            expect(result.type).toBe("augment");
+            expect(result.name).toBe("");
+            expect(result.apCost).toBe(1);
+            expect(result.ppCost).toBe(0);
+            expect(result.levelRequirement).toBe(1);
+            expect(result.traits).toEqual([]);
+            expect(result.requirements).toBe("");
+            expect(result.description).toBe("");
+        });
+
+        test('should validate traits array and filter invalid entries', () => {
+            const input = {
+                traits: ["Tech", null, "Healing", "", "Psychic", undefined, 789]
+            };
+            
+            const result = validateAugment(input);
+            
+            expect(result.traits).toEqual(["Tech", "Healing", "Psychic"]);
+        });
+
+        test('should enforce minimum values for costs and requirements', () => {
+            const input = {
+                apCost: -2,
+                ppCost: -5,
+                levelRequirement: 0
+            };
+            
+            const result = validateAugment(input);
+            
+            expect(result.apCost).toBe(1);
+            expect(result.ppCost).toBe(0);
+            expect(result.levelRequirement).toBe(1);
+        });
+
+        test('should allow zero PP cost for passive augments', () => {
+            const input = {
+                ppCost: 0
+            };
+            
+            const result = validateAugment(input);
+            
+            expect(result.ppCost).toBe(0);
         });
     });
 }); 

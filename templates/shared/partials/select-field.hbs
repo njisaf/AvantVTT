@@ -1,0 +1,45 @@
+{{!-- 
+  Select Field Component
+  
+  Usage:
+    {{> "systems/avant/templates/shared/partials/select-field"
+        name="system.rarity"
+        value=system.rarity
+        label="Rarity"
+        options=rarityOptions
+        required=true
+        hint="How rare this item is"
+        class="custom-class"
+    }}
+  
+  Options format: [{value: "common", label: "Common"}, {value: "rare", label: "Rare"}]
+  
+  Required: name, label, options
+  Optional: value, required, hint, class, disabled
+--}}
+
+<div class="form-group {{#if class}}{{class}}{{/if}}">
+    <label for="{{name}}" class="form-label">
+        {{label}}
+        {{#if required}}<span class="required-indicator" aria-label="required">*</span>{{/if}}
+    </label>
+    
+    <select 
+        id="{{name}}"
+        name="{{name}}" 
+        {{#if required}}required{{/if}}
+        {{#if disabled}}disabled{{/if}}
+        {{#if hint}}aria-describedby="{{name}}-hint"{{/if}}
+        class="form-select"
+    >
+        {{#each options as |option|}}
+            <option value="{{option.value}}" {{#if (eq ../value option.value)}}selected{{/if}}>
+                {{option.label}}
+            </option>
+        {{/each}}
+    </select>
+    
+    {{#if hint}}
+        <div id="{{name}}-hint" class="form-hint" role="note">{{hint}}</div>
+    {{/if}}
+</div> 

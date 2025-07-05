@@ -55,6 +55,7 @@
   @include theme-interface;
   
   // Add theme attribution (hidden but accessible for debugging)
+  // Moved after CSS properties to fix mixed-decls warning
   &::before {
     content: "Theme: " var(--theme-name, "Unknown") " by " var(--theme-author, "Unknown");
     position: fixed;

@@ -131,21 +131,57 @@ export class CompendiumLocalService {
      * const moduleDocs = await service.loadPack('my-module.monsters');
      */
     async loadPack(packId: string): Promise<CompendiumDocument[]> {
+        const timestamp = new Date().toISOString();
+        
+        // PHASE 1 INSTRUMENTATION: Track pack access operations
+        console.debug(`🎯 COMPENDIUM | ${timestamp} | loadPack | ENTRY`, {
+            packId,
+            gameReady: !!(globalThis as any).game?.ready,
+            packsAvailable: !!(globalThis as any).game?.packs,
+            totalPackCount: (globalThis as any).game?.packs?.size || 0
+        });
+        
         this.ensureInitialized();
 
         if (!packId || typeof packId !== 'string') {
+            console.error(`🎯 COMPENDIUM | ${timestamp} | loadPack | Invalid pack ID: ${packId}`);
             throw new Error(`Invalid pack ID: ${packId}. Must be a non-empty string.`);
         }
 
         // Get the pack from FoundryVTT
         const pack = (globalThis as any).game.packs.get(packId);
         if (!pack) {
-            throw new Error(`Compendium pack '${packId}' not found. Available packs: ${Array.from((globalThis as any).game.packs.keys()).join(', ')}`);
+            const availablePacks = Array.from((globalThis as any).game.packs.keys());
+            console.error(`🎯 COMPENDIUM | ${timestamp} | loadPack | Pack not found`, {
+                requestedPack: packId,
+                availablePacks: availablePacks,
+                packCount: availablePacks.length
+            });
+            throw new Error(`Compendium pack '${packId}' not found. Available packs: ${availablePacks.join(', ')}`);
         }
+
+        console.debug(`🎯 COMPENDIUM | ${timestamp} | loadPack | Pack found`, {
+            packId,
+            packName: pack.metadata?.name,
+            packLabel: pack.metadata?.label,
+            packType: pack.metadata?.type,
+            packSystem: pack.metadata?.system,
+            isLocked: pack.locked
+        });
 
         try {
             // Load all documents from the pack
             const documents = await pack.getDocuments();
+            
+            console.debug(`🎯 COMPENDIUM | ${timestamp} | loadPack | Documents loaded`, {
+                packId,
+                documentCount: documents.length,
+                sampleDocuments: documents.slice(0, 3).map((doc: any) => ({
+                    id: doc.id,
+                    name: doc.name,
+                    type: doc.type
+                }))
+            });
             
             // Convert to plain objects for easier manipulation
             const plainDocs: CompendiumDocument[] = documents.map((doc: any) => {
@@ -156,8 +192,19 @@ export class CompendiumLocalService {
                 } as CompendiumDocument;
             });
 
+            console.debug(`🎯 COMPENDIUM | ${timestamp} | loadPack | COMPLETED`, {
+                packId,
+                finalDocumentCount: plainDocs.length,
+                processingTime: `${Date.now() - new Date(timestamp).getTime()}ms`
+            });
+
             return plainDocs;
         } catch (error) {
+            console.error(`🎯 COMPENDIUM | ${timestamp} | loadPack | Error loading documents`, {
+                packId,
+                error: error instanceof Error ? error.message : String(error),
+                errorStack: error instanceof Error ? error.stack : undefined
+            });
             throw new Error(`Failed to load documents from pack '${packId}': ${error instanceof Error ? error.message : String(error)}`);
         }
     }

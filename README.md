@@ -2,6 +2,8 @@
 
 A narrative RPG system for FoundryVTT.
 
+[![RemoteTraitService](https://img.shields.io/badge/RemoteTraitService-🗄️_Archived-orange)](deprecated/remote-trait-service/README.md) [![Deprecation Policy](https://img.shields.io/badge/Deprecation-Policy_Available-blue)](docs/DEPRECATION_POLICY.md)
+
 ## What is Avant?
 Avant is a modular, narrative-focused game system for Foundry Virtual Tabletop (FoundryVTT v13+). It provides a modern, themeable, and extensible ruleset for digital tabletop play.
 
@@ -282,45 +284,31 @@ The system uses SCSS for styling:
 - The `.css` file is generated and will be overwritten
 - Only source `.scss` files should be committed to version control
 
-### Theme Development
+### SCSS Development
 
-The Avant system includes powerful theming tools:
+The system uses SCSS for streamlined styling:
 
-- **Theme help**: `npm run theme:help`
-- **Generate template**: `npm run theme:template`
-- **Generate full template**: `npm run theme:template:full`
-- **List variables**: `npm run theme:list`
-- **Create examples**: `npm run theme:examples`
-- **Validate theme**: `npm run theme:validate <file>`
-- **Generate docs**: `npm run theme:docs`
-- **Update documentation**: `npm run docs:update`
-- **Test themes**: `npm run test:themes`
+- **Build complete styles**: `npm run build`
+- **Watch mode** (auto-recompile): `npm run dev`
+- **SCSS only**: `npm run build:scss`
 
-### Documentation
+**Important**: Always edit `.scss` files, never `.css` directly. The CSS is generated from SCSS source.
 
-- **Update theme docs**: `npm run docs:update`
-- **Generate theme variables**: `npm run docs:themes`
+## Visual Design
 
-### Testing
+Avant features a sleek, cyberpunk-inspired dark theme with:
+- **Professional dark aesthetic** optimized for long gaming sessions
+- **Cyan accent colors** (#00E0DC) for key interactive elements
+- **Consistent typography** using Orbitron (headers) and Exo 2 (body text)
+- **Accessibility-compliant** color contrast ratios for readability
 
-- **Test themes**: `npm run test:themes`
+The system is designed with a single, polished theme to provide:
+- **Optimal performance** without theme switching overhead
+- **Consistent user experience** across all FoundryVTT environments  
+- **Reduced complexity** for easier maintenance and development
+- **Eye strain reduction** with carefully chosen dark colors
 
-## Theming (Updated)
-
-Avant includes a robust theming system with three built-in themes:
-- Dark (Cyberpunk Dark)
-- Light (Clean Light)
-- Forest Green (Nature-inspired)
-
-Theme persistence is fully fixed and works reliably in all environments. Custom themes are supported via the theme manager.
-
-📖 **For complete theming documentation, see [THEMES.md](docs/THEMES.md)**
-
-This includes:
-- User guide for creating and applying custom themes
-- Developer guide for extending the theming engine  
-- CLI utilities and npm scripts for theme development
-- Examples and troubleshooting
+*Theme customization was removed in v0.2.4 to focus on core functionality and performance.*
 
 ## System Requirements
 

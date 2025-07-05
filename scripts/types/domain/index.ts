@@ -27,15 +27,7 @@ export type {
   ItemData
 } from './item';
 
-// Theme-related types
-export type {
-  ColorPalette,
-  ThemeVariables,
-  ThemeConfig,
-  ThemeValidationResult,
-  ThemeManagerState,
-  ContextMenuEntry
-} from './theme';
+
 
 // Sheet-related types
 export type {
@@ -71,7 +63,7 @@ export type {
   RollTerm,
   DieResult,
   ChatMessageData,
-  ThemeApplicationResult as DialogThemeApplicationResult
+
 } from './dialog';
 
 // Chat context menu types
@@ -87,6 +79,27 @@ export type {
   RollEligibilityChecker,
   PermissionChecker
 } from './chat-context';
+
+// Chat integration types (talents & augments)
+export type {
+  PostFeatureCardResult,
+  BuildFeatureCardResult,
+  ChatAPI,
+  ChatIntegrationResult,
+  FeatureCardMetadata,
+  FeatureCardTemplateData,
+  PowerPointValidationResult,
+  PowerPointSpendResult,
+  PowerPointButtonData,
+  PowerPointButtonTemplateData,
+  PowerPointHandlerOptions,
+  FeatureCardStyleOptions,
+  FeatureCardChatOptions,
+  FeatureCardExportData,
+  BatchFeatureCardResult,
+  FeatureCardValidation,
+  ChatIntegrationConfig
+} from './chat';
 
 // Trait system types
 export type {

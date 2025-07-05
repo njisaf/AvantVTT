@@ -134,9 +134,6 @@ export class AvantRerollDialog extends (globalThis as any).Application {
     activateListeners(html: any): void {
         super.activateListeners(html);
         
-        // Apply theme immediately after render to prevent flickering
-        this._applyThemeToDialog();
-        
         // Dice selection
         html.find('.reroll-die').click(this._onDieClick.bind(this));
         
@@ -327,29 +324,7 @@ export class AvantRerollDialog extends (globalThis as any).Application {
         return roll;
     }
     
-    /**
-     * Apply theme to dialog immediately to prevent flickering
-     * @private
-     */
-    private _applyThemeToDialog(): void {
-        // Get the dialog element
-        const dialogElement = this.element?.[0] || this.element;
-        
-        if (dialogElement && (globalThis as any).game.avant?.themeManager) {
-            logger.log('Avant | Applying theme to reroll dialog');
-            
-            // Ensure the dialog has the avant class for theming
-            if (!dialogElement.classList.contains('avant')) {
-                dialogElement.classList.add('avant');
-            }
-            
-            // Apply current theme directly to this dialog
-            (globalThis as any).game.avant.themeManager.applyThemeToElement(
-                dialogElement, 
-                (globalThis as any).game.avant.themeManager.currentTheme
-            );
-        }
-    }
+
     
     /**
      * Update dice selection visual states without full re-render

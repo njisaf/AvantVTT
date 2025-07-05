@@ -145,7 +145,7 @@ export function validateItemType(itemType: unknown): boolean {
         return false;
     }
     
-    const validTypes = ['weapon', 'armor', 'feature', 'action', 'augment'];
+    const validTypes = ['weapon', 'armor', 'feature', 'action', 'talent', 'augment'];
     return validTypes.includes(itemType);
 }
 
@@ -282,18 +282,18 @@ export function formatItemDisplay(item: unknown): ItemDisplayInfo {
  * Extracts and processes form data from item sheet submissions
  * 
  * This function takes flat form data (like "system.damage": "10") and converts
- * it into nested objects with proper data type conversion. It's similar to
- * the existing processFormData but with enhanced type conversion logic.
+ * it into nested objects with proper data type conversion. It handles array fields
+ * (those ending with []) by building arrays from multiple values.
  * 
  * @param formData - Flat form data object from form submission
  * @returns Processed nested object with converted data types
  * 
  * @example
  * ```typescript
- * // Input form data
+ * // Input form data with array field
  * const formData = {
  *     'name': 'Iron Sword',
- *     'system.damage': '1d8',
+ *     'system.traits[]': ['fire', 'sharp'],  // Array field
  *     'system.weight': '3.5',
  *     'system.equipped': 'true'
  * };
@@ -302,7 +302,7 @@ export function formatItemDisplay(item: unknown): ItemDisplayInfo {
  * const result = extractItemFormData(formData);
  * // Result: {
  * //   name: 'Iron Sword',
- * //   system: { damage: '1d8', weight: 3.5, equipped: true }
+ * //   system: { traits: ['fire', 'sharp'], weight: 3.5, equipped: true }
  * // }
  * ```
  */
@@ -313,10 +313,47 @@ export function extractItemFormData(formData: unknown): Record<string, unknown> 
     
     const formObj = formData as Record<string, unknown>;
     const result: Record<string, any> = {};
+    const arrayFields = new Map<string, unknown[]>(); // Track array fields separately
     
-    // Process each form field
+    // First pass: collect all values, identifying array fields
     for (const [key, value] of Object.entries(formObj)) {
-        // Split the key into path segments
+        // Check if this is an array field (ends with [])
+        const isArrayField = key.endsWith('[]');
+        const cleanKey = isArrayField ? key.slice(0, -2) : key; // Remove [] suffix
+        
+        if (isArrayField) {
+            // Handle array field
+            if (!arrayFields.has(cleanKey)) {
+                arrayFields.set(cleanKey, []);
+            }
+            // Support both single values and arrays from FormData
+            if (Array.isArray(value)) {
+                arrayFields.get(cleanKey)!.push(...value);
+            } else {
+                arrayFields.get(cleanKey)!.push(value);
+            }
+        } else {
+            // Handle regular field - split key into path segments
+            const segments = cleanKey.split('.');
+            
+            // Navigate/create the nested structure
+            let current = result;
+            for (let i = 0; i < segments.length - 1; i++) {
+                const segment = segments[i];
+                if (!current[segment]) {
+                    current[segment] = {};
+                }
+                current = current[segment];
+            }
+            
+            // Set the final value with type conversion
+            const finalKey = segments[segments.length - 1];
+            current[finalKey] = convertFormValue(value);
+        }
+    }
+    
+    // Second pass: process array fields
+    for (const [key, values] of arrayFields) {
         const segments = key.split('.');
         
         // Navigate/create the nested structure
@@ -329,9 +366,9 @@ export function extractItemFormData(formData: unknown): Record<string, unknown> 
             current = current[segment];
         }
         
-        // Set the final value with type conversion
+        // Set the array value with type conversion for each element
         const finalKey = segments[segments.length - 1];
-        current[finalKey] = convertFormValue(value);
+        current[finalKey] = values.map(value => convertFormValue(value));
     }
     
     return result;
@@ -356,7 +393,7 @@ export function extractItemFormData(formData: unknown): Record<string, unknown> 
  * });
  * // Result: {
  * //   classes: ['avant', 'sheet', 'item', 'weapon'],
- * //   template: 'systems/avant/templates/item/item-weapon-sheet.html',
+ * //   template: 'systems/avant/templates/item/item-weapon-new.html',
  * //   ...
  * // }
  * ```
@@ -376,7 +413,7 @@ export function createItemSheetConfig(item: unknown): ItemSheetConfig | null {
     // Determine template based on type
     let template: string;
     if (validateItemType(itemType)) {
-        template = `systems/avant/templates/item/item-${itemType}-sheet.html`;
+        template = `systems/avant/templates/item/item-${itemType}-new.html`;
     } else {
         template = 'systems/avant/templates/item/item-sheet.html';
     }

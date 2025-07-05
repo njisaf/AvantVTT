@@ -1,24 +1,24 @@
 import { describe, test, expect, beforeEach, jest } from '@jest/globals';
-import { AvantActorSheet } from '../../../scripts/sheets/actor-sheet.ts';
+import { AvantActorSheet } from '../../../scripts/sheets/actor-sheet';
+import { getInitializationManager } from '@/utils/initialization-manager';
 
 // Mock dependencies
-jest.mock('../../../scripts/utils/initialization-manager.ts', () => ({
+jest.unstable_mockModule('@/utils/initialization-manager', () => ({
   getInitializationManager: jest.fn(),
 }));
-import { getInitializationManager } from '../../../scripts/utils/initialization-manager.ts';
 
-jest.mock('../../../scripts/logic/chat/trait-resolver.ts', () => ({
+jest.mock('../../../scripts/logic/chat/trait-resolver', () => ({
   itemHasTraits: jest.fn(),
   createTraitHtmlForChat: jest.fn(),
 }));
-import { itemHasTraits, createTraitHtmlForChat } from '../../../scripts/logic/chat/trait-resolver.ts';
+import { itemHasTraits, createTraitHtmlForChat } from '../../../scripts/logic/chat/trait-resolver';
 
-jest.mock('../../../scripts/logic/actor-sheet-utils.ts', () => ({
+jest.mock('../../../scripts/logic/actor-sheet-utils', () => ({
   extractCombatItemId: jest.fn(),
   prepareWeaponAttackRoll: jest.fn(),
   prepareWeaponDamageRoll: jest.fn(),
 }));
-import { extractCombatItemId, prepareWeaponAttackRoll, prepareWeaponDamageRoll } from '../../../scripts/logic/actor-sheet-utils.ts';
+import { extractCombatItemId, prepareWeaponAttackRoll, prepareWeaponDamageRoll } from '../../../scripts/logic/actor-sheet-utils';
 
 describe('Combat Rolls with Trait Display', () => {
     let sheet: AvantActorSheet;
@@ -27,7 +27,9 @@ describe('Combat Rolls with Trait Display', () => {
     let mockRoll: any;
     let mockChatMessage: any;
 
-    beforeEach(() => {
+    beforeEach(async () => {
+        const { getInitializationManager } = await import('@/utils/initialization-manager');
+        
         // Reset mocks before each test
         jest.clearAllMocks();
 
@@ -60,7 +62,7 @@ describe('Combat Rolls with Trait Display', () => {
         // Mock FoundryVTT classes
         mockRoll = {
             evaluate: jest.fn().mockResolvedValue(this),
-            toMessage: jest.fn().mockResolvedValue({})
+            toMessage: jest.fn().mockResolvedValue({} as any)
         };
         
         mockChatMessage = {
@@ -85,7 +87,7 @@ describe('Combat Rolls with Trait Display', () => {
         });
         
         // Create a new sheet instance for each test
-        sheet = new AvantActorSheet(mockActor as any);
+        sheet = new (AvantActorSheet as any)(mockActor, {});
     });
     
     test('should include trait display in weapon attack rolls', async () => {
@@ -106,7 +108,7 @@ describe('Combat Rolls with Trait Display', () => {
         await sheet._onAttackRoll(mockEvent);
         
         expect(mockRoll.toMessage).toHaveBeenCalled();
-        const callArgs = mockRoll.toMessage.mock.calls[0][0];
+        const callArgs = (mockRoll.toMessage as jest.Mock).mock.calls[0][0];
         expect(callArgs.speaker).toEqual({ actor: 'test-actor' });
         expect(callArgs.flavor).toContain('Fire Sword Attack');
         expect(callArgs.flavor).toContain('<div class="trait-chips-wrapper">Fire, Magic</div>');
@@ -130,7 +132,7 @@ describe('Combat Rolls with Trait Display', () => {
         await sheet._onDamageRoll(mockEvent);
         
         expect(mockRoll.toMessage).toHaveBeenCalled();
-        const callArgs = mockRoll.toMessage.mock.calls[0][0];
+        const callArgs = (mockRoll.toMessage as jest.Mock).mock.calls[0][0];
         expect(callArgs.speaker).toEqual({ actor: 'test-actor' });
         expect(callArgs.flavor).toContain('Fire Sword Damage (slashing)');
         expect(callArgs.flavor).toContain('<div class="trait-chips-wrapper">Fire, Magic</div>');
@@ -190,5 +192,36 @@ describe('Combat Rolls with Trait Display', () => {
         expect(mockRoll.toMessage).not.toHaveBeenCalled();
         
         consoleSpy.mockRestore();
+    });
+
+    test('should render trait chips correctly', async () => {
+        const { createTraitHtmlForChat } = await import('../../../scripts/logic/chat/trait-resolver');
+        (createTraitHtmlForChat as jest.Mock).mockResolvedValue('<div class="trait-chips-wrapper">Fire, Magic</div>');
+
+        const context = await sheet.getData();
+        const html = await sheet._renderHTML(context);
+        expect(html).toContain('<div class="trait-chips-wrapper">Fire, Magic</div>');
+    });
+
+    test('should handle item roll correctly', async () => {
+        const mockRoll = {
+            evaluate: jest.fn().mockResolvedValue(this),
+            toMessage: jest.fn().mockResolvedValue({} as any)
+        };
+
+        (global as any).Roll = jest.fn(() => mockRoll);
+
+        const mockEvent = {
+            preventDefault: jest.fn(),
+            currentTarget: { dataset: { itemId: 'test-weapon-id' } }
+        } as unknown as Event;
+        
+        await sheet._onAttackRoll(mockEvent);
+        
+        expect(mockRoll.toMessage).toHaveBeenCalled();
+        const callArgs = (mockRoll.toMessage as jest.Mock).mock.calls[0][0];
+        expect(callArgs.speaker).toEqual({ actor: 'test-actor' });
+        expect(callArgs.flavor).toContain('Fire Sword Attack');
+        expect(callArgs.flavor).toContain('<div class="trait-chips-wrapper">Fire, Magic</div>');
     });
 }); 

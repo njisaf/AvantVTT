@@ -323,7 +323,7 @@ describe('Item Sheet Utils - Pure Functions', () => {
             
             expect(result).toEqual({
                 classes: ['avant', 'sheet', 'item', 'weapon'],
-                template: 'systems/avant/templates/item/item-weapon-sheet.html',
+                template: 'systems/avant/templates/item/item-weapon-new.html',
                 width: 520,
                 height: 480,
                 tabs: [{
@@ -345,7 +345,7 @@ describe('Item Sheet Utils - Pure Functions', () => {
             const result = createItemSheetConfig(item);
             
             expect(result.classes).toContain('armor');
-            expect(result.template).toBe('systems/avant/templates/item/item-armor-sheet.html');
+            expect(result.template).toBe('systems/avant/templates/item/item-armor-new.html');
             expect(result.itemType).toBe('armor');
         });
 
@@ -358,7 +358,7 @@ describe('Item Sheet Utils - Pure Functions', () => {
             const result = createItemSheetConfig(item);
             
             expect(result.classes).toContain('feature');
-            expect(result.template).toBe('systems/avant/templates/item/item-feature-sheet.html');
+            expect(result.template).toBe('systems/avant/templates/item/item-feature-new.html');
         });
 
         test('should use default template for unknown types', () => {

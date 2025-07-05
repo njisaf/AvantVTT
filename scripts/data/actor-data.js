@@ -167,6 +167,28 @@ export class AvantActorData extends foundry.abstract.DataModel {
     }
     
     /**
+     * Get skill display labels
+     * @static
+     * @returns {Object} Mapping of skill names to display labels
+     */
+    static getSkillLabels() {
+        return {
+            'debate': 'Debate',
+            'discern': 'Discern',
+            'endure': 'Endure',
+            'finesse': 'Finesse',
+            'force': 'Force',
+            'command': 'Command',
+            'charm': 'Charm',
+            'hide': 'Hide',
+            'inspect': 'Inspect',
+            'intuit': 'Intuit',
+            'recall': 'Recall',
+            'surge': 'Surge'
+        };
+    }
+    
+    /**
      * Get the ability that governs a specific skill
      * @static
      * @param {string} skillName - The name of the skill

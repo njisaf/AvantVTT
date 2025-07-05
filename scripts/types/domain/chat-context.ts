@@ -120,4 +120,22 @@ export type RollEligibilityChecker = (roll: Roll) => boolean;
 /**
  * Function type for actor permission checking
  */
-export type PermissionChecker = (actor: Actor) => boolean; 
+export type PermissionChecker = (actor: Actor) => boolean;
+
+/**
+ * Context menu entry configuration
+ */
+export interface ContextMenuEntry {
+  /** Display label for the menu entry */
+  label?: string;
+  /** Menu entry name/identifier */
+  name?: string;
+  /** HTML icon for the menu entry */
+  icon?: string;
+  /** Function to determine if entry is enabled */
+  condition?: boolean;
+  /** Whether the entry is enabled */
+  enabled?: boolean;
+  /** Callback function when entry is selected */
+  callback?: (li: HTMLElement) => void;
+} 

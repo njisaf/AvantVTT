@@ -475,4 +475,113 @@ export function sanitizeHtml(html) {
         .replace(/\s*on\w+\s*=\s*"[^"]*"/gi, '')
         .replace(/\s*on\w+\s*=\s*'[^']*'/gi, '')
         .replace(/\s*on\w+\s*=\s*[^\s>]*/gi, '');
+}
+
+/**
+ * Validates traits array and filters out invalid entries
+ * 
+ * This function ensures the traits array contains only valid string values.
+ * It filters out null, undefined, empty strings, and non-string values.
+ * 
+ * @param {any} traits - The traits value to validate
+ * @returns {string[]} Validated array of trait strings
+ * 
+ * @example
+ * // Valid traits
+ * const traits = validateTraits(["Fire", "Ice", "Lightning"]);
+ * // Result: ["Fire", "Ice", "Lightning"]
+ * 
+ * // Filter invalid entries
+ * const filtered = validateTraits(["Fire", null, "", "Ice", 123]);
+ * // Result: ["Fire", "Ice"]
+ */
+function validateTraits(traits) {
+    if (!Array.isArray(traits)) {
+        return [];
+    }
+    
+    return traits.filter(trait => 
+        trait !== null && 
+        trait !== undefined && 
+        typeof trait === 'string' && 
+        trait.trim() !== ''
+    );
+}
+
+/**
+ * Validates talent item data according to Avant system requirements
+ * 
+ * This function validates and normalizes talent data to ensure it meets
+ * the system requirements. It fixes invalid values with appropriate defaults
+ * and ensures all required fields are present.
+ * 
+ * @param {Object} data - The talent data to validate
+ * @returns {Object} Validated talent data
+ * 
+ * @example
+ * // Valid talent data
+ * const talent = validateTalent({
+ *     name: "Fire Strike",
+ *     apCost: 2,
+ *     levelRequirement: 3,
+ *     traits: ["Fire", "Attack"],
+ *     requirements: "Must have fire affinity",
+ *     description: "A powerful fire-based attack"
+ * });
+ * // Result: Fully validated talent object
+ */
+export function validateTalent(data) {
+    if (!data || typeof data !== 'object') {
+        data = {};
+    }
+    
+    return {
+        type: "talent",
+        name: validateString(data.name, ""),
+        apCost: Math.max(1, validateNumber(data.apCost, 1, true)),
+        levelRequirement: Math.max(1, validateNumber(data.levelRequirement, 1, true)),
+        traits: validateTraits(data.traits),
+        requirements: validateString(data.requirements, ""),
+        description: validateString(data.description, "")
+    };
+}
+
+/**
+ * Validates augment item data according to Avant system requirements
+ * 
+ * This function validates and normalizes augment data to ensure it meets
+ * the system requirements. It fixes invalid values with appropriate defaults
+ * and ensures all required fields are present.
+ * 
+ * @param {Object} data - The augment data to validate
+ * @returns {Object} Validated augment data
+ * 
+ * @example
+ * // Valid augment data
+ * const augment = validateAugment({
+ *     name: "Neural Interface",
+ *     apCost: 1,
+ *     ppCost: 3,
+ *     levelRequirement: 2,
+ *     traits: ["Tech", "Enhancement"],
+ *     requirements: "Must have cybernetic implant",
+ *     description: "A neural enhancement augment"
+ * });
+ * // Result: Fully validated augment object
+ */
+export function validateAugment(data) {
+    if (!data || typeof data !== 'object') {
+        data = {};
+    }
+    
+    return {
+        type: "augment",
+        name: validateString(data.name, ""),
+        apCost: Math.max(1, validateNumber(data.apCost, 1, true)),
+        ppCost: Math.max(0, validateNumber(data.ppCost, 0, true)),
+        levelRequirement: Math.max(1, validateNumber(data.levelRequirement, 1, true)),
+        traits: validateTraits(data.traits),
+        requirements: validateString(data.requirements, ""),
+        description: validateString(data.description, "")
+    };
 } 

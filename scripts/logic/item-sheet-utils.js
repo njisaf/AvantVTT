@@ -73,8 +73,56 @@ export function validateItemType(itemType) {
         return false;
     }
     
-    const validTypes = ['weapon', 'armor', 'feature', 'action', 'augment'];
+    const validTypes = ['weapon', 'armor', 'feature', 'action', 'talent', 'augment'];
     return validTypes.includes(itemType);
+}
+
+/**
+ * Validates that a template file exists for the given item type
+ * 
+ * This function provides development warnings when an item type
+ * is declared but lacks a corresponding template file. Helps catch
+ * configuration issues during development.
+ * 
+ * @param {string} itemType - The item type to check
+ * @param {string} templatePath - The expected template path
+ * @private
+ */
+function validateTemplateExists(itemType, templatePath) {
+    // Only validate in development environments (when console is available)
+    if (typeof console === 'undefined') {
+        return;
+    }
+    
+    // Skip validation in test environments
+    if (typeof global !== 'undefined' && global.process?.env?.NODE_ENV === 'test') {
+        return;
+    }
+    
+    // Create a cache to avoid repeated warnings for the same template
+    if (!validateTemplateExists._cache) {
+        validateTemplateExists._cache = new Set();
+    }
+    
+    const cacheKey = `${itemType}-${templatePath}`;
+    if (validateTemplateExists._cache.has(cacheKey)) {
+        return;
+    }
+    
+    validateTemplateExists._cache.add(cacheKey);
+    
+    // Log the template being used (informational)
+    console.debug(`ItemSheetConfig | Using template for ${itemType}: ${templatePath}`);
+    
+    // Note: We can't check file existence in browser environment,
+    // but we can provide helpful warnings about common issues
+    if (itemType === 'talent' && !templatePath.includes('talent')) {
+        console.warn(`ItemSheetConfig | Template path mismatch for talent items: ${templatePath}`);
+    }
+    
+    if (itemType === 'augment' && !templatePath.includes('augment')) {
+        console.warn(`ItemSheetConfig | Template path mismatch for augment items: ${templatePath}`);
+    }
 }
 
 /**
@@ -206,17 +254,17 @@ export function formatItemDisplay(item) {
  * Extracts and processes form data from item sheet submissions
  * 
  * This function takes flat form data (like "system.damage": "10") and converts
- * it into nested objects with proper data type conversion. It's similar to
- * the existing processFormData but with enhanced type conversion logic.
+ * it into nested objects with proper data type conversion. It handles array fields
+ * (those ending with []) by building arrays from multiple values.
  * 
  * @param {Object} formData - Flat form data object from form submission
  * @returns {Object} Processed nested object with converted data types
  * 
  * @example
- * // Input form data
+ * // Input form data with array field
  * const formData = {
  *     'name': 'Iron Sword',
- *     'system.damage': '1d8',
+ *     'system.traits[]': ['fire', 'sharp'],  // Array field
  *     'system.weight': '3.5',
  *     'system.equipped': 'true'
  * };
@@ -225,7 +273,7 @@ export function formatItemDisplay(item) {
  * const result = extractItemFormData(formData);
  * // Result: {
  * //   name: 'Iron Sword',
- * //   system: { damage: '1d8', weight: 3.5, equipped: true }
+ * //   system: { traits: ['fire', 'sharp'], weight: 3.5, equipped: true }
  * // }
  */
 export function extractItemFormData(formData) {
@@ -234,10 +282,47 @@ export function extractItemFormData(formData) {
     }
     
     const result = {};
+    const arrayFields = new Map(); // Track array fields separately
     
-    // Process each form field
+    // First pass: collect all values, identifying array fields
     for (const [key, value] of Object.entries(formData)) {
-        // Split the key into path segments
+        // Check if this is an array field (ends with [])
+        const isArrayField = key.endsWith('[]');
+        const cleanKey = isArrayField ? key.slice(0, -2) : key; // Remove [] suffix
+        
+        if (isArrayField) {
+            // Handle array field
+            if (!arrayFields.has(cleanKey)) {
+                arrayFields.set(cleanKey, []);
+            }
+            // Support both single values and arrays from FormData
+            if (Array.isArray(value)) {
+                arrayFields.get(cleanKey).push(...value);
+            } else {
+                arrayFields.get(cleanKey).push(value);
+            }
+        } else {
+            // Handle regular field - split key into path segments
+            const segments = cleanKey.split('.');
+            
+            // Navigate/create the nested structure
+            let current = result;
+            for (let i = 0; i < segments.length - 1; i++) {
+                const segment = segments[i];
+                if (!current[segment]) {
+                    current[segment] = {};
+                }
+                current = current[segment];
+            }
+            
+            // Set the final value with type conversion
+            const finalKey = segments[segments.length - 1];
+            current[finalKey] = convertFormValue(value);
+        }
+    }
+    
+    // Second pass: process array fields
+    for (const [key, values] of arrayFields) {
         const segments = key.split('.');
         
         // Navigate/create the nested structure
@@ -250,9 +335,9 @@ export function extractItemFormData(formData) {
             current = current[segment];
         }
         
-        // Set the final value with type conversion
+        // Set the array value with type conversion for each element
         const finalKey = segments[segments.length - 1];
-        current[finalKey] = convertFormValue(value);
+        current[finalKey] = values.map(value => convertFormValue(value));
     }
     
     return result;
@@ -278,7 +363,7 @@ export function extractItemFormData(formData) {
  * });
  * // Result: {
  * //   classes: ['avant', 'sheet', 'item', 'weapon'],
- * //   template: 'systems/avant/templates/item/item-weapon-sheet.html',
+ * //   template: 'systems/avant/templates/item/item-weapon-new.html',
  * //   ...
  * // }
  */
@@ -293,14 +378,20 @@ export function createItemSheetConfig(item) {
     const baseClasses = ['avant', 'sheet', 'item'];
     const classes = [...baseClasses, itemType];
     
-    // Determine template based on type
+        // Determine template based on type
     let template;
     if (validateItemType(itemType)) {
-        template = `systems/avant/templates/item/item-${itemType}-sheet.html`;
+        template = `systems/avant/templates/item/item-${itemType}-new.html`;
+        
+        // Validate template exists (development warning)
+        if (typeof console !== 'undefined' && validateItemType(itemType)) {
+            validateTemplateExists(itemType, template);
+        }
     } else {
         template = 'systems/avant/templates/item/item-sheet.html';
+        console.warn(`ItemSheetConfig | Unknown item type "${itemType}" using fallback template`);
     }
-    
+
     return {
         classes: classes,
         template: template,

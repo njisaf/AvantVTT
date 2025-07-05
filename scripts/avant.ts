@@ -19,18 +19,15 @@ import { registerSheets, setupConfigDebug, setupDataModels } from './logic/avant
 import { AvantActorData } from './data/actor-data.ts';
 import { AvantActionData, AvantFeatureData, AvantTalentData, AvantAugmentData, AvantWeaponData, AvantArmorData, AvantGearData, AvantTraitData } from './data/item-data.js';
 
-// Sheet classes
-import { AvantActorSheet } from './sheets/actor-sheet.ts';
-import { AvantItemSheet } from './sheets/item-sheet';
+// Sheet classes are now created by factory functions in the initialization manager
+// No direct imports needed - classes are created when Foundry is ready
 
 // Dialog classes
 import { AvantRerollDialog } from './dialogs/reroll-dialog';
 
 // Chat functionality
 import { AvantChatContextMenu } from './chat/context-menu.ts';
-
-// Theme manager
-import { AvantThemeManager } from './themes/theme-manager.js';
+import { initializeChatIntegration } from './logic/chat/chat-integration.js';
 
 // Commands module
 import { initializeAvantCommands } from './commands/index.ts';
@@ -90,13 +87,7 @@ interface UtilityResult {
 Hooks.once('init', async function(): Promise<void> {
     console.log("Avant | Initializing Avant Native system with robust initialization manager");
     
-    // Register settings for theme manager early
-    AvantThemeManager.registerSettings();
-    console.log("Avant | Theme manager settings registered");
-    
-    // Register accessibility settings early (required for template helpers)
-    AvantThemeManager.registerAccessibilitySettings();
-    console.log("Avant | Accessibility settings registered");
+
     
     // Create and expose initialization manager immediately
     const initManager = InitializationManager.getInstance();
@@ -159,15 +150,7 @@ Hooks.once('ready', async function(): Promise<void> {
             const finalStatus = initManager.getStatusReport();
             console.log('Avant | Final Initialization Status:', finalStatus);
             
-            // Validate critical services are ready
-            const criticalServices = ['themeManager', 'themeInitialization'];
-            for (const serviceName of criticalServices) {
-                if (initManager.isServiceReady(serviceName)) {
-                    console.log(`✅ Avant | Critical service '${serviceName}' is ready`);
-                } else {
-                    console.warn(`❌ Avant | Critical service '${serviceName}' is NOT ready`);
-                }
-            }
+
         } else {
             console.error('Avant | Ready phase failed:', readyResult.error);
         }
@@ -180,6 +163,16 @@ Hooks.once('ready', async function(): Promise<void> {
         
         // Attempt to create world-level trait macros (may fail in v13 due to timing)
         await commandsModule.createWorldMacros();
+        
+        // Initialize chat integration for talents and augments
+        console.log("Avant | Initializing chat integration for talents and augments");
+        const chatResult = initializeChatIntegration(game) as { success: boolean; api?: any; error?: string };
+        if (chatResult.success) {
+            console.log("✅ Avant | Chat integration initialized successfully");
+            console.log("✅ Avant | Available chat API:", Object.keys(chatResult.api || {}));
+        } else {
+            console.error("❌ Avant | Chat integration failed:", chatResult.error);
+        }
         
         // Provide fallback method accessible via console
         setupMacroFallback();
@@ -801,11 +794,11 @@ interface AvantGlobals {
     AvantArmorData: typeof AvantArmorData;
     AvantGearData: typeof AvantGearData;
     AvantTraitData: typeof AvantTraitData;
-    AvantActorSheet: typeof AvantActorSheet;
-    AvantItemSheet: typeof AvantItemSheet;
+    // AvantActorSheet and AvantItemSheet are now created by factory functions
+    // AvantActorSheet: typeof AvantActorSheet;
+    // AvantItemSheet: typeof AvantItemSheet;
     AvantRerollDialog: typeof AvantRerollDialog;
     AvantChatContextMenu: typeof AvantChatContextMenu;
-    AvantThemeManager: typeof AvantThemeManager;
     ValidationUtils: typeof ValidationUtils;
 }
 
@@ -820,11 +813,11 @@ const avantGlobals: AvantGlobals = {
     AvantArmorData,
     AvantGearData,
     AvantTraitData,
-    AvantActorSheet,
-    AvantItemSheet,
+    // AvantActorSheet and AvantItemSheet are now created by factory functions
+    // AvantActorSheet,
+    // AvantItemSheet,
     AvantRerollDialog,
     AvantChatContextMenu,
-    AvantThemeManager,
     ValidationUtils
 };
 

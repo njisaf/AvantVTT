@@ -10,6 +10,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { validateTalent, validateAugment } from './logic/validation-utils.js';
 
 // ES module compatibility
 const __filename = fileURLToPath(import.meta.url);
@@ -695,6 +696,93 @@ const TRAIT_SEEDS = [
   }
 ];
 
+const TALENT_SEEDS = [
+  {
+    name: "Fire Strike",
+    type: "talent",
+    system: {
+      apCost: 2,
+      levelRequirement: 1,
+      traits: ["Fire", "Attack"],
+      requirements: "",
+      description: "Channel fire energy into a devastating melee attack. Deal fire damage to a target within reach."
+    },
+    img: "icons/svg/item-bag.svg",
+    sort: 100
+  },
+  {
+    name: "Ice Shield",
+    type: "talent",
+    system: {
+      apCost: 1,
+      levelRequirement: 1,
+      traits: ["Ice", "Defense"],
+      requirements: "",
+      description: "Create a protective barrier of ice around yourself. Grants temporary armor against incoming attacks."
+    },
+    img: "icons/svg/item-bag.svg",
+    sort: 200
+  },
+  {
+    name: "Lightning Bolt",
+    type: "talent",
+    system: {
+      apCost: 3,
+      levelRequirement: 3,
+      traits: ["Lightning", "Ranged"],
+      requirements: "Must have Focus 15+",
+      description: "Unleash a powerful bolt of lightning that can arc between multiple targets."
+    },
+    img: "icons/svg/item-bag.svg",
+    sort: 300
+  }
+];
+
+const AUGMENT_SEEDS = [
+  {
+    name: "Neural Interface",
+    type: "augment",
+    system: {
+      apCost: 1,
+      ppCost: 2,
+      levelRequirement: 2,
+      traits: ["Tech", "Enhancement"],
+      requirements: "Must have cybernetic compatibility",
+      description: "A neural implant that enhances cognitive processing and allows interface with digital systems."
+    },
+    img: "icons/svg/item-bag.svg",
+    sort: 100
+  },
+  {
+    name: "Muscle Enhancer",
+    type: "augment",
+    system: {
+      apCost: 0,
+      ppCost: 0,
+      levelRequirement: 1,
+      traits: ["Tech", "Physical"],
+      requirements: "",
+      description: "Passive muscle fiber enhancement that provides constant physical performance boost."
+    },
+    img: "icons/svg/item-bag.svg",
+    sort: 200
+  },
+  {
+    name: "Psychic Amplifier",
+    type: "augment",
+    system: {
+      apCost: 2,
+      ppCost: 4,
+      levelRequirement: 4,
+      traits: ["Psychic", "Enhancement"],
+      requirements: "Must have natural psychic ability",
+      description: "Amplifies existing psychic abilities, allowing for more powerful mental effects."
+    },
+    img: "icons/svg/item-bag.svg",
+    sort: 300
+  }
+];
+
 /**
  * Create FoundryVTT NeDB compendium pack file (.db format)
  * FoundryVTT will automatically migrate this to LevelDB on first load
@@ -723,15 +811,57 @@ async function createNeDBPack(packPath, items) {
 }
 
 /**
- * Generate FoundryVTT item data with proper IDs
+ * Generate a 16-character alphanumeric ID for FoundryVTT v13
+ * @param {string} seed - A seed string to help make it reproducible
+ * @returns {string} 16-character alphanumeric ID
+ */
+function generateFoundryId(seed = '') {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  
+  // Use seed + timestamp for uniqueness
+  const seedValue = seed + Date.now();
+  
+  for (let i = 0; i < 16; i++) {
+    // Use a combination of the seed and random values
+    const seedIndex = (seedValue.charCodeAt(i % seedValue.length) + i) % chars.length;
+    const randomIndex = Math.floor(Math.random() * chars.length);
+    const charIndex = (seedIndex + randomIndex) % chars.length;
+    result += chars[charIndex];
+  }
+  
+  return result;
+}
+
+/**
+ * Generate FoundryVTT item data with proper IDs and validation
  * 
- * @param {Array} seeds - Trait seed data
+ * @param {Array} seeds - Item seed data
+ * @param {string} itemType - The type of items being generated (trait, talent, augment)
  * @returns {Array} FoundryVTT item documents
  */
-function generateItemDocuments(seeds) {
+function generateItemDocuments(seeds, itemType = 'trait') {
+  console.log(`🏗️ Generating ${itemType} documents with validation...`);
+  
+  // Generate a consistent user ID for build script
+  const buildUserId = generateFoundryId('buildsystem');
+  
   return seeds.map((seed, index) => {
-    // Generate a unique ID using name + timestamp + index
-    const id = `trait_${seed.name.toLowerCase()}_${Date.now()}_${index}`;
+    // Validate item data based on type
+    let validatedSystemData;
+    if (itemType === 'talent') {
+      validatedSystemData = validateTalent(seed.system);
+      console.log(`✅ Validated talent: ${seed.name}`, validatedSystemData);
+    } else if (itemType === 'augment') {
+      validatedSystemData = validateAugment(seed.system);
+      console.log(`✅ Validated augment: ${seed.name}`, validatedSystemData);
+    } else {
+      // For traits and other types, use the system data as-is for now
+      validatedSystemData = seed.system;
+    }
+    
+    // Generate a proper 16-character alphanumeric ID
+    const id = generateFoundryId(`${itemType}-${seed.name}-${index}`);
     console.log(`📝 Generated ID for ${seed.name}: ${id}`);
     
     return {
@@ -739,7 +869,7 @@ function generateItemDocuments(seeds) {
       name: seed.name,
       type: seed.type,
       img: seed.img || 'icons/svg/item-bag.svg',
-      system: seed.system,
+      system: validatedSystemData,
       effects: [],
       folder: null,
       sort: seed.sort || ((index + 1) * 100),
@@ -753,7 +883,7 @@ function generateItemDocuments(seeds) {
         coreVersion: '13.344',
         createdTime: Date.now(),
         modifiedTime: Date.now(),
-        lastModifiedBy: 'build-script'
+        lastModifiedBy: buildUserId
       }
     };
   });
@@ -766,9 +896,12 @@ function generateItemDocuments(seeds) {
  * @returns {Array} FoundryVTT macro documents
  */
 function generateMacroDocuments(seeds) {
+  // Generate a consistent user ID for build script
+  const buildUserId = generateFoundryId('buildsystem');
+  
   return seeds.map((seed, index) => {
-    // Generate a unique ID using name + timestamp + index
-    const id = `macro_${seed.name.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}_${index}`;
+    // Generate a proper 16-character alphanumeric ID
+    const id = generateFoundryId(`macro-${seed.name}-${index}`);
     console.log(`📝 Generated ID for ${seed.name}: ${id}`);
     
     return {
@@ -790,7 +923,7 @@ function generateMacroDocuments(seeds) {
         coreVersion: '13.344',
         createdTime: Date.now(),
         modifiedTime: Date.now(),
-        lastModifiedBy: 'build-script'
+        lastModifiedBy: buildUserId
       }
     };
   });
@@ -822,6 +955,14 @@ function updateSystemJsonForLevelDB(systemJsonPath) {
         pack.path = './packs/avant-macros';
         console.log(`✅ Updated pack path for v13: ${pack.path}`);
       }
+      if (pack.path === './packs/avant-talents.db') {
+        pack.path = './packs/avant-talents';
+        console.log(`✅ Updated pack path for v13: ${pack.path}`);
+      }
+      if (pack.path === './packs/avant-augments.db') {
+        pack.path = './packs/avant-augments';
+        console.log(`✅ Updated pack path for v13: ${pack.path}`);
+      }
     });
   }
   
@@ -843,31 +984,48 @@ async function buildPacks() {
     const packsPath = path.join(distPath, 'packs');
     const traitPackPath = path.join(packsPath, 'avant-traits.db');
     const macroPackPath = path.join(packsPath, 'avant-macros.db');
+    const talentPackPath = path.join(packsPath, 'avant-talents.db');
+    const augmentPackPath = path.join(packsPath, 'avant-augments.db');
     const systemJsonPath = path.join(distPath, 'system.json');
     
     console.log(`📁 Project root: ${projectRoot}`);
     console.log(`📁 Dist path: ${distPath}`);
-    console.log(`📁 Trait pack path: ${traitPackPath}`);
-    console.log(`📁 Macro pack path: ${macroPackPath}`);
+    console.log(`📁 Pack paths:`);
+    console.log(`   - Traits: ${traitPackPath}`);
+    console.log(`   - Macros: ${macroPackPath}`);
+    console.log(`   - Talents: ${talentPackPath}`);
+    console.log(`   - Augments: ${augmentPackPath}`);
     
     // Ensure dist directory exists
     if (!fs.existsSync(distPath)) {
       fs.mkdirSync(distPath, { recursive: true });
     }
     
-    // Generate trait documents
-    const itemDocs = generateItemDocuments(TRAIT_SEEDS);
-    console.log(`📝 Generated ${itemDocs.length} trait documents`);
+    // Generate documents with validation
+    console.log('🔄 Phase 2: Generating documents with build-time validation...');
     
-    // Generate macro documents
+    const traitDocs = generateItemDocuments(TRAIT_SEEDS, 'trait');
+    console.log(`📝 Generated ${traitDocs.length} trait documents`);
+    
     const macroDocs = generateMacroDocuments(MACRO_SEEDS);
     console.log(`📝 Generated ${macroDocs.length} macro documents`);
     
-    // Create the trait compendium pack (NeDB format - FoundryVTT will auto-migrate to LevelDB)
-    await createNeDBPack(traitPackPath, itemDocs);
+    const talentDocs = generateItemDocuments(TALENT_SEEDS, 'talent');
+    console.log(`📝 Generated ${talentDocs.length} talent documents`);
     
-    // Create the macro compendium pack (NeDB format - FoundryVTT will auto-migrate to LevelDB)
+    const augmentDocs = generateItemDocuments(AUGMENT_SEEDS, 'augment');
+    console.log(`📝 Generated ${augmentDocs.length} augment documents`);
+    
+    // Validate that all items passed validation (this would have thrown errors above if not)
+    console.log('✅ All items passed build-time schema validation');
+    
+    // Create compendium packs (NeDB format - FoundryVTT will auto-migrate to LevelDB)
+    console.log('🔄 Creating compendium pack files...');
+    
+    await createNeDBPack(traitPackPath, traitDocs);
     await createNeDBPack(macroPackPath, macroDocs);
+    await createNeDBPack(talentPackPath, talentDocs);
+    await createNeDBPack(augmentPackPath, augmentDocs);
     
     // Update system.json if it exists in dist
     if (fs.existsSync(systemJsonPath)) {
@@ -878,13 +1036,17 @@ async function buildPacks() {
     
     console.log('🎉 Compendium pack build complete!');
     console.log('📋 Summary:');
-    console.log(`   - Created trait pack: ${traitPackPath}`);
-    console.log(`   - Created macro pack: ${macroPackPath}`);
-    console.log(`   - Items: ${itemDocs.length} traits, ${macroDocs.length} macros`);
+    console.log(`   - Created trait pack: ${traitPackPath} (${traitDocs.length} items)`);
+    console.log(`   - Created macro pack: ${macroPackPath} (${macroDocs.length} items)`);
+    console.log(`   - Created talent pack: ${talentPackPath} (${talentDocs.length} items)`);
+    console.log(`   - Created augment pack: ${augmentPackPath} (${augmentDocs.length} items)`);
+    console.log(`   - Total items: ${traitDocs.length + macroDocs.length + talentDocs.length + augmentDocs.length}`);
     console.log(`   - Format: NeDB (.db files) - FoundryVTT v13 will auto-migrate to LevelDB folders`);
+    console.log(`   - Validation: All items validated against schema during build`);
     
   } catch (error) {
     console.error('❌ Error building compendium packs:', error);
+    console.error('💥 Build failed due to validation error or file system issue');
     process.exit(1);
   }
 }

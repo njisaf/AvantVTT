@@ -456,7 +456,17 @@ export function validateSkillRollData(
  * ```
  */
 export function prepareItemData(itemType: string, dataset?: Record<string, unknown>): Partial<ItemData> | null {
+    const timestamp = new Date().toISOString();
+    
+    // PHASE 1 INSTRUMENTATION: Log item data preparation
+    console.debug(`🎯 ITEM-UTILS | ${timestamp} | prepareItemData | ENTRY`, {
+        itemType,
+        hasDataset: !!dataset,
+        datasetKeys: dataset ? Object.keys(dataset) : []
+    });
+    
     if (!itemType || typeof itemType !== 'string') {
+        console.warn(`🎯 ITEM-UTILS | ${timestamp} | prepareItemData | Invalid itemType:`, itemType);
         return null;
     }
     
@@ -485,59 +495,176 @@ export function prepareItemData(itemType: string, dataset?: Record<string, unkno
         (itemData.system as any).augmentType = "enhancement";
     }
     
+    console.debug(`🎯 ITEM-UTILS | ${timestamp} | prepareItemData | RESULT`, {
+        resultName: itemData.name,
+        resultType: itemData.type,
+        systemKeys: itemData.system ? Object.keys(itemData.system) : []
+    });
+    
     return itemData;
 }
 
 /**
- * Validates power point usage against current points
+ * Process dropped item data for actor sheet integration
+ * PHASE 1 INSTRUMENTATION: Track dropped item processing with detailed logging
  * 
- * This function checks if a character has enough power points to spend
- * the requested amount and returns validation results including remaining
- * points and appropriate error messages.
- * 
- * @param currentPoints - Current power points available
- * @param costPoints - Power points needed for the action
- * @returns Validation result with status and details
- * 
- * @example
- * ```typescript
- * // Sufficient points
- * const result = validatePowerPointUsage(5, 2);
- * // Result: { valid: true, remaining: 3, cost: 2 }
- * 
- * // Insufficient points
- * const result = validatePowerPointUsage(1, 3);
- * // Result: { valid: false, remaining: 1, cost: 3, error: "Not enough..." }
- * ```
+ * @param sourceItem - The source item from compendium or world
+ * @param targetActor - The actor receiving the item
+ * @returns Processing result with metadata
  */
-export function validatePowerPointUsage(currentPoints: unknown, costPoints: unknown): PowerPointValidationResult {
-    const current = Number(currentPoints);
-    const cost = Number(costPoints);
+export function processDroppedItem(sourceItem: any, targetActor: any): {
+    success: boolean;
+    cleanData?: any;
+    duplicateInfo?: any;
+    error?: string;
+} {
+    const timestamp = new Date().toISOString();
     
-    // Validate inputs
-    if (isNaN(current) || isNaN(cost) || current < 0 || cost < 0) {
-        return {
-            valid: false,
-            remaining: current || 0,
-            cost: cost || 0,
-            error: 'Invalid power point values provided'
+    console.debug(`🎯 ITEM-UTILS | ${timestamp} | processDroppedItem | ENTRY`, {
+        sourceItemId: sourceItem?.id,
+        sourceItemName: sourceItem?.name,
+        sourceItemType: sourceItem?.type,
+        targetActorId: targetActor?.id,
+        targetActorName: targetActor?.name,
+        targetActorItemCount: targetActor?.items?.size || 0
+    });
+
+    try {
+        // Validate inputs
+        if (!sourceItem) {
+            console.error(`🎯 ITEM-UTILS | ${timestamp} | processDroppedItem | No source item provided`);
+            return { success: false, error: 'No source item provided' };
+        }
+
+        if (!targetActor) {
+            console.error(`🎯 ITEM-UTILS | ${timestamp} | processDroppedItem | No target actor provided`);
+            return { success: false, error: 'No target actor provided' };
+        }
+
+        // Check for duplicates
+        const duplicateCheck = checkForDuplicateItem(sourceItem, targetActor);
+        console.debug(`🎯 ITEM-UTILS | ${timestamp} | processDroppedItem | Duplicate check`, duplicateCheck);
+
+        // Prepare clean data
+        const itemData = sourceItem.toObject ? sourceItem.toObject() : sourceItem;
+        const cleanData = {
+            ...itemData,
+            _id: undefined, // Force new ID generation
+            folder: undefined,
+            sort: undefined,
+            ownership: undefined
         };
+
+        console.debug(`🎯 ITEM-UTILS | ${timestamp} | processDroppedItem | Clean data prepared`, {
+            originalDataKeys: Object.keys(itemData),
+            cleanDataKeys: Object.keys(cleanData),
+            hasName: !!cleanData.name,
+            hasType: !!cleanData.type,
+            hasSystem: !!cleanData.system
+        });
+
+        return {
+            success: true,
+            cleanData,
+            duplicateInfo: duplicateCheck
+        };
+
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.error(`🎯 ITEM-UTILS | ${timestamp} | processDroppedItem | Error:`, error);
+        return { success: false, error: errorMessage };
+    }
+}
+
+/**
+ * Check for duplicate items on an actor
+ * PHASE 1 INSTRUMENTATION: Track duplicate detection logic
+ * 
+ * @param sourceItem - The item being added
+ * @param targetActor - The actor to check
+ * @returns Duplicate information
+ */
+export function checkForDuplicateItem(sourceItem: any, targetActor: any): {
+    hasDuplicate: boolean;
+    duplicateItem?: any;
+    duplicateCount: number;
+    conflictType: 'none' | 'exact' | 'name' | 'multiple';
+} {
+    const timestamp = new Date().toISOString();
+    
+    console.debug(`🎯 ITEM-UTILS | ${timestamp} | checkForDuplicateItem | ENTRY`, {
+        sourceItemName: sourceItem?.name,
+        sourceItemType: sourceItem?.type,
+        actorItemCount: targetActor?.items?.size || 0
+    });
+
+    try {
+        if (!targetActor?.items) {
+            console.debug(`🎯 ITEM-UTILS | ${timestamp} | checkForDuplicateItem | No items collection on actor`);
+            return { hasDuplicate: false, duplicateCount: 0, conflictType: 'none' };
+        }
+
+        // Find exact matches (name and type)
+        const exactMatches = targetActor.items.filter((item: any) => 
+            item.name === sourceItem.name && item.type === sourceItem.type
+        );
+
+        // Find name-only matches
+        const nameMatches = targetActor.items.filter((item: any) => 
+            item.name === sourceItem.name
+        );
+
+        const result = {
+            hasDuplicate: exactMatches.length > 0,
+            duplicateItem: exactMatches[0] || nameMatches[0],
+            duplicateCount: exactMatches.length,
+            conflictType: exactMatches.length > 1 ? 'multiple' : 
+                         exactMatches.length === 1 ? 'exact' :
+                         nameMatches.length > 0 ? 'name' : 'none'
+        } as const;
+
+        console.debug(`🎯 ITEM-UTILS | ${timestamp} | checkForDuplicateItem | RESULT`, {
+            hasDuplicate: result.hasDuplicate,
+            exactMatches: exactMatches.length,
+            nameMatches: nameMatches.length,
+            conflictType: result.conflictType
+        });
+
+        return result;
+
+    } catch (error) {
+        console.error(`🎯 ITEM-UTILS | ${timestamp} | checkForDuplicateItem | Error:`, error);
+        return { hasDuplicate: false, duplicateCount: 0, conflictType: 'none' };
+    }
+}
+
+/**
+ * Validate if an actor has enough power points for an action
+ * @param powerPoints - The actor's power points data
+ * @param cost - The power point cost to validate
+ * @returns Validation result with success/error information
+ */
+export function validatePowerPointUsage(powerPoints: any, cost: number): { valid: boolean; error?: string } {
+    if (!powerPoints) {
+        return { valid: false, error: 'No power points data available' };
+    }
+    
+    const current = powerPoints.current || 0;
+    const max = powerPoints.max || 0;
+    
+    if (cost < 0) {
+        return { valid: false, error: 'Power point cost cannot be negative' };
+    }
+    
+    if (cost === 0) {
+        return { valid: true };
     }
     
     if (current < cost) {
-        return {
-            valid: false,
-            remaining: current,
-            cost: cost,
-            error: `Not enough Power Points! Need ${cost}, have ${current}`
-        };
+        return { valid: false, error: `Insufficient power points (need ${cost}, have ${current})` };
     }
     
-    return {
-        valid: true,
-        remaining: current - cost,
-        cost: cost
-    };
+    return { valid: true };
 }
 
 /**
@@ -720,8 +847,8 @@ export function prepareGenericRoll(dataset: Record<string, unknown>): RollConfig
  * 
  * This function safely extracts the item ID from a DOM element by first checking
  * for a direct data-item-id attribute, then falling back to finding the closest 
- * .item or .combat-item parent. This handles both gear tab (.item) and combat 
- * tab (.combat-item) scenarios.
+ * item parent with various class names used in the actor sheet template.
+ * Handles all item types: gear, action, feature, talent, augment, and combat items.
  * 
  * @param element - The DOM element to search from
  * @returns The item ID or null if not found
@@ -745,22 +872,25 @@ export function extractItemIdFromElement(element: unknown): string | null {
         return htmlElement.dataset.itemId;
     }
     
-    // Second try: Look for closest .item parent (for gear tab)
+    // Second try: Look for all possible item parent selectors used in the template
     if (typeof htmlElement.closest === 'function') {
-        const itemElement = htmlElement.closest('.item');
-        if (itemElement) {
-            const htmlItemElement = itemElement as HTMLElement;
-            if (htmlItemElement.dataset && htmlItemElement.dataset.itemId) {
-                return htmlItemElement.dataset.itemId;
-            }
-        }
+        const itemSelectors = [
+            '.item',           // Generic items (gear)
+            '.gear-item',      // Gear items
+            '.action-item',    // Action items
+            '.feature-item',   // Feature items  
+            '.talent-item',    // Talent items
+            '.augment-item',   // Augment items
+            '.combat-item'     // Combat items (weapons, armor)
+        ];
         
-        // Third try: Look for closest .combat-item parent (for combat tab)
-        const combatItemElement = htmlElement.closest('.combat-item');
-        if (combatItemElement) {
-            const htmlCombatElement = combatItemElement as HTMLElement;
-            if (htmlCombatElement.dataset && htmlCombatElement.dataset.itemId) {
-                return htmlCombatElement.dataset.itemId;
+        for (const selector of itemSelectors) {
+            const itemElement = htmlElement.closest(selector);
+            if (itemElement) {
+                const htmlItemElement = itemElement as HTMLElement;
+                if (htmlItemElement.dataset && htmlItemElement.dataset.itemId) {
+                    return htmlItemElement.dataset.itemId;
+                }
             }
         }
     }
@@ -803,6 +933,180 @@ export function extractCombatItemId(element: unknown): string | null {
     }
     
     return null;
+}
+
+/**
+ * Handles keyboard navigation for talent and augment rows
+ * 
+ * This function manages up/down arrow navigation through talent and augment rows,
+ * with space to activate/roll and proper focus management following WCAG guidelines.
+ * 
+ * @param event - The keyboard event 
+ * @param currentElement - The currently focused element
+ * @returns True if the event was handled, false otherwise
+ * 
+ * @example
+ * ```typescript
+ * // Handle keyboard navigation in talent rows
+ * const handled = handleRowKeyboardNavigation(keyEvent, focusedElement);
+ * if (handled) {
+ *     keyEvent.preventDefault();
+ * }
+ * ```
+ */
+export function handleRowKeyboardNavigation(event: unknown, currentElement: unknown): boolean {
+    if (!event || !currentElement || typeof event !== 'object' || typeof currentElement !== 'object') {
+        return false;
+    }
+    
+    const keyboardEvent = event as KeyboardEvent;
+    const element = currentElement as HTMLElement;
+    
+    // Only handle specific keys
+    if (!['ArrowUp', 'ArrowDown', 'Space', 'Enter'].includes(keyboardEvent.key)) {
+        return false;
+    }
+    
+    const currentRow = element.closest('.talent-item, .augment-item');
+    if (!currentRow) {
+        return false;
+    }
+    
+    const allRows = Array.from(document.querySelectorAll('.talent-item, .augment-item'));
+    const currentIndex = allRows.indexOf(currentRow as Element);
+    
+    if (currentIndex === -1) {
+        return false;
+    }
+    
+    switch (keyboardEvent.key) {
+        case 'ArrowUp':
+            if (currentIndex > 0) {
+                const previousRow = allRows[currentIndex - 1] as HTMLElement;
+                const focusTarget = previousRow.querySelector('.row-title, .chat-roll-btn, .activate-toggle-btn') as HTMLElement;
+                focusTarget?.focus();
+                return true;
+            }
+            break;
+            
+        case 'ArrowDown':
+            if (currentIndex < allRows.length - 1) {
+                const nextRow = allRows[currentIndex + 1] as HTMLElement;
+                const focusTarget = nextRow.querySelector('.row-title, .chat-roll-btn, .activate-toggle-btn') as HTMLElement;
+                focusTarget?.focus();
+                return true;
+            }
+            break;
+            
+        case 'Space':
+        case 'Enter':
+            // Activate the primary action (roll or activate)
+            const actionButton = currentRow.querySelector('.chat-roll-btn, .activate-toggle-btn') as HTMLElement;
+            if (actionButton) {
+                actionButton.click();
+                return true;
+            }
+            break;
+    }
+    
+    return false;
+}
+
+/**
+ * Manages focus for AP selector radiogroup
+ * 
+ * This function handles keyboard navigation within the AP selector, ensuring
+ * proper radiogroup behavior with arrow keys and space/enter activation.
+ * 
+ * @param event - The keyboard event
+ * @param selectorElement - The AP selector container element
+ * @returns True if the event was handled, false otherwise
+ * 
+ * @example
+ * ```typescript
+ * // Handle AP selector keyboard navigation
+ * const handled = handleAPSelectorNavigation(keyEvent, apSelector);
+ * if (handled) {
+ *     keyEvent.preventDefault();
+ * }
+ * ```
+ */
+export function handleAPSelectorNavigation(event: unknown, selectorElement: unknown): boolean {
+    if (!event || !selectorElement || typeof event !== 'object' || typeof selectorElement !== 'object') {
+        return false;
+    }
+    
+    const keyboardEvent = event as KeyboardEvent;
+    const selector = selectorElement as HTMLElement;
+    
+    // Only handle arrow keys and space/enter within radiogroup
+    if (!['ArrowLeft', 'ArrowRight', 'Space', 'Enter'].includes(keyboardEvent.key)) {
+        return false;
+    }
+    
+    const apIcons = Array.from(selector.querySelectorAll('.ap-icon')) as HTMLElement[];
+    const currentFocused = apIcons.find(icon => icon === document.activeElement);
+    const currentIndex = currentFocused ? apIcons.indexOf(currentFocused) : -1;
+    
+    switch (keyboardEvent.key) {
+        case 'ArrowLeft':
+            if (currentIndex > 0) {
+                apIcons[currentIndex - 1].focus();
+                return true;
+            }
+            break;
+            
+        case 'ArrowRight':
+            if (currentIndex < apIcons.length - 1) {
+                apIcons[currentIndex + 1].focus();
+                return true;
+            }
+            break;
+            
+        case 'Space':
+        case 'Enter':
+            if (currentFocused) {
+                currentFocused.click();
+                return true;
+            }
+            break;
+    }
+    
+    return false;
+}
+
+/**
+ * Calculates trait overflow count for display
+ * 
+ * This function determines how many traits are hidden when there are too many
+ * to display in the available space (limited to ~2 rows or 4 traits).
+ * 
+ * @param traits - Array of trait objects
+ * @param maxVisible - Maximum number of traits to show (default: 4)
+ * @returns Object with visible traits and overflow count
+ * 
+ * @example
+ * ```typescript
+ * // Calculate trait overflow
+ * const result = calculateTraitOverflow(traits, 4);
+ * // Result: { visibleTraits: [...], overflowCount: 2 }
+ * ```
+ */
+export function calculateTraitOverflow(traits: unknown, maxVisible: number = 4): { visibleTraits: any[], overflowCount: number } {
+    if (!Array.isArray(traits)) {
+        return { visibleTraits: [], overflowCount: 0 };
+    }
+    
+    const maxTraits = Math.max(1, Math.floor(maxVisible));
+    
+    if (traits.length <= maxTraits) {
+        return { visibleTraits: traits, overflowCount: 0 };
+    }
+    
+    return {
+        visibleTraits: traits.slice(0, maxTraits),
+        overflowCount: traits.length - maxTraits
+    };
 }
 
 /**

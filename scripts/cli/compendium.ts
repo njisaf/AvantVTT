@@ -143,10 +143,10 @@ async function diffCommand(srcId: string, destId: string, options: any) {
     
     displayDiffResults(diff, srcId, destId, options);
     
-    process.exit(0);
+    return 0;
   } catch (error) {
     console.error(`❌ Error comparing packs: ${error instanceof Error ? error.message : String(error)}`);
-    process.exit(1);
+    return 1;
   }
 }
 
@@ -185,7 +185,7 @@ async function copyCommand(srcId: string, destId: string, options: any) {
       }
     }
     
-    process.exit(0);
+    return 0;
   } catch (error) {
     console.error(`❌ Error copying documents: ${error instanceof Error ? error.message : String(error)}`);
     if (options.json) {
@@ -194,7 +194,7 @@ async function copyCommand(srcId: string, destId: string, options: any) {
         error: error instanceof Error ? error.message : String(error)
       }, null, 2));
     }
-    process.exit(1);
+    return 1;
   }
 }
 
@@ -255,10 +255,10 @@ async function listCommand(options: any) {
       }
     }
     
-    process.exit(0);
+    return 0;
   } catch (error) {
     console.error(`❌ Error listing packs: ${error instanceof Error ? error.message : String(error)}`);
-    process.exit(1);
+    return 1;
   }
 }
 

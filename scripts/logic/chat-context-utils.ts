@@ -5,7 +5,7 @@
  * @description Pure business logic functions for chat context menu functionality
  */
 
-import type { ContextMenuEntry } from '../types/domain/theme';
+import type { ContextMenuEntry } from '../types/domain/chat-context';
 
 /**
  * Validation result for message reroll eligibility.

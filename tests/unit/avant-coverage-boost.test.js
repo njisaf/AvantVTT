@@ -326,13 +326,14 @@ describe('Avant.js Coverage Boost', () => {
                 "systems/avant/templates/actor-sheet.html",
                 "systems/avant/templates/item-sheet.html",
                 "systems/avant/templates/reroll-dialog.html",
-                "systems/avant/templates/item/item-action-sheet.html",
-                "systems/avant/templates/item/item-feature-sheet.html",
-                "systems/avant/templates/item/item-talent-sheet.html",
-                "systems/avant/templates/item/item-augment-sheet.html",
-                "systems/avant/templates/item/item-weapon-sheet.html",
-                "systems/avant/templates/item/item-armor-sheet.html",
-                "systems/avant/templates/item/item-gear-sheet.html"
+                "systems/avant/templates/item/item-action-new.html",
+                "systems/avant/templates/item/item-feature-new.html",
+                "systems/avant/templates/item/item-talent-new.html",
+                "systems/avant/templates/item/item-augment-new.html",
+                "systems/avant/templates/item/item-weapon-new.html",
+                "systems/avant/templates/item/item-armor-new.html",
+                "systems/avant/templates/item/item-gear-new.html",
+                "systems/avant/templates/item/item-trait-new.html"
             ];
 
             await mockLoadTemplates(templates);

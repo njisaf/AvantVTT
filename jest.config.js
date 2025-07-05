@@ -39,7 +39,8 @@ export default {
       },
       testMatch: [
         '<rootDir>/tests/unit/**/*.test.[jt]s',
-        '!<rootDir>/tests/unit/**/*.int.test.[jt]s'
+        '!<rootDir>/tests/unit/**/*.int.test.[jt]s',
+        '!<rootDir>/deprecated/**/*.test.[jt]s' // Deprecated features — do not run
       ],
       setupFilesAfterEnv: [
         '<rootDir>/tests/setup.js'
@@ -49,7 +50,6 @@ export default {
         'scripts/utils/**/*.js',
         'scripts/data/**/*.{js,ts}',
         'scripts/services/**/*.{js,ts}',
-        'scripts/themes/theme-manager.js',
         'scripts/avant.js',
         '!**/*.test.js',
         '!**/*.spec.js',
@@ -59,9 +59,6 @@ export default {
       coverageThreshold: {
         'scripts/utils/logger.js': {
           lines: 90
-        },
-        'scripts/themes/theme-manager.js': {
-          lines: 75
         },
         'scripts/avant.js': {
           lines: 60
@@ -112,7 +109,8 @@ export default {
         '^#lib/(.*)$': '<rootDir>/scripts/lib/$1'
       },
       testMatch: [
-        '<rootDir>/tests/integration/**/*.int.test.[jt]s'
+        '<rootDir>/tests/integration/**/*.int.test.[jt]s',
+        '!<rootDir>/deprecated/**/*.int.test.[jt]s' // Deprecated features — do not run
       ],
       setupFilesAfterEnv: [
         '<rootDir>/tests/setup.js'
@@ -202,5 +200,9 @@ export default {
   
   // Error handling improvements
   errorOnDeprecated: false, // Don't fail on deprecation warnings during stabilization
-  verbose: false // Reduce noise during mass test runs
+  verbose: false, // Reduce noise during mass test runs
+  fakeTimers: {
+    enableGlobally: true,
+    legacyFakeTimers: false
+  }
 }; 

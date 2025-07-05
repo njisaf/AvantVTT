@@ -1,0 +1,17 @@
+{{!-- 
+  Details Tab Partial
+  
+  This tab content is used for item sheets that have tabbed interfaces.
+  It provides the details fields like ability, modifier, and cost in a standard layout.
+  
+  Usage:
+    {{> "systems/avant/templates/shared/partials/details-tab.hbs" system=system abilityOptions=abilityOptions}}
+  
+  Optional: class - Additional CSS classes for the tab content
+--}}
+
+<div class="tab-content details-tab {{#if class}}{{class}}{{/if}}" data-tab="details">
+    {{> "systems/avant/templates/shared/partials/select-field.hbs" name="system.ability" value=system.ability label="Ability" options=abilityOptions}}
+    {{> "systems/avant/templates/shared/partials/number-field.hbs" name="system.modifier" value=system.modifier label="Modifier"}}
+    {{> "systems/avant/templates/shared/partials/number-field.hbs" name="system.cost" value=system.cost label="Cost"}}
+</div> 
