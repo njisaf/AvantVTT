@@ -26,7 +26,7 @@
     "test": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage",
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' jest --watch",
     "lint": "eslint . --ext .js,.ts && npm run guard:deprecated",
-    "lint:deadcode": "depcheck . --ignores='@types/*,foundry,jest-*' --skip-missing",
+    "lint:deadcode": "depcheck . --ignores='@types/*,foundry,jest-*,ts-node,ts-jest' --skip-missing",
     "guard:deprecated": "npm run lint:deadcode && node -e \"const fs = require('fs'); const path = require('path'); const violations = []; const scanFiles = (dir) => { if (!fs.existsSync(dir)) return; fs.readdirSync(dir, { withFileTypes: true }).forEach(dirent => { if (dirent.isDirectory()) scanFiles(path.join(dir, dirent.name)); else if (dirent.name.match(/\\.(js|ts)$/)) { const content = fs.readFileSync(path.join(dir, dirent.name), 'utf8'); if (content.includes('RemoteTraitService')) violations.push(path.join(dir, dirent.name)); } }); }; scanFiles('scripts'); if (violations.length > 0) { console.error('❌ Found RemoteTraitService imports in:', violations.join(', ')); process.exit(1); } else { console.log('✅ No deprecated service imports found'); }\"",
     "clean": "rm -f styles/avant.css.map",
     "prepare": "npm run build"
@@ -36,9 +36,6 @@
     "@types/node": "^22.0.0",
     "@typescript-eslint/eslint-plugin": "^8.34.1",
     "@typescript-eslint/parser": "^8.34.1",
-    "@vitejs/plugin-legacy": "^6.1.1",
-    "depcheck": "^1.4.7",
-    "execa": "^9.0.0",
     "glob": "^11.0.3",
     "jest": "^29.7.0",
     "jest-chain": "^1.1.6",
@@ -46,7 +43,6 @@
     "jest-extended": "^4.0.0",
     "sass": "^1.69.0",
     "ts-jest": "^29.4.0",
-    "ts-node": "^10.9.0",
     "typescript": "^5.8.3",
     "vite": "^6.3.5"
   },
