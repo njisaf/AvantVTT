@@ -1,0 +1,173 @@
+name: AvantVTT E2E Tests (Slopcore)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      test_spec:
+        description: "Test specification to run"
+        required: false
+        default: "smoke"
+        type: choice
+        options:
+          - smoke
+          - regression
+          - full
+
+env:
+  SYSTEM_ID: avant
+  NODE_VERSION: 20
+  LANGFUSE_PUBLIC_KEY: ${{ secrets.LANGFUSE_PUBLIC_KEY }}
+  LANGFUSE_SECRET_KEY: ${{ secrets.LANGFUSE_SECRET_KEY }}
+  DOCKER_MCP_URL: http://localhost:4000
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout AvantVTT
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout Slopcore
+        uses: actions/checkout@v4
+        with:
+          repository: njisaf/slopcore
+          path: .slopcore
+          token: ${{ secrets.SLOPCORE_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Setup Docker MCP
+        run: |
+          docker run -d \
+            --name docker-mcp \
+            --network host \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            ghcr.io/microsoft/docker-mcp:latest
+
+          # Wait for MCP to be ready
+          timeout 30 bash -c 'until curl -f http://localhost:4000/health; do sleep 1; done'
+
+      - name: Install Slopcore dependencies
+        working-directory: .slopcore
+        run: |
+          npm install -g pnpm
+          pnpm install
+
+      - name: Build AvantVTT for testing
+        run: |
+          npm ci
+          npm run build
+
+      - name: Deploy test container via Slopcore MCP
+        working-directory: .slopcore
+        run: |
+          pnpm mcp run deploy-image \
+            --system ${{ env.SYSTEM_ID }} \
+            --version test-${{ github.sha }} \
+            --port 30000
+
+      - name: Wait for container readiness
+        run: |
+          timeout 120 bash -c 'until curl -f http://localhost:30000/health; do sleep 2; done'
+
+      - name: Run E2E tests
+        working-directory: .slopcore
+        run: |
+          SYSTEM_ID=${{ env.SYSTEM_ID }} \
+          TEST_SPEC=${{ github.event.inputs.test_spec || 'smoke' }} \
+          pnpm slop e2e --spec ${{ github.event.inputs.test_spec || 'smoke' }}
+
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-artifacts-${{ github.sha }}
+          path: |
+            .slopcore/packages/e2e-playwright/test-results/
+            .slopcore/packages/e2e-playwright/playwright-report/
+
+      - name: Log E2E results to Langfuse
+        if: always()
+        working-directory: .slopcore
+        run: |
+          node -e "
+          const { langfuse } = require('./packages/devbot/src/langfuse');
+          langfuse.trace({
+            name: 'AvantVTT.E2ETests',
+            input: { 
+              system: '${{ env.SYSTEM_ID }}',
+              testSpec: '${{ github.event.inputs.test_spec || 'smoke' }}',
+              branch: '${{ github.ref_name }}',
+              commit: '${{ github.sha }}'
+            },
+            output: { 
+              success: process.env.EXIT_CODE === '0',
+              duration: process.env.DURATION,
+              artifactsUrl: 'https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+            },
+            sessionId: '${{ github.run_id }}'
+          });
+          "
+        env:
+          EXIT_CODE: ${{ job.status == 'success' && '0' || '1' }}
+
+      - name: Container health check
+        if: always()
+        working-directory: .slopcore
+        run: |
+          pnpm mcp run restart-if-unhealthy --system ${{ env.SYSTEM_ID }}
+
+      - name: Cleanup test container
+        if: always()
+        working-directory: .slopcore
+        run: |
+          pnpm mcp run remove-container --system ${{ env.SYSTEM_ID }} --force
+
+      - name: Trigger self-heal on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { context } = require('@actions/github');
+
+            // Trigger DevBot self-heal workflow with trace attachment
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'njisaf',
+              repo: 'slopcore',
+              workflow_id: 'devbot-fix.yml',
+              ref: 'main',
+              inputs: {
+                target_repo: context.repo.repo,
+                target_sha: context.sha,
+                failure_type: 'e2e_tests',
+                system_id: '${{ env.SYSTEM_ID }}',
+                trace_artifact_url: `https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}`
+              }
+            });
+
+            // Add comment to PR if this is a PR
+            if (context.payload.pull_request) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body: '🤖 **DevBot Activated**: E2E tests failed. Attempting automatic fix...\n\n' +
+                      `Triggered self-heal workflow for \`${context.sha}\`\n` +
+                      `System: \`${{ env.SYSTEM_ID }}\`\n` +
+                      `Test Spec: \`${{ github.event.inputs.test_spec || 'smoke' }}\`\n` +
+                      `[View Test Artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`
+              });
+            }

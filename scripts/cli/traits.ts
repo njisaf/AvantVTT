@@ -8,7 +8,7 @@
 import { promises as fs } from 'fs';
 import { join, dirname, resolve } from 'path';
 import { TraitProvider } from '../services/trait-provider.ts';
-// RemoteTraitService removed in Phase 3 - see deprecated/remote-trait-service/README.md
+// Legacy remote trait sync service was removed in Phase 3 – see deprecation docs for details
 import type { Trait, TraitItemSystemData } from '../types/domain/trait.ts';
 import { Command } from 'commander';
 

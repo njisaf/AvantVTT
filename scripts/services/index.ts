@@ -7,5 +7,5 @@
 
 // Trait system services
 export { TraitProvider } from './trait-provider.js';
-// RemoteTraitService removed in Phase 3 - see deprecated/remote-trait-service/README.md
+// Legacy remote trait sync service removed in Phase 3 – refer to deprecation docs for details
 export { TagRegistryService } from './tag-registry-service.ts'; 
