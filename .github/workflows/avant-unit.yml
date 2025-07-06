@@ -71,7 +71,7 @@ jobs:
         if: failure()
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.SLOPCORE_ACTION_TOKEN }}
           script: |
             // 'context' is already pre-injected by github-script
 
