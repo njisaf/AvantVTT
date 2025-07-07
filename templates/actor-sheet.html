@@ -1,5 +1,5 @@
-<!-- Avant Native Actor Sheet Template - V2 ApplicationV2 -->
-<div class="{{cssClass}} flexcol" autocomplete="off">
+<!-- Avant Native Actor Sheet Template - Futuristic Layout -->
+<form class="{{cssClass}} flexcol" autocomplete="off">
     <!-- Fixed Header with Character Name and Avatar -->
     <header class="sheet-header">
         <img class="profile-img" src="{{#if actor.img}}{{actor.img}}{{else}}icons/svg/mystery-man.svg{{/if}}" data-edit="img" title="{{actor.name}}"/>
@@ -27,8 +27,8 @@
             <div class="sidebar-section">
                 <h4>Defense Threshold</h4>
                 <div class="stat-tiles-row">
-                    <div class="stat-tile">
-                        <input type="text" name="system.defenseThreshold" value="{{system.defenseThreshold}}" data-dtype="Number" class="stat-tile-input"/>
+                    <div class="stat-tile readonly">
+                        <span class="stat-tile-value">{{system.defenseThreshold}}</span>
                         <span class="stat-tile-label">Defense</span>
                     </div>
                 </div>
@@ -53,6 +53,7 @@
                 </div>
             </div>
 
+
             <!-- Expertise Points -->
             <div class="sidebar-section">
                 <h4>Expertise Points</h4>
@@ -65,8 +66,8 @@
                         <input type="text" name="system.expertisePoints.spent" value="{{system.expertisePoints.spent}}" data-dtype="Number" class="stat-tile-input"/>
                         <span class="stat-tile-label">Spent</span>
                     </div>
-                    <div class="stat-tile">
-                        <input type="text" name="system.expertisePoints.remaining" value="{{system.expertisePoints.remaining}}" data-dtype="Number" class="stat-tile-input"/>
+                    <div class="stat-tile readonly">
+                        <span class="stat-tile-value">{{system.expertisePoints.remaining}}</span>
                         <span class="stat-tile-label">Remaining</span>
                     </div>
                 </div>
@@ -80,7 +81,7 @@
                         <label>Might</label>
                         <div class="ability-input-row">
                             <input type="text" name="system.abilities.might.modifier" value="{{system.abilities.might.modifier}}" data-dtype="Number" class="ability-modifier-input"/>
-                            <button type="button" class="ability-roll-btn rollable" data-action="rollAbility" data-ability="might" title="Click: Might Check (2d10+Level+Modifier)">
+                            <button type="button" class="ability-roll-btn rollable" data-roll-type="ability" data-ability="might" title="Click: Might Check (2d10+Level+Modifier)">
                                 {{#if (gt abilityTotalModifiers.might 0)}}+{{/if}}{{abilityTotalModifiers.might}}
                             </button>
                         </div>
@@ -89,7 +90,7 @@
                         <label>Grace</label>
                         <div class="ability-input-row">
                             <input type="text" name="system.abilities.grace.modifier" value="{{system.abilities.grace.modifier}}" data-dtype="Number" class="ability-modifier-input"/>
-                            <button type="button" class="ability-roll-btn rollable" data-action="rollAbility" data-ability="grace" title="Click: Grace Check (2d10+Level+Modifier)">
+                            <button type="button" class="ability-roll-btn rollable" data-roll-type="ability" data-ability="grace" title="Click: Grace Check (2d10+Level+Modifier)">
                                 {{#if (gt abilityTotalModifiers.grace 0)}}+{{/if}}{{abilityTotalModifiers.grace}}
                             </button>
                         </div>
@@ -98,7 +99,7 @@
                         <label>Intellect</label>
                         <div class="ability-input-row">
                             <input type="text" name="system.abilities.intellect.modifier" value="{{system.abilities.intellect.modifier}}" data-dtype="Number" class="ability-modifier-input"/>
-                            <button type="button" class="ability-roll-btn rollable" data-action="rollAbility" data-ability="intellect" title="Click: Intellect Check (2d10+Level+Modifier)">
+                            <button type="button" class="ability-roll-btn rollable" data-roll-type="ability" data-ability="intellect" title="Click: Intellect Check (2d10+Level+Modifier)">
                                 {{#if (gt abilityTotalModifiers.intellect 0)}}+{{/if}}{{abilityTotalModifiers.intellect}}
                             </button>
                         </div>
@@ -107,7 +108,7 @@
                         <label>Focus</label>
                         <div class="ability-input-row">
                             <input type="text" name="system.abilities.focus.modifier" value="{{system.abilities.focus.modifier}}" data-dtype="Number" class="ability-modifier-input"/>
-                            <button type="button" class="ability-roll-btn rollable" data-action="rollAbility" data-ability="focus" title="Click: Focus Check (2d10+Level+Modifier)">
+                            <button type="button" class="ability-roll-btn rollable" data-roll-type="ability" data-ability="focus" title="Click: Focus Check (2d10+Level+Modifier)">
                                 {{#if (gt abilityTotalModifiers.focus 0)}}+{{/if}}{{abilityTotalModifiers.focus}}
                             </button>
                         </div>
@@ -119,20 +120,20 @@
         <!-- Main Content Area -->
         <main class="main-content">
             <!-- Navigation Tabs -->
-            <nav class="sheet-tabs tabs" data-group="sheet">
-                <a class="item" data-tab="core" data-group="sheet">Core</a>
-                <a class="item" data-tab="combat" data-group="sheet">Combat</a>
-                <a class="item" data-tab="gear" data-group="sheet">Gear</a>
-                <a class="item" data-tab="skills" data-group="sheet">Skills</a>
-                <a class="item" data-tab="actions" data-group="sheet">Actions</a>
-                <a class="item" data-tab="features" data-group="sheet">Features</a>
-                <a class="item" data-tab="talents" data-group="sheet">Talents & Powers</a>
+            <nav class="sheet-tabs tabs" data-group="primary">
+                <a class="item" data-tab="core">Core</a>
+                <a class="item" data-tab="combat">Combat</a>
+                <a class="item" data-tab="gear">Gear</a>
+                <a class="item" data-tab="skills">Skills</a>
+                <a class="item" data-tab="actions">Actions</a>
+                <a class="item" data-tab="features">Features</a>
+                <a class="item" data-tab="talents">Talents & Powers</a>
             </nav>
 
             <!-- Scrollable Content Area -->
             <section class="sheet-body">
                 <!-- Core Tab -->
-                <div class="tab" data-group="sheet" data-tab="core">
+                <div class="tab" data-group="primary" data-tab="core">
                     <!-- Character Information -->
                     <div class="character-info-section">
                         <h3>Character Information</h3>
@@ -205,7 +206,7 @@
                         </div>
                     </div>
 
-                    <!-- Biography Section -->
+                    <!-- Biography Section (moved from Biography tab) -->
                     <div class="character-info-section">
                         <h3>Biography</h3>
                         <div class="form-group">
@@ -220,10 +221,10 @@
                 </div>
 
                 <!-- Combat Tab -->
-                <div class="tab" data-group="sheet" data-tab="combat">
+                <div class="tab" data-group="primary" data-tab="combat">
                     <div class="items-header">
                         <h3>Weapons</h3>
-                        <button type="button" class="item-create" data-action="createItem" data-type="weapon" title="Create Weapon">
+                        <button type="button" class="item-create" data-type="weapon" title="Create Weapon">
                             <i class="fas fa-plus"></i> Add
                         </button>
                     </div>
@@ -231,11 +232,11 @@
                         {{#each items.weapon as |item id|}}
                         <div class="combat-item" data-item-id="{{item._id}}">
                             <div class="combat-item-actions">
-                                <button type="button" class="combat-action-btn attack-roll" data-action="rollAttack" data-item-id="{{item._id}}" title="Attack Roll">
+                                <button type="button" class="combat-action-btn attack-roll" data-item-id="{{item._id}}" title="Attack Roll">
                                     <i class="fas fa-dice-d20"></i>
                                     <span>Attack</span>
                                 </button>
-                                <button type="button" class="combat-action-btn damage-roll" data-action="rollDamage" data-item-id="{{item._id}}" title="Damage Roll">
+                                <button type="button" class="combat-action-btn damage-roll" data-item-id="{{item._id}}" title="Damage Roll">
                                     <i class="fas fa-dice-six"></i>
                                     <span>Damage</span>
                                 </button>
@@ -275,7 +276,7 @@
 
                     <div class="items-header">
                         <h3>Armor</h3>
-                        <button type="button" class="item-create" data-action="createItem" data-type="armor" title="Create Armor">
+                        <button type="button" class="item-create" data-type="armor" title="Create Armor">
                             <i class="fas fa-plus"></i> Add
                         </button>
                     </div>
@@ -283,7 +284,7 @@
                         {{#each items.armor as |item id|}}
                         <div class="combat-item" data-item-id="{{item._id}}">
                             <div class="combat-item-actions">
-                                <button type="button" class="combat-action-btn armor-roll" data-action="rollArmor" data-item-id="{{item._id}}" title="Armor Roll">
+                                <button type="button" class="combat-action-btn armor-roll" data-item-id="{{item._id}}" title="Armor Roll">
                                     <i class="fas fa-dice-d20"></i>
                                     <span>Roll</span>
                                 </button>
@@ -310,8 +311,103 @@
                     </div>
                 </div>
 
-                <!-- Skills Tab -->
-                <div class="tab" data-group="sheet" data-tab="skills">
+                <!-- Gear Tab -->
+                <div class="tab" data-group="primary" data-tab="gear">
+                    <div class="gear-section">
+                        <!-- Weapons as Gear -->
+                        <div class="gear-subsection">
+                            <div class="items-header">
+                                <h3>Weapons</h3>
+                                <button type="button" class="item-create" data-type="weapon" title="Create Weapon">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                            <div class="items-list">
+                                {{#each items.weapon as |item id|}}
+                                <div class="item" data-item-id="{{item._id}}">
+                                    <div class="item-name">{{item.name}}</div>
+                                    <div class="item-details">
+                                        <span class="item-property" title="Weapon Range">{{item.system.range}}</span>
+                                        <span class="item-property" title="Weight">{{item.system.weight}} lbs</span>
+                                        <span class="item-property" title="Cost">{{item.system.cost}} credits</span>
+                                    </div>
+                                    <div class="item-controls">
+                                        <button type="button" class="item-control item-edit" title="Edit Item">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button type="button" class="item-control item-delete" title="Delete Item">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                {{/each}}
+                            </div>
+                        </div>
+
+                        <!-- Armor as Gear -->
+                        <div class="gear-subsection">
+                            <div class="items-header">
+                                <h3>Armor</h3>
+                                <button type="button" class="item-create" data-type="armor" title="Create Armor">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                            <div class="items-list">
+                                {{#each items.armor as |item id|}}
+                                <div class="item" data-item-id="{{item._id}}">
+                                    <div class="item-name">{{item.name}}</div>
+                                    <div class="item-details">
+                                        <span class="item-property" title="Armor Class">AC: {{item.system.armorClass}}</span>
+                                        <span class="item-property" title="Weight">{{item.system.weight}} lbs</span>
+                                        <span class="item-property" title="Cost">{{item.system.cost}} credits</span>
+                                    </div>
+                                    <div class="item-controls">
+                                        <button type="button" class="item-control item-edit" title="Edit Item">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button type="button" class="item-control item-delete" title="Delete Item">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                {{/each}}
+                            </div>
+                        </div>
+
+                        <!-- General Equipment -->
+                        <div class="gear-subsection">
+                            <div class="items-header">
+                                <h3>Equipment</h3>
+                                <button type="button" class="item-create" data-type="gear" title="Create Gear">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                            <div class="items-list">
+                                {{#each items.gear as |item id|}}
+                                <div class="item" data-item-id="{{item._id}}">
+                                    <div class="item-name">{{item.name}}</div>
+                                    <div class="item-details">
+                                        <span class="item-property" title="Quantity">Qty: {{item.system.quantity}}</span>
+                                        <span class="item-property" title="Weight">{{item.system.weight}} lbs</span>
+                                        <span class="item-property" title="Cost">{{item.system.cost}} credits</span>
+                                    </div>
+                                    <div class="item-controls">
+                                        <button type="button" class="item-control item-edit" title="Edit Item">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button type="button" class="item-control item-delete" title="Delete Item">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                {{/each}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skills Tab (Dynamic - generated from AvantActorData.getSkillAbilities()) -->
+                <div class="tab" data-group="primary" data-tab="skills">
                     <div class="skills-section">
                         <h3>Skills</h3>
                         
@@ -325,7 +421,7 @@
                                     <div class="skill-tile">
                                         <label>{{skill.label}}</label>
                                         <input type="text" name="system.skills.{{skill.name}}" value="{{skill.value}}" data-dtype="Number"/>
-                                        <button type="button" class="skill-roll rollable" data-action="rollSkill" data-skill="{{skill.name}}" title="Roll {{skill.label}} (2d10+Level+Ability+Skill)">
+                                        <button type="button" class="skill-roll rollable" data-skill="{{skill.name}}" title="Roll {{skill.label}} (2d10+Level+Ability+Skill)">
                                             {{#if (gt skill.totalModifier 0)}}+{{/if}}{{skill.totalModifier}}
                                         </button>
                                     </div>
@@ -341,7 +437,7 @@
                                     <div class="skill-tile">
                                         <label>{{skill.label}}</label>
                                         <input type="text" name="system.skills.{{skill.name}}" value="{{skill.value}}" data-dtype="Number"/>
-                                        <button type="button" class="skill-roll rollable" data-action="rollSkill" data-skill="{{skill.name}}" title="Roll {{skill.label}} (2d10+Level+Ability+Skill)">
+                                        <button type="button" class="skill-roll rollable" data-skill="{{skill.name}}" title="Roll {{skill.label}} (2d10+Level+Ability+Skill)">
                                             {{#if (gt skill.totalModifier 0)}}+{{/if}}{{skill.totalModifier}}
                                         </button>
                                     </div>
@@ -357,7 +453,7 @@
                                     <div class="skill-tile">
                                         <label>{{skill.label}}</label>
                                         <input type="text" name="system.skills.{{skill.name}}" value="{{skill.value}}" data-dtype="Number"/>
-                                        <button type="button" class="skill-roll rollable" data-action="rollSkill" data-skill="{{skill.name}}" title="Roll {{skill.label}} (2d10+Level+Ability+Skill)">
+                                        <button type="button" class="skill-roll rollable" data-skill="{{skill.name}}" title="Roll {{skill.label}} (2d10+Level+Ability+Skill)">
                                             {{#if (gt skill.totalModifier 0)}}+{{/if}}{{skill.totalModifier}}
                                         </button>
                                     </div>
@@ -373,7 +469,7 @@
                                     <div class="skill-tile">
                                         <label>{{skill.label}}</label>
                                         <input type="text" name="system.skills.{{skill.name}}" value="{{skill.value}}" data-dtype="Number"/>
-                                        <button type="button" class="skill-roll rollable" data-action="rollSkill" data-skill="{{skill.name}}" title="Roll {{skill.label}} (2d10+Level+Ability+Skill)">
+                                        <button type="button" class="skill-roll rollable" data-skill="{{skill.name}}" title="Roll {{skill.label}} (2d10+Level+Ability+Skill)">
                                             {{#if (gt skill.totalModifier 0)}}+{{/if}}{{skill.totalModifier}}
                                         </button>
                                     </div>
@@ -384,57 +480,25 @@
                     </div>
                 </div>
 
-                <!-- Gear Tab -->
-                <div class="tab" data-group="sheet" data-tab="gear">
-                    <div class="items-header">
-                        <h3>Equipment & Gear</h3>
-                        <button type="button" class="item-create" data-action="createItem" data-type="gear" title="Create Gear">
-                            <i class="fas fa-plus"></i> Add
-                        </button>
-                    </div>
-                    <div class="items-list">
-                        {{#each items.gear as |item id|}}
-                        <div class="item gear-item" data-item-id="{{item._id}}">
-                            <div class="item-image">
-                                <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
-                            </div>
-                            <h4 class="item-name">{{item.name}}</h4>
-                            <div class="item-weight">{{item.system.weight}} lbs</div>
-                            <div class="item-controls">
-                                <a class="item-control item-edit" title="Edit Item" data-action="editItem"><i class="fas fa-edit"></i></a>
-                                <a class="item-control item-delete" title="Delete Item" data-action="deleteItem"><i class="fas fa-trash"></i></a>
-                            </div>
-                        </div>
-                        {{/each}}
-                    </div>
-                </div>
-
                 <!-- Actions Tab -->
-                <div class="tab" data-group="sheet" data-tab="actions">
+                <div class="tab" data-group="primary" data-tab="actions">
                     <div class="items-header">
                         <h3>Actions</h3>
-                        <button type="button" class="item-create" data-action="createItem" data-type="action" title="Create Action">
+                        <button type="button" class="item-create" data-type="action" title="Create Action">
                             <i class="fas fa-plus"></i> Add
                         </button>
                     </div>
                     <div class="items-list">
                         {{#each items.action as |item id|}}
-                        <div class="action-item" data-item-id="{{item._id}}">
-                            <div class="action-header">
-                                <div class="action-name">{{item.name}}</div>
-                                <div class="action-controls">
-                                    <button type="button" class="action-use-btn" data-action="useAction" data-item-id="{{item._id}}" title="Use Action">
-                                        <i class="fas fa-play"></i>
-                                        Use
-                                    </button>
-                                    <a class="item-control item-edit" title="Edit Item" data-action="editItem"><i class="fas fa-edit"></i></a>
-                                    <a class="item-control item-delete" title="Delete Item" data-action="deleteItem"><i class="fas fa-trash"></i></a>
-                                </div>
-                            </div>
-                            <div class="action-details">
-                                {{#if item.system.apCost}}<span class="action-cost">AP: {{item.system.apCost}}</span>{{/if}}
-                                {{#if item.system.ppCost}}<span class="action-cost">PP: {{item.system.ppCost}}</span>{{/if}}
-                                {{#if item.system.description}}<div class="action-description">{{item.system.description}}</div>{{/if}}
+                        <div class="item" data-item-id="{{item._id}}">
+                            <div class="item-name">{{item.name}}</div>
+                            <div class="item-controls">
+                                <button type="button" class="item-control item-edit" title="Edit Item">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="item-control item-delete" title="Delete Item">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </div>
                         </div>
                         {{/each}}
@@ -442,68 +506,106 @@
                 </div>
 
                 <!-- Features Tab -->
-                <div class="tab" data-group="sheet" data-tab="features">
-                    <div class="items-header">
-                        <h3>Features</h3>
-                        <button type="button" class="item-create" data-action="createItem" data-type="feature" title="Create Feature">
-                            <i class="fas fa-plus"></i> Add
-                        </button>
-                    </div>
-                    <div class="items-list">
-                        {{#each items.feature as |item id|}}
-                        <div class="feature-item" data-item-id="{{item._id}}">
-                            <div class="feature-header">
-                                <div class="feature-name">{{item.name}}</div>
-                                <div class="feature-controls">
-                                    <a class="item-control item-edit" title="Edit Item" data-action="editItem"><i class="fas fa-edit"></i></a>
-                                    <a class="item-control item-delete" title="Delete Item" data-action="deleteItem"><i class="fas fa-trash"></i></a>
+                <div class="tab" data-group="primary" data-tab="features">
+                    <div class="features-container">
+                        <div class="items-header">
+                            <h3>Features</h3>
+                            <button type="button" class="item-create" data-type="feature" title="Create Feature">
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                        </div>
+                        <div class="items-list">
+                            {{#each items.feature as |item id|}}
+                            <div class="item" data-item-id="{{item._id}}">
+                                <div class="item-name">{{item.name}}</div>
+                                <div class="item-controls">
+                                    <button type="button" class="item-control item-edit" title="Edit Item">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button type="button" class="item-control item-delete" title="Delete Item">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </div>
                             </div>
-                            <div class="feature-details">
-                                {{#if item.system.description}}<div class="feature-description">{{item.system.description}}</div>{{/if}}
-                            </div>
+                            {{/each}}
                         </div>
-                        {{/each}}
                     </div>
                 </div>
 
-                <!-- Talents & Augments Tab -->
-                <div class="tab" data-group="sheet" data-tab="talents">
-                    <!-- Power Points Section -->
-                    {{!-- PARTIAL TEMPLATE INCLUSION SYNTAX:
-                          - Use double-brace-gt "full-system-path" syntax to include partial templates
-                          - Path must match exactly what's registered in initialization-manager.ts
-                          - Template must be loaded during system initialization or it won't be found
-                          - No need for file extension in some contexts, but .hbs is explicit and clear --}}
-                    {{> "systems/avant/templates/actor/power-points-section.hbs"}}
-                    
-                    <!-- Talents Section -->
-                    <div class="items-header">
-                        <h3>Talents</h3>
-                        <button type="button" class="item-create" data-action="createItem" data-type="talent" title="Create Talent">
-                            <i class="fas fa-plus"></i> Add
-                        </button>
-                    </div>
-                    <div class="items-list talent-rows">
-                        {{#each items.talent as |item id|}}
-                            {{> "systems/avant/templates/actor/row-talent-augment.hbs" item=item}}
-                        {{/each}}
+                <!-- Talents & Powers Tab -->
+                <div class="tab" data-group="primary" data-tab="talents">
+                    <!-- Power Points Resource Section -->
+                    <div class="power-points-section">
+                        <h3>Power Points</h3>
+                        <div class="power-points-tiles">
+                            <div class="power-point-tile">
+                                <label>Current</label>
+                                <input type="text" name="system.powerPoints.value" value="{{system.powerPoints.value}}" data-dtype="Number" class="power-point-input"/>
+                            </div>
+                            <div class="power-point-tile">
+                                <label>Maximum</label>
+                                <input type="text" name="system.powerPoints.max" value="{{system.powerPoints.max}}" data-dtype="Number" class="power-point-input"/>
+                            </div>
+                            <div class="power-point-tile">
+                                <label>Usage Limit</label>
+                                <input type="text" name="system.powerPoints.limit" value="{{system.powerPoints.limit}}" data-dtype="Number" class="power-point-input"/>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Augments Section -->
-                    <div class="items-header">
-                        <h3>Augments</h3>
-                        <button type="button" class="item-create" data-action="createItem" data-type="augment" title="Create Augment">
-                            <i class="fas fa-plus"></i> Add
-                        </button>
-                    </div>
-                    <div class="items-list augment-rows">
-                        {{#each items.augment as |item id|}}
-                            {{> "systems/avant/templates/actor/row-talent-augment.hbs" item=item}}
-                        {{/each}}
+                    <div class="talents-container">
+                        <div class="items-header">
+                            <h3>Talents</h3>
+                            <button type="button" class="item-create" data-type="talent" title="Create Talent">
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                        </div>
+                        <div class="items-list">
+                            {{#each items.talent as |item id|}}
+                            <div class="item" data-item-id="{{item._id}}">
+                                <div class="item-name">{{item.name}}</div>
+                                <div class="item-controls">
+                                    <button type="button" class="item-control power-point-use" data-cost="{{item.system.powerPointCost}}" title="Use Power Points">
+                                        PP: {{item.system.powerPointCost}}
+                                    </button>
+                                    <button type="button" class="item-control item-edit" title="Edit Item">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button type="button" class="item-control item-delete" title="Delete Item">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {{/each}}
+                        </div>
+
+                        <div class="items-header">
+                            <h3>Augments</h3>
+                            <button type="button" class="item-create" data-type="augment" title="Create Augment">
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                        </div>
+                        <div class="items-list">
+                            {{#each items.augment as |item id|}}
+                            <div class="item" data-item-id="{{item._id}}">
+                                <div class="item-name">{{item.name}}</div>
+                                <div class="item-controls">
+                                    <button type="button" class="item-control power-point-use" data-cost="{{item.system.powerPointCost}}" title="Use Power Points">
+                                        PP: {{item.system.powerPointCost}}
+                                    </button>
+                                    <button type="button" class="item-control item-edit" title="Edit Item">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button type="button" class="item-control item-delete" title="Delete Item">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {{/each}}
+                        </div>
                     </div>
                 </div>
             </section>
         </main>
     </div>
-</div>
+</form>

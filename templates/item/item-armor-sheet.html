@@ -1,0 +1,55 @@
+<!-- Armor Item Sheet Template -->
+<form class="{{cssClass}} flexcol" autocomplete="off">
+    <header class="sheet-header">
+        <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" height="64" width="64"/>
+        <div class="header-fields">
+            <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Armor Name"/></h1>
+        </div>
+    </header>
+
+    <nav class="sheet-tabs tabs" data-group="primary">
+        <a class="item" data-tab="description">Description</a>
+        <a class="item" data-tab="details">Details</a>
+    </nav>
+
+    <section class="sheet-body">
+        <div class="tab" data-group="primary" data-tab="description">
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="system.description" rows="8">{{system.description}}</textarea>
+            </div>
+        </div>
+
+        <div class="tab" data-group="primary" data-tab="details">
+            <div class="form-group">
+                <label>Ability</label>
+                <select name="system.ability">
+                    <option value="might" {{#if (eq system.ability "might")}}selected{{/if}}>Might</option>
+                    <option value="grace" {{#if (eq system.ability "grace")}}selected{{/if}}>Grace</option>
+                    <option value="intellect" {{#if (eq system.ability "intellect")}}selected{{/if}}>Intellect</option>
+                    <option value="focus" {{#if (eq system.ability "focus")}}selected{{/if}}>Focus</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Modifier</label>
+                <input type="number" name="system.modifier" value="{{system.modifier}}" placeholder="0"/>
+            </div>
+            
+            <div class="form-group">
+                <label>Armor Class</label>
+                <input type="number" name="system.armorClass" value="{{system.armorClass}}" placeholder="10"/>
+            </div>
+            
+            <div class="form-group">
+                <label>Weight</label>
+                <input type="number" name="system.weight" value="{{system.weight}}" step="0.1" placeholder="1"/>
+            </div>
+            
+            <div class="form-group">
+                <label>Cost</label>
+                <input type="number" name="system.cost" value="{{system.cost}}" placeholder="0"/>
+            </div>
+        </div>
+    </section>
+</form>

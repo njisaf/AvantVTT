@@ -4,13 +4,9 @@
  * Compatible with FoundryVTT v12 and v13
  */
 
-@use 'base';
-
 @mixin theme-dark {
-  // Include base theme interface first
-  @include base.theme-interface;
+  @include theme-base;
   
-  // All CSS custom properties grouped together to avoid mixed-decls warning
   // Theme Metadata
   --theme-name: "Cyberpunk Dark";
   --theme-author: "Avant VTT Team";
@@ -61,28 +57,4 @@
   // Backdrop filters for modern browsers
   --theme-backdrop-blur: blur(10px);
   --theme-backdrop-saturate: saturate(180%);
-  
-  // Consolidated compatibility variables (reduced from 9 to 5 variables)
-  --theme-surface: var(--theme-bg-primary);
-  --theme-text: var(--theme-text-primary);
-  --theme-text-on-primary: #000000;
-  --theme-primary: var(--theme-accent-primary);
-  --theme-border: var(--theme-border-primary);
-  
-  // State Variables (consolidated for PP buttons)
-  --color-success: #22c55e;
-  --color-success-text: var(--theme-text-on-primary);
-  --color-error: var(--theme-error);
-  --color-error-bg: rgba(239, 68, 68, 0.1);
-  
-  // Theme attribution (hidden but accessible for debugging)
-  &::before {
-    content: "Theme: " var(--theme-name, "Unknown") " by " var(--theme-author, "Unknown");
-    position: fixed;
-    top: -100px;
-    left: -100px;
-    opacity: 0;
-    pointer-events: none;
-    z-index: -1;
-  }
 } 

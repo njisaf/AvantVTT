@@ -5,28 +5,10 @@
  * @description Provides validation and normalization utilities for actor and item data
  */
 
-import { logger } from './logger.js';
-import {
-    validateNumber,
-    validateString,
-    validateActorType,
-    validateItemType,
-    validateAbilities,
-    validateSkills,
-    validateActorAbilities,
-    validateActorSkills,
-    validateHealthData,
-    validatePowerPointsData,
-    validateUsesData,
-    isValidDocumentId,
-    sanitizeHtml
-} from '../logic/validation-utils.ts';
-
 /**
  * Validation utilities for data normalization and type safety
  * @class ValidationUtils
  * @description Provides static methods for validating and normalizing game data
- * Uses thin wrapper delegation pattern with pure functions for business logic
  */
 export class ValidationUtils {
     /**
@@ -36,63 +18,91 @@ export class ValidationUtils {
      * @returns {Object} Validated and normalized actor data
      */
     static validateActorData(data) {
-        if (!data || typeof data !== 'object') {
-            data = {};
+        console.log('ValidationUtils | validateActorData called with:', JSON.stringify(data));
+        
+        // Ensure type is set to a valid value
+        if (!data.type || typeof data.type !== 'string' || data.type.trim() === '') {
+            console.log('ValidationUtils | Setting default actor type to character');
+            data.type = 'character';
         }
-        logger.debug('ValidationUtils | validateActorData called with:', JSON.stringify(data));
         
-        // Validate actor type using pure function
-        const originalType = data.type;
-        data.type = validateActorType(data.type);
-        
-        if (originalType !== data.type) {
-            logger.info(`ValidationUtils | Actor type changed from '${originalType}' to '${data.type}'`);
+        // Validate type is supported
+        const supportedTypes = ['character', 'npc', 'vehicle'];
+        if (!supportedTypes.includes(data.type)) {
+            console.log(`ValidationUtils | Invalid actor type '${data.type}', defaulting to character`);
+            data.type = 'character';
         }
         
         // Ensure system data exists
         if (!data.system) {
-            logger.debug('ValidationUtils | Creating empty system data object');
+            console.log('ValidationUtils | Creating empty system data object');
             data.system = {};
         }
         
-        // Validate numeric fields using pure functions
+        // Validate numeric fields
         if (data.system.level !== undefined) {
-            data.system.level = validateNumber(data.system.level, 1);
+            data.system.level = this.validateNumber(data.system.level, 1);
         }
         
         if (data.system.tier !== undefined) {
-            data.system.tier = validateNumber(data.system.tier, 1);
+            data.system.tier = this.validateNumber(data.system.tier, 1);
         }
         
         if (data.system.effort !== undefined) {
-            data.system.effort = validateNumber(data.system.effort, 1);
+            data.system.effort = this.validateNumber(data.system.effort, 1);
         }
         
         if (data.system.fortunePoints !== undefined) {
-            data.system.fortunePoints = validateNumber(data.system.fortunePoints, 3);
+            data.system.fortunePoints = this.validateNumber(data.system.fortunePoints, 3);
         }
         
-        // Validate abilities using pure function
+        // Validate abilities
         if (data.system.abilities) {
-            data.system.abilities = validateActorAbilities(data.system.abilities);
+            for (const [abilityName, abilityData] of Object.entries(data.system.abilities)) {
+                if (abilityData && typeof abilityData === 'object') {
+                    if (abilityData.value !== undefined) {
+                        abilityData.value = this.validateNumber(abilityData.value, 10);
+                    }
+                    if (abilityData.mod !== undefined) {
+                        abilityData.mod = this.validateNumber(abilityData.mod, 0);
+                    }
+                }
+            }
         }
         
-        // Validate skills using pure function
+        // Validate skills
         if (data.system.skills) {
-            data.system.skills = validateActorSkills(data.system.skills);
+            for (const [skillName, skillValue] of Object.entries(data.system.skills)) {
+                if (skillValue !== undefined) {
+                    data.system.skills[skillName] = this.validateNumber(skillValue, 0);
+                }
+            }
         }
         
-        // Validate health using pure function
+        // Validate health
         if (data.system.health) {
-            data.system.health = validateHealthData(data.system.health);
+            if (data.system.health.value !== undefined) {
+                data.system.health.value = this.validateNumber(data.system.health.value, 20);
+            }
+            if (data.system.health.max !== undefined) {
+                data.system.health.max = this.validateNumber(data.system.health.max, 20);
+            }
+            if (data.system.health.temp !== undefined) {
+                data.system.health.temp = this.validateNumber(data.system.health.temp, 0);
+            }
         }
         
-        // Validate power points using pure function
+        // Validate power points
         if (data.system.powerPoints) {
-            data.system.powerPoints = validatePowerPointsData(data.system.powerPoints);
+            if (data.system.powerPoints.value !== undefined) {
+                data.system.powerPoints.value = this.validateNumber(data.system.powerPoints.value, 10);
+            }
+            if (data.system.powerPoints.max !== undefined) {
+                data.system.powerPoints.max = this.validateNumber(data.system.powerPoints.max, 10);
+            }
         }
         
-        logger.debug(`ValidationUtils | Actor validation complete - type: ${data.type}`);
+        console.log(`ValidationUtils | Actor validation complete - type: ${data.type}`);
         return data;
     }
 
@@ -103,17 +113,13 @@ export class ValidationUtils {
      * @returns {Object} Validated and normalized item data
      */
     static validateItemData(data) {
-        if (!data || typeof data !== 'object') {
-            data = {};
-        }
-        logger.debug('ValidationUtils | validateItemData called with:', JSON.stringify(data));
+        console.log('ValidationUtils | validateItemData called with:', JSON.stringify(data));
         
-        // Validate item type using pure function
-        const originalType = data.type;
-        data.type = validateItemType(data.type);
-        
-        if (originalType !== data.type) {
-            logger.info(`ValidationUtils | Item type changed from '${originalType}' to '${data.type}'`);
+        // Ensure type exists and is supported
+        const supportedItemTypes = ["action", "feature", "talent", "augment", "weapon", "armor", "gear"];
+        if (!data.type || !supportedItemTypes.includes(data.type)) {
+            console.log(`ValidationUtils | Unsupported item type '${data.type}', defaulting to 'gear'`);
+            data.type = "gear";
         }
         
         // Ensure system data exists
@@ -121,17 +127,17 @@ export class ValidationUtils {
             data.system = {};
         }
         
-        // Type-specific validation using pure functions
+        // Type-specific validation (use data.type which has been corrected)
         switch (data.type) {
             case "action":
                 if (!data.system.ability) {
                     data.system.ability = "might";
                 }
                 if (data.system.difficulty !== undefined) {
-                    data.system.difficulty = validateNumber(data.system.difficulty, 11);
+                    data.system.difficulty = this.validateNumber(data.system.difficulty, 11);
                 }
                 if (data.system.powerPointCost !== undefined) {
-                    data.system.powerPointCost = validateNumber(data.system.powerPointCost, 0);
+                    data.system.powerPointCost = this.validateNumber(data.system.powerPointCost, 0);
                 }
                 break;
                 
@@ -140,16 +146,16 @@ export class ValidationUtils {
                     data.system.category = "general";
                 }
                 if (data.system.powerPointCost !== undefined) {
-                    data.system.powerPointCost = validateNumber(data.system.powerPointCost, 0);
+                    data.system.powerPointCost = this.validateNumber(data.system.powerPointCost, 0);
                 }
                 break;
                 
             case "talent":
                 if (data.system.powerPointCost !== undefined) {
-                    data.system.powerPointCost = validateNumber(data.system.powerPointCost, 1);
+                    data.system.powerPointCost = this.validateNumber(data.system.powerPointCost, 1);
                 }
                 if (data.system.tier !== undefined) {
-                    data.system.tier = validateNumber(data.system.tier, 1);
+                    data.system.tier = this.validateNumber(data.system.tier, 1);
                 }
                 break;
                 
@@ -158,7 +164,7 @@ export class ValidationUtils {
                     data.system.augmentType = "enhancement";
                 }
                 if (data.system.powerPointCost !== undefined) {
-                    data.system.powerPointCost = validateNumber(data.system.powerPointCost, 0);
+                    data.system.powerPointCost = this.validateNumber(data.system.powerPointCost, 0);
                 }
                 break;
                 
@@ -167,22 +173,22 @@ export class ValidationUtils {
                     data.system.ability = "might";
                 }
                 if (data.system.modifier !== undefined) {
-                    data.system.modifier = validateNumber(data.system.modifier, 0);
+                    data.system.modifier = this.validateNumber(data.system.modifier, 0);
                 }
                 if (!data.system.damageDie) {
                     data.system.damageDie = "1d6";
                 }
                 if (data.system.threshold !== undefined) {
-                    data.system.threshold = validateNumber(data.system.threshold, 11);
+                    data.system.threshold = this.validateNumber(data.system.threshold, 11);
                 }
                 if (data.system.weight !== undefined) {
-                    data.system.weight = validateNumber(data.system.weight, 1, false);
+                    data.system.weight = this.validateNumber(data.system.weight, 1, false);
                 }
                 if (data.system.cost !== undefined) {
-                    data.system.cost = validateNumber(data.system.cost, 0, false);
+                    data.system.cost = this.validateNumber(data.system.cost, 0, false);
                 }
                 if (data.system.quantity !== undefined) {
-                    data.system.quantity = validateNumber(data.system.quantity, 1);
+                    data.system.quantity = this.validateNumber(data.system.quantity, 1);
                 }
                 break;
                 
@@ -191,44 +197,49 @@ export class ValidationUtils {
                     data.system.ability = "grace";
                 }
                 if (data.system.modifier !== undefined) {
-                    data.system.modifier = validateNumber(data.system.modifier, 0);
+                    data.system.modifier = this.validateNumber(data.system.modifier, 0);
                 }
                 if (data.system.threshold !== undefined) {
-                    data.system.threshold = validateNumber(data.system.threshold, 11);
+                    data.system.threshold = this.validateNumber(data.system.threshold, 11);
                 }
                 if (data.system.damageReduction !== undefined) {
-                    data.system.damageReduction = validateNumber(data.system.damageReduction, 0);
+                    data.system.damageReduction = this.validateNumber(data.system.damageReduction, 0);
                 }
                 if (data.system.weight !== undefined) {
-                    data.system.weight = validateNumber(data.system.weight, 5, false);
+                    data.system.weight = this.validateNumber(data.system.weight, 5, false);
                 }
                 if (data.system.cost !== undefined) {
-                    data.system.cost = validateNumber(data.system.cost, 0, false);
+                    data.system.cost = this.validateNumber(data.system.cost, 0, false);
                 }
                 if (data.system.quantity !== undefined) {
-                    data.system.quantity = validateNumber(data.system.quantity, 1);
+                    data.system.quantity = this.validateNumber(data.system.quantity, 1);
                 }
                 break;
                 
             case "gear":
                 if (data.system.weight !== undefined) {
-                    data.system.weight = validateNumber(data.system.weight, 1, false);
+                    data.system.weight = this.validateNumber(data.system.weight, 1, false);
                 }
                 if (data.system.cost !== undefined) {
-                    data.system.cost = validateNumber(data.system.cost, 0, false);
+                    data.system.cost = this.validateNumber(data.system.cost, 0, false);
                 }
                 if (data.system.quantity !== undefined) {
-                    data.system.quantity = validateNumber(data.system.quantity, 1);
+                    data.system.quantity = this.validateNumber(data.system.quantity, 1);
                 }
                 break;
         }
         
-        // Validate uses using pure function
+        // Validate uses for all item types that support it
         if (data.system.uses) {
-            data.system.uses = validateUsesData(data.system.uses);
+            if (data.system.uses.value !== undefined) {
+                data.system.uses.value = this.validateNumber(data.system.uses.value, 0);
+            }
+            if (data.system.uses.max !== undefined) {
+                data.system.uses.max = this.validateNumber(data.system.uses.max, 0);
+            }
         }
         
-        logger.debug(`ValidationUtils | Item validation complete - type: ${data.type}`);
+        console.log(`ValidationUtils | Item validation complete - type: ${data.type}`);
         return data;
     }
 
@@ -241,14 +252,18 @@ export class ValidationUtils {
      * @returns {number} The validated number
      */
     static validateNumber(value, defaultValue = 0, isInteger = true) {
-        const originalValue = value;
-        const result = validateNumber(value, defaultValue, isInteger);
-        
-        if (originalValue !== result && originalValue !== undefined && originalValue !== null && originalValue !== '') {
-            logger.warn(`ValidationUtils | Invalid number value '${originalValue}', using default ${defaultValue}`);
+        if (value === undefined || value === null || value === '') {
+            return defaultValue;
         }
         
-        return result;
+        const parsed = isInteger ? parseInt(value) : parseFloat(value);
+        
+        if (isNaN(parsed)) {
+            console.warn(`ValidationUtils | Invalid number value '${value}', using default ${defaultValue}`);
+            return defaultValue;
+        }
+        
+        return parsed;
     }
 
     /**
@@ -259,7 +274,11 @@ export class ValidationUtils {
      * @returns {string} The validated string
      */
     static validateString(value, defaultValue = '') {
-        return validateString(value, defaultValue);
+        if (value === undefined || value === null) {
+            return defaultValue;
+        }
+        
+        return String(value);
     }
 
     /**
@@ -275,40 +294,45 @@ export class ValidationUtils {
         if (processedData.system) {
             // Convert powerPointCost to integer if present
             if (processedData.system.powerPointCost !== undefined) {
-                processedData.system.powerPointCost = validateNumber(processedData.system.powerPointCost, 0);
+                processedData.system.powerPointCost = this.validateNumber(processedData.system.powerPointCost, 0);
             }
             
-            // Convert uses fields using pure function
+            // Convert uses fields to integers if present
             if (processedData.system.uses) {
-                processedData.system.uses = validateUsesData(processedData.system.uses);
+                if (processedData.system.uses.value !== undefined) {
+                    processedData.system.uses.value = this.validateNumber(processedData.system.uses.value, 0);
+                }
+                if (processedData.system.uses.max !== undefined) {
+                    processedData.system.uses.max = this.validateNumber(processedData.system.uses.max, 0);
+                }
             }
             
-            // Handle weapon/armor specific integer fields using pure functions
+            // Handle weapon/armor specific integer fields
             if (processedData.system.modifier !== undefined) {
-                processedData.system.modifier = validateNumber(processedData.system.modifier, 0);
+                processedData.system.modifier = this.validateNumber(processedData.system.modifier, 0);
             }
             if (processedData.system.threshold !== undefined) {
-                processedData.system.threshold = validateNumber(processedData.system.threshold, 11);
+                processedData.system.threshold = this.validateNumber(processedData.system.threshold, 11);
             }
             if (processedData.system.damageReduction !== undefined) {
-                processedData.system.damageReduction = validateNumber(processedData.system.damageReduction, 0);
+                processedData.system.damageReduction = this.validateNumber(processedData.system.damageReduction, 0);
             }
             if (processedData.system.tier !== undefined) {
-                processedData.system.tier = validateNumber(processedData.system.tier, 1);
+                processedData.system.tier = this.validateNumber(processedData.system.tier, 1);
             }
             if (processedData.system.difficulty !== undefined) {
-                processedData.system.difficulty = validateNumber(processedData.system.difficulty, 11);
+                processedData.system.difficulty = this.validateNumber(processedData.system.difficulty, 11);
             }
             if (processedData.system.quantity !== undefined) {
-                processedData.system.quantity = validateNumber(processedData.system.quantity, 1);
+                processedData.system.quantity = this.validateNumber(processedData.system.quantity, 1);
             }
             
             // Handle numeric fields that should be numbers (not necessarily integers)
             if (processedData.system.weight !== undefined) {
-                processedData.system.weight = validateNumber(processedData.system.weight, 0, false);
+                processedData.system.weight = this.validateNumber(processedData.system.weight, 0, false);
             }
             if (processedData.system.cost !== undefined) {
-                processedData.system.cost = validateNumber(processedData.system.cost, 0, false);
+                processedData.system.cost = this.validateNumber(processedData.system.cost, 0, false);
             }
         }
         
@@ -324,7 +348,19 @@ export class ValidationUtils {
      * @returns {number} Normalized numeric value
      */
     static normalizeNumber(value, defaultValue = 0, isInteger = false) {
-        return validateNumber(value, defaultValue, isInteger);
+        let result;
+        
+        if (isInteger) {
+            result = parseInt(value);
+        } else {
+            result = parseFloat(value);
+        }
+        
+        if (isNaN(result)) {
+            return defaultValue;
+        }
+        
+        return result;
     }
 
     /**
@@ -335,7 +371,15 @@ export class ValidationUtils {
      * @returns {string} Normalized string value
      */
     static normalizeString(value, defaultValue = "") {
-        return validateString(value, defaultValue);
+        if (typeof value === 'string') {
+            return value;
+        }
+        
+        if (value === null || value === undefined) {
+            return defaultValue;
+        }
+        
+        return String(value);
     }
 
     /**
@@ -345,7 +389,30 @@ export class ValidationUtils {
      * @returns {Object} Validated abilities
      */
     static validateAbilities(abilities) {
-        return validateAbilities(abilities);
+        const validatedAbilities = {};
+        const defaultAbilities = ['might', 'grace', 'intellect', 'focus'];
+        
+        for (const abilityName of defaultAbilities) {
+            if (abilities[abilityName]) {
+                validatedAbilities[abilityName] = {
+                    modifier: this.normalizeNumber(abilities[abilityName].modifier, 0, true)
+                };
+                
+                // Ensure ability modifier is within reasonable bounds (-10 to +10)
+                if (validatedAbilities[abilityName].modifier < -10) {
+                    validatedAbilities[abilityName].modifier = -10;
+                }
+                if (validatedAbilities[abilityName].modifier > 10) {
+                    validatedAbilities[abilityName].modifier = 10;
+                }
+            } else {
+                validatedAbilities[abilityName] = {
+                    modifier: 0
+                };
+            }
+        }
+        
+        return validatedAbilities;
     }
 
     /**
@@ -355,7 +422,19 @@ export class ValidationUtils {
      * @returns {Object} Validated skills
      */
     static validateSkills(skills) {
-        return validateSkills(skills);
+        const validatedSkills = {};
+        const defaultSkills = [
+            'debate', 'discern', 'endure', 'finesse', 'force', 'command',
+            'charm', 'hide', 'inspect', 'intuit', 'recall', 'surge'
+        ];
+        
+        for (const skillName of defaultSkills) {
+            validatedSkills[skillName] = this.normalizeNumber(
+                skills[skillName], 0, true
+            );
+        }
+        
+        return validatedSkills;
     }
 
     /**
@@ -365,7 +444,7 @@ export class ValidationUtils {
      * @returns {boolean} True if valid ID format
      */
     static isValidDocumentId(id) {
-        return isValidDocumentId(id);
+        return typeof id === 'string' && id.length === 16 && /^[a-zA-Z0-9]+$/.test(id);
     }
 
     /**
@@ -375,6 +454,14 @@ export class ValidationUtils {
      * @returns {string} Sanitized HTML
      */
     static sanitizeHtml(html) {
-        return sanitizeHtml(html);
+        // Basic HTML sanitization - remove script tags and javascript: links
+        if (typeof html !== 'string') {
+            return '';
+        }
+        
+        return html
+            .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+            .replace(/javascript:/gi, '')
+            .replace(/on\w+\s*=/gi, '');
     }
 } 
