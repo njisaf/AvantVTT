@@ -36,16 +36,16 @@ export class AvantActorData extends foundry.abstract.DataModel {
             // Core Abilities - Direct modifiers (not D&D-style scores)
             abilities: new fields.SchemaField({
                 might: new fields.SchemaField({
-                    modifier: new fields.NumberField({ required: true, initial: 0, integer: true })
+                    modifier: new fields.NumberField({ required: true, initial: 0, integer: true, min: -10, max: 10 })
                 }),
                 grace: new fields.SchemaField({
-                    modifier: new fields.NumberField({ required: true, initial: 0, integer: true })
+                    modifier: new fields.NumberField({ required: true, initial: 0, integer: true, min: -10, max: 10 })
                 }),
                 intellect: new fields.SchemaField({
-                    modifier: new fields.NumberField({ required: true, initial: 0, integer: true })
+                    modifier: new fields.NumberField({ required: true, initial: 0, integer: true, min: -10, max: 10 })
                 }),
                 focus: new fields.SchemaField({
-                    modifier: new fields.NumberField({ required: true, initial: 0, integer: true })
+                    modifier: new fields.NumberField({ required: true, initial: 0, integer: true, min: -10, max: 10 })
                 })
             }),
             
@@ -84,8 +84,8 @@ export class AvantActorData extends foundry.abstract.DataModel {
             
             // Health & Resources
             health: new fields.SchemaField({
-                value: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0 }),
-                max: new fields.NumberField({ required: true, initial: 0, integer: true }),
+                value: new fields.NumberField({ required: true, initial: 20, integer: true, min: 0 }),
+                max: new fields.NumberField({ required: true, initial: 20, integer: true, min: 1 }),
                 temp: new fields.NumberField({ required: true, initial: 0, integer: true, min: 0 })
             }),
             
@@ -118,7 +118,7 @@ export class AvantActorData extends foundry.abstract.DataModel {
                 focus: new fields.NumberField({ required: true, initial: 11, integer: true, min: 0 })
             }),
             
-            defenseThreshold: new fields.NumberField({ required: true, initial: 0, integer: true }),
+            defenseThreshold: new fields.NumberField({ required: true, initial: 11, integer: true, min: 0 }),
             
             // Physical Characteristics
             physical: new fields.SchemaField({
@@ -167,28 +167,6 @@ export class AvantActorData extends foundry.abstract.DataModel {
     }
     
     /**
-     * Get skill display labels
-     * @static
-     * @returns {Object} Mapping of skill names to display labels
-     */
-    static getSkillLabels() {
-        return {
-            'debate': 'Debate',
-            'discern': 'Discern',
-            'endure': 'Endure',
-            'finesse': 'Finesse',
-            'force': 'Force',
-            'command': 'Command',
-            'charm': 'Charm',
-            'hide': 'Hide',
-            'inspect': 'Inspect',
-            'intuit': 'Intuit',
-            'recall': 'Recall',
-            'surge': 'Surge'
-        };
-    }
-    
-    /**
      * Get the ability that governs a specific skill
      * @static
      * @param {string} skillName - The name of the skill
@@ -232,10 +210,22 @@ export class AvantActorData extends foundry.abstract.DataModel {
             this.defense[abilityName] = 11 + this.tier + (abilityData.modifier || 0);
         }
         
-        // Ensure current health doesn't exceed max (only constraint we keep)
-        if (this.health.max > 0 && this.health.value > this.health.max) {
+        // Calculate max health based on tier and might modifier
+        const baseHealth = 20;
+        const tierBonus = (this.tier - 1) * 5;
+        const mightBonus = this.abilities.might.modifier || 0;
+        this.health.max = Math.max(1, baseHealth + tierBonus + mightBonus);
+        
+        // Ensure current health doesn't exceed max
+        if (this.health.value > this.health.max) {
             this.health.value = this.health.max;
         }
+        
+        // Calculate max power points based on tier and intellect modifier
+        const basePP = 10;
+        const tierPPBonus = (this.tier - 1) * 5;
+        const intellectBonus = this.abilities.intellect.modifier || 0;
+        this.powerPoints.max = Math.max(0, basePP + tierPPBonus + intellectBonus);
         
         // Calculate power point limit (can be spent at once) - typically 1/3 of max
         this.powerPoints.limit = Math.max(1, Math.floor(this.powerPoints.max / 3));
@@ -247,6 +237,14 @@ export class AvantActorData extends foundry.abstract.DataModel {
         
         // Calculate expertise points remaining
         this.expertisePoints.remaining = Math.max(0, this.expertisePoints.total - this.expertisePoints.spent);
+        
+        // Calculate defense threshold - use the highest defense value as the primary threshold
+        this.defenseThreshold = Math.max(
+            this.defense.might,
+            this.defense.grace,
+            this.defense.intellect,
+            this.defense.focus
+        );
         
         // Calculate encumbrance max based on might modifier + base value
         const mightModifier = this.abilities.might.modifier || 0;

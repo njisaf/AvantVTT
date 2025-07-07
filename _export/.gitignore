@@ -1,8 +1,0 @@
-# Ignore all exported files
-*.json
-*.csv
-*.txt
-
-# Keep this directory structure
-!.gitignore
-!README.md 

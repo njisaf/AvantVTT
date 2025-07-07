@@ -1,9 +1,6 @@
 # Node modules
 node_modules/
 
-# Build artifacts
-dist/
-
 # Logs
 logs
 *.log
@@ -62,9 +59,5 @@ Thumbs.db
 packs/
 *.db 
 
-# release artifacts
-_releases/
-_sprints/
-_exports/
-_devDocs/
+# generated changelogs
 changelogs/

@@ -1,0 +1,65 @@
+<form class="{{cssClass}} flexcol" autocomplete="off">
+    <header class="sheet-header">
+        <img class="profile-img" src="{{#if item.img}}{{item.img}}{{else}}icons/svg/clockwork.svg{{/if}}" data-edit="img" title="{{item.name}}" height="64" width="64"/>
+        <div class="header-fields">
+            <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Augment Name"/></h1>
+            <div class="resource-row">
+                <div class="resource">
+                    <label for="system.powerPointCost">Power Point Cost</label>
+                    <input type="number" name="system.powerPointCost" value="{{system.powerPointCost}}" data-dtype="Number" min="0"/>
+                </div>
+                <div class="resource">
+                    <label for="system.uses.max">Max Uses</label>
+                    <input type="number" name="system.uses.max" value="{{system.uses.max}}" data-dtype="Number" min="0"/>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="sheet-tabs tabs" data-group="primary">
+        <a class="item" data-tab="description">Description</a>
+        <a class="item" data-tab="details">Details</a>
+    </nav>
+
+    <section class="sheet-body">
+        <div class="tab" data-group="primary" data-tab="description">
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="system.description" rows="10">{{system.description}}</textarea>
+            </div>
+        </div>
+
+        <div class="tab" data-group="primary" data-tab="details">
+            <div class="form-group">
+                <label>Prerequisites</label>
+                <input type="text" name="system.prerequisites" value="{{system.prerequisites}}" placeholder="Any prerequisites for this augment"/>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="system.uses.value">Current Uses</label>
+                    <input type="number" name="system.uses.value" value="{{system.uses.value}}" data-dtype="Number" min="0"/>
+                </div>
+                <div class="form-group">
+                    <label for="system.uses.max">Maximum Uses</label>
+                    <input type="number" name="system.uses.max" value="{{system.uses.max}}" data-dtype="Number" min="0"/>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Augment Type</label>
+                <select name="system.augmentType">
+                    <option value="enhancement" {{#if (eq system.augmentType "enhancement")}}selected{{/if}}>Enhancement</option>
+                    <option value="modification" {{#if (eq system.augmentType "modification")}}selected{{/if}}>Modification</option>
+                    <option value="implant" {{#if (eq system.augmentType "implant")}}selected{{/if}}>Implant</option>
+                    <option value="symbiotic" {{#if (eq system.augmentType "symbiotic")}}selected{{/if}}>Symbiotic</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Power Point Cost</label>
+                <input type="number" name="system.powerPointCost" value="{{system.powerPointCost}}" data-dtype="Number" min="0"/>
+            </div>
+        </div>
+    </section>
+</form> 

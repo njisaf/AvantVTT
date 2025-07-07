@@ -3,7 +3,7 @@
     "types": ["character", "npc", "vehicle"],
     "character": {
       "level": 1,
-      "fortunePoints": 0,
+      "fortunePoints": 3,
       "ancestry": "",
       "lineage": "",
       "culture": "",
@@ -11,16 +11,20 @@
       "languages": "",
       "abilities": {
         "might": {
-          "modifier": 0
+          "value": 10,
+          "mod": 0
         },
         "grace": {
-          "modifier": 0
+          "value": 10,
+          "mod": 0
         },
         "intellect": {
-          "modifier": 0
+          "value": 10,
+          "mod": 0
         },
         "focus": {
-          "modifier": 0
+          "value": 10,
+          "mod": 0
         }
       },
       "skills": {
@@ -48,17 +52,17 @@
         "remaining": 0
       },
       "health": {
-        "value": 0,
-        "max": 0,
+        "value": 25,
+        "max": 25,
         "temp": 0
       },
-      "defenseThreshold": 0,
+      "defenseThreshold": 11,
       "biography": "",
       "notes": ""
     },
     "npc": {
       "level": 1,
-      "fortunePoints": 0,
+      "fortunePoints": 3,
       "ancestry": "",
       "lineage": "",
       "culture": "",
@@ -66,16 +70,20 @@
       "languages": "",
       "abilities": {
         "might": {
-          "modifier": 0
+          "value": 10,
+          "mod": 0
         },
         "grace": {
-          "modifier": 0
+          "value": 10,
+          "mod": 0
         },
         "intellect": {
-          "modifier": 0
+          "value": 10,
+          "mod": 0
         },
         "focus": {
-          "modifier": 0
+          "value": 10,
+          "mod": 0
         }
       },
       "skills": {
@@ -103,17 +111,17 @@
         "remaining": 0
       },
       "health": {
-        "value": 0,
-        "max": 0,
+        "value": 25,
+        "max": 25,
         "temp": 0
       },
-      "defenseThreshold": 0,
+      "defenseThreshold": 11,
       "biography": "",
       "notes": ""
     },
     "vehicle": {
       "level": 1,
-      "fortunePoints": 0,
+      "fortunePoints": 3,
       "ancestry": "",
       "lineage": "",
       "culture": "",
@@ -121,16 +129,20 @@
       "languages": "",
       "abilities": {
         "might": {
-          "modifier": 0
+          "value": 10,
+          "mod": 0
         },
         "grace": {
-          "modifier": 0
+          "value": 10,
+          "mod": 0
         },
         "intellect": {
-          "modifier": 0
+          "value": 10,
+          "mod": 0
         },
         "focus": {
-          "modifier": 0
+          "value": 10,
+          "mod": 0
         }
       },
       "skills": {
@@ -158,22 +170,21 @@
         "remaining": 0
       },
       "health": {
-        "value": 0,
-        "max": 0,
+        "value": 25,
+        "max": 25,
         "temp": 0
       },
-      "defenseThreshold": 0,
+      "defenseThreshold": 11,
       "biography": "",
       "notes": ""
     }
   },
   "Item": {
-    "types": ["action", "feature", "talent", "augment", "weapon", "armor", "gear", "trait"],
+    "types": ["action", "feature", "talent", "augment", "weapon", "armor", "gear"],
     "action": {
       "description": "",
       "ability": "might",
-      "difficulty": 11,
-      "traits": []
+      "difficulty": 11
     },
     "feature": {
       "description": "",
@@ -182,95 +193,51 @@
       "uses": {
         "value": 0,
         "max": 0
-      },
-      "color": "",
-      "icon": "",
-      "localKey": "",
-      "isActive": false,
-      "powerPointCost": 0,
-      "traits": []
+      }
     },
     "talent": {
       "description": "",
-      "apCost": 1,
-      "levelRequirement": 1,
+      "source": "",
       "tier": 1,
-      "requirements": "",
+      "category": "general",
       "prerequisites": "",
       "uses": {
         "value": 0,
         "max": 0
-      },
-      "isActive": false,
-      "traits": []
+      }
     },
     "augment": {
       "description": "",
-      "apCost": 0,
-      "ppCost": 0,
-      "levelRequirement": 1,
+      "source": "",
+      "tier": 1,
+      "category": "general",
+      "prerequisites": "",
       "uses": {
         "value": 0,
         "max": 0
-      },
-      "augmentType": "enhancement",
-      "powerPointCost": 0,
-      "isActive": false,
-      "rarity": "common",
-      "requirements": "",
-      "traits": []
+      }
     },
     "weapon": {
       "description": "",
-      "damageType": "",
-      "range": "Melee",
-      "weight": 1,
+      "damage": "1d6",
+      "damageType": "physical",
+      "range": "melee",
+      "weight": 0,
       "cost": 0,
-      "ability": "might",
-      "modifier": 0,
-      "damageDie": "1d6",
-      "properties": "",
-      "threshold": 11,
-      "quantity": 1,
-      "equipped": false,
-      "traits": []
+      "qualities": ""
     },
     "armor": {
       "description": "",
-      "weight": 5,
+      "defense": 0,
+      "weight": 0,
       "cost": 0,
-      "ability": "grace",
-      "modifier": 0,
-      "threshold": 11,
-      "damageReduction": 0,
-      "armorType": "light",
-      "quantity": 1,
-      "equipped": false,
-      "properties": "",
-      "traits": []
+      "qualities": ""
     },
     "gear": {
       "description": "",
-      "weight": 1,
+      "weight": 0,
       "cost": 0,
-      "quantity": 1,
-      "rarity": "common",
-      "category": "miscellaneous",
-      "isConsumable": false,
-      "uses": {
-        "value": 0,
-        "max": 0
-      },
-      "traits": []
-    },
-    "trait": {
-      "description": "",
-      "color": "#00E0DC",
-      "icon": "fas fa-tag",
-      "localKey": "",
-      "tags": [],
-      "rarity": "common",
-      "effects": ""
+      "quantity": 1
     }
   }
 } 

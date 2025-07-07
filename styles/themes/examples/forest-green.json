@@ -1,0 +1,61 @@
+{
+  "name": "Forest Green",
+  "author": "Avant VTT Community",
+  "version": "1.0.0",
+  "description": "A nature-inspired theme with forest green accents and earthy tones",
+  "compatibilityVersion": "1.0",
+  "license": "MIT",
+  "tags": ["nature", "green", "forest", "earth"],
+  "colors": {
+    "backgrounds": {
+      "primary": "#1A2618",
+      "secondary": "#233629", 
+      "tertiary": "#2D4530"
+    },
+    "text": {
+      "primary": "#E8F5E8",
+      "secondary": "#A8C8A8",
+      "muted": "#728972"
+    },
+    "accents": {
+      "primary": "#4CAF50",
+      "secondary": "#66BB6A",
+      "tertiary": "#388E3C"
+    },
+    "borders": {
+      "primary": "#4A5A4A",
+      "accent": "#4CAF50"
+    },
+    "states": {
+      "success": "#4CAF50",
+      "warning": "#FF9800", 
+      "error": "#F44336",
+      "info": "#2196F3"
+    }
+  },
+  "typography": {
+    "fontPrimary": "'Roboto', 'Segoe UI', sans-serif",
+    "fontDisplay": "'Roboto Mono', monospace"
+  },
+  "effects": {
+    "shadows": {
+      "primary": "0 4px 20px rgba(76, 175, 80, 0.1)",
+      "accent": "0 0 20px rgba(76, 175, 80, 0.3)",
+      "deep": "0 8px 32px rgba(0, 0, 0, 0.6)"
+    },
+    "gradients": {
+      "primary": "linear-gradient(135deg, #1A2618 0%, #233629 100%)",
+      "accent": "linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%)"
+    },
+    "glows": {
+      "primary": "0 0 10px #4CAF50",
+      "secondary": "0 0 15px #66BB6A"
+    }
+  },
+  "advanced": {
+    "backdropBlur": "blur(8px)",
+    "backdropSaturate": "saturate(150%)",
+    "hoverOverlay": "rgba(76, 175, 80, 0.1)",
+    "focusOutline": "#4CAF50"
+  }
+} 
