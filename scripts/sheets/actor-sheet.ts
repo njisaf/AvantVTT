@@ -71,26 +71,26 @@ interface ActorSheetContext {
 export function createAvantActorSheet() {
     // Access FoundryVTT v13 ApplicationV2 classes with safety checks
     const foundryGlobal = (globalThis as any).foundry;
-    
+
     if (!foundryGlobal?.applications?.api) {
         throw new Error('FoundryVTT v13 applications API not available - ensure Foundry has fully initialized');
     }
-    
+
     const { ApplicationV2, HandlebarsApplicationMixin } = foundryGlobal.applications.api;
-    
+
     // CRITICAL: Use ActorSheetV2 for proper actor sheet ApplicationV2 behavior
     // ActorSheetV2 provides actor-specific window management, drag-drop, and event handling
     // that is essential for ApplicationV2 compatibility
     const ActorSheetV2 = foundryGlobal.applications?.sheets?.ActorSheetV2;
     const DocumentSheetV2 = foundryGlobal.applications.api.DocumentSheetV2;
-    
+
     // Prefer ActorSheetV2 for actor sheets, fallback to DocumentSheetV2 for safety
     const BaseClass = ActorSheetV2 || DocumentSheetV2;
-    
+
     if (!ApplicationV2 || !HandlebarsApplicationMixin || !BaseClass) {
         throw new Error('Required ApplicationV2 classes not found - ensure you are running FoundryVTT v13+');
     }
-    
+
     // Log the base class being used for troubleshooting (production-safe)
     logger.info('Avant Actor Sheet using ApplicationV2 base class:', BaseClass.name || 'ActorSheetV2/DocumentSheetV2');
 
@@ -114,7 +114,7 @@ export function createAvantActorSheet() {
     class AvantActorSheet extends HandlebarsApplicationMixin(BaseClass) {
         /** The actor document associated with this sheet */
         declare document: any;
-        
+
         /**
          * 🎯 APPLICATIONV2 ACTION REGISTRATION SYSTEM
          * 
@@ -141,10 +141,10 @@ export function createAvantActorSheet() {
         static DEFAULT_OPTIONS = {
             // CSS classes applied to the application element
             classes: ["avant", "sheet", "actor"],
-            
+
             // Use form tag for proper form handling
             tag: "form",
-            
+
             // CRITICAL: Window configuration for ApplicationV2
             // These settings enable proper window behavior including resizing,
             // positioning, and window controls with FontAwesome icons
@@ -155,26 +155,26 @@ export function createAvantActorSheet() {
                 icon: "fas fa-user", // FontAwesome icon for window header
                 title: "TYPES.Actor.character" // Localized title key
             },
-            
+
             // Default window size
             position: {
                 width: 900,
                 height: 630
             },
-            
+
             // Form handling configuration
             form: {
                 submitOnChange: true,  // Auto-submit on field changes
                 closeOnSubmit: false, // Keep sheet open after submission
                 handler: AvantActorSheet._handleFormSubmission // Custom form handler
             },
-            
+
             // 🎯 CRITICAL: All ApplicationV2 actions must be registered here
             // This replaces the legacy activateListeners approach
             actions: {
                 // 🔧 Debug/Test Actions (used during debugging process)
                 testAction: AvantActorSheet._onTestAction,
-                
+
                 // 🎲 Dice Rolling Actions
                 rollAbility: AvantActorSheet._onRollAbility,
                 rollSkill: AvantActorSheet._onRollSkill,
@@ -182,16 +182,16 @@ export function createAvantActorSheet() {
                 rollAttack: AvantActorSheet._onRollAttack,
                 rollDamage: AvantActorSheet._onRollDamage,
                 rollArmor: AvantActorSheet._onRollArmor,
-                
+
                 // 📦 Item Management Actions
                 createItem: AvantActorSheet._onCreateItem,
                 editItem: AvantActorSheet._onEditItem,
                 deleteItem: AvantActorSheet._onDeleteItem,
-                
+
                 // 💬 Chat Integration Actions
                 postChatCard: AvantActorSheet._onPostChatCard,
                 useAction: AvantActorSheet._onUseAction,
-                
+
                 // 🎯 FEATURE CARD SYSTEM - The main fix that resolved the debugging issue
                 // These actions connect to the complete feature card infrastructure:
                 // - feature-card-builder.ts: Generates rich HTML cards with traits and PP integration
@@ -242,14 +242,14 @@ export function createAvantActorSheet() {
             const game = (globalThis as any).game;
             const actorName = this.document?.name || game?.i18n?.localize("DOCUMENT.Actor") || "Actor";
             const actorType = this.document?.type || "character";
-            
+
             // Get localized type name
             let typeName = actorType;
             if (game?.i18n) {
                 // Try FoundryVTT core localization first
                 const coreKey = `TYPES.Actor.${actorType}`;
                 const coreLocalization = game.i18n.localize(coreKey);
-                
+
                 if (coreLocalization !== coreKey) {
                     typeName = coreLocalization;
                 } else {
@@ -257,7 +257,7 @@ export function createAvantActorSheet() {
                     typeName = actorType.charAt(0).toUpperCase() + actorType.slice(1);
                 }
             }
-            
+
             return `${actorName} [${typeName}]`;
         }
 
@@ -277,30 +277,30 @@ export function createAvantActorSheet() {
         async _prepareContext(options: any): Promise<any> {
             // Get base ApplicationV2 context
             const context = await super._prepareContext(options);
-            
+
             // Extract actor data for processing
             const actorData = this.document.toObject(false);
-            
+
             // Add core actor data to context
             context.system = actorData.system;
             context.flags = actorData.flags;
             context.actor = this.document; // Template needs direct document reference
-            
+
             // Add ApplicationV2 required fields for template compatibility
             context.editable = this.isEditable;
             context.owner = this.document.isOwner;
-            
+
             // Build CSS classes for ApplicationV2 styling compatibility
             const cssClasses = ["avant", "sheet", "actor"];
             if (this.isEditable) cssClasses.push("editable");
             if (this.document.isOwner) cssClasses.push("owner");
             context.cssClass = cssClasses.join(" ");
-            
+
             // Extract core data for calculations
             const level = actorData.system.level || 1;
             const abilities = actorData.system.abilities || {};
             const skills = actorData.system.skills || {};
-            
+
             // Define skill-ability mapping for the Avant system
             // This mapping determines which ability modifier applies to each skill
             const skillAbilityMap: SkillAbilityMap = {
@@ -317,26 +317,26 @@ export function createAvantActorSheet() {
                 'command': 'might' as const,
                 'surge': 'might' as const
             };
-            
+
             // Calculate derived values using pure functions from actor-sheet-utils
             // These functions are tested and handle edge cases properly
             context.abilityTotalModifiers = calculateAbilityTotalModifiers(abilities, level);
             context.skillTotalModifiers = calculateSkillTotalModifiers(skills, abilities, skillAbilityMap, level);
             context.powerPointLimit = calculatePowerPointLimit(actorData.system.powerPoints?.max || 10);
-            
+
             // Organize data for template display
             context.skillsByAbility = organizeSkillsByAbility(skills, abilities, skillAbilityMap, level);
-            
+
             // Organize items by type for template sections
             const itemsArray = Array.from(this.document.items.values());
             context.items = organizeItemsByType(itemsArray);
-            
+
             // Add comprehensive display data to items (traits, descriptions, requirements, etc.)
             await this._addTraitDisplayDataToItems(context.items);
-            
+
             // Add system configuration data
             context.config = (globalThis as any).CONFIG?.AVANT || {};
-            
+
             return context;
         }
 
@@ -355,7 +355,7 @@ export function createAvantActorSheet() {
         async _onRender(context: any, options: any): Promise<void> {
             // Complete base ApplicationV2 rendering first
             await super._onRender(context, options);
-            
+
             // Initialize custom functionality that ApplicationV2 doesn't handle automatically
             this._initializeTabs();    // Manual tab management for Avant sheets
             this._ensureItemStyling(); // Ensure proper item display styling
@@ -373,19 +373,19 @@ export function createAvantActorSheet() {
         private _initializeTabs(): void {
             const tabs = this.element.querySelectorAll('.sheet-tabs .item');
             const tabContents = this.element.querySelectorAll('.tab');
-            
+
             // Skip initialization if no tabs are present
             if (tabs.length === 0 || tabContents.length === 0) {
                 return;
             }
-            
+
             // Clean up any existing event listeners by cloning elements
             // This prevents memory leaks and duplicate listeners
             tabs.forEach((tab: Element) => {
                 const newTab = tab.cloneNode(true);
                 tab.parentNode?.replaceChild(newTab, tab);
             });
-            
+
             // Add click listeners to all tab elements
             this.element.querySelectorAll('.sheet-tabs .item').forEach((tab: Element) => {
                 tab.addEventListener('click', (event: Event) => {
@@ -397,7 +397,7 @@ export function createAvantActorSheet() {
                     }
                 });
             });
-            
+
             // Activate the current tab or default to the first available tab
             const targetTab = this._currentTab || tabs[0]?.getAttribute('data-tab') || 'core';
             this._activateTab(targetTab);
@@ -415,15 +415,15 @@ export function createAvantActorSheet() {
         private _activateTab(tabName: string): void {
             const tabs = this.element.querySelectorAll('.sheet-tabs .item');
             const tabContents = this.element.querySelectorAll('.tab');
-            
+
             // Clear all active states to ensure clean switching
             tabs.forEach((tab: Element) => tab.classList.remove('active'));
             tabContents.forEach((content: Element) => content.classList.remove('active'));
-            
+
             // Find the specific tab button and content area
             const targetTab = this.element.querySelector(`.sheet-tabs .item[data-tab="${tabName}"]`);
             const targetContent = this.element.querySelector(`.tab[data-tab="${tabName}"]`);
-            
+
             // Activate the tab if both elements exist
             if (targetTab && targetContent) {
                 targetTab.classList.add('active');
@@ -458,7 +458,7 @@ export function createAvantActorSheet() {
                 '.augment-item',   // Augment items
                 '.combat-item'     // Combat items (weapons, armor)
             ];
-            
+
             // Process each item type and ensure proper display
             itemSelectors.forEach(selector => {
                 const items = this.element.querySelectorAll(selector);
@@ -474,7 +474,29 @@ export function createAvantActorSheet() {
 
         /**
          * Add display data to items for actor sheet display
-         * @param items - Organized items by type
+         * 
+         * CRITICAL FEATURE: This method resolves trait references on items into proper
+         * display data (colors, icons, names) for the actor sheet template.
+         * 
+         * THE TRAIT DISPLAY CHALLENGE:
+         * - Items store trait references in various formats: "Fire", "avant-trait-fire", legacy IDs, etc.
+         * - Templates need rich display data: colors (#FF6B6B), icons (fas fa-fire), readable names
+         * - Without this resolution, traits appear as gray boxes showing raw IDs
+         * 
+         * HOW THIS WORKS:
+         * 1. **Get TraitProvider**: Access the centralized trait service
+         * 2. **Process Each Item**: Loop through all items by category (talents, augments, etc.)
+         * 3. **Resolve Trait References**: For each trait ID on an item, use enhanced lookup
+         * 4. **Build Display Data**: Create displayTraits array with:
+         *    - Proper trait names ("Fire" instead of "avant-trait-fire")
+         *    - Brand colors ("#FF6B6B" for fire traits)
+         *    - FontAwesome icons ("fas fa-fire")
+         *    - Accessible text colors (high contrast)
+         * 5. **Fallback Handling**: If lookup fails, show gray box with descriptive name
+         * 
+         * RESULT: Actor sheet shows beautiful colored trait chips instead of gray ID boxes
+         * 
+         * @param items - Organized items by type from organizeItemsByType()
          * @private
          */
         private async _addTraitDisplayDataToItems(items: any): Promise<void> {
@@ -482,15 +504,25 @@ export function createAvantActorSheet() {
                 // Get TraitProvider service if available
                 const game = (globalThis as any).game;
                 let allTraits: any[] = [];
-                
+
+                // Get TraitProvider service for trait display data
+
                 if (game?.avant?.initializationManager) {
                     const traitProvider = game.avant.initializationManager.getService('traitProvider');
+
                     if (traitProvider) {
                         const result = await traitProvider.getAll();
+
                         if (result.success && result.data) {
                             allTraits = result.data;
+                        } else {
+                            logger.warn('Failed to load traits from provider:', result.error);
                         }
+                    } else {
+                        logger.warn('TraitProvider service not available');
                     }
+                } else {
+                    logger.warn('InitializationManager not available for trait loading');
                 }
 
                 // Add comprehensive display data to each item in each category
@@ -501,7 +533,7 @@ export function createAvantActorSheet() {
                             if (!item.system) {
                                 item.system = {};
                             }
-                            
+
                             // Ensure all common fields are accessible for display
                             item.system.description = item.system.description || '';
                             item.system.requirements = item.system.requirements || '';
@@ -510,28 +542,44 @@ export function createAvantActorSheet() {
                             item.system.ppCost = item.system.ppCost || 0;
                             item.system.usable = item.system.usable || false;
                             item.system.isActive = item.system.isActive || false;
-                            
+
                             // Process trait display data
                             if (item.system?.traits && Array.isArray(item.system.traits)) {
-                                item.displayTraits = item.system.traits.map((traitId: string) => {
-                                    const trait = allTraits.find((t: any) => t.id === traitId);
-                                    if (trait) {
-                                        // Debug logging for trait data
-                                        logger.debug('AvantActorSheet | Found trait data:', {
-                                            traitId,
-                                            traitName: trait.name,
-                                            traitColor: trait.color,
-                                            traitIcon: trait.icon
-                                        });
-                                        
+
+                                // Process trait display data using enhanced lookup
+                                const self = this; // Capture this context for async functions
+                                const traitPromises = item.system.traits.map(async (traitId: string) => {
+                                    // Get the trait provider service
+                                    const traitProviderService = game?.avant?.initializationManager?.getService('traitProvider');
+                                    if (!traitProviderService) {
+                                        console.warn('🔍 TRAIT DEBUG | TraitProvider service not available for enhanced lookup');
                                         return {
                                             id: traitId,
+                                            name: self._generateFallbackTraitName(traitId),
+                                            displayId: traitId,
+                                            color: '#6C757D',
+                                            textColor: '#FFFFFF',
+                                            icon: 'fas fa-tag',
+                                            matchType: 'no_service'
+                                        };
+                                    }
+
+                                    // Use the enhanced findByReference method for flexible trait lookup
+                                    const traitResult = await traitProviderService.findByReference(traitId);
+
+                                    if (traitResult.success && traitResult.data) {
+                                        const trait = traitResult.data;
+                                        const matchType = traitResult.metadata?.matchType || 'unknown';
+
+                                        return {
+                                            id: trait.id,
                                             name: trait.name,
                                             color: trait.color || '#00E0DC', // Fallback to primary accent
                                             textColor: trait.textColor || '#000000', // Explicit text color
                                             icon: trait.icon || 'fas fa-tag',
                                             description: trait.description,
-                                            displayId: traitId
+                                            displayId: traitId,
+                                            matchType: matchType
                                         };
                                     } else {
                                         // Only log warning for legitimate trait IDs, not corrupted data
@@ -540,18 +588,22 @@ export function createAvantActorSheet() {
                                         } else {
                                             logger.debug('AvantActorSheet | Skipping corrupted trait data:', traitId);
                                         }
-                                        
+
                                         return {
                                             id: traitId,
-                                            name: this._generateFallbackTraitName(traitId),
+                                            name: self._generateFallbackTraitName(traitId),
                                             displayId: traitId,
                                             // Provide default styling for missing traits
                                             color: '#6C757D', // Bootstrap secondary gray
                                             textColor: '#FFFFFF', // White text for gray background
-                                            icon: 'fas fa-tag'  // Generic tag icon
+                                            icon: 'fas fa-tag',  // Generic tag icon
+                                            matchType: 'fallback'
                                         };
                                     }
                                 });
+
+                                // Wait for all trait lookups to complete
+                                item.displayTraits = await Promise.all(traitPromises);
                             } else {
                                 item.displayTraits = [];
                             }
@@ -577,7 +629,7 @@ export function createAvantActorSheet() {
                     .replace(/_/g, ' ')
                     .replace(/\b\w/g, l => l.toUpperCase());
             }
-            
+
             // For other IDs, just return as-is (this will show the raw ID for custom traits)
             return traitId;
         }
@@ -602,7 +654,7 @@ export function createAvantActorSheet() {
         _activateCoreListeners(html: HTMLElement | any): void {
             // Convert jQuery to HTMLElement if needed
             const element = html instanceof HTMLElement ? html : (html as any)[0];
-            
+
             if (!element) return;
 
             // Call parent implementation for core functionality
@@ -633,7 +685,7 @@ export function createAvantActorSheet() {
          */
         static async _onRollAbility(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
             event.preventDefault();
-            
+
             // ApplicationV2 automatically binds 'this' to the sheet instance
             const sheet = this;
             if (!sheet?.document) return;
@@ -643,7 +695,7 @@ export function createAvantActorSheet() {
                 logger.warn('AvantActorSheet | No ability specified for roll');
                 return;
             }
-            
+
             // Get the ability data from the actor
             const ability = sheet.document.system.abilities?.[abilityName];
             if (!ability) {
@@ -655,7 +707,7 @@ export function createAvantActorSheet() {
             const Roll = (globalThis as any).Roll;
             const roll = new Roll('2d10 + @value', { value: ability.value });
             await roll.evaluate();
-            
+
             // Send the result to chat
             const ChatMessage = (globalThis as any).ChatMessage;
             await roll.toMessage({
@@ -677,7 +729,7 @@ export function createAvantActorSheet() {
          */
         static async _onRollSkill(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
             event.preventDefault();
-            
+
             // ApplicationV2 automatically binds 'this' to the sheet instance
             const sheet = this;
             if (!sheet?.document) return;
@@ -699,7 +751,7 @@ export function createAvantActorSheet() {
             const Roll = (globalThis as any).Roll;
             const roll = new Roll('2d10 + @value', { value: skill.value });
             await roll.evaluate();
-            
+
             // Send the result to chat
             const ChatMessage = (globalThis as any).ChatMessage;
             await roll.toMessage({
@@ -716,17 +768,17 @@ export function createAvantActorSheet() {
          */
         static async _onRollPowerPoints(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
             event.preventDefault();
-            
+
             // FIXED: In ApplicationV2, 'this' is bound to the sheet instance
             const sheet = this;
             if (!sheet?.document) return;
 
             try {
                 const powerPoints = sheet.document.system.powerPoints || { current: 0, max: 10 };
-                
+
                 // Use pure function to validate power point usage
                 const usageData = validatePowerPointUsage(powerPoints, 1);
-                
+
                 if (!usageData.valid) {
                     FoundryUI.notify(usageData.error || 'Invalid power point usage', 'warn');
                     return;
@@ -761,7 +813,7 @@ export function createAvantActorSheet() {
         static async _onRollAttack(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
 
             event.preventDefault();
-            
+
             // FIXED: In ApplicationV2, 'this' is bound to the sheet instance
             const sheet = this;
             if (!sheet?.document) return;
@@ -777,13 +829,13 @@ export function createAvantActorSheet() {
             const Roll = (globalThis as any).Roll;
             const roll = new Roll('2d10 + @attack', { attack: attackValue });
             await roll.evaluate();
-            
+
             const ChatMessage = (globalThis as any).ChatMessage;
             await roll.toMessage({
                 speaker: ChatMessage.getSpeaker({ actor: sheet.document }),
                 flavor: `${item.name} Attack Roll`
             });
-            
+
         }
 
         /**
@@ -794,7 +846,7 @@ export function createAvantActorSheet() {
          */
         static async _onRollDamage(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
             event.preventDefault();
-            
+
             // FIXED: In ApplicationV2, 'this' is bound to the sheet instance
             const sheet = this;
             if (!sheet?.document) return;
@@ -810,13 +862,13 @@ export function createAvantActorSheet() {
             const Roll = (globalThis as any).Roll;
             const roll = new Roll(damageFormula);
             await roll.evaluate();
-            
+
             const ChatMessage = (globalThis as any).ChatMessage;
             await roll.toMessage({
                 speaker: ChatMessage.getSpeaker({ actor: sheet.document }),
                 flavor: `${item.name} Damage`
             });
-            
+
         }
 
         /**
@@ -827,7 +879,7 @@ export function createAvantActorSheet() {
          */
         static async _onRollArmor(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
             event.preventDefault();
-            
+
             // FIXED: In ApplicationV2, 'this' is bound to the sheet instance
             const sheet = this;
             if (!sheet?.document) return;
@@ -848,7 +900,7 @@ export function createAvantActorSheet() {
             try {
                 // Use pure function to prepare armor roll
                 const rollData = prepareArmorRoll(item, sheet.document.system);
-                
+
                 if (!rollData) {
                     FoundryUI.notify('Invalid armor roll data', 'warn');
                     return;
@@ -882,7 +934,7 @@ export function createAvantActorSheet() {
          */
         static async _onCreateItem(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
             event.preventDefault();
-            
+
             // FIXED: In ApplicationV2, 'this' is bound to the sheet instance
             const sheet = this;
             if (!sheet?.document) return;
@@ -899,7 +951,7 @@ export function createAvantActorSheet() {
             // Create the item
             try {
                 const created = await sheet.document.createEmbeddedDocuments('Item', [itemData]);
-                
+
                 // Open the item sheet for editing
                 if (created?.[0]) {
                     created[0].sheet.render(true);
@@ -920,7 +972,7 @@ export function createAvantActorSheet() {
         static async _onEditItem(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
             console.log('🎯 Avant | _onEditItem triggered!', { event, target });
             event.preventDefault();
-            
+
             // FIXED: In ApplicationV2, 'this' is bound to the sheet instance
             const sheet = this;
             if (!sheet?.document) return;
@@ -931,7 +983,7 @@ export function createAvantActorSheet() {
                 return;
             }
 
-            
+
             // Get the item
             const item = sheet.document.items.get(itemId);
             if (!item) {
@@ -952,7 +1004,7 @@ export function createAvantActorSheet() {
          */
         static async _onDeleteItem(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
             event.preventDefault();
-            
+
             // FIXED: In ApplicationV2, 'this' is bound to the sheet instance
             const sheet = this;
             if (!sheet?.document) return;
@@ -963,7 +1015,7 @@ export function createAvantActorSheet() {
                 return;
             }
 
-            
+
             // Get the item
             const item = sheet.document.items.get(itemId);
             if (!item) {
@@ -995,7 +1047,7 @@ export function createAvantActorSheet() {
          */
         static async _onPostChatCard(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
             event.preventDefault();
-            
+
             // FIXED: In ApplicationV2, 'this' is bound to the sheet instance
             const sheet = this;
             if (!sheet?.document) return;
@@ -1016,7 +1068,7 @@ export function createAvantActorSheet() {
                 // Use the proper feature card system
                 const game = (globalThis as any).game;
                 const result = await game.avant.chat.postFeatureCard(itemId, sheet.document.id);
-                
+
                 if (result.success) {
                     logger.log(`AvantActorSheet | Posted feature card for: ${item.name}`);
                 } else {
@@ -1038,7 +1090,7 @@ export function createAvantActorSheet() {
          */
         static async _onUseAction(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
             event.preventDefault();
-            
+
             const sheet = this;
             if (!sheet?.document) return;
 
@@ -1058,7 +1110,7 @@ export function createAvantActorSheet() {
                 // Use the proper feature card system
                 const game = (globalThis as any).game;
                 const result = await game.avant.chat.postFeatureCard(itemId, sheet.document.id);
-                
+
                 if (result.success) {
                     logger.log(`AvantActorSheet | Posted action usage for: ${item.name}`);
                 } else {
@@ -1110,7 +1162,7 @@ export function createAvantActorSheet() {
         static async _onUseTalent(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
             console.log('🎯 Avant | _onUseTalent triggered!', { event, target });
             event.preventDefault();
-            
+
             const sheet = this;
             if (!sheet?.document) return;
 
@@ -1130,15 +1182,15 @@ export function createAvantActorSheet() {
 
             try {
                 console.log('🎯 Avant | Posting talent feature card for:', item.name);
-                
+
                 // 🎨 DYNAMIC IMPORT PATTERN - Ensures modules are loaded when needed
                 // This prevents circular dependencies and ensures proper initialization order
                 const { postFeatureCard } = await import('../logic/chat/feature-card-builder.js');
                 const { TraitProvider } = await import('../services/trait-provider.js');
-                
+
                 // Initialize trait provider for trait resolution
                 const traitProvider = new TraitProvider();
-                
+
                 // 💬 POST FEATURE CARD - The core functionality
                 // This creates a rich HTML card and posts it to chat with:
                 // - Talent details and description
@@ -1146,7 +1198,7 @@ export function createAvantActorSheet() {
                 // - Power point cost and spending buttons
                 // - Professional styling and accessibility
                 const result = await postFeatureCard(item, sheet.document, traitProvider);
-                
+
                 if (result.success) {
                     console.log('🎯 Avant | Posted talent card successfully:', result.messageId);
                     logger.log(`AvantActorSheet | Posted talent card for: ${item.name}`);
@@ -1224,7 +1276,7 @@ export function createAvantActorSheet() {
         static async _onUseAugment(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
             console.log('🎯 Avant | _onUseAugment triggered!', { event, target });
             event.preventDefault();
-            
+
             const sheet = this;
             if (!sheet?.document) return;
 
@@ -1244,15 +1296,15 @@ export function createAvantActorSheet() {
 
             try {
                 console.log('🎯 Avant | Posting augment feature card for:', item.name);
-                
+
                 // 🔧 DYNAMIC IMPORT PATTERN - Consistent with talent handler
                 // Same module loading strategy for maintainability
                 const { postFeatureCard } = await import('../logic/chat/feature-card-builder.js');
                 const { TraitProvider } = await import('../services/trait-provider.js');
-                
+
                 // Initialize trait provider for augment trait resolution
                 const traitProvider = new TraitProvider();
-                
+
                 // 💬 POST AUGMENT FEATURE CARD - Same core functionality as talents
                 // The feature card builder automatically handles augment-specific display:
                 // - Augment type and rarity
@@ -1260,7 +1312,7 @@ export function createAvantActorSheet() {
                 // - Power point costs and spending
                 // - Trait classifications and styling
                 const result = await postFeatureCard(item, sheet.document, traitProvider);
-                
+
                 if (result.success) {
                     logger.info('Avant | Augment feature card posted successfully:', result.messageId);
                     FoundryUI.notify(`Posted augment card for ${item.name}`, 'info');
@@ -1268,7 +1320,7 @@ export function createAvantActorSheet() {
                     logger.error('Avant | Failed to post augment feature card:', result.error);
                     FoundryUI.notify('Failed to post augment card', 'error');
                 }
-                
+
             } catch (error) {
                 logger.error('Avant | Error in _onUseAugment:', error);
                 FoundryUI.notify('Error posting augment card', 'error');
@@ -1307,7 +1359,7 @@ export function createAvantActorSheet() {
         static async _onSpendAugmentPP(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
             console.log('🔋 Avant | _onSpendAugmentPP triggered!', { event, target });
             event.preventDefault();
-            
+
             const sheet = this;
             if (!sheet?.document) return;
 
@@ -1343,16 +1395,16 @@ export function createAvantActorSheet() {
 
             try {
                 console.log('🔋 Avant | Processing PP spend for:', item.name, 'Cost:', ppCost);
-                
+
                 // Import required modules
                 const { handlePowerPointSpend } = await import('../logic/chat/power-point-handler.js');
                 const { postFeatureCard } = await import('../logic/chat/feature-card-builder.js');
                 const { TraitProvider } = await import('../services/trait-provider.js');
-                
+
                 // Spend the power points
                 const game = (globalThis as any).game;
                 const spendResult = await handlePowerPointSpend(sheet.document, ppCost, game.user);
-                
+
                 if (!spendResult.success) {
                     // PP spend failed - show error and re-enable button
                     FoundryUI.notify(spendResult.error || 'Failed to spend power points', 'warn');
@@ -1368,7 +1420,7 @@ export function createAvantActorSheet() {
                 button.classList.add('spent');
                 button.innerHTML = '<i class="fas fa-check-circle" aria-hidden="true"></i>Spent ' + ppCost + ' PP';
                 button.disabled = true;
-                
+
                 // Show success notification
                 FoundryUI.notify(
                     `${sheet.document.name} spent ${ppCost} PP for ${item.name}. Remaining: ${spendResult.newValue}`,
@@ -1378,12 +1430,12 @@ export function createAvantActorSheet() {
                 // Post augment card with "Spent X PP" message
                 const traitProvider = new TraitProvider();
                 const cardResult = await postFeatureCard(
-                    item, 
-                    sheet.document, 
-                    traitProvider, 
+                    item,
+                    sheet.document,
+                    traitProvider,
                     { alreadySpent: ppCost } // Pass spent amount to feature card
                 );
-                
+
                 if (cardResult.success) {
                     console.log('🔋 Avant | Augment card posted with spent PP confirmation');
                 } else {
@@ -1393,7 +1445,7 @@ export function createAvantActorSheet() {
             } catch (error) {
                 logger.error('Avant | Error in _onSpendAugmentPP:', error);
                 FoundryUI.notify('Error spending power points', 'error');
-                
+
                 // Re-enable button on error
                 button.disabled = false;
                 button.innerHTML = originalText;
@@ -1410,13 +1462,13 @@ export function createAvantActorSheet() {
         static async _handleFormSubmission(event: Event, form: HTMLFormElement, formData: any): Promise<void> {
             // Try multiple methods to find the sheet instance
             let sheet: AvantActorSheet | null = null;
-            
+
             // Method 1: Try the ApplicationV2 way (closest .app element)
             const appElement = form.closest('.app') as any;
             if (appElement?.app) {
                 sheet = appElement.app as AvantActorSheet;
             }
-            
+
             // Method 2: Try finding via the form's data attributes
             if (!sheet && form.dataset.actorId) {
                 const game = (globalThis as any).game;
@@ -1425,7 +1477,7 @@ export function createAvantActorSheet() {
                     sheet = actor.sheet as AvantActorSheet;
                 }
             }
-            
+
             // Method 3: Try finding via the window applications registry
             if (!sheet && form.closest('.window-app')) {
                 const windowElement = form.closest('.window-app') as any;
@@ -1438,7 +1490,7 @@ export function createAvantActorSheet() {
                     }
                 }
             }
-            
+
             // If we found a sheet, use it; otherwise handle gracefully
             if (sheet && sheet._onSubmitForm) {
                 try {
@@ -1448,14 +1500,14 @@ export function createAvantActorSheet() {
                     // Don't throw - let the form submission continue with default behavior
                 }
             }
-            
+
             // Fallback: Handle the form data directly if no sheet found
             if (formData?.object) {
                 try {
                     // Extract actor ID from form or event target
-                    const actorId = form.dataset.actorId || 
-                                  (event.target as HTMLElement)?.closest('[data-actor-id]')?.getAttribute('data-actor-id');
-                    
+                    const actorId = form.dataset.actorId ||
+                        (event.target as HTMLElement)?.closest('[data-actor-id]')?.getAttribute('data-actor-id');
+
                     if (actorId) {
                         const game = (globalThis as any).game;
                         const actor = game?.actors?.get(actorId);
@@ -1468,7 +1520,7 @@ export function createAvantActorSheet() {
                     logger.error('AvantActorSheet | Fallback form submission error:', error);
                 }
             }
-            
+
             return Promise.resolve();
         }
 
@@ -1493,19 +1545,19 @@ export function createAvantActorSheet() {
 
                 // Process and update the actor with the form data
                 await this.document.update(formData.object);
-                
+
                 // Log successful update for debugging
                 logger.debug('AvantActorSheet | Actor updated successfully:', this.document.name);
-                
+
             } catch (error) {
                 logger.error('AvantActorSheet | Form submission failed:', error);
-                
+
                 // Show user-friendly error message
                 const ui = (globalThis as any).ui;
                 if (ui?.notifications) {
                     ui.notifications.error('Failed to save character data. Please try again.');
                 }
-                
+
                 // Re-throw to ensure proper error handling upstream
                 throw error;
             }
@@ -1535,7 +1587,7 @@ export function createAvantActorSheet() {
             event.preventDefault();
         }
     }
-    
+
     return AvantActorSheet;
 }
 

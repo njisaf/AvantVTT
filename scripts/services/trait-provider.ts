@@ -27,14 +27,14 @@ import { CompendiumLocalService } from './compendium-local-service.ts';
  */
 export class TraitProvider {
   private static _instance: TraitProvider | undefined;
-  
+
   private readonly config!: TraitProviderConfig;
   private cache: TraitCacheEntry | null = null;
   private isInitialized = false;
   private readonly foundry: any;
   private readonly game: any;
   private readonly compendiumService!: CompendiumLocalService;
-  
+
   /**
    * Create a new TraitProvider instance.
    * Use getInstance() instead for singleton access.
@@ -46,9 +46,9 @@ export class TraitProvider {
     if (TraitProvider._instance) {
       return TraitProvider._instance;
     }
-    
+
     TraitProvider._instance = this;
-    
+
     // Default configuration - explicit assignment to fix TypeScript error
     const defaultConfig: TraitProviderConfig = {
       systemPackName: 'avant.avant-traits',
@@ -58,19 +58,19 @@ export class TraitProvider {
       enableCaching: true,
       cacheTimeout: 300000 // 5 minutes
     };
-    
+
     this.config = { ...defaultConfig, ...config };
-    
+
     // Get FoundryVTT globals safely
     this.foundry = (globalThis as any).foundry;
     this.game = (globalThis as any).game;
-    
+
     // Initialize CompendiumLocalService for pack operations
     this.compendiumService = new CompendiumLocalService();
-    
+
     console.log('🏷️ TraitProvider | Instance created with config:', this.config);
   }
-  
+
   /**
    * Get the singleton instance of TraitProvider
    * 
@@ -83,7 +83,7 @@ export class TraitProvider {
     }
     return TraitProvider._instance!;
   }
-  
+
   /**
    * Initialize the trait provider by waiting for FoundryVTT, setting up packs, and seeding custom traits.
    * 
@@ -96,7 +96,7 @@ export class TraitProvider {
   async initialize(): Promise<TraitProviderResult<boolean>> {
     try {
       console.log('🏷️ TraitProvider | Starting initialization...');
-      
+
       // Verify FoundryVTT is ready
       if (!this.game?.ready) {
         return {
@@ -104,7 +104,7 @@ export class TraitProvider {
           error: 'FoundryVTT game not ready - cannot initialize TraitProvider'
         };
       }
-      
+
       // Ensure world pack exists
       const worldPackResult = await this.ensureWorldPackExists();
       if (!worldPackResult.success) {
@@ -118,52 +118,52 @@ export class TraitProvider {
       let traitsSeeded = 0;
       try {
         console.log('🏷️ TraitProvider | Starting trait seeding process...');
-        
+
         // Load seed pack (system traits) and custom pack
         const seedDocs = await this.compendiumService.loadPack(this.config.systemPackName);
         const customDocs = await this.compendiumService.loadPack(this.config.worldPackName);
-        
+
         // Compare packs to find missing traits in custom pack
         const diff = await this.compendiumService.diffLocalPacks(this.config.systemPackName, this.config.worldPackName);
-        
+
         if (diff.added.length > 0) {
           console.log(`🏷️ TraitProvider | Found ${diff.added.length} traits missing from custom pack, copying...`);
-          
+
           // Copy missing traits to custom pack
           await this.compendiumService.copyDocs(
-            this.config.systemPackName, 
+            this.config.systemPackName,
             this.config.worldPackName,
             {
               filter: (doc) => diff.added.some(addedDoc => addedDoc.name === doc.name),
               preserveIds: false
             }
           );
-          
+
           traitsSeeded = diff.added.length;
-          
+
           // Emit seeding hook
           const seedHookData = {
             copied: traitsSeeded,
             targetPack: this.config.worldPackName
           };
-          
+
           if (this.foundry?.utils?.hooks?.call) {
             this.foundry.utils.hooks.call('avantTraitSeeded', seedHookData);
           } else if ((globalThis as any).Hooks?.call) {
             (globalThis as any).Hooks.call('avantTraitSeeded', seedHookData);
           }
-          
+
           console.log(`🏷️ TraitProvider | Seeded ${traitsSeeded} traits to custom pack`);
         } else {
           console.log('🏷️ TraitProvider | All default traits already present in custom pack');
         }
-        
+
       } catch (seedError) {
         // Log seeding error but don't fail initialization - custom traits may still exist
         const seedErrorMessage = seedError instanceof Error ? seedError.message : String(seedError);
         console.warn(`🏷️ TraitProvider | Trait seeding failed, continuing with existing traits: ${seedErrorMessage}`);
       }
-      
+
       // Load initial traits to populate cache
       const traitsResult = await this.getAll({ forceRefresh: true });
       if (!traitsResult.success) {
@@ -172,28 +172,28 @@ export class TraitProvider {
           error: `Failed to load initial traits: ${traitsResult.error}`
         };
       }
-      
+
       // Emit hook for each initially loaded trait
       if (traitsResult.data) {
         for (const trait of traitsResult.data) {
           this._emitTraitRegisteredHook(trait, 'initialized');
         }
       }
-      
+
       this.isInitialized = true;
       console.log(`🏷️ TraitProvider | Initialized successfully with ${traitsResult.data?.length || 0} traits (${traitsSeeded} newly seeded)`);
-      
+
       return {
         success: true,
         data: true,
-        metadata: { 
+        metadata: {
           traitsLoaded: traitsResult.data?.length || 0,
           traitsSeeded,
           systemPackExists: await this.checkPackExists('system'),
           worldPackExists: await this.checkPackExists('world')
         }
       };
-      
+
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.error('🏷️ TraitProvider | Initialization failed:', error);
@@ -203,7 +203,7 @@ export class TraitProvider {
       };
     }
   }
-  
+
   /**
    * Get all available traits from both system and world packs.
    * 
@@ -218,7 +218,7 @@ export class TraitProvider {
         forceRefresh: false,
         ...options
       };
-      
+
       // Check cache first (if not forcing refresh)
       if (!opts.forceRefresh && this.config.enableCaching && this.cache) {
         const cacheAge = Date.now() - this.cache.timestamp;
@@ -231,11 +231,11 @@ export class TraitProvider {
           };
         }
       }
-      
+
       // Load traits from packs
       const allTraits: Trait[] = [];
       const sources: TraitSource[] = [];
-      
+
       if (opts.includeSystem) {
         const systemTraits = await this.loadTraitsFromPack('system');
         if (systemTraits.success && systemTraits.data) {
@@ -243,7 +243,7 @@ export class TraitProvider {
           sources.push('system');
         }
       }
-      
+
       if (opts.includeWorld) {
         const worldTraits = await this.loadTraitsFromPack('world');
         if (worldTraits.success && worldTraits.data) {
@@ -251,10 +251,10 @@ export class TraitProvider {
           sources.push('world');
         }
       }
-      
+
       // Deduplicate traits (world takes precedence over system)
       const deduplicatedTraits = this.deduplicateTraits(allTraits);
-      
+
       // Update cache
       if (this.config.enableCaching) {
         this.cache = {
@@ -263,19 +263,19 @@ export class TraitProvider {
           sources
         };
       }
-      
+
       console.log(`🏷️ TraitProvider | Loaded ${deduplicatedTraits.length} traits from ${sources.join(', ')}`);
-      
+
       return {
         success: true,
         data: this.filterTraits(deduplicatedTraits, opts),
-        metadata: { 
+        metadata: {
           sources,
           totalTraits: deduplicatedTraits.length,
           loadedFrom: 'packs'
         }
       };
-      
+
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.error('🏷️ TraitProvider | Failed to get all traits:', error);
@@ -285,7 +285,7 @@ export class TraitProvider {
       };
     }
   }
-  
+
   /**
    * Get a specific trait by ID.
    * 
@@ -296,22 +296,22 @@ export class TraitProvider {
   async get(id: string, options: TraitRetrievalOptions = {}): Promise<TraitProviderResult<Trait | null>> {
     try {
       const allTraitsResult = await this.getAll(options);
-      
+
       if (!allTraitsResult.success || !allTraitsResult.data) {
         return {
           success: false,
           error: `Failed to load traits: ${allTraitsResult.error}`
         };
       }
-      
+
       const trait = allTraitsResult.data.find(t => t.id === id) || null;
-      
+
       return {
         success: true,
         data: trait,
         metadata: { searchedId: id, found: trait !== null }
       };
-      
+
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.error(`🏷️ TraitProvider | Failed to get trait '${id}':`, error);
@@ -321,7 +321,139 @@ export class TraitProvider {
       };
     }
   }
-  
+
+  /**
+   * Find a trait by flexible reference lookup
+   * 
+   * CRITICAL FEATURE: This method was added to solve the trait display issue where
+   * items could reference traits using various ID formats, but the provider only
+   * supported exact document ID lookups.
+   * 
+   * THE PROBLEM WE SOLVED:
+   * - Items stored trait references as: "Fire", "Ice", "system_trait_fire", old IDs like "jNreUvVJ5HZsxCXM"
+   * - TraitProvider only looked up by exact document ID: "avant-trait-fire"
+   * - Result: Most trait lookups failed, showing gray boxes with IDs
+   * 
+   * THE SOLUTION - MULTIPLE LOOKUP STRATEGIES:
+   * This method tries to find traits using multiple approaches in order of preference:
+   * 
+   * 1. **Exact Document ID**: "avant-trait-fire" → matches trait.id directly
+   * 2. **Exact Name Match**: "Fire" → finds trait where trait.name === "Fire"  
+   * 3. **Case-Insensitive Name**: "FIRE" → finds trait where trait.name.toLowerCase() === "fire"
+   * 4. **Legacy System ID**: "system_trait_fire" → legacy format support
+   * 5. **Partial Name Match**: "fir" → finds trait where trait.name includes "fir"
+   * 
+   * REAL-WORLD EXAMPLE:
+   * - User adds "Fire" trait to an item (stores as "Fire" string)
+   * - Actor sheet calls findByReference("Fire")
+   * - Method tries document ID lookup (fails), then name lookup (succeeds!)
+   * - Returns trait with proper color (#FF6B6B) and icon (fas fa-fire)
+   * - Trait displays correctly instead of gray box
+   * 
+   * @param {string} reference - The trait reference to look up (ID, name, legacy format, etc.)
+   * @param {TraitRetrievalOptions} options - Options for trait retrieval
+   * @returns {Promise<TraitProviderResult<Trait | null>>} The found trait with metadata about how it was found
+   */
+  async findByReference(reference: string, options: TraitRetrievalOptions = {}): Promise<TraitProviderResult<Trait | null>> {
+    try {
+      if (!reference || reference.trim() === '') {
+        return {
+          success: true,
+          data: null,
+          metadata: { searchedReference: reference, reason: 'empty_reference' }
+        };
+      }
+
+      const allTraitsResult = await this.getAll(options);
+
+      if (!allTraitsResult.success || !allTraitsResult.data) {
+        return {
+          success: false,
+          error: `Failed to load traits: ${allTraitsResult.error}`
+        };
+      }
+
+      const cleanReference = reference.trim();
+      let trait: Trait | null = null;
+      let matchType: string = 'none';
+
+      // Strategy 1: Exact document ID match
+      trait = allTraitsResult.data.find(t => t.id === cleanReference) || null;
+      if (trait) {
+        matchType = 'document_id';
+      }
+
+      // Strategy 2: Exact name match (case-sensitive)
+      if (!trait) {
+        trait = allTraitsResult.data.find(t => t.name === cleanReference) || null;
+        if (trait) {
+          matchType = 'exact_name';
+        }
+      }
+
+      // Strategy 3: Case-insensitive name match
+      if (!trait) {
+        const lowerReference = cleanReference.toLowerCase();
+        trait = allTraitsResult.data.find(t => t.name.toLowerCase() === lowerReference) || null;
+        if (trait) {
+          matchType = 'case_insensitive_name';
+        }
+      }
+
+      // Strategy 4: Legacy system ID pattern (system_trait_<name>)
+      if (!trait && cleanReference.startsWith('system_trait_')) {
+        const legacyName = cleanReference
+          .replace(/^system_trait_/, '')         // Remove prefix
+          .replace(/_\d+$/, '')                  // Remove timestamp suffix if present
+          .replace(/_/g, ' ')                    // Replace underscores with spaces
+          .split(' ')                            // Split into words
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize each word
+          .join(' ');                            // Join back together
+
+        // Try exact match first
+        trait = allTraitsResult.data.find(t => t.name === legacyName) || null;
+
+        // If not found, try case-insensitive
+        if (!trait) {
+          trait = allTraitsResult.data.find(t => t.name.toLowerCase() === legacyName.toLowerCase()) || null;
+        }
+
+        if (trait) {
+          matchType = 'legacy_system_id';
+        }
+      }
+
+      // Strategy 5: Simple name normalization (handle single words)
+      if (!trait) {
+        const normalizedReference = cleanReference.charAt(0).toUpperCase() + cleanReference.slice(1).toLowerCase();
+        trait = allTraitsResult.data.find(t => t.name === normalizedReference) || null;
+        if (trait) {
+          matchType = 'normalized_name';
+        }
+      }
+
+      return {
+        success: true,
+        data: trait,
+        metadata: {
+          searchedReference: cleanReference,
+          found: trait !== null,
+          matchType,
+          traitId: trait?.id,
+          traitName: trait?.name
+        }
+      };
+
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error(`🏷️ TraitProvider | Failed to find trait by reference '${reference}':`, error);
+      return {
+        success: false,
+        error: `Failed to find trait by reference: ${errorMessage}`
+      };
+    }
+  }
+
   /**
    * Check if the TraitProvider is initialized and ready to use.
    * 
@@ -330,7 +462,7 @@ export class TraitProvider {
   isReady(): boolean {
     return this.isInitialized;
   }
-  
+
   /**
    * Clear the internal cache, forcing next request to reload from packs.
    */
@@ -338,7 +470,7 @@ export class TraitProvider {
     this.cache = null;
     console.log('🏷️ TraitProvider | Cache cleared');
   }
-  
+
   /**
    * Get information about both system and world compendium packs.
    * 
@@ -348,12 +480,12 @@ export class TraitProvider {
     try {
       const systemPack = await this.getPackInfo_internal('system');
       const worldPack = await this.getPackInfo_internal('world');
-      
+
       return {
         success: true,
         data: { system: systemPack, world: worldPack }
       };
-      
+
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       return {
@@ -362,7 +494,7 @@ export class TraitProvider {
       };
     }
   }
-  
+
   /**
    * Create a new trait in the world pack.
    * 
@@ -377,7 +509,7 @@ export class TraitProvider {
           error: 'TraitProvider not initialized'
         };
       }
-      
+
       const worldPack = this.game.packs.get(this.config.worldPackName);
       if (!worldPack) {
         return {
@@ -385,7 +517,7 @@ export class TraitProvider {
           error: 'World pack not found'
         };
       }
-      
+
       // Create the item in the world pack
       const itemData = {
         name: traitData.name || 'New Trait',
@@ -393,38 +525,38 @@ export class TraitProvider {
         system: traitData.system || {},
         ...traitData
       };
-      
+
       const [createdItem] = await worldPack.createDocuments([itemData]);
-      
+
       if (!createdItem) {
         return {
           success: false,
           error: 'Failed to create trait item'
         };
       }
-      
+
       // Convert to trait object
       const trait = this.convertItemToTrait(createdItem, 'world');
-      
+
       if (trait) {
         // Clear cache to force reload
         this.clearCache();
-        
+
         // Emit hook for trait registration
         this._emitTraitRegisteredHook(trait, 'created');
-        
+
         console.log(`🏷️ TraitProvider | Created trait '${trait.name}' in world pack`);
       }
-      
+
       return {
         success: true,
         data: trait,
-        metadata: { 
+        metadata: {
           itemId: createdItem._id,
           packName: this.config.worldPackName
         }
       };
-      
+
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.error('🏷️ TraitProvider | Failed to create trait:', error);
@@ -434,7 +566,7 @@ export class TraitProvider {
       };
     }
   }
-  
+
   /**
    * Update an existing trait in the world pack.
    * 
@@ -450,7 +582,7 @@ export class TraitProvider {
           error: 'TraitProvider not initialized'
         };
       }
-      
+
       const worldPack = this.game.packs.get(this.config.worldPackName);
       if (!worldPack) {
         return {
@@ -458,7 +590,7 @@ export class TraitProvider {
           error: 'World pack not found'
         };
       }
-      
+
       // Find the existing item
       const existingItem = worldPack.get(traitId);
       if (!existingItem) {
@@ -467,32 +599,32 @@ export class TraitProvider {
           error: 'Trait not found in world pack'
         };
       }
-      
+
       // Update the item
       await existingItem.update(updateData);
-      
+
       // Convert to trait object
       const trait = this.convertItemToTrait(existingItem, 'world');
-      
+
       if (trait) {
         // Clear cache to force reload
         this.clearCache();
-        
+
         // Emit hook for trait registration
         this._emitTraitRegisteredHook(trait, 'updated');
-        
+
         console.log(`🏷️ TraitProvider | Updated trait '${trait.name}' in world pack`);
       }
-      
+
       return {
         success: true,
         data: trait,
-        metadata: { 
+        metadata: {
           itemId: traitId,
           packName: this.config.worldPackName
         }
       };
-      
+
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.error('🏷️ TraitProvider | Failed to update trait:', error);
@@ -502,7 +634,7 @@ export class TraitProvider {
       };
     }
   }
-  
+
   /**
    * Delete a trait from the world pack.
    * 
@@ -517,7 +649,7 @@ export class TraitProvider {
           error: 'TraitProvider not initialized'
         };
       }
-      
+
       const worldPack = this.game.packs.get(this.config.worldPackName);
       if (!worldPack) {
         return {
@@ -525,7 +657,7 @@ export class TraitProvider {
           error: 'World pack not found'
         };
       }
-      
+
       // Find the existing item
       const existingItem = worldPack.get(traitId);
       if (!existingItem) {
@@ -534,32 +666,32 @@ export class TraitProvider {
           error: 'Trait not found in world pack'
         };
       }
-      
+
       // Convert to trait object before deletion for the hook
       const trait = this.convertItemToTrait(existingItem, 'world');
-      
+
       // Delete the item
       await existingItem.delete();
-      
+
       // Clear cache to force reload
       this.clearCache();
-      
+
       // Emit hook for trait deletion
       if (trait) {
         this._emitTraitDeletedHook(trait);
       }
-      
+
       console.log(`🏷️ TraitProvider | Deleted trait '${existingItem.name}' from world pack`);
-      
+
       return {
         success: true,
         data: true,
-        metadata: { 
+        metadata: {
           itemId: traitId,
           packName: this.config.worldPackName
         }
       };
-      
+
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.error('🏷️ TraitProvider | Failed to delete trait:', error);
@@ -569,7 +701,7 @@ export class TraitProvider {
       };
     }
   }
-  
+
   /**
    * Search traits by name and tags
    * 
@@ -580,52 +712,52 @@ export class TraitProvider {
   async search(searchTerm: string, options: TraitRetrievalOptions = {}): Promise<TraitProviderResult<Trait[]>> {
     try {
       const allTraitsResult = await this.getAll(options);
-      
+
       if (!allTraitsResult.success || !allTraitsResult.data) {
         return {
           success: false,
           error: `Failed to load traits for search: ${allTraitsResult.error}`
         };
       }
-      
+
       const searchTermLower = searchTerm.toLowerCase().trim();
-      
+
       if (!searchTermLower) {
         // Return all traits if no search term
         return allTraitsResult;
       }
-      
+
       const matchingTraits = allTraitsResult.data.filter(trait => {
         // Search in trait name
         if (trait.name.toLowerCase().includes(searchTermLower)) {
           return true;
         }
-        
+
         // Search in trait tags
         if (trait.tags && trait.tags.length > 0) {
           return trait.tags.some(tag => tag.toLowerCase().includes(searchTermLower));
         }
-        
+
         // Search in legacy metadata tags for backward compatibility
         if (trait.item.system.traitMetadata?.tags && trait.item.system.traitMetadata.tags.length > 0) {
           return trait.item.system.traitMetadata.tags.some(tag => tag.toLowerCase().includes(searchTermLower));
         }
-        
+
         return false;
       });
-      
+
       console.log(`🏷️ TraitProvider | Search for '${searchTerm}' found ${matchingTraits.length} matches`);
-      
+
       return {
         success: true,
         data: matchingTraits,
-        metadata: { 
+        metadata: {
           searchTerm,
           totalTraits: allTraitsResult.data.length,
           matchCount: matchingTraits.length
         }
       };
-      
+
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.error(`🏷️ TraitProvider | Failed to search traits for '${searchTerm}':`, error);
@@ -635,11 +767,11 @@ export class TraitProvider {
       };
     }
   }
-  
+
   // =========================================================================
   // PRIVATE METHODS
   // =========================================================================
-  
+
   /**
    * Load traits from a specific pack (system or world) using CompendiumLocalService
    * 
@@ -653,11 +785,11 @@ export class TraitProvider {
   private async loadTraitsFromPack(source: TraitSource): Promise<TraitProviderResult<Trait[]>> {
     try {
       const packName = source === 'system' ? this.config.systemPackName : this.config.worldPackName;
-      
+
       console.log(`🏷️ TRAIT DEBUG | loadTraitsFromPack called for source '${source}', packName: '${packName}'`);
       console.log(`🏷️ TRAIT DEBUG | Using CompendiumLocalService for pack loading...`);
       console.log(`🏷️ TRAIT DEBUG | Current timestamp: ${new Date().toISOString()}`);
-      
+
       // Use CompendiumLocalService to load documents
       let items;
       try {
@@ -667,7 +799,7 @@ export class TraitProvider {
         // If pack doesn't exist or can't be loaded, that's not necessarily an error
         const errorMsg = loadError instanceof Error ? loadError.message : String(loadError);
         console.log(`🏷️ TRAIT DEBUG | Pack '${packName}' could not be loaded: ${errorMsg}`);
-        
+
         // If it's a "not found" error, return empty result rather than failing
         if (errorMsg.includes('not found')) {
           console.log(`🏷️ TRAIT DEBUG | Pack '${packName}' not found for source '${source}' - returning empty result`);
@@ -676,30 +808,30 @@ export class TraitProvider {
             data: []
           };
         }
-        
+
         // Re-throw other errors
         throw loadError;
       }
-      
+
       // If system pack is empty, this means the build process didn't populate it correctly
       if (items.length === 0 && source === 'system') {
         console.warn(`🏷️ TRAIT DEBUG | System pack is empty - this should be populated during build process`);
         console.warn(`🏷️ TRAIT DEBUG | Run 'npm run build:packs' to populate system compendium pack`);
         console.warn(`🏷️ TRAIT DEBUG | Continuing with empty system pack...`);
       }
-      
+
       console.log(`🏷️ TRAIT DEBUG | Final document count: ${items.length}`);
       console.log(`🏷️ TRAIT DEBUG | Sample items:`, items.slice(0, 3).map((i: any) => ({ id: i._id, name: i.name, type: i.type })));
-      
+
       const traits: Trait[] = [];
       let processedCount = 0;
       let skippedCount = 0;
       let convertedCount = 0;
-      
+
       for (const item of items) {
         processedCount++;
         console.log(`🏷️ TRAIT DEBUG | Processing item ${processedCount}: ${item.name} (type: ${item.type})`);
-        
+
         // For system pack, only process items of the configured type (feature)
         // For world pack, allow any item type if it has the required trait properties
         if (source === 'system') {
@@ -713,7 +845,7 @@ export class TraitProvider {
           // localKey is optional for custom/world traits since they don't need localization
           const system = item.system;
           const hasTraitProperties = !!(system?.color && system?.icon);
-          
+
           if (!hasTraitProperties) {
             const missingProps = [];
             if (!system?.color) missingProps.push('color');
@@ -725,7 +857,7 @@ export class TraitProvider {
             console.log(`🏷️ TRAIT DEBUG | World item '${item.name}' (type: ${item.type}) has trait properties, will attempt conversion`);
           }
         }
-        
+
         const trait = this.convertItemToTrait(item, source);
         if (trait) {
           traits.push(trait);
@@ -736,10 +868,10 @@ export class TraitProvider {
           console.log(`🏷️ TRAIT DEBUG | Failed to convert item '${item.name}' to trait`);
         }
       }
-      
+
       console.log(`🏷️ TRAIT DEBUG | Final results - processed: ${processedCount}, skipped: ${skippedCount}, converted: ${convertedCount}`);
       console.log(`🏷️ TraitProvider | Loaded ${traits.length} traits from ${source} pack '${packName}' via CompendiumLocalService`);
-      
+
       return {
         success: true,
         data: traits
@@ -753,7 +885,7 @@ export class TraitProvider {
       };
     }
   }
-  
+
   /**
    * Convert a FoundryVTT item to a Trait object
    * 
@@ -764,16 +896,16 @@ export class TraitProvider {
       console.log(`🏷️ TRAIT DEBUG | convertItemToTrait called for item '${item.name}'`);
       console.log(`🏷️ TRAIT DEBUG | Item ID info - _id: ${item._id}, id: ${item.id}, uuid: ${item.uuid}`);
       console.log(`🏷️ TRAIT DEBUG | Full item object keys:`, Object.keys(item));
-      
+
       const system = item.system as TraitItemSystemData;
       console.log(`🏷️ TRAIT DEBUG | Item system properties:`, {
         color: system.color,
-        icon: system.icon, 
+        icon: system.icon,
         localKey: system.localKey,
         description: system.description,
         tags: system.tags
       });
-      
+
       // For new trait items, validate required properties
       if (item.type === 'trait') {
         if (!system.color || !system.icon) {
@@ -792,9 +924,9 @@ export class TraitProvider {
           return null;
         }
       }
-      
+
       console.log(`🏷️ TRAIT DEBUG | All required properties present, creating trait object...`);
-      
+
       // Generate ID with fallback strategy if item._id is null
       let traitId = item._id || item.id;
       if (!traitId) {
@@ -803,7 +935,7 @@ export class TraitProvider {
         traitId = `${source}_trait_${sanitizedName}`;
         console.log(`🏷️ TRAIT DEBUG | Generated deterministic ID: ${traitId}`);
       }
-      
+
       const trait: Trait = {
         id: traitId,
         name: item.name,
@@ -824,18 +956,18 @@ export class TraitProvider {
           flags: item.flags
         }
       };
-      
+
       console.log(`🏷️ TRAIT DEBUG | Successfully created trait object for '${item.name}' with ID: ${traitId}`);
       console.log(`🏷️ TRAIT DEBUG | Final trait object ID field: ${trait.id}, tags: ${trait.tags}`);
       return trait;
-      
+
     } catch (error) {
       console.error(`🏷️ TRAIT DEBUG | Failed to convert item '${item.name}' to trait:`, error);
       console.error(`🏷️ TRAIT DEBUG | Error stack:`, (error as Error)?.stack || 'No stack trace');
       return null;
     }
   }
-  
+
   /**
    * Remove duplicate traits, preferring world traits over system traits
    * 
@@ -843,10 +975,10 @@ export class TraitProvider {
    */
   private deduplicateTraits(traits: Trait[]): Trait[] {
     const traitMap = new Map<string, Trait>();
-    
+
     console.log(`🏷️ TRAIT DEBUG | deduplicateTraits called with ${traits.length} traits`);
     console.log(`🏷️ TRAIT DEBUG | Input trait names:`, traits.map(t => t.name));
-    
+
     // First add all system traits (use trait name as key, not ID)
     for (const trait of traits) {
       if (trait.source === 'system') {
@@ -854,7 +986,7 @@ export class TraitProvider {
         console.log(`🏷️ TRAIT DEBUG | Added system trait '${trait.name}' with key '${trait.name}'`);
       }
     }
-    
+
     // Then add world traits, which will override system traits with same name
     for (const trait of traits) {
       if (trait.source === 'world') {
@@ -862,14 +994,14 @@ export class TraitProvider {
         console.log(`🏷️ TRAIT DEBUG | Added/overwrote world trait '${trait.name}' with key '${trait.name}'`);
       }
     }
-    
+
     const result = Array.from(traitMap.values());
     console.log(`🏷️ TRAIT DEBUG | deduplicateTraits result: ${result.length} unique traits`);
     console.log(`🏷️ TRAIT DEBUG | Result trait names:`, result.map(t => t.name));
-    
+
     return result;
   }
-  
+
   /**
    * Filter traits based on retrieval options
    * 
@@ -877,7 +1009,7 @@ export class TraitProvider {
    */
   private filterTraits(traits: Trait[], options: TraitRetrievalOptions): Trait[] {
     let filtered = traits;
-    
+
     // Filter by categories
     if (options.categories?.length) {
       filtered = filtered.filter(trait => {
@@ -885,7 +1017,7 @@ export class TraitProvider {
         return options.categories!.some(cat => categories.includes(cat));
       });
     }
-    
+
     // Filter by tags
     if (options.tags?.length) {
       filtered = filtered.filter(trait => {
@@ -893,10 +1025,10 @@ export class TraitProvider {
         return options.tags!.some(tag => tags.includes(tag));
       });
     }
-    
+
     return filtered;
   }
-  
+
   /**
    * Ensure the world compendium pack exists, creating it if necessary
    * 
@@ -905,15 +1037,15 @@ export class TraitProvider {
   private async ensureWorldPackExists(): Promise<TraitProviderResult<boolean>> {
     try {
       const packExists = await this.checkPackExists('world');
-      
+
       if (packExists) {
         console.log('🏷️ TraitProvider | World pack already exists');
         return { success: true, data: true };
       }
-      
+
       // Create the world pack
       console.log('🏷️ TraitProvider | Creating world pack...');
-      
+
       const packData = {
         name: this.config.worldPackName,
         label: this.config.worldPackLabel,
@@ -921,22 +1053,22 @@ export class TraitProvider {
         type: 'Item',
         system: this.game.system.id
       };
-      
+
       await (this.foundry as any).documents.collections.CompendiumCollection.createCompendium(packData);
-      
+
       console.log(`🏷️ TraitProvider | World pack '${this.config.worldPackName}' created successfully`);
-      
+
       return { success: true, data: true };
-      
+
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      
+
       // Check if error is about pack already existing - this is not actually an error
       if (errorMessage.includes('already exists') || errorMessage.includes('cannot be created')) {
         console.log('🏷️ TraitProvider | World pack already exists (detected via error), continuing...');
         return { success: true, data: true };
       }
-      
+
       console.error('🏷️ TraitProvider | Failed to ensure world pack exists:', error);
       return {
         success: false,
@@ -944,7 +1076,7 @@ export class TraitProvider {
       };
     }
   }
-  
+
   /**
    * Check if a specific pack exists
    * 
@@ -960,7 +1092,7 @@ export class TraitProvider {
       return false;
     }
   }
-  
+
   /**
    * Get detailed information about a specific pack
    * 
@@ -969,11 +1101,11 @@ export class TraitProvider {
   private async getPackInfo_internal(source: TraitSource): Promise<CompendiumPackInfo> {
     const packName = source === 'system' ? this.config.systemPackName : this.config.worldPackName;
     const packLabel = source === 'system' ? 'Avant Traits' : this.config.worldPackLabel;
-    
+
     try {
       const pack = this.game?.packs?.get(packName);
       const exists = pack !== undefined && pack !== null;
-      
+
       return {
         name: packName,
         label: packLabel,
@@ -981,7 +1113,7 @@ export class TraitProvider {
         accessible: exists && pack.visible !== false,
         collection: exists ? pack : undefined
       };
-      
+
     } catch (error) {
       console.error(`🏷️ TraitProvider | Error getting pack info for ${source}:`, error);
       return {
@@ -992,7 +1124,7 @@ export class TraitProvider {
       };
     }
   }
-  
+
   /**
    * Emit the 'avantTraitRegistered' hook for plugin integration.
    * 
@@ -1009,7 +1141,7 @@ export class TraitProvider {
         timestamp: new Date().toISOString(),
         provider: this
       };
-      
+
       // Emit the hook for plugins to listen to
       if (this.foundry?.utils?.hooks?.call) {
         this.foundry.utils.hooks.call('avantTraitRegistered', hookData);
@@ -1020,15 +1152,15 @@ export class TraitProvider {
         // ✅ NEW: Also emit avantTagsUpdated hook to trigger autocomplete index rebuild
         (globalThis as any).Hooks.call('avantTagsUpdated', []);
       }
-      
+
       console.log(`🏷️ TraitProvider | Emitted 'avantTraitRegistered' hook for trait '${trait.name}' (${action})`);
       console.log(`🏷️ TraitProvider | Emitted 'avantTagsUpdated' hook to trigger autocomplete rebuild`);
-      
+
     } catch (error) {
       console.error('🏷️ TraitProvider | Failed to emit trait registered hook:', error);
     }
   }
-  
+
   /**
    * Emit the 'avantTraitDeleted' hook for plugin integration.
    * 
@@ -1044,18 +1176,19 @@ export class TraitProvider {
         timestamp: new Date().toISOString(),
         provider: this
       };
-      
+
       // Emit the hook for plugins to listen to
       if (this.foundry?.utils?.hooks?.call) {
         this.foundry.utils.hooks.call('avantTraitDeleted', hookData);
       } else if ((globalThis as any).Hooks?.call) {
         (globalThis as any).Hooks.call('avantTraitDeleted', hookData);
       }
-      
+
       console.log(`🏷️ TraitProvider | Emitted 'avantTraitDeleted' hook for trait '${trait.name}'`);
-      
+
     } catch (error) {
       console.error('🏷️ TraitProvider | Failed to emit trait deleted hook:', error);
     }
   }
-} 
+}
+

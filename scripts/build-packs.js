@@ -206,7 +206,7 @@ try {
     sort: 100,
     flags: {}
   },
-  
+
   {
     name: "Create Custom Trait",
     type: "script",
@@ -352,7 +352,7 @@ try {
       }
     }
   },
-  
+
   {
     name: "Import to Avant Traits",
     type: "script",
@@ -558,7 +558,7 @@ new Dialog({
     flags: {
       "avant": {
         "description": "Imports traits from JSON file into the world compendium with file dialog interface",
-        "version": "1.0.0", 
+        "version": "1.0.0",
         "category": "trait-management"
       }
     }
@@ -584,7 +584,7 @@ const TRAIT_SEEDS = [
   },
   {
     name: "Ice",
-    type: "trait", 
+    type: "trait",
     system: {
       color: "#4ECDC4",
       icon: "fas fa-snowflake",
@@ -604,7 +604,7 @@ const TRAIT_SEEDS = [
     system: {
       color: "#FFE66D",
       icon: "fas fa-bolt",
-      localKey: "AVANT.Trait.Lightning", 
+      localKey: "AVANT.Trait.Lightning",
       description: "Represents electrical and lightning-based abilities, damage types, or elemental affinities",
       category: "general",
       isActive: false,
@@ -792,44 +792,104 @@ const AUGMENT_SEEDS = [
  */
 async function createNeDBPack(packPath, items) {
   console.log(`🔨 Creating NeDB pack at: ${packPath}`);
-  
+
   // Ensure parent directory exists
   const parentDir = path.dirname(packPath);
   if (!fs.existsSync(parentDir)) {
     fs.mkdirSync(parentDir, { recursive: true });
   }
-  
+
   // Create NeDB data - each document on its own line as JSON
   const nedbData = items.map(item => JSON.stringify(item)).join('\n') + '\n';
-  
+
   // Write the .db file
   fs.writeFileSync(packPath, nedbData, 'utf8');
-  
+
   console.log(`✅ Created NeDB pack with ${items.length} items`);
   console.log(`📦 File size: ${Buffer.byteLength(nedbData, 'utf8')} bytes`);
   console.log(`🔄 FoundryVTT will auto-migrate this to LevelDB on first load`);
 }
 
 /**
- * Generate a 16-character alphanumeric ID for FoundryVTT v13
- * @param {string} seed - A seed string to help make it reproducible
- * @returns {string} 16-character alphanumeric ID
+ * Generate stable FoundryVTT document IDs for compendium items
+ * 
+ * CRITICAL FIX: This function was completely rewritten to solve the "trait display issue"
+ * where traits appeared as gray boxes showing IDs instead of proper colors and names.
+ * 
+ * ROOT CAUSE OF THE ORIGINAL ISSUE:
+ * - Previous implementation generated random IDs on every build (like jNreUvVJ5HZsxCXM)
+ * - This meant trait IDs changed every time we ran `npm run build`
+ * - Items in actor sheets referenced old trait IDs that no longer existed
+ * - Result: Trait provider couldn't find traits, displayed gray boxes with IDs
+ * 
+ * THE SOLUTION - STABLE, SEMANTIC IDs:
+ * Instead of random generation, we now create stable, meaningful IDs like:
+ * - "avant-trait-fire" (always the same for Fire trait)
+ * - "avant-trait-ice" (always the same for Ice trait)  
+ * - "avant-talent-fire-strike" (always the same for Fire Strike talent)
+ * 
+ * BENEFITS:
+ * 1. Same trait always gets same ID across ALL builds
+ * 2. No more broken references between builds
+ * 3. Human-readable IDs that make sense
+ * 4. No need for legacy ID mapping systems
+ * 5. Traits display properly with colors and icons
+ * 
+ * @param {string} seed - The source string for ID generation (e.g., "trait-Fire-0")
+ * @returns {string} A stable, semantic ID (e.g., "avant-trait-fire")
  */
 function generateFoundryId(seed = '') {
+  // For traits and system items, use stable, semantic IDs
+  // This ensures consistency across builds and installations
+  if (seed.includes('trait-')) {
+    // Extract trait name and create stable ID
+    // "trait-Fire-0" → "avant-trait-fire"
+    const traitName = seed.replace('trait-', '').replace(/-\d+$/, '').toLowerCase();
+    return `avant-trait-${traitName}`;
+  }
+
+  if (seed.includes('talent-')) {
+    // Extract talent name and create stable ID
+    // "talent-Fire Strike-0" → "avant-talent-fire-strike"
+    const talentName = seed.replace('talent-', '').replace(/-\d+$/, '').toLowerCase().replace(/\s+/g, '-');
+    return `avant-talent-${talentName}`;
+  }
+
+  if (seed.includes('augment-')) {
+    // Extract augment name and create stable ID
+    // "augment-Neural Interface-0" → "avant-augment-neural-interface"
+    const augmentName = seed.replace('augment-', '').replace(/-\d+$/, '').toLowerCase().replace(/\s+/g, '-');
+    return `avant-augment-${augmentName}`;
+  }
+
+  if (seed.includes('macro-')) {
+    // Extract macro name and create stable ID
+    // "macro-Import Traits-0" → "avant-macro-import-traits"
+    const macroName = seed.replace('macro-', '').replace(/-\d+$/, '').toLowerCase().replace(/\s+/g, '-');
+    return `avant-macro-${macroName}`;
+  }
+
+  // For other items, use a simple hash-based approach for stability
+  // This provides deterministic IDs without being semantic
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let result = '';
-  
-  // Use seed + timestamp for uniqueness
-  const seedValue = seed + Date.now();
-  
-  for (let i = 0; i < 16; i++) {
-    // Use a combination of the seed and random values
-    const seedIndex = (seedValue.charCodeAt(i % seedValue.length) + i) % chars.length;
-    const randomIndex = Math.floor(Math.random() * chars.length);
-    const charIndex = (seedIndex + randomIndex) % chars.length;
-    result += chars[charIndex];
+
+  const seedValue = seed || 'default';
+
+  // Create a simple hash from the seed
+  let hash = 0;
+  for (let i = 0; i < seedValue.length; i++) {
+    const char = seedValue.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
   }
-  
+
+  // Use the hash to generate a deterministic 16-character ID
+  for (let i = 0; i < 16; i++) {
+    const index = Math.abs(hash + i * 31) % chars.length;
+    result += chars[index];
+  }
+
   return result;
 }
 
@@ -842,10 +902,10 @@ function generateFoundryId(seed = '') {
  */
 function generateItemDocuments(seeds, itemType = 'trait') {
   console.log(`🏗️ Generating ${itemType} documents with validation...`);
-  
+
   // Generate a consistent user ID for build script
   const buildUserId = generateFoundryId('buildsystem');
-  
+
   return seeds.map((seed, index) => {
     // Validate item data based on type
     let validatedSystemData;
@@ -859,11 +919,11 @@ function generateItemDocuments(seeds, itemType = 'trait') {
       // For traits and other types, use the system data as-is for now
       validatedSystemData = seed.system;
     }
-    
+
     // Generate a proper 16-character alphanumeric ID
     const id = generateFoundryId(`${itemType}-${seed.name}-${index}`);
     console.log(`📝 Generated ID for ${seed.name}: ${id}`);
-    
+
     return {
       _id: id,
       name: seed.name,
@@ -898,12 +958,12 @@ function generateItemDocuments(seeds, itemType = 'trait') {
 function generateMacroDocuments(seeds) {
   // Generate a consistent user ID for build script
   const buildUserId = generateFoundryId('buildsystem');
-  
+
   return seeds.map((seed, index) => {
     // Generate a proper 16-character alphanumeric ID
     const id = generateFoundryId(`macro-${seed.name}-${index}`);
     console.log(`📝 Generated ID for ${seed.name}: ${id}`);
-    
+
     return {
       _id: id,
       name: seed.name,
@@ -936,14 +996,14 @@ function generateMacroDocuments(seeds) {
  */
 function updateSystemJsonForLevelDB(systemJsonPath) {
   console.log('🔨 Updating system.json for LevelDB format (FoundryVTT v13)...');
-  
+
   if (!fs.existsSync(systemJsonPath)) {
     console.error('❌ system.json not found!');
     return;
   }
-  
+
   const systemJson = JSON.parse(fs.readFileSync(systemJsonPath, 'utf8'));
-  
+
   // Update pack definitions to use folder paths instead of .db files for v13
   if (systemJson.packs) {
     systemJson.packs.forEach(pack => {
@@ -965,7 +1025,7 @@ function updateSystemJsonForLevelDB(systemJsonPath) {
       }
     });
   }
-  
+
   // Write updated system.json
   fs.writeFileSync(systemJsonPath, JSON.stringify(systemJson, null, 2));
   console.log('✅ system.json updated for LevelDB format (v13)');
@@ -977,7 +1037,7 @@ function updateSystemJsonForLevelDB(systemJsonPath) {
 async function buildPacks() {
   try {
     console.log('🚀 Building Avant VTT compendium packs...');
-    
+
     // Define paths
     const projectRoot = path.resolve(__dirname, '..');
     const distPath = path.join(projectRoot, 'dist');
@@ -987,7 +1047,7 @@ async function buildPacks() {
     const talentPackPath = path.join(packsPath, 'avant-talents.db');
     const augmentPackPath = path.join(packsPath, 'avant-augments.db');
     const systemJsonPath = path.join(distPath, 'system.json');
-    
+
     console.log(`📁 Project root: ${projectRoot}`);
     console.log(`📁 Dist path: ${distPath}`);
     console.log(`📁 Pack paths:`);
@@ -995,45 +1055,45 @@ async function buildPacks() {
     console.log(`   - Macros: ${macroPackPath}`);
     console.log(`   - Talents: ${talentPackPath}`);
     console.log(`   - Augments: ${augmentPackPath}`);
-    
+
     // Ensure dist directory exists
     if (!fs.existsSync(distPath)) {
       fs.mkdirSync(distPath, { recursive: true });
     }
-    
+
     // Generate documents with validation
     console.log('🔄 Phase 2: Generating documents with build-time validation...');
-    
+
     const traitDocs = generateItemDocuments(TRAIT_SEEDS, 'trait');
     console.log(`📝 Generated ${traitDocs.length} trait documents`);
-    
+
     const macroDocs = generateMacroDocuments(MACRO_SEEDS);
     console.log(`📝 Generated ${macroDocs.length} macro documents`);
-    
+
     const talentDocs = generateItemDocuments(TALENT_SEEDS, 'talent');
     console.log(`📝 Generated ${talentDocs.length} talent documents`);
-    
+
     const augmentDocs = generateItemDocuments(AUGMENT_SEEDS, 'augment');
     console.log(`📝 Generated ${augmentDocs.length} augment documents`);
-    
+
     // Validate that all items passed validation (this would have thrown errors above if not)
     console.log('✅ All items passed build-time schema validation');
-    
+
     // Create compendium packs (NeDB format - FoundryVTT will auto-migrate to LevelDB)
     console.log('🔄 Creating compendium pack files...');
-    
+
     await createNeDBPack(traitPackPath, traitDocs);
     await createNeDBPack(macroPackPath, macroDocs);
     await createNeDBPack(talentPackPath, talentDocs);
     await createNeDBPack(augmentPackPath, augmentDocs);
-    
+
     // Update system.json if it exists in dist
     if (fs.existsSync(systemJsonPath)) {
       updateSystemJsonForLevelDB(systemJsonPath);
     } else {
       console.log('⚠️  system.json not found in dist - will be copied during main build');
     }
-    
+
     console.log('🎉 Compendium pack build complete!');
     console.log('📋 Summary:');
     console.log(`   - Created trait pack: ${traitPackPath} (${traitDocs.length} items)`);
@@ -1043,7 +1103,7 @@ async function buildPacks() {
     console.log(`   - Total items: ${traitDocs.length + macroDocs.length + talentDocs.length + augmentDocs.length}`);
     console.log(`   - Format: NeDB (.db files) - FoundryVTT v13 will auto-migrate to LevelDB folders`);
     console.log(`   - Validation: All items validated against schema during build`);
-    
+
   } catch (error) {
     console.error('❌ Error building compendium packs:', error);
     console.error('💥 Build failed due to validation error or file system issue');
