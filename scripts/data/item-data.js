@@ -56,6 +56,14 @@ export class AvantActionData extends foundry.abstract.DataModel {
                     integer: true,
                     min: 0
                 })
+            }),
+            // Trait assignment for actions
+            traits: new fields.ArrayField(new fields.StringField({
+                required: false,
+                blank: false
+            }), {
+                required: false,
+                initial: []
             })
         };
     }
@@ -109,6 +117,30 @@ export class AvantFeatureData extends foundry.abstract.DataModel {
                     integer: true,
                     min: 0
                 })
+            }),
+            // Trait-specific properties for features used as traits
+            color: new fields.StringField({
+                required: false,
+                initial: "",
+                blank: true
+            }),
+            icon: new fields.StringField({
+                required: false,
+                initial: "",
+                blank: true
+            }),
+            localKey: new fields.StringField({
+                required: false,
+                initial: "",
+                blank: true
+            }),
+            // Trait assignment for features
+            traits: new fields.ArrayField(new fields.StringField({
+                required: false,
+                blank: false
+            }), {
+                required: false,
+                initial: []
             })
         };
     }
@@ -118,7 +150,7 @@ export class AvantFeatureData extends foundry.abstract.DataModel {
  * Talent Item Data Model
  * @class AvantTalentData
  * @extends {foundry.abstract.DataModel}
- * @description Data model for talents with power point costs and tiers
+ * @description Data model for talents with action point costs and level requirements
  */
 export class AvantTalentData extends foundry.abstract.DataModel {
     /**
@@ -134,6 +166,19 @@ export class AvantTalentData extends foundry.abstract.DataModel {
                 initial: "",
                 blank: true
             }),
+            apCost: new fields.NumberField({
+                required: true,
+                initial: 1,
+                integer: true,
+                min: 0,
+                max: 3
+            }),
+            levelRequirement: new fields.NumberField({
+                required: true,
+                initial: 1,
+                integer: true,
+                min: 1
+            }),
             tier: new fields.NumberField({
                 required: true,
                 initial: 1,
@@ -141,18 +186,18 @@ export class AvantTalentData extends foundry.abstract.DataModel {
                 min: 1,
                 max: 6
             }),
-            powerPointCost: new fields.NumberField({
-                required: true,
-                initial: 1,
-                integer: true,
-                min: 0
-            }),
             isActive: new fields.BooleanField({
                 required: true,
                 initial: false
             }),
+            requirements: new fields.StringField({
+                required: false,
+                initial: "",
+                blank: true
+            }),
+            // Legacy field for backwards compatibility
             prerequisites: new fields.StringField({
-                required: true,
+                required: false,
                 initial: "",
                 blank: true
             }),
@@ -169,6 +214,14 @@ export class AvantTalentData extends foundry.abstract.DataModel {
                     integer: true,
                     min: 0
                 })
+            }),
+            // Trait assignment for talents
+            traits: new fields.ArrayField(new fields.StringField({
+                required: false,
+                blank: false
+            }), {
+                required: false,
+                initial: []
             })
         };
     }
@@ -194,13 +247,33 @@ export class AvantAugmentData extends foundry.abstract.DataModel {
                 initial: "",
                 blank: true
             }),
+            apCost: new fields.NumberField({
+                required: true,
+                initial: 0,
+                integer: true,
+                min: 0,
+                max: 3
+            }),
+            ppCost: new fields.NumberField({
+                required: true,
+                initial: 0,
+                integer: true,
+                min: 0
+            }),
+            levelRequirement: new fields.NumberField({
+                required: true,
+                initial: 1,
+                integer: true,
+                min: 1
+            }),
             augmentType: new fields.StringField({
                 required: true,
                 initial: "enhancement",
                 choices: ["enhancement", "cybernetic", "biological", "magical", "psionic"]
             }),
+            // Legacy field for backwards compatibility
             powerPointCost: new fields.NumberField({
-                required: true,
+                required: false,
                 initial: 0,
                 integer: true,
                 min: 0
@@ -213,6 +286,11 @@ export class AvantAugmentData extends foundry.abstract.DataModel {
                 required: true,
                 initial: "common",
                 choices: ["common", "uncommon", "rare", "epic", "legendary", "artifact"]
+            }),
+            requirements: new fields.StringField({
+                required: false,
+                initial: "",
+                blank: true
             }),
             uses: new fields.SchemaField({
                 value: new fields.NumberField({
@@ -227,6 +305,14 @@ export class AvantAugmentData extends foundry.abstract.DataModel {
                     integer: true,
                     min: 0
                 })
+            }),
+            // Trait assignment for augments
+            traits: new fields.ArrayField(new fields.StringField({
+                required: false,
+                blank: false
+            }), {
+                required: false,
+                initial: []
             })
         };
     }
@@ -310,6 +396,14 @@ export class AvantWeaponData extends foundry.abstract.DataModel {
                 required: true,
                 initial: "",
                 blank: true
+            }),
+            // Trait assignment for weapons
+            traits: new fields.ArrayField(new fields.StringField({
+                required: false,
+                blank: false
+            }), {
+                required: false,
+                initial: []
             })
         };
     }
@@ -390,6 +484,14 @@ export class AvantArmorData extends foundry.abstract.DataModel {
                 required: true,
                 initial: "",
                 blank: true
+            }),
+            // Trait assignment for armor
+            traits: new fields.ArrayField(new fields.StringField({
+                required: false,
+                blank: false
+            }), {
+                required: false,
+                initial: []
             })
         };
     }
@@ -467,6 +569,93 @@ export class AvantGearData extends foundry.abstract.DataModel {
                     integer: true,
                     min: 0
                 })
+            }),
+            // Trait assignment for gear
+            traits: new fields.ArrayField(new fields.StringField({
+                required: false,
+                blank: false
+            }), {
+                required: false,
+                initial: []
+            })
+        };
+    }
+}
+
+/**
+ * Trait Definition Data Model
+ * @class AvantTraitData
+ * @extends {foundry.abstract.DataModel}
+ * @description Data model for trait definitions that can be applied to items
+ */
+export class AvantTraitData extends foundry.abstract.DataModel {
+    /**
+     * Define the data schema for trait items
+     * @static
+     * @returns {Object} The schema definition object
+     */
+    static defineSchema() {
+        const fields = foundry.data.fields;
+        return {
+            description: new fields.HTMLField({
+                required: true,
+                initial: "",
+                blank: true
+            }),
+            // Visual appearance properties
+            color: new fields.StringField({
+                required: true,
+                initial: "#00E0DC",
+                blank: false,
+                validate: (value) => {
+                    if (!value || typeof value !== 'string') return false;
+                    // Accept hex colors with or without #
+                    const hexPattern = /^#?[0-9A-Fa-f]{6}$/;
+                    return hexPattern.test(value);
+                },
+                validationError: "Color must be a valid hex color code (e.g., #FF5733 or FF5733)"
+            }),
+            textColor: new fields.StringField({
+                required: true,
+                initial: "#000000",
+                blank: false,
+                validate: (value) => {
+                    if (!value || typeof value !== 'string') return false;
+                    // Accept hex colors with or without #
+                    const hexPattern = /^#?[0-9A-Fa-f]{6}$/;
+                    return hexPattern.test(value);
+                },
+                validationError: "Text color must be a valid hex color code (e.g., #000000 or 000000)"
+            }),
+            icon: new fields.StringField({
+                required: true,
+                initial: "fas fa-tag",
+                blank: false
+            }),
+            // Categorization and identification
+            tags: new fields.ArrayField(new fields.StringField({
+                required: false,
+                blank: false
+            }), {
+                required: false,
+                initial: []
+            }),
+            localKey: new fields.StringField({
+                required: false,
+                initial: "",
+                blank: true
+            }),
+            // Rarity for special traits
+            rarity: new fields.StringField({
+                required: true,
+                initial: "common",
+                choices: ["common", "uncommon", "rare", "epic", "legendary", "artifact"]
+            }),
+            // Game mechanical effects (optional)
+            effects: new fields.StringField({
+                required: true,
+                initial: "",
+                blank: true
             })
         };
     }

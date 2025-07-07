@@ -1,0 +1,143 @@
+{{!-- 
+  Talent & Augment Row Template
+  Enhanced layout: 32px | 1fr | auto 
+  Left: chat icon | Middle: title+level, AP, requirements, description, traits | Right: edit + delete
+--}}
+
+{{#if (eq item.type "talent")}}
+<div class="talent-item" data-item-id="{{item._id}}" data-item-type="talent">
+{{else if (eq item.type "augment")}}
+<div class="augment-item" data-item-id="{{item._id}}" data-item-type="augment">
+{{/if}}
+
+  {{!-- Left Column: Chat/Roll Control (32px) - Feature card button for both types --}}
+  <div class="row-control">
+      <button type="button" 
+              class="chat-roll-btn" 
+              data-action="{{#if (eq item.type 'talent')}}useTalent{{else}}useAugment{{/if}}" 
+              data-item-id="{{item._id}}"
+              title="{{#if (eq item.type 'talent')}}Use Talent{{else}}Use Augment{{/if}}: {{item.name}}"
+              aria-label="{{#if (eq item.type 'talent')}}Use Talent{{else}}Use Augment{{/if}}: {{item.name}}"
+              tabindex="0">
+        <i class="fas fa-comments" aria-hidden="true"></i>
+      </button>
+      
+      {{!-- Direct PP Spend Button (only for augments with PP cost) --}}
+      {{!-- 🔧 DEVELOPMENT NOTE (2025-01-17): 
+           This revolutionary UX feature allows direct PP spending from actor sheets.
+           Single-click spends PP immediately and posts confirmation card.
+           Provides superior user experience compared to two-step chat card method. --}}
+      {{#if (and (eq item.type "augment") (gt item.system.ppCost 0))}}
+      <button type="button" 
+              class="pp-spend-btn" 
+              data-action="spendAugmentPP" 
+              data-item-id="{{item._id}}"
+              data-pp-cost="{{item.system.ppCost}}"
+              title="Spend {{item.system.ppCost}} PP: {{item.name}}"
+              aria-label="Spend {{item.system.ppCost}} power points for {{item.name}}"
+              tabindex="0">
+        <i class="fas fa-bolt" aria-hidden="true"></i>
+        <span class="pp-spend-cost">{{item.system.ppCost}}</span>
+      </button>
+      {{/if}}
+  </div>
+
+  {{!-- Middle Column: Title+Level, AP, Requirements, Description, Traits (1fr) --}}
+  <div class="row-content">
+    {{!-- Title with Level indicator next to it --}}
+    <div class="row-title-line">
+      <h4 class="row-title" 
+          data-action="editItem" 
+          data-item-id="{{item._id}}"
+          title="Edit {{item.name}}"
+          tabindex="0"
+          role="button">
+        {{item.name}}
+      </h4>
+      {{#if item.system.levelRequirement}}
+        <span class="row-level-inline">Level {{item.system.levelRequirement}}+</span>
+      {{/if}}
+    </div>
+    
+    {{!-- AP Cost display --}}
+    {{#if (gt item.system.apCost 0)}}
+    <div class="row-ap-cost">
+      <span class="ap-cost-label">AP:</span>
+      <div class="ap-icons-inline">
+        <span class="ap-icon {{#if (gte item.system.apCost 1)}}filled{{else}}empty{{/if}}">
+          <i class="fas fa-circle" aria-hidden="true"></i>
+        </span>
+        <span class="ap-icon {{#if (gte item.system.apCost 2)}}filled{{else}}empty{{/if}}">
+          <i class="fas fa-circle" aria-hidden="true"></i>
+        </span>
+        <span class="ap-icon {{#if (gte item.system.apCost 3)}}filled{{else}}empty{{/if}}">
+          <i class="fas fa-circle" aria-hidden="true"></i>
+        </span>
+      </div>
+      {{#if (and (eq item.type "augment") item.system.ppCost)}}
+        <span class="pp-cost-inline">PP: {{item.system.ppCost}}</span>
+      {{/if}}
+    </div>
+    {{/if}}
+    
+    {{!-- Requirements displayed --}}
+    {{#if item.system.requirements}}
+    <div class="row-requirements">
+      <strong>Requirements:</strong> {{item.system.requirements}}
+    </div>
+    {{/if}}
+    
+    {{!-- Description displayed --}}
+    {{#if item.system.description}}
+    <div class="row-description">
+      {{item.system.description}}
+    </div>
+    {{/if}}
+    
+    {{!-- Traits displayed last --}}
+    {{#if item.displayTraits}}
+    <div class="trait-chips {{#if (gt item.displayTraits.length 4)}}has-overflow{{/if}}">
+      {{#each item.displayTraits as |trait|}}
+        {{#if (lt @index 4)}}
+        <span class="trait-chip" 
+              data-trait="{{trait.id}}"
+              style="{{traitChipStyle trait}}"
+              title="{{#if trait.description}}{{trait.description}}{{else}}{{trait.name}}{{/if}}">
+          {{#if trait.icon}}<i class="trait-chip__icon {{trait.icon}}" aria-hidden="true"></i>{{/if}}
+          <span class="trait-chip__text">{{trait.name}}</span>
+        </span>
+        {{/if}}
+      {{/each}}
+      {{#if (gt item.displayTraits.length 4)}}
+        <span class="trait-overflow-count">+{{math item.displayTraits.length "-" 4}}</span>
+      {{/if}}
+    </div>
+    {{/if}}
+  </div>
+
+  {{!-- Right Column: Edit/Delete (auto) - Locked to right side --}}
+  <div class="row-actions">
+    {{!-- Edit Button --}}
+    <button type="button" 
+            class="row-edit" 
+            data-action="editItem" 
+            data-item-id="{{item._id}}"
+            title="Edit {{item.name}}"
+            aria-label="Edit {{item.name}}"
+            tabindex="0">
+      <i class="fas fa-edit" aria-hidden="true"></i>
+    </button>
+
+    {{!-- Delete Button --}}
+    <button type="button" 
+            class="row-delete" 
+            data-action="deleteItem" 
+            data-item-id="{{item._id}}"
+            title="Delete {{item.name}}"
+            aria-label="Delete {{item.name}}"
+            tabindex="0">
+      <i class="fas fa-trash" aria-hidden="true"></i>
+    </button>
+  </div>
+
+</div> 

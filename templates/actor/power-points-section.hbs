@@ -1,0 +1,64 @@
+{{!-- 
+    POWER POINTS SECTION PARTIAL TEMPLATE
+    
+    PURPOSE: Provides UI for tracking Power Points on the Talents & Augments tab
+    TEMPLATE TYPE: Handlebars Partial (*.hbs)
+    
+    INTEGRATION NOTES:
+    - Included in actor-sheet.html via {{> "systems/avant/templates/actor/power-points-section.hbs"}}
+    - Must be registered in initialization-manager.ts templatePaths array to be found
+    
+    DATA BINDING:
+    - All inputs bind to system.powerPoints.* fields in actor data model
+    - data-dtype="Number" ensures FoundryVTT treats values as numbers
+    - min="0" prevents negative values in the UI
+    
+    STYLING:
+    - Uses .power-points-section, .power-point-tile, .power-point-input CSS classes
+    - SCSS styles are already compiled in avant.css - no CSS changes needed
+    - Theme system automatically applies dark/light mode styling
+    
+    FUTURE ENHANCEMENTS (Stage 4):
+    - Roll/spend buttons will be added to individual augment rows, not here
+    - This section is purely for tracking current PP values
+    - PP spending logic handled via chat cards and row controls
+--}}
+
+<section class="power-points-section">
+  <h3>Power Points</h3>
+
+  <div class="power-points-tiles">
+    {{!-- Current Power Points - the active pool --}}
+    <div class="power-point-tile">
+      <label>Current</label>
+      <input class="power-point-input"
+             type="number"
+             name="system.powerPoints.value"
+             value="{{system.powerPoints.value}}"
+             data-dtype="Number"
+             min="0">
+    </div>
+
+    {{!-- Maximum Power Points - total capacity --}}
+    <div class="power-point-tile">
+      <label>Maximum</label>
+      <input class="power-point-input"
+             type="number"
+             name="system.powerPoints.max"
+             value="{{system.powerPoints.max}}"
+             data-dtype="Number"
+             min="0">
+    </div>
+
+    {{!-- Daily Limit - maximum PP that can be spent per day --}}
+    <div class="power-point-tile">
+      <label>Daily Limit</label>
+      <input class="power-point-input"
+             type="number"
+             name="system.powerPoints.limit"
+             value="{{system.powerPoints.limit}}"
+             data-dtype="Number"
+             min="0">
+    </div>
+  </div>
+</section> 

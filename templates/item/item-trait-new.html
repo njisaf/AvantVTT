@@ -1,0 +1,123 @@
+{{!-- 
+  Trait Item Sheet Template - Phase 5 Component Library Version
+  
+  This template uses the unified component library to provide a clean,
+  accessible, and maintainable trait sheet experience. Traits are
+  specialized items that represent core game mechanics and categorization.
+  
+  Features:
+  - Component library partials for consistent styling
+  - Single-content layout without tabs
+  - Enhanced accessibility with proper ARIA support
+  - Color and icon configuration
+  - Rarity selection
+  - Comprehensive form validation
+--}}
+
+<div class="item-sheet trait-sheet flexcol" autocomplete="off" data-application-part="form">
+    {{!-- Header Section --}}
+    <header class="sheet-header">
+        <div class="header-main">
+            {{!-- Image Upload Component --}}
+            {{> "systems/avant/templates/shared/partials/image-upload.hbs" 
+                src=item.img 
+                alt=item.name 
+                title=item.name 
+                size=64 
+                class="trait-image"}}
+            
+            {{!-- Name Field --}}
+            {{> "systems/avant/templates/shared/partials/text-field.hbs" 
+                name="name" 
+                value=item.name 
+                label="Trait Name" 
+                placeholder="Enter trait name..." 
+                required=true 
+                class="trait-name-field"}}
+        </div>
+        
+        <div class="header-preview">
+            {{!-- Trait Preview --}}
+            {{#if (and system.color item.name)}}
+                <div class="trait-preview">
+                    <label class="trait-preview-label">Preview:</label>
+                    <span class="trait-chip trait-chip--preview" style="{{traitChipStyle system}}">
+                        {{#if system.icon}}<i class="{{system.icon}}" aria-hidden="true"></i>{{/if}}
+                        <span class="trait-chip__text">{{item.name}}</span>
+                    </span>
+                </div>
+            {{/if}}
+        </div>
+    </header>
+
+    {{!-- Body Section --}}
+    <div class="sheet-body">
+        {{!-- Description Field --}}
+        {{> "systems/avant/templates/shared/partials/textarea-field.hbs" 
+            name="system.description" 
+            value=system.description 
+            label="Description" 
+            rows=3 
+            placeholder="Describe this trait..." 
+            class="trait-description"}}
+        
+        {{!-- Color and Icon Row --}}
+        <div class="form-row">
+            {{!-- Trait Color Field --}}
+            {{> "systems/avant/templates/shared/partials/text-field.hbs" 
+                name="system.color" 
+                value=system.color 
+                label="Color" 
+                placeholder="#FF5733" 
+                hint="Hex color code for the trait chip" 
+                required=true 
+                class="trait-color"}}
+            
+            {{!-- Trait Icon Field --}}
+            {{> "systems/avant/templates/shared/partials/text-field.hbs" 
+                name="system.icon" 
+                value=system.icon 
+                label="Icon" 
+                placeholder="fas fa-fire" 
+                hint="FontAwesome icon class" 
+                class="trait-icon"}}
+        </div>
+        
+        {{!-- Rarity and Local Key Row --}}
+        <div class="form-row">
+            {{!-- Rarity Selection --}}
+            {{> "systems/avant/templates/shared/partials/select-field.hbs" 
+                name="system.rarity" 
+                value=system.rarity 
+                label="Rarity" 
+                options=(array 
+                    (object value="common" label="Common")
+                    (object value="uncommon" label="Uncommon")
+                    (object value="rare" label="Rare")
+                    (object value="epic" label="Epic")
+                    (object value="legendary" label="Legendary")
+                    (object value="artifact" label="Artifact")
+                )
+                hint="Trait rarity classification" 
+                class="trait-rarity"}}
+            
+            {{!-- Localization Key --}}
+            {{> "systems/avant/templates/shared/partials/text-field.hbs" 
+                name="system.localKey" 
+                value=system.localKey 
+                label="Local Key" 
+                placeholder="TRAIT.MyTraitName" 
+                hint="Unique identifier for localization" 
+                class="trait-local-key"}}
+        </div>
+        
+        {{!-- Text Color Field --}}
+        {{> "systems/avant/templates/shared/partials/text-field.hbs" 
+            name="system.textColor" 
+            value=system.textColor 
+            label="Text Color" 
+            placeholder="#FFFFFF" 
+            hint="Text color for readability (auto-calculated if empty)" 
+            class="trait-text-color"}}
+    </div>
+</div> 

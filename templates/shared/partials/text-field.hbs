@@ -1,0 +1,39 @@
+{{!-- 
+  Text Field Component
+  
+  Usage:
+    {{> "systems/avant/templates/shared/partials/text-field" 
+        name="system.name"
+        value=system.name
+        label="Field Label"
+        placeholder="Enter text..."
+        required=true
+        maxlength=100
+        hint="Helpful hint text"
+        class="custom-class"
+    }}
+  
+  Required: name
+  Optional: value, label, placeholder, required (boolean), maxlength, hint, class
+--}}
+
+<div class="form-group form-group--text-field {{#if class}}{{class}}{{/if}}">
+    <label for="{{name}}" class="form-label">
+        {{#if label}}{{label}}{{else}}Text Field{{/if}}
+        {{#if required}}<span class="required" aria-label="required">*</span>{{/if}}
+    </label>
+    
+    <input type="text"
+           id="{{name}}"
+           name="{{name}}"
+           value="{{value}}"
+           {{#if placeholder}}placeholder="{{placeholder}}"{{/if}}
+           {{#if required}}required{{/if}}
+           {{#if maxlength}}maxlength="{{maxlength}}"{{/if}}
+           {{#if hint}}aria-describedby="{{name}}-hint"{{/if}}
+           class="form-input">
+    
+    {{#if hint}}
+        <div id="{{name}}-hint" class="form-hint" role="note">{{hint}}</div>
+    {{/if}}
+</div> 

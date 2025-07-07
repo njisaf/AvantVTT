@@ -1,0 +1,374 @@
+<form class="avant accessibility-settings-content">
+    <div class="accessibility-settings-header">
+        <h2>{{localize "AVANT.accessibilitySettings.title" default="Avant Accessibility Settings"}}</h2>
+        <p class="accessibility-settings-description">
+            Configure accessibility features to improve usability and meet your specific needs. These settings help make the interface more accessible for users with different abilities and preferences.
+        </p>
+    </div>
+
+    <div class="accessibility-settings-body">
+        <!-- Auto-Contrast Section -->
+        <div class="accessibility-setting-group">
+            <div class="setting-header">
+                <label for="autoContrast" class="setting-label">
+                    <i class="fas fa-adjust" aria-hidden="true"></i>
+                    {{localize "AVANT.settings.accessibility.autoContrast.name" default="Auto-Contrast"}}
+                </label>
+                <div class="setting-control">
+                    <input type="checkbox" 
+                           id="autoContrast" 
+                           name="autoContrast" 
+                           {{#if autoContrast}}checked{{/if}}
+                           aria-describedby="autoContrast-hint">
+                    <span class="checkbox-custom"></span>
+                </div>
+            </div>
+            <p class="setting-hint" id="autoContrast-hint">
+                {{localize "AVANT.settings.accessibility.autoContrast.hint" default="Automatically generate accessible text colors that meet WCAG AA standards for trait chips and UI elements"}}
+            </p>
+        </div>
+
+        <!-- High Contrast Section -->
+        <div class="accessibility-setting-group">
+            <div class="setting-header">
+                <label for="highContrast" class="setting-label">
+                    <i class="fas fa-eye" aria-hidden="true"></i>
+                    {{localize "AVANT.settings.accessibility.highContrast.name" default="High Contrast Mode"}}
+                </label>
+                <div class="setting-control">
+                    <input type="checkbox" 
+                           id="highContrast" 
+                           name="highContrast" 
+                           {{#if highContrast}}checked{{/if}}
+                           aria-describedby="highContrast-hint">
+                    <span class="checkbox-custom"></span>
+                </div>
+            </div>
+            <p class="setting-hint" id="highContrast-hint">
+                {{localize "AVANT.settings.accessibility.highContrast.hint" default="Enable high contrast mode for better visibility"}}
+            </p>
+        </div>
+
+        <!-- Reduced Motion Section -->
+        <div class="accessibility-setting-group">
+            <div class="setting-header">
+                <label for="reducedMotion" class="setting-label">
+                    <i class="fas fa-pause-circle" aria-hidden="true"></i>
+                    {{localize "AVANT.settings.accessibility.reducedMotion.name" default="Reduced Motion"}}
+                </label>
+                <div class="setting-control">
+                    <input type="checkbox" 
+                           id="reducedMotion" 
+                           name="reducedMotion" 
+                           {{#if reducedMotion}}checked{{/if}}
+                           aria-describedby="reducedMotion-hint">
+                    <span class="checkbox-custom"></span>
+                </div>
+            </div>
+            <p class="setting-hint" id="reducedMotion-hint">
+                {{localize "AVANT.settings.accessibility.reducedMotion.hint" default="Respect your system's reduced motion preference to minimize animations"}}
+            </p>
+        </div>
+
+        <!-- Contrast Level Section -->
+        <div class="accessibility-setting-group">
+            <div class="setting-header">
+                <label for="contrastLevel" class="setting-label">
+                    <i class="fas fa-certificate" aria-hidden="true"></i>
+                    {{localize "AVANT.settings.accessibility.contrastLevel.name" default="Contrast Level"}}
+                </label>
+                <div class="setting-control">
+                    <select id="contrastLevel" 
+                            name="contrastLevel" 
+                            aria-describedby="contrastLevel-hint">
+                        <option value="AA" {{#if (eq contrastLevel "AA")}}selected{{/if}}>
+                            WCAG AA (4.5:1 ratio)
+                        </option>
+                        <option value="AAA" {{#if (eq contrastLevel "AAA")}}selected{{/if}}>
+                            WCAG AAA (7:1 ratio)
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <p class="setting-hint" id="contrastLevel-hint">
+                {{localize "AVANT.settings.accessibility.contrastLevel.hint" default="Choose WCAG compliance level for color contrast (AA for normal use, AAA for high accessibility needs)"}}
+            </p>
+        </div>
+
+        <!-- Information Section -->
+        <div class="accessibility-info-section">
+            <h3>About Accessibility Features</h3>
+            <div class="accessibility-info-content">
+                <div class="info-item">
+                    <strong>Auto-Contrast:</strong> When enabled, the system automatically calculates and applies text colors that meet WCAG contrast standards for all trait chips and interface elements.
+                </div>
+                <div class="info-item">
+                    <strong>High Contrast Mode:</strong> Enhances visual contrast throughout the interface to improve readability for users with vision difficulties.
+                </div>
+                <div class="info-item">
+                    <strong>Reduced Motion:</strong> Minimizes or disables animations and transitions when your system preferences indicate motion sensitivity.
+                </div>
+                <div class="info-item">
+                    <strong>Contrast Levels:</strong> 
+                    <ul>
+                        <li><strong>AA:</strong> Standard accessibility (4.5:1 contrast ratio) - recommended for most users</li>
+                        <li><strong>AAA:</strong> Enhanced accessibility (7:1 contrast ratio) - for users with high accessibility needs</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<style>
+/* Accessibility Settings Specific Styles */
+.accessibility-settings-content {
+    padding: 20px;
+    max-height: 450px;
+    overflow-y: auto;
+    font-family: var(--theme-font-primary, 'Exo 2', sans-serif);
+}
+
+.accessibility-settings-header {
+    margin-bottom: 30px;
+    border-bottom: 2px solid var(--theme-accent-primary, #00E0DC);
+    padding-bottom: 15px;
+}
+
+.accessibility-settings-header h2 {
+    margin: 0 0 10px 0;
+    color: var(--theme-accent-primary, #00E0DC);
+    font-family: var(--theme-font-display, 'Orbitron', monospace);
+    font-size: 22px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.accessibility-settings-description {
+    color: var(--theme-text-secondary, #BFBFBF);
+    margin: 0;
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+.accessibility-settings-body {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.accessibility-setting-group {
+    background: var(--theme-bg-secondary, #2A2A2A);
+    border: 1px solid var(--theme-border-primary, #404040);
+    border-left: 4px solid var(--theme-accent-primary, #00E0DC);
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.accessibility-setting-group:hover {
+    border-color: var(--theme-accent-primary, #00E0DC);
+    box-shadow: 0 2px 10px rgba(0, 224, 220, 0.1);
+}
+
+.setting-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.setting-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--theme-text-primary, #FFFFFF);
+    font-family: var(--theme-font-display, 'Orbitron', monospace);
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    margin: 0;
+}
+
+.setting-label i {
+    color: var(--theme-accent-primary, #00E0DC);
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+
+.setting-control {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* Custom Checkbox Styling */
+.setting-control input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkbox-custom {
+    position: relative;
+    height: 20px;
+    width: 20px;
+    background: var(--theme-bg-tertiary, #333333);
+    border: 2px solid var(--theme-accent-primary, #00E0DC);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.checkbox-custom:after {
+    content: "";
+    position: absolute;
+    display: none;
+    left: 5px;
+    top: 2px;
+    width: 6px;
+    height: 10px;
+    border: solid var(--theme-bg-primary, #1C1C1C);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.setting-control input[type="checkbox"]:checked ~ .checkbox-custom {
+    background: var(--theme-accent-primary, #00E0DC);
+    box-shadow: 0 0 10px rgba(0, 224, 220, 0.3);
+}
+
+.setting-control input[type="checkbox"]:checked ~ .checkbox-custom:after {
+    display: block;
+}
+
+.setting-control input[type="checkbox"]:focus ~ .checkbox-custom {
+    outline: 2px solid var(--theme-accent-secondary, #4CE2E1);
+    outline-offset: 2px;
+}
+
+/* Select Dropdown Styling */
+.setting-control select {
+    background: var(--theme-bg-tertiary, #333333);
+    border: 2px solid var(--theme-accent-primary, #00E0DC);
+    color: var(--theme-text-primary, #FFFFFF);
+    padding: 8px 12px;
+    font-family: var(--theme-font-primary, 'Exo 2', sans-serif);
+    font-size: 12px;
+    cursor: pointer;
+    min-width: 180px;
+    border-radius: 0;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300E0DC' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 16px;
+    padding-right: 35px;
+}
+
+.setting-control select:focus {
+    outline: 2px solid var(--theme-accent-secondary, #4CE2E1);
+    outline-offset: 2px;
+    box-shadow: 0 0 10px rgba(0, 224, 220, 0.3);
+}
+
+.setting-control select option {
+    background: var(--theme-bg-secondary, #2A2A2A);
+    color: var(--theme-text-primary, #FFFFFF);
+    padding: 8px;
+}
+
+.setting-hint {
+    color: var(--theme-text-muted, #808080);
+    font-size: 12px;
+    line-height: 1.4;
+    margin: 0;
+    padding: 0;
+}
+
+/* Information Section */
+.accessibility-info-section {
+    background: var(--theme-bg-secondary, #2A2A2A);
+    border: 1px solid var(--theme-border-primary, #404040);
+    border-left: 4px solid var(--theme-accent-secondary, #4CE2E1);
+    padding: 20px;
+    margin-top: 10px;
+}
+
+.accessibility-info-section h3 {
+    margin: 0 0 15px 0;
+    color: var(--theme-accent-secondary, #4CE2E1);
+    font-family: var(--theme-font-display, 'Orbitron', monospace);
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.accessibility-info-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.info-item {
+    color: var(--theme-text-secondary, #BFBFBF);
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.info-item strong {
+    color: var(--theme-text-primary, #FFFFFF);
+    font-weight: 600;
+}
+
+.info-item ul {
+    margin: 5px 0 0 15px;
+    padding: 0;
+}
+
+.info-item li {
+    margin-bottom: 3px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 500px) {
+    .setting-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .setting-control {
+        align-self: flex-end;
+    }
+}
+
+/* High contrast mode enhancements */
+@media (prefers-contrast: high) {
+    .accessibility-setting-group {
+        border-width: 2px;
+    }
+    
+    .checkbox-custom {
+        border-width: 3px;
+    }
+    
+    .setting-control select {
+        border-width: 3px;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .accessibility-setting-group,
+    .checkbox-custom,
+    .setting-control select {
+        transition: none;
+    }
+}
+</style> 

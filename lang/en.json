@@ -10,49 +10,34 @@
     "description": "Description"
   },
   "AVANT": {
-    "themeManager": {
-      "title": "Avant Theme Manager",
-      "description": "Choose and manage themes for your Avant character sheets. Upload custom JSON themes or select from built-in options.",
-      "upload": {
-        "title": "Upload Custom Theme",
-        "button": "Choose Theme File",
-        "hint": "Upload a .json theme file to add custom themes."
-      },
-      "available": {
-        "title": "Available Themes"
-      },
-      "builtin": "Built-in",
-      "custom": "Custom",
-      "active": "Active",
-      "by": "by",
-      "version": "Version",
-      "select": "Select",
-      "export": "Export",
-      "delete": "Delete",
-      "deleteTitle": "Delete Theme",
-      "deleteConfirm": "Are you sure you want to delete this theme? This action cannot be undone.",
-      "docs": {
-        "title": "Creating Custom Themes",
-        "intro": "Create your own themes by uploading JSON files with the following structure:",
-        "example": "Example Theme Structure",
-        "tips": {
-          "title": "Tips:",
-          "contrast": "Ensure sufficient contrast between text and background colors for readability",
-          "test": "Test your theme with different content to ensure it works well",
-          "backup": "Export themes to back them up before making changes",
-          "examples": "Use the example themes in the styles/themes/examples/ folder as templates"
-        }
-      }
+
+    "accessibilitySettings": {
+      "title": "Avant Accessibility Settings"
     },
     "settings": {
-      "selectedTheme": {
-        "name": "Selected Theme",
-        "hint": "Choose the active theme for Avant character sheets"
+
+      "accessibility": {
+        "autoContrast": {
+          "name": "Auto-Contrast",
+          "hint": "Automatically generate accessible text colors that meet WCAG AA standards for trait chips and UI elements"
+        },
+        "highContrast": {
+          "name": "High Contrast Mode",
+          "hint": "Enable high contrast mode for better visibility"
+        },
+        "reducedMotion": {
+          "name": "Reduced Motion",
+          "hint": "Respect your system's reduced motion preference to minimize animations"
+        },
+        "contrastLevel": {
+          "name": "Contrast Level",
+          "hint": "Choose WCAG compliance level for color contrast (AA for normal use, AAA for high accessibility needs)"
+        }
       },
-      "themeManager": {
-        "name": "Theme Manager",
-        "label": "Manage Themes",
-        "hint": "Switch themes and upload custom themes"
+      "accessibilitySettings": {
+        "name": "Accessibility Settings",
+        "label": "Configure Accessibility",
+        "hint": "Configure accessibility features for better usability"
       }
     }
   }

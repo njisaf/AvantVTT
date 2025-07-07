@@ -1,0 +1,439 @@
+/**
+ * @fileoverview Item Sheet Utils - Pure Functions
+ * @description Additional pure functions for item sheet operations without FoundryVTT dependencies
+ * @version 2.0.0
+ * @author Avant Development Team
+ */
+
+/**
+ * Prepares template data for item sheet rendering
+ * 
+ * This function takes an item object and prepares all the data needed for
+ * template rendering, including type-specific flags and CSS classes.
+ * It determines what type of item this is and sets appropriate display flags.
+ * 
+ * @param {Object} item - The item data object
+ * @param {string} item.name - The name of the item
+ * @param {string} item.type - The type of item (weapon, armor, feature, etc.)
+ * @param {Object} [item.system] - The system data for the item
+ * @param {Object} [item.flags] - The flags data for the item
+ * @returns {Object|null} Template data object or null if invalid item
+ * 
+ * @example
+ * // Weapon item
+ * const templateData = prepareTemplateData({
+ *     name: 'Iron Sword',
+ *     type: 'weapon',
+ *     system: { damage: '1d8' }
+ * });
+ * // Result: { item: {...}, isWeapon: true, cssClass: 'item-sheet weapon-sheet', ... }
+ */
+export function prepareTemplateData(item) {
+    if (!item || typeof item !== 'object') {
+        return null;
+    }
+    
+    const system = item.system || {};
+    const flags = item.flags || {};
+    const itemType = item.type || 'unknown';
+    
+    return {
+        item: item,
+        system: system,
+        flags: flags,
+        cssClass: `item-sheet ${itemType}-sheet`,
+        isWeapon: itemType === 'weapon',
+        isArmor: itemType === 'armor',
+        isFeature: itemType === 'feature',
+        isAction: itemType === 'action'
+    };
+}
+
+/**
+ * Validates if an item type is supported by the system
+ * 
+ * This function checks if the provided item type is one of the known
+ * item types supported by the Avant system. Used for validation
+ * before processing item operations.
+ * 
+ * @param {string} itemType - The item type to validate
+ * @returns {boolean} True if the item type is valid, false otherwise
+ * 
+ * @example
+ * // Valid types
+ * const isValid = validateItemType('weapon'); // true
+ * const isAlsoValid = validateItemType('armor'); // true
+ * 
+ * // Invalid types
+ * const isInvalid = validateItemType('unknown'); // false
+ * const isNull = validateItemType(null); // false
+ */
+export function validateItemType(itemType) {
+    if (typeof itemType !== 'string') {
+        return false;
+    }
+    
+    const validTypes = ['weapon', 'armor', 'feature', 'action', 'talent', 'augment'];
+    return validTypes.includes(itemType);
+}
+
+/**
+ * Validates that a template file exists for the given item type
+ * 
+ * This function provides development warnings when an item type
+ * is declared but lacks a corresponding template file. Helps catch
+ * configuration issues during development.
+ * 
+ * @param {string} itemType - The item type to check
+ * @param {string} templatePath - The expected template path
+ * @private
+ */
+function validateTemplateExists(itemType, templatePath) {
+    // Only validate in development environments (when console is available)
+    if (typeof console === 'undefined') {
+        return;
+    }
+    
+    // Skip validation in test environments
+    if (typeof global !== 'undefined' && global.process?.env?.NODE_ENV === 'test') {
+        return;
+    }
+    
+    // Create a cache to avoid repeated warnings for the same template
+    if (!validateTemplateExists._cache) {
+        validateTemplateExists._cache = new Set();
+    }
+    
+    const cacheKey = `${itemType}-${templatePath}`;
+    if (validateTemplateExists._cache.has(cacheKey)) {
+        return;
+    }
+    
+    validateTemplateExists._cache.add(cacheKey);
+    
+    // Log the template being used (informational)
+    console.debug(`ItemSheetConfig | Using template for ${itemType}: ${templatePath}`);
+    
+    // Note: We can't check file existence in browser environment,
+    // but we can provide helpful warnings about common issues
+    if (itemType === 'talent' && !templatePath.includes('talent')) {
+        console.warn(`ItemSheetConfig | Template path mismatch for talent items: ${templatePath}`);
+    }
+    
+    if (itemType === 'augment' && !templatePath.includes('augment')) {
+        console.warn(`ItemSheetConfig | Template path mismatch for augment items: ${templatePath}`);
+    }
+}
+
+/**
+ * Calculates the total weight of an item including quantity
+ * 
+ * This function takes an item and calculates its total weight by
+ * multiplying the base weight by the quantity. Handles missing
+ * values gracefully with sensible defaults.
+ * 
+ * @param {Object} item - The item data object
+ * @param {Object} [item.system] - The system data containing weight and quantity
+ * @param {number} [item.system.weight] - The base weight of one item
+ * @param {number} [item.system.quantity] - The quantity of items
+ * @returns {number} The total weight (weight * quantity)
+ * 
+ * @example
+ * // Single item
+ * const weight1 = calculateItemWeight({
+ *     system: { weight: 2.5, quantity: 1 }
+ * }); // 2.5
+ * 
+ * // Multiple items
+ * const weight2 = calculateItemWeight({
+ *     system: { weight: 1.5, quantity: 3 }
+ * }); // 4.5
+ */
+export function calculateItemWeight(item) {
+    if (!item || !item.system) {
+        return 0;
+    }
+    
+    const weight = Number(item.system.weight) || 0;
+    const quantity = Number(item.system.quantity) || 1;
+    
+    return weight * quantity;
+}
+
+/**
+ * Formats item information for display purposes
+ * 
+ * This function takes an item and creates formatted display information
+ * including appropriate details based on the item type. Used for creating
+ * consistent item display text across the interface.
+ * 
+ * @param {Object} item - The item data object
+ * @param {string} item.name - The name of the item
+ * @param {string} item.type - The type of item
+ * @param {Object} [item.system] - The system data for the item
+ * @returns {Object} Formatted display information
+ * 
+ * @example
+ * // Weapon formatting
+ * const display = formatItemDisplay({
+ *     name: 'Iron Sword',
+ *     type: 'weapon',
+ *     system: { damage: '1d8', damageType: 'slashing', ability: 'might' }
+ * });
+ * // Result: { displayText: 'Iron Sword (1d8 slashing, might)', ... }
+ */
+export function formatItemDisplay(item) {
+    if (!item) {
+        return { displayText: '' };
+    }
+    
+    const name = item.name || 'Unnamed Item';
+    const type = item.type || 'unknown';
+    const system = item.system || {};
+    
+    const result = {
+        name: name,
+        type: type,
+        displayText: name
+    };
+    
+    // Type-specific formatting
+    if (type === 'weapon') {
+        const damage = system.damage || '';
+        const damageType = system.damageType || '';
+        const ability = system.ability || '';
+        
+        const parts = [];
+        if (damage && damageType) {
+            result.damageInfo = `${damage} ${damageType}`;
+            parts.push(result.damageInfo);
+        } else if (damage) {
+            result.damageInfo = damage;
+            parts.push(damage);
+        }
+        
+        if (ability) {
+            result.abilityInfo = ability;
+            parts.push(ability);
+        }
+        
+        if (parts.length > 0) {
+            result.displayText = `${name} (${parts.join(', ')})`;
+        }
+    } else if (type === 'armor') {
+        const ac = system.ac;
+        const ability = system.ability || '';
+        
+        const parts = [];
+        if (ac !== undefined && ac !== null) {
+            result.acInfo = `AC +${ac}`;
+            parts.push(result.acInfo);
+        }
+        
+        if (ability) {
+            result.abilityInfo = ability;
+            parts.push(ability);
+        }
+        
+        if (parts.length > 0) {
+            result.displayText = `${name} (${parts.join(', ')})`;
+        }
+    } else if (type === 'feature') {
+        const category = system.category;
+        
+        if (category) {
+            result.categoryInfo = category;
+            result.displayText = `${name} (${category})`;
+        }
+    }
+    
+    return result;
+}
+
+/**
+ * Extracts and processes form data from item sheet submissions
+ * 
+ * This function takes flat form data (like "system.damage": "10") and converts
+ * it into nested objects with proper data type conversion. It handles array fields
+ * (those ending with []) by building arrays from multiple values.
+ * 
+ * @param {Object} formData - Flat form data object from form submission
+ * @returns {Object} Processed nested object with converted data types
+ * 
+ * @example
+ * // Input form data with array field
+ * const formData = {
+ *     'name': 'Iron Sword',
+ *     'system.traits[]': ['fire', 'sharp'],  // Array field
+ *     'system.weight': '3.5',
+ *     'system.equipped': 'true'
+ * };
+ * 
+ * // Processed result
+ * const result = extractItemFormData(formData);
+ * // Result: {
+ * //   name: 'Iron Sword',
+ * //   system: { traits: ['fire', 'sharp'], weight: 3.5, equipped: true }
+ * // }
+ */
+export function extractItemFormData(formData) {
+    if (!formData || typeof formData !== 'object') {
+        return {};
+    }
+    
+    const result = {};
+    const arrayFields = new Map(); // Track array fields separately
+    
+    // First pass: collect all values, identifying array fields
+    for (const [key, value] of Object.entries(formData)) {
+        // Check if this is an array field (ends with [])
+        const isArrayField = key.endsWith('[]');
+        const cleanKey = isArrayField ? key.slice(0, -2) : key; // Remove [] suffix
+        
+        if (isArrayField) {
+            // Handle array field
+            if (!arrayFields.has(cleanKey)) {
+                arrayFields.set(cleanKey, []);
+            }
+            // Support both single values and arrays from FormData
+            if (Array.isArray(value)) {
+                arrayFields.get(cleanKey).push(...value);
+            } else {
+                arrayFields.get(cleanKey).push(value);
+            }
+        } else {
+            // Handle regular field - split key into path segments
+            const segments = cleanKey.split('.');
+            
+            // Navigate/create the nested structure
+            let current = result;
+            for (let i = 0; i < segments.length - 1; i++) {
+                const segment = segments[i];
+                if (!current[segment]) {
+                    current[segment] = {};
+                }
+                current = current[segment];
+            }
+            
+            // Set the final value with type conversion
+            const finalKey = segments[segments.length - 1];
+            current[finalKey] = convertFormValue(value);
+        }
+    }
+    
+    // Second pass: process array fields
+    for (const [key, values] of arrayFields) {
+        const segments = key.split('.');
+        
+        // Navigate/create the nested structure
+        let current = result;
+        for (let i = 0; i < segments.length - 1; i++) {
+            const segment = segments[i];
+            if (!current[segment]) {
+                current[segment] = {};
+            }
+            current = current[segment];
+        }
+        
+        // Set the array value with type conversion for each element
+        const finalKey = segments[segments.length - 1];
+        current[finalKey] = values.map(value => convertFormValue(value));
+    }
+    
+    return result;
+}
+
+/**
+ * Creates sheet configuration for different item types
+ * 
+ * This function generates the configuration object used for item sheet
+ * initialization, including CSS classes, templates, dimensions, and
+ * other sheet-specific settings based on the item type.
+ * 
+ * @param {Object} item - The item data object
+ * @param {string} item.type - The type of item
+ * @param {string} item.name - The name of the item
+ * @returns {Object|null} Sheet configuration object or null if invalid item
+ * 
+ * @example
+ * // Weapon sheet config
+ * const config = createItemSheetConfig({
+ *     type: 'weapon',
+ *     name: 'Iron Sword'
+ * });
+ * // Result: {
+ * //   classes: ['avant', 'sheet', 'item', 'weapon'],
+ * //   template: 'systems/avant/templates/item/item-weapon-new.html',
+ * //   ...
+ * // }
+ */
+export function createItemSheetConfig(item) {
+    if (!item || typeof item !== 'object') {
+        return null;
+    }
+    
+    const itemType = item.type || 'unknown';
+    const itemName = item.name || 'Unnamed Item';
+    
+    const baseClasses = ['avant', 'sheet', 'item'];
+    const classes = [...baseClasses, itemType];
+    
+        // Determine template based on type
+    let template;
+    if (validateItemType(itemType)) {
+        template = `systems/avant/templates/item/item-${itemType}-new.html`;
+        
+        // Validate template exists (development warning)
+        if (typeof console !== 'undefined' && validateItemType(itemType)) {
+            validateTemplateExists(itemType, template);
+        }
+    } else {
+        template = 'systems/avant/templates/item/item-sheet.html';
+        console.warn(`ItemSheetConfig | Unknown item type "${itemType}" using fallback template`);
+    }
+
+    return {
+        classes: classes,
+        template: template,
+        width: 520,
+        height: 480,
+        tabs: [{
+            navSelector: '.sheet-tabs',
+            contentSelector: '.sheet-body',
+            initial: 'description'
+        }],
+        title: itemName,
+        itemType: itemType
+    };
+}
+
+/**
+ * Converts form values to appropriate types
+ * 
+ * This helper function determines the appropriate data type for a form value
+ * and converts it accordingly. Enhanced version with better type detection.
+ * 
+ * @param {string} value - The string value to convert
+ * @returns {number|boolean|string} The converted value
+ * @private
+ */
+function convertFormValue(value) {
+    if (typeof value !== 'string') {
+        return value;
+    }
+    
+    // Handle boolean values
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    
+    // Handle numeric values (including decimals)
+    if (/^-?\d+\.?\d*$/.test(value)) {
+        const num = Number(value);
+        if (!isNaN(num)) {
+            return num;
+        }
+    }
+    
+    // Return as string if no conversion applies
+    return value;
+} 

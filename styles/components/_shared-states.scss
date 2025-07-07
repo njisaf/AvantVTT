@@ -1,0 +1,134 @@
+/**
+ * Shared Component States
+ * @description Unified styling for common component states (spent, success, error, etc.)
+ * @version 2.0.0
+ * @author Avant Development Team
+ * 
+ * 🎓 LESSONS LEARNED FROM FEATURE CARD DEVELOPMENT:
+ * 
+ * 1. **Icon Consistency Crisis**: Originally had double icons showing because we mixed 
+ *    CSS ::before pseudo-elements with HTML <i> elements. The solution was to pick 
+ *    ONE approach (HTML <i> elements) and stick with it across ALL code paths.
+ * 
+ * 2. **HTML Structure Must Be Identical**: When multiple JavaScript files generate 
+ *    the same UI elements, they MUST produce identical HTML. Even small differences 
+ *    cause visual inconsistencies that users notice immediately.
+ * 
+ * 3. **SCSS DRY Principle**: We had 3 different spent state implementations before 
+ *    consolidation. This mixin eliminates ~80 lines of duplicate code and ensures 
+ *    any future changes only need to be made in ONE place.
+ * 
+ * 4. **Theme Integration Magic**: The theme system just works! User didn't even apply 
+ *    themes manually - proper CSS variables (--theme-success) automatically adapt 
+ *    to dark/light themes without extra effort.
+ * 
+ * 5. **FontAwesome v13 Compatibility**: FoundryVTT v13 needs specific font stacks 
+ *    for FontAwesome to render correctly. The font-family declaration here is crucial.
+ * 
+ * 6. **Future Feature Card Development**: This pattern should be used for ANY shared 
+ *    states (error, warning, loading, disabled, etc.). Feature cards will be central 
+ *    to the system going forward.
+ */
+
+// =============================================================================
+// SPENT STATE MIXIN - Unified styling for all spent/success states
+// 🔧 MAINTENANCE NOTE: This single mixin replaced 3 different implementations
+// and ~80 lines of duplicate code. Future state styling should follow this pattern.
+// =============================================================================
+
+@mixin spent-state {
+  // Layout
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs, 4px);
+  padding: 6px 12px;
+  
+  // Styling - Success green theme (using proper FoundryVTT theme variables)
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid var(--theme-success, #22c55e);
+  border-radius: var(--border-radius-sm, 4px);
+  color: var(--theme-success, #22c55e);
+  
+  // Typography - Using FoundryVTT theme variables
+  font-family: var(--theme-font-display, 'Orbitron', monospace);
+  font-size: var(--font-size-xs, 10px);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  
+  // Remove button-specific styling when spent
+  cursor: default;
+  transform: none;
+  box-shadow: none;
+  transition: none;
+  
+  // Success icon styling for <i> element
+  i {
+    color: var(--theme-success, #22c55e);
+    font-size: var(--font-size-xs, 10px);
+    margin-right: var(--space-xs, 4px);
+    font-family: 'Font Awesome 6 Free', 'Font Awesome 6 Pro', 'Font Awesome 5 Free', 'FontAwesome';
+    font-weight: 900;
+    font-style: normal;
+    display: inline-block;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  // Hover state - No changes when spent
+  &:hover {
+    background: rgba(34, 197, 94, 0.1);
+    border-color: var(--theme-success, #22c55e);
+    color: var(--theme-success, #22c55e);
+    transform: none;
+    box-shadow: none;
+    cursor: default;
+    
+    i {
+      color: var(--theme-success, #22c55e);
+    }
+  }
+  
+  // Accessibility: High contrast mode support
+  @media (prefers-contrast: high) {
+    border-width: 2px;
+    font-weight: 600;
+    background: var(--theme-success, #22c55e);
+    color: var(--theme-bg-primary, #000);
+    
+    i {
+      color: var(--theme-bg-primary, #000);
+    }
+  }
+  
+
+}
+
+// =============================================================================
+// UTILITY CLASSES - Apply the mixin to common classes
+// =============================================================================
+
+// All spent states use the same styling
+.pp-spent-confirmation,
+.pp-spend.spent,
+.pp-spend-btn.spent {
+  @include spent-state;
+}
+
+// Override any conflicting properties for buttons
+.pp-spend.spent,
+.pp-spend-btn.spent {
+  // Remove button-specific dimensions
+  min-height: auto;
+  width: auto;
+  
+  // Remove button-specific spacing/effects
+  margin: 0;
+  outline: none;
+  
+  // Disable button interactions
+  pointer-events: none;
+  user-select: none;
+} 
