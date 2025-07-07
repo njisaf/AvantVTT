@@ -17,7 +17,6 @@
     "compile-scss": "sass styles/avant.scss styles/avant.css --style=expanded",
     "dev": "vite build --watch",
     "watch-scss": "sass --watch styles/avant.scss styles/avant.css --style=expanded",
-
     "traits:export": "node --experimental-loader ts-node/esm scripts/cli/traits.ts export",
     "traits:import": "node --experimental-loader ts-node/esm scripts/cli/traits.ts import",
     "traits:sync": "node --experimental-loader ts-node/esm scripts/cli/traits.ts sync",
