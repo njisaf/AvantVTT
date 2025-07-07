@@ -1408,10 +1408,67 @@ export function createAvantActorSheet() {
          * @returns Promise<void>
          */
         static async _handleFormSubmission(event: Event, form: HTMLFormElement, formData: any): Promise<void> {
-            const sheet = (form.closest('.app') as any)?.app as AvantActorSheet;
-            if (sheet) {
-                return sheet._onSubmitForm(event, form, formData);
+            // Try multiple methods to find the sheet instance
+            let sheet: AvantActorSheet | null = null;
+            
+            // Method 1: Try the ApplicationV2 way (closest .app element)
+            const appElement = form.closest('.app') as any;
+            if (appElement?.app) {
+                sheet = appElement.app as AvantActorSheet;
             }
+            
+            // Method 2: Try finding via the form's data attributes
+            if (!sheet && form.dataset.actorId) {
+                const game = (globalThis as any).game;
+                const actor = game?.actors?.get(form.dataset.actorId);
+                if (actor?.sheet) {
+                    sheet = actor.sheet as AvantActorSheet;
+                }
+            }
+            
+            // Method 3: Try finding via the window applications registry
+            if (!sheet && form.closest('.window-app')) {
+                const windowElement = form.closest('.window-app') as any;
+                const appId = windowElement?.dataset?.appid;
+                if (appId) {
+                    const game = (globalThis as any).game;
+                    const app = Object.values(game?.applications || {}).find((app: any) => app.appId === appId);
+                    if (app instanceof AvantActorSheet) {
+                        sheet = app;
+                    }
+                }
+            }
+            
+            // If we found a sheet, use it; otherwise handle gracefully
+            if (sheet && sheet._onSubmitForm) {
+                try {
+                    return await sheet._onSubmitForm(event, form, formData);
+                } catch (error) {
+                    logger.error('AvantActorSheet | Form submission error:', error);
+                    // Don't throw - let the form submission continue with default behavior
+                }
+            }
+            
+            // Fallback: Handle the form data directly if no sheet found
+            if (formData?.object) {
+                try {
+                    // Extract actor ID from form or event target
+                    const actorId = form.dataset.actorId || 
+                                  (event.target as HTMLElement)?.closest('[data-actor-id]')?.getAttribute('data-actor-id');
+                    
+                    if (actorId) {
+                        const game = (globalThis as any).game;
+                        const actor = game?.actors?.get(actorId);
+                        if (actor) {
+                            await actor.update(formData.object);
+                            return;
+                        }
+                    }
+                } catch (error) {
+                    logger.error('AvantActorSheet | Fallback form submission error:', error);
+                }
+            }
+            
             return Promise.resolve();
         }
 
@@ -1422,13 +1479,35 @@ export function createAvantActorSheet() {
          * @param formData - The form data
          */
         async _onSubmitForm(event: Event, form: HTMLFormElement, formData: any): Promise<void> {
-            if (!this.document) return;
+            if (!this.document) {
+                logger.warn('AvantActorSheet | No document available for form submission');
+                return;
+            }
 
             try {
+                // Validate formData before processing
+                if (!formData || !formData.object) {
+                    logger.warn('AvantActorSheet | No form data to process');
+                    return;
+                }
+
                 // Process and update the actor with the form data
                 await this.document.update(formData.object);
+                
+                // Log successful update for debugging
+                logger.debug('AvantActorSheet | Actor updated successfully:', this.document.name);
+                
             } catch (error) {
-                console.error('AvantActorSheet | Form submission failed:', error);
+                logger.error('AvantActorSheet | Form submission failed:', error);
+                
+                // Show user-friendly error message
+                const ui = (globalThis as any).ui;
+                if (ui?.notifications) {
+                    ui.notifications.error('Failed to save character data. Please try again.');
+                }
+                
+                // Re-throw to ensure proper error handling upstream
+                throw error;
             }
         }
 
