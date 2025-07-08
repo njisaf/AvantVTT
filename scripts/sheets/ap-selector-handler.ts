@@ -26,7 +26,7 @@ const updateTimers = new WeakMap<HTMLElement, number>();
  */
 export function initializeApSelector(html: HTMLElement, updateCallback?: (apCost: number) => void): void {
     const apSelectors = html.querySelectorAll('.ap-selector');
-    
+
     apSelectors.forEach(selector => {
         const selectorElement = selector as HTMLElement;
         setupApSelector(selectorElement, updateCallback);
@@ -45,13 +45,13 @@ export function initializeApSelector(html: HTMLElement, updateCallback?: (apCost
  */
 function setupApSelector(selector: HTMLElement, updateCallback?: (apCost: number) => void): void {
     const hiddenInput = selector.querySelector('input[type="hidden"]') as HTMLInputElement;
-    const apIcons = selector.querySelectorAll('.ap-icon') as NodeListOf<HTMLButtonElement>;
-    
+    const apIcons = selector.querySelectorAll('.ap-selector__icon') as NodeListOf<HTMLButtonElement>;
+
     if (!hiddenInput || !apIcons.length) {
         console.warn('AP selector missing required elements');
         return;
     }
-    
+
     // Get initial AP cost value
     const initialApCost = validateApCost(hiddenInput.value);
     console.debug('AP Selector Setup:', {
@@ -60,25 +60,25 @@ function setupApSelector(selector: HTMLElement, updateCallback?: (apCost: number
         apIconsCount: apIcons.length,
         selectorDataApCost: selector.getAttribute('data-ap-cost')
     });
-    
+
     // Update visual state to match initial value
     updateApSelectorVisual(selector, initialApCost);
-    
+
     // Add click handlers to each AP icon with progressive toggle behavior
     apIcons.forEach((icon, index) => {
         icon.addEventListener('click', (event) => {
             event.preventDefault();
             event.stopPropagation();
-            
+
             const clickedApValue = parseInt(icon.dataset.apValue || '1', 10);
             const currentApCost = validateApCost(hiddenInput.value);
-            
+
             console.debug('AP Icon Clicked:', {
                 clickedApValue: clickedApValue,
                 currentApCost: currentApCost,
                 iconIndex: index
             });
-            
+
             // Progressive toggle behavior:
             // - If current AP cost equals the clicked button value, reduce to previous level
             // - Otherwise, set to the clicked button value
@@ -90,25 +90,25 @@ function setupApSelector(selector: HTMLElement, updateCallback?: (apCost: number
                 // Set to clicked value (this will light up all buttons up to this level)
                 newApCost = clickedApValue;
             }
-            
+
             const validatedApCost = validateApCost(newApCost);
-            
+
             console.debug('AP Cost Change:', {
                 oldValue: currentApCost,
                 newValue: validatedApCost,
                 action: currentApCost === clickedApValue ? 'toggle-off' : 'set-value'
             });
-            
+
             // Update hidden input immediately for UI responsiveness
             hiddenInput.value = validatedApCost.toString();
-            
+
             // Update visual state immediately for instant feedback
             updateApSelectorVisual(selector, validatedApCost);
-            
+
             // Use debounced update to prevent excessive database writes and re-renders
             debouncedUpdate(selector, validatedApCost, updateCallback);
         });
-        
+
         // Add keyboard support
         icon.addEventListener('keydown', (event) => {
             if (event.key === 'Enter' || event.key === ' ') {
@@ -135,17 +135,17 @@ function debouncedUpdate(selector: HTMLElement, apCost: number, updateCallback?:
     if (existingTimer) {
         clearTimeout(existingTimer);
     }
-    
+
     // Set a new timer for 300ms delay
     const newTimer = window.setTimeout(() => {
         updateTimers.delete(selector);
-        
+
         // Call updateCallback if provided - this handles the actual document update
         if (updateCallback) {
             updateCallback(apCost);
         }
     }, 300); // 300ms debounce
-    
+
     updateTimers.set(selector, newTimer);
 }
 
@@ -161,8 +161,8 @@ function debouncedUpdate(selector: HTMLElement, apCost: number, updateCallback?:
  */
 function updateApSelectorVisual(selector: HTMLElement, apCost: number): void {
     const validatedCost = validateApCost(apCost);
-    const apIcons = selector.querySelectorAll('.ap-icon') as NodeListOf<HTMLElement>;
-    
+    const apIcons = selector.querySelectorAll('.ap-selector__icon') as NodeListOf<HTMLElement>;
+
     // Only log in debug mode to reduce console spam
     if (console.debug) {
         console.debug('Updating AP Selector Visual:', {
@@ -171,27 +171,27 @@ function updateApSelectorVisual(selector: HTMLElement, apCost: number): void {
             iconsFound: apIcons.length
         });
     }
-    
+
     // Update selector data attribute
     selector.setAttribute('data-ap-cost', validatedCost.toString());
-    
+
     // Update aria label
     const ariaLabel = `Action Point cost: ${validatedCost}`;
     selector.setAttribute('aria-label', ariaLabel);
-    
+
     // Update each icon's visual state - progressive filling
     // Optimized to minimize class manipulation
     apIcons.forEach((icon, index) => {
         const apValue = parseInt(icon.dataset.apValue || '1', 10);
         const shouldBeFilled = apValue <= validatedCost;
         const isSelected = apValue === validatedCost && validatedCost > 0;
-        
+
         // Get current classes
         const classList = icon.classList;
         const hadFilled = classList.contains('ap-icon--filled');
         const hadEmpty = classList.contains('ap-icon--empty');
         const hadSelected = classList.contains('ap-icon--selected');
-        
+
         // Only update classes if they actually need to change
         if (shouldBeFilled && !hadFilled) {
             classList.remove('ap-icon--empty');
@@ -200,18 +200,18 @@ function updateApSelectorVisual(selector: HTMLElement, apCost: number): void {
             classList.remove('ap-icon--filled', 'ap-icon--selected');
             classList.add('ap-icon--empty');
         }
-        
+
         // Handle selected state
         if (isSelected && !hadSelected) {
             classList.add('ap-icon--selected');
         } else if (!isSelected && hadSelected) {
             classList.remove('ap-icon--selected');
         }
-        
+
         // Update aria state only if changed
         const newPressed = shouldBeFilled.toString();
         const newChecked = isSelected.toString();
-        
+
         if (icon.getAttribute('aria-pressed') !== newPressed) {
             icon.setAttribute('aria-pressed', newPressed);
         }
@@ -231,11 +231,11 @@ function updateApSelectorVisual(selector: HTMLElement, apCost: number): void {
  */
 export function getApSelectorValue(selector: HTMLElement): number {
     const hiddenInput = selector.querySelector('input[type="hidden"]') as HTMLInputElement;
-    
+
     if (!hiddenInput) {
         return 0;
     }
-    
+
     return validateApCost(hiddenInput.value);
 }
 
@@ -249,16 +249,16 @@ export function getApSelectorValue(selector: HTMLElement): number {
  */
 export function setApSelectorValue(selector: HTMLElement, apCost: number): void {
     const hiddenInput = selector.querySelector('input[type="hidden"]') as HTMLInputElement;
-    
+
     if (!hiddenInput) {
         console.warn('Cannot set AP selector value: hidden input not found');
         return;
     }
-    
+
     const validatedCost = validateApCost(apCost);
     hiddenInput.value = validatedCost.toString();
     updateApSelectorVisual(selector, validatedCost);
-    
+
     // Trigger change event
     hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
 }
@@ -272,7 +272,7 @@ export function setApSelectorValue(selector: HTMLElement, apCost: number): void 
  */
 export function resetApSelectors(form: HTMLElement): void {
     const apSelectors = form.querySelectorAll('.ap-selector') as NodeListOf<HTMLElement>;
-    
+
     apSelectors.forEach(selector => {
         setApSelectorValue(selector, 0);
     });
@@ -290,15 +290,15 @@ export function resetApSelectors(form: HTMLElement): void {
 export function validateApSelectors(form: HTMLElement): string[] {
     const errors: string[] = [];
     const apSelectors = form.querySelectorAll('.ap-selector') as NodeListOf<HTMLElement>;
-    
+
     apSelectors.forEach((selector, index) => {
         const apCost = getApSelectorValue(selector);
-        
+
         // Check if AP cost is within valid range (0-3)
         if (apCost < 0 || apCost > 3) {
             errors.push(`AP selector ${index + 1}: Invalid AP cost ${apCost} (must be 0-3)`);
         }
     });
-    
+
     return errors;
 } 
