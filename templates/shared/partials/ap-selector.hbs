@@ -1,53 +1,54 @@
-{{!-- 
-  AP Selector Component
-  
-  Usage:
-    {{> "systems/avant/templates/shared/partials/ap-selector" 
-        name="system.apCost"
-        value=system.apCost
-        label="AP"
-        hint="Action Point cost for this ability"
-        max=3
-        class="custom-class"
-    }}
-  
-  Required: name
-  Optional: value, label (defaults to "AP"), hint, max (defaults to 3), class
+{{!--
+AP Selector Component - Universal Item Sheet Architecture
+
+Provides visual clickable dots for setting Action Point costs (1-3).
+Part of the Stage 2 universal item sheet refactor.
+
+Usage:
+{{> "systems/avant/templates/shared/partials/ap-selector"
+name="system.apCost"
+value=system.apCost
+label="AP"
+hint="Action Point cost for this ability"
+max=3
+class="custom-class"
+}}
+
+Required: name
+Optional: value, label (defaults to "AP"), hint, max (defaults to 3), class
+
+CRITICAL IMPLEMENTATION NOTE (January 2025):
+Uses 'avantOr' helper instead of 'or' to avoid FoundryVTT v13 helper conflicts.
+FoundryVTT's built-in 'or' helper returns boolean values, breaking the math.
+Our 'avantOr' helper returns actual values needed for range calculations.
 --}}
 
 <div class="form-group form-group--ap-selector {{#if class}}{{class}}{{/if}}">
-    <div class="ap-selector" 
-         data-ap-cost="{{value}}" 
-         role="radiogroup" 
-         aria-label="{{#if label}}{{label}}{{else}}AP{{/if}} cost: {{#if value}}{{value}}{{else}}0{{/if}}"
-         {{#if hint}}aria-describedby="{{name}}-hint"{{/if}}>
-        
+    <div class="ap-selector" data-ap-cost="{{value}}" role="radiogroup"
+        aria-label="{{#if label}}{{label}}{{else}}AP{{/if}} cost: {{#if value}}{{value}}{{else}}0{{/if}}" {{#if
+        hint}}aria-describedby="{{name}}-hint" {{/if}}>
+
         <label class="ap-selector__label form-label">
             {{#if label}}{{label}}{{else}}AP{{/if}}
         </label>
-        
+
         <div class="ap-selector__icons">
-            {{#each (range 1 (add (or max 3) 1)) as |apValue|}}
-                <button type="button" 
-                        class="ap-selector__icon" 
-                        data-ap-value="{{apValue}}" 
-                        title="Set {{#if ../label}}{{../label}}{{else}}AP{{/if}} cost to {{apValue}}" 
-                        aria-label="Set Action Point cost to {{apValue}}" 
-                        role="radio"
-                        {{#if (eq ../value apValue)}}aria-checked="true"{{else}}aria-checked="false"{{/if}}
-                        tabindex="{{#if (eq ../value apValue)}}0{{else}}-1{{/if}}">
-                    <i class="fas fa-circle" aria-hidden="true"></i>
-                </button>
+            {{!-- Generate clickable dots using avantOr helper for FoundryVTT compatibility --}}
+            {{#each (range 1 (add (avantOr max 3) 1)) as |apValue|}}
+            <button type="button" class="ap-selector__icon" data-ap-value="{{apValue}}"
+                title="Set {{#if ../label}}{{../label}}{{else}}AP{{/if}} cost to {{apValue}}"
+                aria-label="Set Action Point cost to {{apValue}}" role="radio" {{#if (eq ../value
+                apValue)}}aria-checked="true" {{else}}aria-checked="false" {{/if}}
+                tabindex="{{#if (eq ../value apValue)}}0{{else}}-1{{/if}}">
+                <i class="fas fa-circle" aria-hidden="true"></i>
+            </button>
             {{/each}}
         </div>
-        
-        <input type="hidden" 
-               name="{{name}}" 
-               value="{{#if value}}{{value}}{{else}}0{{/if}}" 
-               data-dtype="Number">
+
+        <input type="hidden" name="{{name}}" value="{{#if value}}{{value}}{{else}}0{{/if}}" data-dtype="Number">
     </div>
-    
+
     {{#if hint}}
-        <div id="{{name}}-hint" class="form-hint" role="note">{{hint}}</div>
+    <div id="{{name}}-hint" class="form-hint" role="note">{{hint}}</div>
     {{/if}}
-</div> 
+</div>

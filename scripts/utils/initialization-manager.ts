@@ -619,6 +619,11 @@ export class FoundryInitializationHelper {
                 "systems/avant/templates/shared/partials/traits-field.hbs",
                 "systems/avant/templates/shared/partials/item-header.hbs",
 
+                // Stage 2 Universal Item Sheet Partials - NEW shared header and body architecture
+                "systems/avant/templates/shared/partials/avant-item-header.hbs",  // Universal header with icon + name + meta fields
+                "systems/avant/templates/shared/partials/item-body.hbs",          // Universal body with organized field rows
+                "systems/avant/templates/shared/partials/render-field.hbs",       // Field renderer for all field types
+
                 // Phase 5 Additional Components
                 "systems/avant/templates/shared/partials/category-select.hbs",
                 "systems/avant/templates/shared/partials/uses-counter.hbs",

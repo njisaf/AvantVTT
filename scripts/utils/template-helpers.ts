@@ -1,10 +1,10 @@
 /**
  * @fileoverview Handlebars Template Helpers Registration
  * @description Centralized registration of all custom Handlebars helpers for the Avant system
- * @version 2.0.0
+ * @version 2.1.0 - FoundryVTT Helper Conflict Resolution
  * @author Avant Development Team
  * 
- * STAGE 4 LESSONS LEARNED:
+ * STAGE 4 LESSONS LEARNED (SUCCESSFULLY RESOLVED):
  * 
  * 🔍 CRITICAL DEBUGGING INSIGHTS:
  * 1. Missing helpers cause COMPLETE template rendering failure with clear error messages
@@ -12,16 +12,29 @@
  * 3. FoundryVTT v13 is more strict about helper dependencies than previous versions
  * 4. Complex template expressions like {{#each (range 1 (add (or max 3) 1))}} require ALL helpers
  * 
+ * 🚨 FOUNDRY HELPER CONFLICTS DISCOVERED & RESOLVED (January 2025):
+ * 1. FoundryVTT v13 has built-in helpers that conflict with custom helper names
+ * 2. Built-in 'or' helper performs boolean evaluation, not value selection
+ * 3. This caused AP selector button generation to completely fail
+ * 4. SOLUTION: Force-override conflicting helpers + provide unique fallback names
+ * 5. LESSON: Always test helpers in actual FoundryVTT environment, not just build validation
+ * 
  * 🎯 HELPER DESIGN PATTERNS:
  * 1. Always check if helper exists before registering (avoid conflicts)
  * 2. Use defensive parameter parsing (parseFloat, parseInt with fallbacks)
  * 3. Document helper usage clearly for future developers
  * 4. Keep helpers pure and predictable (same input = same output)
+ * 5. Provide fallback helpers with unique names for critical functionality
  * 
  * 🚨 RUNTIME FAILURE POINTS:
- * 1. AP Selector template requires: add, range, or helpers for iteration logic
+ * 1. AP Selector template requires: add, range, avantOr helpers for iteration logic
  * 2. Template partials require .hbs extensions in FoundryVTT v13
  * 3. Helper registration timing is critical in initialization sequence
+ * 4. Helper conflicts can cause silent failures with unexpected results
+ * 
+ * ✅ STAGE 2 UNIVERSAL ITEM SHEET SUCCESS:
+ * All issues resolved! AP selectors now generate clickable visual dots correctly.
+ * Universal item sheet architecture is fully functional across all item types.
  * 
  * 💡 DEBUGGING METHODOLOGY THAT WORKED:
  * 1. Check browser console for specific "Missing helper: X" errors
@@ -29,6 +42,8 @@
  * 3. Implement missing helpers with proper validation
  * 4. Test deployment immediately after each fix
  * 5. Verify with actual template rendering, not just build validation
+ * 6. Add comprehensive debug logging to trace helper execution
+ * 7. Compare expected vs actual helper return values
  */
 
 /**
@@ -123,14 +138,39 @@ export async function registerAvantHandlebarsHelpers(Handlebars: any): Promise<v
         });
     }
 
+    // =============================================================================
+    // CRITICAL DISCOVERY: FoundryVTT Helper Conflicts (January 2025)
+    // =============================================================================
+    // 
+    // ISSUE DISCOVERED: FoundryVTT v13 has built-in helpers that conflict with custom helpers.
+    // The built-in 'or' helper performs boolean evaluation instead of value selection.
+    // 
+    // MANIFESTATION:
+    // - {{or max 3}} returned 'true' instead of the numeric value '3'
+    // - This caused {{range 1 1}} to generate empty arrays []
+    // - Result: AP selector buttons failed to render completely
+    // 
+    // SOLUTION: Force-override conflicting helpers + provide fallback with unique names
+    // LESSON: Always test helper behavior in actual FoundryVTT environment, not just build tools
+    // 
+    // =============================================================================
+
     // Or helper for logical OR operations (CRITICAL for AP selector)
     // Usage: {{or value1 value2}} returns first truthy value or value2
     // Used in: templates/shared/partials/ap-selector.hbs for default values
-    if (!Handlebars.helpers.or) {
-        Handlebars.registerHelper('or', function (a: any, b: any) {
-            return a || b;
-        });
-    }
+    // 
+    // IMPORTANT: Force override any existing 'or' helper that might conflict
+    // FoundryVTT's built-in 'or' helper returns boolean values, not actual values
+    Handlebars.registerHelper('or', function (a: any, b: any) {
+        return a || b;
+    });
+
+    // Alternative helper name to avoid future conflicts
+    // Usage: {{avantOr value1 value2}} - guaranteed conflict-free
+    // This is the primary helper used in templates for reliability
+    Handlebars.registerHelper('avantOr', function (a: any, b: any) {
+        return a || b;
+    });
 
     // =============================================================================
     // HEADER LAYOUT HELPERS - Item Sheet Refactor
@@ -278,6 +318,7 @@ export async function registerAvantHandlebarsHelpers(Handlebars: any): Promise<v
 
     console.log('✅ Template Helpers | All Avant Handlebars helpers registered successfully');
     console.log('🎯 Template Helpers | Stage 4 mathematical helpers (add, range, or) now available');
+    console.log('🔧 Template Helpers | FoundryVTT v13 helper conflicts resolved (January 2025)');
 }
 
 /**

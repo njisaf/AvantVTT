@@ -37,7 +37,7 @@
 
 import { ValidationUtils } from '../utils/validation.js';
 import { executeRoll, processFormData } from '../logic/item-sheet.js';
-import { prepareTemplateData, extractItemFormData } from '../logic/item-sheet-utils.js';
+import { prepareTemplateData, extractItemFormData, prepareItemHeaderMetaFields, prepareItemBodyFields } from '../logic/item-sheet-utils.js';
 import { logger } from '../utils/logger.js';
 import { initializeApSelector } from './ap-selector-handler';
 
@@ -471,15 +471,23 @@ export function createAvantItemSheet() {
 
             // Prepare metaFields for consistent header layout
             try {
-                const { prepareItemHeaderMetaFields } = await import('../logic/item-sheet-utils');
                 context.metaFields = prepareItemHeaderMetaFields(itemData, context.system);
                 logger.debug('AvantItemSheet | MetaFields prepared:', {
                     itemType: itemData.type,
                     fieldCount: context.metaFields.length
                 });
+
+                // Prepare bodyFields for consistent body layout (Stage 2 Universal Architecture)
+                context.bodyFields = prepareItemBodyFields(itemData, context.system);
+                logger.debug('AvantItemSheet | BodyFields prepared:', {
+                    itemType: itemData.type,
+                    fieldCount: context.bodyFields.length,
+                    fieldTypes: context.bodyFields.map((field: any) => field.type)
+                });
             } catch (error) {
-                logger.warn('AvantItemSheet | Failed to prepare metaFields:', error);
+                logger.warn('AvantItemSheet | Failed to prepare fields:', error);
                 context.metaFields = [];
+                context.bodyFields = [];
             }
 
             // Ensure traits array exists
