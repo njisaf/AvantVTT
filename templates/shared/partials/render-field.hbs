@@ -17,6 +17,7 @@ Supported field types:
 - number: number input
 - select: dropdown selection
 - checkbox: checkbox input
+- ap-selector: action point selector with visual dots
 - uses-counter: current/max counter
 - traits: trait chip input
 --}}
@@ -86,6 +87,16 @@ name=field.name
 checked=field.checked
 label=field.label
 hint=field.hint
+class=field.class}}
+
+{{else if (eq field.type "ap-selector")}}
+{{!-- Action Point selector with visual dots --}}
+{{> "systems/avant/templates/shared/partials/ap-selector.hbs"
+name=field.name
+value=field.value
+label=field.label
+hint=field.hint
+max=field.max
 class=field.class}}
 
 {{else if (eq field.type "uses-counter")}}
