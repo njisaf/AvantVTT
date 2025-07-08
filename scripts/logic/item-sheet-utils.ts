@@ -78,14 +78,14 @@ export interface ItemSheetConfig {
 
 /**
  * Prepares template data for item sheet rendering
- * 
+ *
  * This function takes an item object and prepares all the data needed for
  * template rendering, including type-specific flags and CSS classes.
  * It determines what type of item this is and sets appropriate display flags.
- * 
+ *
  * @param item - The item data object
  * @returns Template data object or null if invalid item
- * 
+ *
  * @example
  * ```typescript
  * // Weapon item
@@ -121,20 +121,20 @@ export function prepareTemplateData(item: unknown): ItemTemplateData | null {
 
 /**
  * Validates if an item type is supported by the system
- * 
+ *
  * This function checks if the provided item type is one of the known
  * item types supported by the Avant system. Used for validation
  * before processing item operations.
- * 
+ *
  * @param itemType - The item type to validate
  * @returns True if the item type is valid, false otherwise
- * 
+ *
  * @example
  * ```typescript
  * // Valid types
  * const isValid = validateItemType('weapon'); // true
  * const isAlsoValid = validateItemType('armor'); // true
- * 
+ *
  * // Invalid types
  * const isInvalid = validateItemType('unknown'); // false
  * const isNull = validateItemType(null); // false
@@ -151,21 +151,21 @@ export function validateItemType(itemType: unknown): boolean {
 
 /**
  * Calculates the total weight of an item including quantity
- * 
+ *
  * This function takes an item and calculates its total weight by
  * multiplying the base weight by the quantity. Handles missing
  * values gracefully with sensible defaults.
- * 
+ *
  * @param item - The item data object
  * @returns The total weight (weight * quantity)
- * 
+ *
  * @example
  * ```typescript
  * // Single item
  * const weight1 = calculateItemWeight({
  *     system: { weight: 2.5, quantity: 1 }
  * }); // 2.5
- * 
+ *
  * // Multiple items
  * const weight2 = calculateItemWeight({
  *     system: { weight: 1.5, quantity: 3 }
@@ -190,14 +190,14 @@ export function calculateItemWeight(item: unknown): number {
 
 /**
  * Formats item information for display purposes
- * 
+ *
  * This function takes an item and creates formatted display information
  * including appropriate details based on the item type. Used for creating
  * consistent item display text across the interface.
- * 
+ *
  * @param item - The item data object
  * @returns Formatted display information
- * 
+ *
  * @example
  * ```typescript
  * // Weapon formatting
@@ -280,14 +280,14 @@ export function formatItemDisplay(item: unknown): ItemDisplayInfo {
 
 /**
  * Extracts and processes form data from item sheet submissions
- * 
+ *
  * This function takes flat form data (like "system.damage": "10") and converts
  * it into nested objects with proper data type conversion. It handles array fields
  * (those ending with []) by building arrays from multiple values.
- * 
+ *
  * @param formData - Flat form data object from form submission
  * @returns Processed nested object with converted data types
- * 
+ *
  * @example
  * ```typescript
  * // Input form data with array field
@@ -297,7 +297,7 @@ export function formatItemDisplay(item: unknown): ItemDisplayInfo {
  *     'system.weight': '3.5',
  *     'system.equipped': 'true'
  * };
- * 
+ *
  * // Processed result
  * const result = extractItemFormData(formData);
  * // Result: {
@@ -376,14 +376,14 @@ export function extractItemFormData(formData: unknown): Record<string, unknown> 
 
 /**
  * Creates sheet configuration for different item types
- * 
+ *
  * This function generates the configuration object used for item sheet
  * initialization, including CSS classes, templates, dimensions, and
  * other sheet-specific settings based on the item type.
- * 
+ *
  * @param item - The item data object
  * @returns Sheet configuration object or null if invalid item
- * 
+ *
  * @example
  * ```typescript
  * // Weapon sheet config
@@ -435,10 +435,10 @@ export function createItemSheetConfig(item: unknown): ItemSheetConfig | null {
 
 /**
  * Converts form values to appropriate types
- * 
+ *
  * This helper function determines the appropriate data type for a form value
  * and converts it accordingly. Enhanced version with better type detection.
- * 
+ *
  * @param value - The string value to convert
  * @returns The converted value
  */
@@ -465,10 +465,10 @@ function convertFormValue(value: unknown): number | boolean | string {
 
 /**
  * Prepare meta fields for item sheet headers
- * 
+ *
  * This function organizes all header fields (except icon and name) into a standardized
  * array that can be chunked into rows for consistent header layouts across all item types.
- * 
+ *
  * @param item - The item data
  * @param system - The item's system data
  * @returns Array of field objects for header display
@@ -644,11 +644,11 @@ export function prepareItemHeaderMetaFields(item: any, system: any): any[] {
 
 /**
  * Prepare body fields for item sheet body content
- * 
+ *
  * This function organizes all body content (description, traits, stats, etc.) into
  * a structured array that can be rendered consistently across all item types.
  * Fields are grouped logically and can be chunked into rows for layout.
- * 
+ *
  * @param item - The item data
  * @param system - The item's system data
  * @returns Array of field objects for body content
@@ -656,7 +656,175 @@ export function prepareItemHeaderMetaFields(item: any, system: any): any[] {
 export function prepareItemBodyFields(item: any, system: any): any[] {
     const bodyFields: any[] = [];
 
-    // Always include description field first for all item types
+    // Add meta fields that were moved from header to body (Stage 2 Universal Architecture)
+    // These appear first in the body, right after header
+    switch (item.type) {
+        case 'talent':
+            if (system.apCost !== undefined) {
+                bodyFields.push({
+                    type: 'ap-selector',
+                    name: 'system.apCost',
+                    value: system.apCost,
+                    label: 'AP',
+                    hint: 'Action Point cost to use this talent',
+                    max: 3,
+                    class: 'talent-ap-cost'
+                });
+            }
+            break;
+
+        case 'augment':
+            if (system.apCost !== undefined) {
+                bodyFields.push({
+                    type: 'ap-selector',
+                    name: 'system.apCost',
+                    value: system.apCost,
+                    label: 'AP',
+                    hint: 'Action Point cost to activate this augment',
+                    max: 3,
+                    class: 'augment-ap-cost'
+                });
+            }
+            if (system.ppCost !== undefined) {
+                bodyFields.push({
+                    type: 'number',
+                    name: 'system.ppCost',
+                    value: system.ppCost,
+                    label: 'PP',
+                    min: 0,
+                    max: 20,
+                    placeholder: '0',
+                    hint: 'Power Point cost to use this augment',
+                    class: 'augment-pp-cost'
+                });
+            }
+            break;
+
+        case 'weapon':
+            if (system.damage !== undefined) {
+                bodyFields.push({
+                    type: 'text',
+                    name: 'system.damage',
+                    value: system.damage,
+                    label: 'Damage',
+                    placeholder: '1d8',
+                    hint: 'Weapon damage dice (e.g., 1d8, 2d6)',
+                    class: 'weapon-damage'
+                });
+            }
+            if (system.modifier !== undefined) {
+                bodyFields.push({
+                    type: 'number',
+                    name: 'system.modifier',
+                    value: system.modifier,
+                    label: 'Modifier',
+                    min: -10,
+                    max: 20,
+                    placeholder: '0',
+                    hint: 'Attack modifier bonus/penalty',
+                    class: 'weapon-modifier'
+                });
+            }
+            break;
+
+        case 'armor':
+            if (system.armorClass !== undefined) {
+                bodyFields.push({
+                    type: 'number',
+                    name: 'system.armorClass',
+                    value: system.armorClass,
+                    label: 'AC',
+                    min: 10,
+                    max: 25,
+                    placeholder: '10',
+                    hint: 'Armor Class defense value',
+                    class: 'armor-ac'
+                });
+            }
+            if (system.threshold !== undefined) {
+                bodyFields.push({
+                    type: 'number',
+                    name: 'system.threshold',
+                    value: system.threshold,
+                    label: 'Threshold',
+                    min: 0,
+                    max: 20,
+                    placeholder: '0',
+                    hint: 'Damage threshold before penetration',
+                    class: 'armor-threshold'
+                });
+            }
+            break;
+
+        case 'gear':
+            if (system.weight !== undefined) {
+                bodyFields.push({
+                    type: 'number',
+                    name: 'system.weight',
+                    value: system.weight,
+                    label: 'Weight',
+                    min: 0,
+                    step: 0.1,
+                    placeholder: '0',
+                    hint: 'Weight in pounds',
+                    class: 'gear-weight'
+                });
+            }
+            if (system.cost !== undefined) {
+                bodyFields.push({
+                    type: 'number',
+                    name: 'system.cost',
+                    value: system.cost,
+                    label: 'Cost',
+                    min: 0,
+                    placeholder: '0',
+                    hint: 'Cost in credits',
+                    class: 'gear-cost'
+                });
+            }
+            break;
+
+        case 'feature':
+            if (system.powerPointCost !== undefined) {
+                bodyFields.push({
+                    type: 'number',
+                    name: 'system.powerPointCost',
+                    value: system.powerPointCost,
+                    label: 'PP Cost',
+                    min: 0,
+                    max: 20,
+                    placeholder: '0',
+                    hint: 'Power Point cost to use this feature',
+                    class: 'feature-pp-cost'
+                });
+            }
+            if (system.isActive !== undefined) {
+                bodyFields.push({
+                    type: 'checkbox',
+                    name: 'system.isActive',
+                    checked: system.isActive,
+                    label: 'Active',
+                    hint: 'Is this an active feature?',
+                    class: 'feature-active'
+                });
+            }
+            break;
+
+        case 'trait':
+            // Trait preview (if color and name exist)
+            if (system.color && item.name) {
+                bodyFields.push({
+                    type: 'trait-preview',
+                    trait: system,
+                    itemName: item.name,
+                    label: 'Preview',
+                    class: 'trait-preview'
+                });
+            }
+            break;
+    }
+
+    // Always include description field after meta fields for all item types
     bodyFields.push({
         type: 'description',
         name: 'system.description',
@@ -669,28 +837,9 @@ export function prepareItemBodyFields(item: any, system: any): any[] {
         fullWidth: true  // Description spans full width
     });
 
-    // Add type-specific fields
+    // Continue with existing type-specific fields after meta fields
     switch (item.type) {
-        case 'action':
-            // Actions only need description and traits
-            break;
-
         case 'talent':
-            // Backstory field for talents
-            if (system.backstory !== undefined) {
-                bodyFields.push({
-                    type: 'textarea',
-                    name: 'system.backstory',
-                    value: system.backstory || '',
-                    label: 'Backstory',
-                    placeholder: 'How did your character learn this talent? (Optional)',
-                    rows: 3,
-                    hint: 'Optional background story about how this talent was acquired',
-                    class: 'talent-backstory',
-                    fullWidth: true
-                });
-            }
-
             // Level requirement
             if (system.levelRequirement !== undefined) {
                 bodyFields.push({
@@ -705,23 +854,24 @@ export function prepareItemBodyFields(item: any, system: any): any[] {
                     class: 'talent-level-requirement'
                 });
             }
-            break;
 
-        case 'augment':
             // Requirements text field
             if (system.requirements !== undefined) {
                 bodyFields.push({
-                    type: 'text',
+                    type: 'textarea',
                     name: 'system.requirements',
                     value: system.requirements || '',
                     label: 'Requirements',
-                    placeholder: 'Enter any prerequisites or requirements...',
-                    hint: 'List any conditions needed to install or use this augment',
-                    class: 'augment-requirements'
+                    placeholder: 'Any prerequisites or requirements...',
+                    rows: 2,
+                    hint: 'List any conditions needed to learn this talent',
+                    class: 'talent-requirements'
                 });
             }
+            break;
 
-            // Level requirement and active status row
+        case 'augment':
+            // Level requirement
             if (system.levelRequirement !== undefined) {
                 bodyFields.push({
                     type: 'number',
@@ -736,6 +886,21 @@ export function prepareItemBodyFields(item: any, system: any): any[] {
                 });
             }
 
+            // Requirements text field
+            if (system.requirements !== undefined) {
+                bodyFields.push({
+                    type: 'textarea',
+                    name: 'system.requirements',
+                    value: system.requirements || '',
+                    label: 'Requirements',
+                    placeholder: 'Enter any prerequisites or requirements...',
+                    rows: 2,
+                    hint: 'List any conditions needed to install or use this augment',
+                    class: 'augment-requirements'
+                });
+            }
+
+            // Active status
             if (system.isActive !== undefined) {
                 bodyFields.push({
                     type: 'checkbox',
@@ -784,7 +949,7 @@ export function prepareItemBodyFields(item: any, system: any): any[] {
             break;
 
         case 'weapon':
-            // Ability selection
+            // Ability selection, weight and cost (already have damage and modifier from meta fields)
             if (system.ability !== undefined) {
                 bodyFields.push({
                     type: 'select',
@@ -802,7 +967,6 @@ export function prepareItemBodyFields(item: any, system: any): any[] {
                 });
             }
 
-            // Weight and cost
             if (system.weight !== undefined) {
                 bodyFields.push({
                     type: 'number',
@@ -832,7 +996,7 @@ export function prepareItemBodyFields(item: any, system: any): any[] {
             break;
 
         case 'armor':
-            // Ability selection and modifier
+            // Ability selection and modifier, weight and cost (already have AC and threshold from meta fields)
             if (system.ability !== undefined) {
                 bodyFields.push({
                     type: 'select',
@@ -864,7 +1028,6 @@ export function prepareItemBodyFields(item: any, system: any): any[] {
                 });
             }
 
-            // Weight and cost
             if (system.weight !== undefined) {
                 bodyFields.push({
                     type: 'number',
@@ -958,7 +1121,7 @@ export function prepareItemBodyFields(item: any, system: any): any[] {
                 });
             }
 
-            // Rarity and local key
+            // Rarity
             if (system.rarity !== undefined) {
                 bodyFields.push({
                     type: 'select',
@@ -975,37 +1138,21 @@ export function prepareItemBodyFields(item: any, system: any): any[] {
                     class: 'trait-rarity'
                 });
             }
-
-            if (system.localKey !== undefined) {
-                bodyFields.push({
-                    type: 'text',
-                    name: 'system.localKey',
-                    value: system.localKey || '',
-                    label: 'Localization Key',
-                    placeholder: 'AVANT.Traits.Fire',
-                    hint: 'Localization key for trait name',
-                    class: 'trait-local-key'
-                });
-            }
-            break;
-
-        default:
-            // No additional fields for unknown types
             break;
     }
 
-    // Always add traits field at the end (except for trait items themselves)
-    if (item.type !== 'trait' && system.traits !== undefined) {
+    // Always include traits field at the end for all item types (except trait items themselves)
+    if (item.type !== 'trait') {
         bodyFields.push({
             type: 'traits',
             name: 'system.traits',
-            displayTraits: system.displayTraits || [],
+            value: system.traits || [],
             label: 'Traits',
-            hint: `Add traits to categorize this ${item.type}`,
+            hint: 'Add descriptive traits for this item',
             class: `${item.type}-traits`,
             fullWidth: true  // Traits span full width
         });
     }
 
     return bodyFields;
-} 
+}
