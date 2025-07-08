@@ -16,7 +16,7 @@
   background: var(--theme-bg-primary, #2a2a2a) !important;
   border: 1px solid var(--theme-border-primary, #555) !important;
   min-height: 400px !important;
-  
+
   // Window content container
   .window-content {
     background: var(--theme-bg-primary, #2a2a2a) !important;
@@ -26,7 +26,7 @@
     visibility: visible !important;
     opacity: 1 !important;
     padding: 0 !important;
-    
+
     // Main item sheet container
     .item-sheet {
       background: var(--theme-bg-primary, #2a2a2a) !important;
@@ -38,17 +38,19 @@
       opacity: 1 !important;
       padding: 0 !important;
       height: 100% !important;
-      
+
       // Sheet header with item image and name
       .sheet-header {
         background: var(--theme-bg-secondary, #333) !important;
         border-bottom: 1px solid var(--theme-border-primary, #555) !important;
         min-height: 60px !important;
         display: flex !important;
-        align-items: center !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: var(--space-sm, 8px) !important;
         padding: 10px !important;
         flex-shrink: 0 !important;
-        
+
         .profile-img {
           width: 64px !important;
           height: 64px !important;
@@ -56,14 +58,14 @@
           cursor: pointer !important;
           flex-shrink: 0 !important;
         }
-        
+
         .header-fields {
           flex: 1 !important;
           margin-left: 10px !important;
-          
+
           .charname {
             margin: 0 !important;
-            
+
             input {
               background: var(--theme-bg-tertiary, #444) !important;
               border: 1px solid var(--theme-border-primary, #555) !important;
@@ -72,7 +74,7 @@
               font-weight: bold !important;
               padding: 8px !important;
               width: 100% !important;
-              
+
               &:focus {
                 border-color: var(--theme-accent-primary, #00e0dc) !important;
                 outline: none !important;
@@ -81,20 +83,20 @@
             }
           }
         }
-        
+
         // AP Selector in Item Sheet Header
         .header-costs {
           display: flex !important;
           align-items: center !important;
           gap: 12px !important;
           flex-shrink: 0 !important;
-          
+
           .ap-selector {
             display: flex !important;
             flex-direction: column !important;
             align-items: center !important;
             gap: 4px !important;
-            
+
             .ap-selector__label {
               font-family: var(--theme-font-display, "Orbitron", monospace) !important;
               font-size: 10px !important;
@@ -103,11 +105,11 @@
               text-transform: uppercase !important;
               letter-spacing: 0.5px !important;
             }
-            
+
             .ap-selector__icons {
               display: flex !important;
               gap: 3px !important;
-              
+
               .ap-icon {
                 width: 16px !important;
                 height: 16px !important;
@@ -121,39 +123,39 @@
                 align-items: center !important;
                 justify-content: center !important;
                 padding: 0 !important;
-                
+
                 &:hover {
                   background: var(--theme-accent-primary, #00E0DC) !important;
                   color: var(--theme-bg-primary, #1C1C1C) !important;
                 }
-                
+
                 // Filled state (progressive system)
                 &.ap-icon--filled {
                   background: var(--theme-accent-primary, #00E0DC) !important;
                   color: var(--theme-bg-primary, #1C1C1C) !important;
                 }
-                
+
                 // Empty state
                 &.ap-icon--empty {
                   background: transparent !important;
                   color: var(--theme-accent-primary, #00E0DC) !important;
                   opacity: 0.5 !important;
                 }
-                
+
                 // Selected state (for the highest active button)
                 &.ap-icon--selected {
                   background: var(--theme-accent-primary, #00E0DC) !important;
                   color: var(--theme-bg-primary, #1C1C1C) !important;
                   box-shadow: 0 0 8px rgba(0, 224, 220, 0.5) !important;
                 }
-                
+
                 i {
                   font-size: 8px !important;
                 }
               }
             }
           }
-          
+
           // PP cost display for augments
           .pp-cost {
             background: var(--theme-accent-secondary, #4CE2E1) !important;
@@ -168,7 +170,7 @@
           }
         }
       }
-      
+
       // Tab navigation system
       .sheet-tabs {
         background: var(--theme-bg-secondary, #333) !important;
@@ -178,7 +180,7 @@
         flex-shrink: 0 !important;
         margin: 0 !important;
         padding: 0 !important;
-        
+
         .item {
           padding: 8px 16px !important;
           background: transparent !important;
@@ -194,12 +196,12 @@
           height: 36px !important;
           border-bottom: 2px solid transparent !important;
           transition: all 0.2s ease !important;
-          
+
           &:hover {
             background: rgba(0, 224, 220, 0.1) !important;
             color: var(--theme-accent-primary, #00e0dc) !important;
           }
-          
+
           &.active {
             background: var(--theme-bg-primary, #2a2a2a) !important;
             color: var(--theme-text-primary, #ffffff) !important;
@@ -207,7 +209,7 @@
           }
         }
       }
-      
+
       // Tab content area with proper visibility management
       .sheet-body {
         background: var(--theme-bg-primary, #2a2a2a) !important;
@@ -217,7 +219,7 @@
         flex: 1 !important;
         padding: 0 !important;
         overflow-y: auto !important;
-        
+
         // Individual tab panels - Critical for ApplicationV2 tab functionality
         .tab {
           background: var(--theme-bg-primary, #2a2a2a) !important;
@@ -226,12 +228,12 @@
           display: none !important; // Hide all tabs by default
           padding: 15px !important;
           margin: 0 !important;
-          
+
           // Only show the active tab
           &.active {
             display: block !important;
           }
-          
+
           // Form elements within tabs
           .form-group {
             background: transparent !important;
@@ -240,7 +242,7 @@
             display: block !important;
             margin-bottom: 15px !important;
             padding: 0 !important;
-            
+
             label {
               background: transparent !important;
               color: var(--theme-text-secondary, #aaa) !important;
@@ -253,8 +255,10 @@
               padding: 0 !important;
               border: none !important;
             }
-            
-            input, textarea, select {
+
+            input,
+            textarea,
+            select {
               background: var(--theme-bg-tertiary, #444) !important;
               border: 1px solid var(--theme-border-primary, #555) !important;
               color: var(--theme-text-primary, #ffffff) !important;
@@ -263,47 +267,47 @@
               width: 100% !important;
               padding: 8px !important;
               min-height: auto !important;
-              
+
               &:focus {
                 border-color: var(--theme-accent-primary, #00e0dc) !important;
                 outline: none !important;
                 box-shadow: 0 0 8px rgba(0, 224, 220, 0.3) !important;
               }
             }
-            
+
             textarea {
               min-height: 80px !important;
               resize: vertical !important;
             }
-            
+
             // Trait chip input system styling
             .trait-chip-input {
               background: var(--theme-bg-tertiary, #444) !important;
               border: 1px solid var(--theme-border-primary, #555) !important;
               border-radius: 4px !important;
               padding: 4px !important;
-              
+
               .trait-chip-input__field {
                 background: transparent !important;
                 border: none !important;
-                
+
                 .trait-chip-input__input {
                   background: transparent !important;
                   border: none !important;
                   color: var(--theme-text-primary, #ffffff) !important;
                   padding: 4px !important;
-                  
+
                   &::placeholder {
                     color: var(--theme-text-secondary, #aaa) !important;
                   }
-                  
+
                   &:focus {
                     outline: none !important;
                     box-shadow: none !important;
                   }
                 }
               }
-              
+
               .trait-chip-input__dropdown {
                 background: var(--theme-bg-secondary, #333) !important;
                 border: 1px solid var(--theme-border-primary, #555) !important;
@@ -315,17 +319,17 @@
       }
     }
   }
-  
+
   // Default active state - Ensure first tab is visible by default
   &:not(.has-active-tab) {
     .sheet-body .tab:first-child {
       display: block !important;
     }
-    
+
     .sheet-tabs .item:first-child {
       background: var(--theme-bg-primary, #2a2a2a) !important;
       color: var(--theme-text-primary, #ffffff) !important;
       border-bottom-color: var(--theme-accent-primary, #00e0dc) !important;
     }
   }
-} 
+}

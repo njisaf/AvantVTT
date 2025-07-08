@@ -1,157 +1,118 @@
-{{!-- 
-  Feature Item Sheet Template - Phase 5 Component Library Version
-  
-  This template uses the unified component library to provide a clean,
-  accessible, and maintainable feature sheet experience. It replaces the
-  legacy feature template with modern component-based architecture.
-  
-  Features:
-  - Component library partials for consistent styling
-  - Single-content layout without tabs
-  - Enhanced accessibility with proper ARIA support
-  - Category selection for feature classification
-  - Uses counter for limited-use features
-  - Power Point cost input
-  - Trait configuration for custom traits
-  - Comprehensive form validation
+{{!--
+Feature Item Sheet Template - Phase 5 Component Library Version
+
+This template uses the unified component library to provide a clean,
+accessible, and maintainable feature sheet experience. It replaces the
+legacy feature template with modern component-based architecture.
+
+Features:
+- Component library partials for consistent styling
+- Single-content layout without tabs
+- Enhanced accessibility with proper ARIA support
+- Category selection for feature classification
+- Uses counter for limited-use features
+- Power Point cost input
+- Trait configuration for custom traits
+- Comprehensive form validation
 --}}
 
 <div class="item-sheet feature-sheet flexcol" autocomplete="off" data-application-part="form">
-    {{!-- Header Section --}}
-    <header class="sheet-header">
-        <div class="header-main">
-            {{!-- Image Upload Component --}}
-            {{> "systems/avant/templates/shared/partials/image-upload.hbs" 
-                src=item.img 
-                alt=item.name 
-                title=item.name 
-                size=64 
-                class="feature-image"}}
-            
-            {{!-- Name Field --}}
-            {{> "systems/avant/templates/shared/partials/text-field.hbs" 
-                name="name" 
-                value=item.name 
-                label="Feature Name" 
-                placeholder="Enter feature name..." 
-                required=true 
-                class="feature-name-field"}}
-        </div>
-        
-        <div class="header-stats">
-            {{!-- Power Point Cost Field --}}
-            {{> "systems/avant/templates/shared/partials/number-field.hbs" 
-                name="system.powerPointCost" 
-                value=system.powerPointCost 
-                label="PP Cost" 
-                min=0 
-                max=20 
-                placeholder="0" 
-                hint="Power Point cost to use this feature" 
-                class="feature-pp-cost"}}
-            
-            {{!-- Active Feature Checkbox --}}
-            {{> "systems/avant/templates/shared/partials/checkbox-field.hbs" 
-                name="system.isActive" 
-                checked=system.isActive 
-                label="Active" 
-                hint="Is this an active feature?" 
-                class="feature-active"}}
-        </div>
-    </header>
+    {{!-- Header Section - Using Consistent Layout --}}
+    {{> "systems/avant/templates/shared/partials/item-header.hbs"}}
 
     {{!-- Body Section --}}
     <div class="sheet-body">
         {{!-- Description Field --}}
-        {{> "systems/avant/templates/shared/partials/textarea-field.hbs" 
-            name="system.description" 
-            value=system.description 
-            label="Description" 
-            rows=4 
-            placeholder="Describe this feature..." 
-            class="feature-description"}}
-        
+        {{> "systems/avant/templates/shared/partials/textarea-field.hbs"
+        name="system.description"
+        value=system.description
+        label="Description"
+        rows=4
+        placeholder="Describe this feature..."
+        class="feature-description"}}
+
         {{!-- Form Row: Category and Uses --}}
         <div class="form-row">
             {{!-- Category Selection --}}
-            {{> "systems/avant/templates/shared/partials/select-field.hbs" 
-                name="system.category" 
-                value=system.category 
-                label="Category" 
-                options=(array 
-                    (object value="racial" label="Racial")
-                    (object value="class" label="Class")
-                    (object value="background" label="Background")
-                    (object value="general" label="General")
-                    (object value="special" label="Special")
-                )
-                hint="Feature category classification" 
-                class="feature-category"}}
-            
+            {{> "systems/avant/templates/shared/partials/select-field.hbs"
+            name="system.category"
+            value=system.category
+            label="Category"
+            options=(array
+            (object value="racial" label="Racial")
+            (object value="class" label="Class")
+            (object value="background" label="Background")
+            (object value="general" label="General")
+            (object value="special" label="Special")
+            )
+            hint="Feature category classification"
+            class="feature-category"}}
+
             {{!-- Uses Counter --}}
-            {{> "systems/avant/templates/shared/partials/uses-counter.hbs" 
-                name="system.uses" 
-                current=system.uses.value 
-                max=system.uses.max 
-                label="Uses" 
-                hint="Limited uses per day/encounter" 
-                class="feature-uses"}}
+            {{> "systems/avant/templates/shared/partials/uses-counter.hbs"
+            name="system.uses"
+            current=system.uses.value
+            max=system.uses.max
+            label="Uses"
+            hint="Limited uses per day/encounter"
+            class="feature-uses"}}
         </div>
-        
+
         {{!-- Trait Configuration Section --}}
         <fieldset class="trait-configuration">
             <legend>Trait Configuration</legend>
-            <p class="trait-config-hint">Configure these fields to make this item appear as a custom trait in autocomplete. Leave blank if this is a regular feature.</p>
-            
+            <p class="trait-config-hint">Configure these fields to make this item appear as a custom trait in
+                autocomplete. Leave blank if this is a regular feature.</p>
+
             {{!-- Form Row: Color and Icon --}}
             <div class="form-row">
                 {{!-- Trait Color Field --}}
-                {{> "systems/avant/templates/shared/partials/text-field.hbs" 
-                    name="system.color" 
-                    value=system.color 
-                    label="Trait Color" 
-                    placeholder="#FF5733" 
-                    hint="Hex color code for the trait chip" 
-                    class="trait-color"}}
-                
+                {{> "systems/avant/templates/shared/partials/text-field.hbs"
+                name="system.color"
+                value=system.color
+                label="Trait Color"
+                placeholder="#FF5733"
+                hint="Hex color code for the trait chip"
+                class="trait-color"}}
+
                 {{!-- Trait Icon Field --}}
-                {{> "systems/avant/templates/shared/partials/text-field.hbs" 
-                    name="system.icon" 
-                    value=system.icon 
-                    label="Trait Icon" 
-                    placeholder="fas fa-fire" 
-                    hint="FontAwesome icon class" 
-                    class="trait-icon"}}
+                {{> "systems/avant/templates/shared/partials/text-field.hbs"
+                name="system.icon"
+                value=system.icon
+                label="Trait Icon"
+                placeholder="fas fa-fire"
+                hint="FontAwesome icon class"
+                class="trait-icon"}}
             </div>
-            
+
             {{!-- Trait Localization Key --}}
-            {{> "systems/avant/templates/shared/partials/text-field.hbs" 
-                name="system.localKey" 
-                value=system.localKey 
-                label="Trait Localization Key" 
-                placeholder="CUSTOM.Trait.MyTraitName" 
-                hint="Unique identifier for this trait" 
-                class="trait-local-key"}}
-            
+            {{> "systems/avant/templates/shared/partials/text-field.hbs"
+            name="system.localKey"
+            value=system.localKey
+            label="Trait Localization Key"
+            placeholder="CUSTOM.Trait.MyTraitName"
+            hint="Unique identifier for this trait"
+            class="trait-local-key"}}
+
             {{!-- Trait Preview --}}
             {{#if (and system.color system.icon)}}
-                <div class="trait-preview">
-                    <label class="trait-preview-label">Preview:</label>
-                    <span class="trait-chip trait-chip--preview" style="background-color: {{system.color}};">
-                        <i class="{{system.icon}}" aria-hidden="true"></i>
-                        <span class="trait-chip__text">{{item.name}}</span>
-                    </span>
-                </div>
+            <div class="trait-preview">
+                <label class="trait-preview-label">Preview:</label>
+                <span class="trait-chip trait-chip--preview" style="background-color: {{system.color}};">
+                    <i class="{{system.icon}}" aria-hidden="true"></i>
+                    <span class="trait-chip__text">{{item.name}}</span>
+                </span>
+            </div>
             {{/if}}
         </fieldset>
-        
+
         {{!-- Traits Field --}}
-        {{> "systems/avant/templates/shared/partials/traits-field.hbs" 
-            name="system.traits" 
-            displayTraits=displayTraits 
-            label="Traits" 
-            hint="Add traits to categorize this feature" 
-            editable=editable 
-            class="feature-traits"}}
+        {{> "systems/avant/templates/shared/partials/traits-field.hbs"
+        name="system.traits"
+        displayTraits=displayTraits
+        label="Traits"
+        hint="Add traits to categorize this feature"
+        editable=editable
+        class="feature-traits"}}
     </div>
-</div> 
+</div>

@@ -20,28 +20,28 @@
     // Base container using CSS Grid for layout
     display: grid;
     grid-template-rows: auto auto 1fr;
-    grid-template-areas: 
+    grid-template-areas:
         "header"
         "tabs"
         "body";
     gap: var(--space-md, 12px);
-    
+
     // Container properties
     min-height: 400px;
     width: 100%;
     padding: var(--space-lg, 16px);
-    
+
     // Theme integration
     background: var(--color-background-primary, #ffffff);
     color: var(--color-text-primary, #000000);
     border: 1px solid var(--color-border-primary, #cccccc);
     border-radius: var(--border-radius-md, 6px);
-    
+
     // Typography
     font-family: var(--font-primary, 'Exo 2', sans-serif);
     font-size: var(--font-size-base, 14px);
     line-height: var(--line-height-base, 1.4);
-    
+
     // Focus management for accessibility
     &:focus-within {
         outline: 2px solid var(--color-focus, #00E0DC);
@@ -50,38 +50,171 @@
 }
 
 // ============================================================================
-// HEADER STYLES
+// HEADER STYLES - Enhanced Specificity for FoundryVTT Override
 // ============================================================================
 
-.item-sheet__header {
+.item-sheet .sheet-header {
     grid-area: header;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    grid-template-areas: "main costs";
-    gap: var(--space-md, 12px);
-    align-items: center;
-    
+    display: flex !important;
+    flex-direction: column !important;
+    gap: var(--space-sm, 8px) !important;
+    padding: var(--space-md, 12px);
+
     // Responsive behavior
     @media (max-width: 480px) {
-        grid-template-columns: 1fr;
-        grid-template-areas: 
-            "main"
-            "costs";
-        text-align: center;
+        gap: var(--space-xs, 4px) !important;
+        padding: var(--space-sm, 8px);
     }
 }
 
-.item-sheet__header-main {
-    grid-area: main;
-    display: flex;
-    align-items: center;
-    gap: var(--space-md, 12px);
-    min-width: 0; // Prevent flex overflow
+// Additional specificity for nested structure override
+.avant.item-sheet .sheet-header,
+.item-sheet.avant .sheet-header {
+    display: flex !important;
+    flex-direction: column !important;
 }
+
+// CRITICAL FIX: Override ApplicationV2 and main avant.scss flex row behavior
+// These selectors have maximum specificity to override conflicting styles
+.application.sheet.avant.item .sheet-header,
+.avant.application.sheet.item .sheet-header,
+.item-sheet.avant.application.sheet .sheet-header {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    gap: var(--space-sm, 8px) !important;
+    padding: var(--space-md, 12px) !important;
+
+    // Remove any conflicting height constraints that might force horizontal layout
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+}
+
+// ============================================================================
+// ROW CONTAINER STYLES - New Consistent Layout System
+// ============================================================================
+
+.item-sheet .sheet-header .row-container {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: var(--space-md, 12px) !important;
+    align-items: center !important;
+    width: 100% !important;
+
+    // Child elements are equal width by default
+    >* {
+        flex: 1 1 0 !important;
+        min-width: 0 !important; // Prevent overflow
+    }
+
+    // CRITICAL FIX: Form groups inside row containers should display inline
+    // Override the column behavior from form-components.scss
+    .form-group {
+        display: flex !important;
+        flex-direction: column !important; // Keep internal structure vertical
+        align-items: stretch !important;
+        justify-content: flex-start !important;
+        margin-bottom: 0 !important; // Remove bottom margin within rows
+
+        // Ensure form groups take equal space within the row
+        flex: 1 1 0 !important;
+        min-width: 0 !important;
+    }
+
+    // Special handling for image upload form groups
+    .form-group--image-upload {
+        flex: 0 0 auto !important; // Don't stretch the image upload
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    // Special handling for text field form groups
+    .form-group--text-field {
+        flex: 1 !important; // Text fields should take remaining space
+        min-width: 0 !important;
+    }
+
+    // Responsive behavior for mobile
+    @media (max-width: 480px) {
+        gap: var(--space-sm, 8px) !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+
+        >* {
+            flex: none !important;
+        }
+
+        .form-group {
+            margin-bottom: var(--space-sm, 8px) !important;
+        }
+    }
+}
+
+// Fallback for any row-container not in header
+.row-container {
+    display: flex;
+    gap: var(--space-md, 12px);
+    align-items: center;
+
+    >* {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+
+    // Form groups inside any row container should also follow the same pattern
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        margin-bottom: 0;
+        flex: 1 1 0;
+        min-width: 0;
+    }
+
+    .form-group--image-upload {
+        flex: 0 0 auto;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .form-group--text-field {
+        flex: 1;
+        min-width: 0;
+    }
+}
+
+// Header main row - special case with fixed icon width  
+.item-sheet .sheet-header .header-main {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: var(--space-md, 12px) !important;
+    align-items: center !important;
+
+    // Icon has fixed width, name takes remaining space
+    .item-icon,
+    .form-group--image-upload {
+        flex: 0 0 48px !important; // Fixed width for icon
+    }
+
+    .item-name-field,
+    .form-group--text-field {
+        flex: 1 !important;
+        min-width: 0 !important;
+    }
+
+    @media (max-width: 480px) {
+        gap: var(--space-sm, 8px) !important;
+    }
+}
+
+// Legacy header-main styles removed - now using .header-main class
 
 .item-sheet__image {
     flex-shrink: 0;
-    
+
     .item-sheet__profile-img {
         width: 64px;
         height: 64px;
@@ -90,11 +223,11 @@
         object-fit: cover;
         cursor: pointer;
         transition: border-color 0.2s ease;
-        
+
         &:hover {
             border-color: var(--color-primary, #00E0DC);
         }
-        
+
         &:focus {
             outline: 2px solid var(--color-focus, #00E0DC);
             outline-offset: 2px;
@@ -109,7 +242,7 @@
 
 .item-sheet__name {
     margin: 0;
-    
+
     input {
         width: 100%;
         background: transparent;
@@ -121,29 +254,24 @@
         font-weight: 600;
         color: var(--color-text-primary, #000000);
         transition: border-color 0.2s ease;
-        
+
         &:focus {
             outline: none;
             border-bottom-color: var(--color-primary, #00E0DC);
         }
-        
+
         &::placeholder {
             color: var(--color-text-muted, #666666);
             opacity: 0.7;
         }
-        
+
         &:invalid {
             border-bottom-color: var(--color-error, #ff4444);
         }
     }
 }
 
-.item-sheet__header-costs {
-    grid-area: costs;
-    display: flex;
-    align-items: center;
-    gap: var(--space-lg, 16px);
-}
+// Legacy header-costs styles removed - now using .row-container class
 
 // ============================================================================
 // AP SELECTOR WIDGET STYLES
@@ -153,7 +281,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-sm, 8px);
-    
+
     .item-sheet__ap-label {
         font-family: var(--font-display, 'Orbitron', monospace);
         font-weight: 600;
@@ -177,34 +305,34 @@
     cursor: pointer;
     border-radius: 50%;
     transition: all 0.2s ease;
-    
+
     // Default state - empty
     i {
         color: var(--color-border-primary, #cccccc);
         font-size: 16px;
         transition: color 0.2s ease;
     }
-    
+
     // Active state
     &[aria-checked="true"] i {
         color: var(--color-primary, #00E0DC);
     }
-    
+
     // Hover and focus states
     &:hover,
     &:focus {
         outline: 2px solid var(--color-focus, #00E0DC);
         outline-offset: 2px;
         background: var(--color-background-secondary, #f9f9f9);
-        
+
         i {
             color: var(--color-primary, #00E0DC);
         }
     }
-    
+
     // Progressive activation visual
-    &[data-ap-value="1"]:hover ~ &[data-ap-value],
-    &[data-ap-value="2"]:hover ~ &[data-ap-value],
+    &[data-ap-value="1"]:hover~&[data-ap-value],
+    &[data-ap-value="2"]:hover~&[data-ap-value],
     &[data-ap-value="3"]:hover {
         i {
             color: var(--color-border-primary, #cccccc);
@@ -220,7 +348,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-sm, 8px);
-    
+
     label {
         font-family: var(--font-display, 'Orbitron', monospace);
         font-weight: 600;
@@ -228,7 +356,7 @@
         color: var(--color-text-secondary, #555555);
         margin: 0;
     }
-    
+
     input {
         width: 60px;
         padding: var(--space-xs, 4px) var(--space-sm, 8px);
@@ -239,13 +367,13 @@
         font-size: var(--font-size-sm, 12px);
         text-align: center;
         transition: border-color 0.2s ease;
-        
+
         &:focus {
             outline: none;
             border-color: var(--color-primary, #00E0DC);
             box-shadow: 0 0 0 2px var(--color-primary-alpha, rgba(0, 224, 220, 0.2));
         }
-        
+
         &:invalid {
             border-color: var(--color-error, #ff4444);
         }
@@ -261,7 +389,7 @@
     display: flex;
     border-bottom: 2px solid var(--color-border-primary, #cccccc);
     margin-bottom: var(--space-md, 12px);
-    
+
     // Hide tabs area when not needed
     &:empty {
         display: none;
@@ -281,30 +409,30 @@
     color: var(--color-text-secondary, #555555);
     border-bottom: 3px solid transparent;
     transition: all 0.2s ease;
-    
+
     // Icon styling
     i {
         font-size: var(--font-size-xs, 10px);
     }
-    
+
     // Hover state
     &:hover {
         color: var(--color-text-primary, #000000);
         background: var(--color-background-secondary, #f9f9f9);
     }
-    
+
     // Focus state
     &:focus {
         outline: 2px solid var(--color-focus, #00E0DC);
         outline-offset: 2px;
     }
-    
+
     // Active state
     &--active {
         color: var(--color-primary, #00E0DC);
         border-bottom-color: var(--color-primary, #00E0DC);
         font-weight: 600;
-        
+
         i {
             color: var(--color-primary, #00E0DC);
         }
@@ -319,6 +447,155 @@
     grid-area: body;
     overflow-y: auto;
     min-height: 0; // Allow grid shrinking
+}
+
+// ============================================================================
+// UNIVERSAL SHEET BODY STYLES - Stage 2 Refactor
+// ============================================================================
+
+.sheet-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm, 8px);
+    padding: var(--space-md, 12px);
+    flex: 1;
+    overflow-y: auto;
+
+    // Row containers inside sheet body
+    .row-container {
+        display: flex;
+        gap: var(--space-md, 12px);
+        align-items: flex-start; // Align to top for better field alignment
+        width: 100%;
+
+        // Regular row containers - equal width children
+        &:not(.full-width) {
+            >* {
+                flex: 1 1 0;
+                min-width: 0; // Prevent overflow
+            }
+
+            .form-group {
+                margin-bottom: 0; // Remove spacing within rows
+                flex: 1 1 0;
+                min-width: 0;
+            }
+        }
+
+        // Full-width containers for description and traits
+        &.full-width {
+            .form-group {
+                width: 100%;
+                margin-bottom: 0;
+            }
+        }
+
+        // Responsive behavior - stack on mobile
+        @media (max-width: 480px) {
+            flex-direction: column;
+            gap: var(--space-sm, 8px);
+
+            >* {
+                flex: none !important;
+                width: 100%;
+            }
+
+            .form-group {
+                margin-bottom: var(--space-sm, 8px);
+            }
+        }
+    }
+
+    // Enhanced spacing for full-width elements
+    .row-container.full-width {
+        margin-bottom: var(--space-md, 12px);
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    // Form groups within sheet body
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-xs, 4px);
+
+        // Ensure proper label styling
+        .form-label {
+            font-family: var(--font-display, 'Orbitron', monospace);
+            font-size: var(--font-size-xs, 10px);
+            font-weight: 600;
+            color: var(--color-text-secondary, #666666);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: var(--space-xs, 4px);
+        }
+
+        // Input styling consistency
+        .form-input,
+        .form-textarea,
+        .form-select {
+            background: var(--color-background-primary, #ffffff);
+            border: 1px solid var(--color-border-primary, #cccccc);
+            color: var(--color-text-primary, #000000);
+            font-family: var(--font-primary, 'Exo 2', sans-serif);
+            font-size: var(--font-size-sm, 12px);
+            padding: var(--space-sm, 8px);
+            border-radius: var(--border-radius-sm, 4px);
+            transition: border-color 0.2s ease;
+
+            &:focus {
+                outline: none;
+                border-color: var(--color-primary, #00E0DC);
+                box-shadow: 0 0 0 2px var(--color-primary-alpha, rgba(0, 224, 220, 0.2));
+            }
+
+            &:invalid {
+                border-color: var(--color-error, #ff4444);
+            }
+        }
+
+        // Textarea specific styling
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+            line-height: 1.4;
+        }
+
+        // Checkbox styling
+        .form-checkbox {
+            width: auto;
+            margin-right: var(--space-xs, 4px);
+        }
+
+        // Hint text styling
+        .form-hint {
+            font-size: var(--font-size-xs, 10px);
+            color: var(--color-text-muted, #888888);
+            font-style: italic;
+        }
+    }
+}
+
+// ============================================================================
+// FIELD TYPE SPECIFIC STYLES
+// ============================================================================
+
+// Unknown field type fallback styling
+.unknown-field-type {
+    padding: var(--space-md, 12px);
+    background: var(--color-background-secondary, #f9f9f9);
+    border: 2px dashed var(--color-border-secondary, #dddddd);
+    border-radius: var(--border-radius-md, 6px);
+    text-align: center;
+    color: var(--color-text-muted, #666666);
+
+    .unknown-field-message {
+        font-style: italic;
+        font-size: var(--font-size-sm, 12px);
+        margin-top: var(--space-xs, 4px);
+    }
 }
 
 .item-sheet__tab-content {
@@ -364,7 +641,7 @@
         cursor: pointer;
         font-weight: 600;
         margin-bottom: var(--space-sm, 8px);
-        
+
         &:focus {
             outline: 2px solid var(--color-focus, #00E0DC);
             outline-offset: 2px;
@@ -377,12 +654,12 @@
     grid-template-columns: auto 1fr;
     gap: var(--space-xs, 4px) var(--space-sm, 8px);
     margin: 0;
-    
+
     dt {
         font-weight: 600;
         color: var(--color-text-secondary, #555555);
     }
-    
+
     dd {
         margin: 0;
         font-family: monospace;
@@ -415,18 +692,18 @@
         padding: var(--space-md, 12px);
         gap: var(--space-sm, 8px);
     }
-    
+
     .item-sheet__header-main {
         flex-direction: column;
         text-align: center;
         gap: var(--space-sm, 8px);
     }
-    
+
     .item-sheet__tabs {
         flex-wrap: wrap;
         gap: var(--space-xs, 4px);
     }
-    
+
     .item-sheet__tab {
         flex: 1;
         min-width: 0;
@@ -468,4 +745,4 @@
     These classes will be implemented in Phase 2 as the component library
     is developed. The current structure provides the foundation for these
     components to integrate seamlessly.
-*/ 
+*/

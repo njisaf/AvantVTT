@@ -32,11 +32,11 @@ export function prepareTemplateData(item) {
     if (!item || typeof item !== 'object') {
         return null;
     }
-    
+
     const system = item.system || {};
     const flags = item.flags || {};
     const itemType = item.type || 'unknown';
-    
+
     return {
         item: item,
         system: system,
@@ -72,7 +72,7 @@ export function validateItemType(itemType) {
     if (typeof itemType !== 'string') {
         return false;
     }
-    
+
     const validTypes = ['weapon', 'armor', 'feature', 'action', 'talent', 'augment'];
     return validTypes.includes(itemType);
 }
@@ -93,33 +93,33 @@ function validateTemplateExists(itemType, templatePath) {
     if (typeof console === 'undefined') {
         return;
     }
-    
+
     // Skip validation in test environments
     if (typeof global !== 'undefined' && global.process?.env?.NODE_ENV === 'test') {
         return;
     }
-    
+
     // Create a cache to avoid repeated warnings for the same template
     if (!validateTemplateExists._cache) {
         validateTemplateExists._cache = new Set();
     }
-    
+
     const cacheKey = `${itemType}-${templatePath}`;
     if (validateTemplateExists._cache.has(cacheKey)) {
         return;
     }
-    
+
     validateTemplateExists._cache.add(cacheKey);
-    
+
     // Log the template being used (informational)
     console.debug(`ItemSheetConfig | Using template for ${itemType}: ${templatePath}`);
-    
+
     // Note: We can't check file existence in browser environment,
     // but we can provide helpful warnings about common issues
     if (itemType === 'talent' && !templatePath.includes('talent')) {
         console.warn(`ItemSheetConfig | Template path mismatch for talent items: ${templatePath}`);
     }
-    
+
     if (itemType === 'augment' && !templatePath.includes('augment')) {
         console.warn(`ItemSheetConfig | Template path mismatch for augment items: ${templatePath}`);
     }
@@ -153,10 +153,10 @@ export function calculateItemWeight(item) {
     if (!item || !item.system) {
         return 0;
     }
-    
+
     const weight = Number(item.system.weight) || 0;
     const quantity = Number(item.system.quantity) || 1;
-    
+
     return weight * quantity;
 }
 
@@ -186,23 +186,23 @@ export function formatItemDisplay(item) {
     if (!item) {
         return { displayText: '' };
     }
-    
+
     const name = item.name || 'Unnamed Item';
     const type = item.type || 'unknown';
     const system = item.system || {};
-    
+
     const result = {
         name: name,
         type: type,
         displayText: name
     };
-    
+
     // Type-specific formatting
     if (type === 'weapon') {
         const damage = system.damage || '';
         const damageType = system.damageType || '';
         const ability = system.ability || '';
-        
+
         const parts = [];
         if (damage && damageType) {
             result.damageInfo = `${damage} ${damageType}`;
@@ -211,42 +211,42 @@ export function formatItemDisplay(item) {
             result.damageInfo = damage;
             parts.push(damage);
         }
-        
+
         if (ability) {
             result.abilityInfo = ability;
             parts.push(ability);
         }
-        
+
         if (parts.length > 0) {
             result.displayText = `${name} (${parts.join(', ')})`;
         }
     } else if (type === 'armor') {
         const ac = system.ac;
         const ability = system.ability || '';
-        
+
         const parts = [];
         if (ac !== undefined && ac !== null) {
             result.acInfo = `AC +${ac}`;
             parts.push(result.acInfo);
         }
-        
+
         if (ability) {
             result.abilityInfo = ability;
             parts.push(ability);
         }
-        
+
         if (parts.length > 0) {
             result.displayText = `${name} (${parts.join(', ')})`;
         }
     } else if (type === 'feature') {
         const category = system.category;
-        
+
         if (category) {
             result.categoryInfo = category;
             result.displayText = `${name} (${category})`;
         }
     }
-    
+
     return result;
 }
 
@@ -280,16 +280,16 @@ export function extractItemFormData(formData) {
     if (!formData || typeof formData !== 'object') {
         return {};
     }
-    
+
     const result = {};
     const arrayFields = new Map(); // Track array fields separately
-    
+
     // First pass: collect all values, identifying array fields
     for (const [key, value] of Object.entries(formData)) {
         // Check if this is an array field (ends with [])
         const isArrayField = key.endsWith('[]');
         const cleanKey = isArrayField ? key.slice(0, -2) : key; // Remove [] suffix
-        
+
         if (isArrayField) {
             // Handle array field
             if (!arrayFields.has(cleanKey)) {
@@ -304,7 +304,7 @@ export function extractItemFormData(formData) {
         } else {
             // Handle regular field - split key into path segments
             const segments = cleanKey.split('.');
-            
+
             // Navigate/create the nested structure
             let current = result;
             for (let i = 0; i < segments.length - 1; i++) {
@@ -314,17 +314,17 @@ export function extractItemFormData(formData) {
                 }
                 current = current[segment];
             }
-            
+
             // Set the final value with type conversion
             const finalKey = segments[segments.length - 1];
             current[finalKey] = convertFormValue(value);
         }
     }
-    
+
     // Second pass: process array fields
     for (const [key, values] of arrayFields) {
         const segments = key.split('.');
-        
+
         // Navigate/create the nested structure
         let current = result;
         for (let i = 0; i < segments.length - 1; i++) {
@@ -334,12 +334,12 @@ export function extractItemFormData(formData) {
             }
             current = current[segment];
         }
-        
+
         // Set the array value with type conversion for each element
         const finalKey = segments[segments.length - 1];
         current[finalKey] = values.map(value => convertFormValue(value));
     }
-    
+
     return result;
 }
 
@@ -371,18 +371,18 @@ export function createItemSheetConfig(item) {
     if (!item || typeof item !== 'object') {
         return null;
     }
-    
+
     const itemType = item.type || 'unknown';
     const itemName = item.name || 'Unnamed Item';
-    
+
     const baseClasses = ['avant', 'sheet', 'item'];
     const classes = [...baseClasses, itemType];
-    
-        // Determine template based on type
+
+    // Determine template based on type
     let template;
     if (validateItemType(itemType)) {
         template = `systems/avant/templates/item/item-${itemType}-new.html`;
-        
+
         // Validate template exists (development warning)
         if (typeof console !== 'undefined' && validateItemType(itemType)) {
             validateTemplateExists(itemType, template);
@@ -421,11 +421,11 @@ function convertFormValue(value) {
     if (typeof value !== 'string') {
         return value;
     }
-    
+
     // Handle boolean values
     if (value === 'true') return true;
     if (value === 'false') return false;
-    
+
     // Handle numeric values (including decimals)
     if (/^-?\d+\.?\d*$/.test(value)) {
         const num = Number(value);
@@ -433,7 +433,186 @@ function convertFormValue(value) {
             return num;
         }
     }
-    
+
     // Return as string if no conversion applies
     return value;
+}
+
+/**
+ * Prepare meta fields for item sheet headers
+ * 
+ * This function organizes all header fields (except icon and name) into a standardized
+ * array that can be chunked into rows for consistent header layouts across all item types.
+ * 
+ * @param {Object} item - The item data
+ * @param {Object} system - The item's system data
+ * @returns {Array} Array of field objects for header display
+ */
+export function prepareItemHeaderMetaFields(item, system) {
+    const metaFields = [];
+
+    // Map different item types to their specific header fields
+    switch (item.type) {
+        case 'action':
+            // Actions typically only have icon and name, no meta fields
+            break;
+
+        case 'talent':
+            if (system.apCost !== undefined) {
+                metaFields.push({
+                    type: 'ap-selector',
+                    name: 'system.apCost',
+                    value: system.apCost,
+                    label: 'AP',
+                    hint: 'Action Point cost to use this talent',
+                    max: 3
+                });
+            }
+            break;
+
+        case 'augment':
+            if (system.apCost !== undefined) {
+                metaFields.push({
+                    type: 'ap-selector',
+                    name: 'system.apCost',
+                    value: system.apCost,
+                    label: 'AP',
+                    hint: 'Action Point cost to activate this augment',
+                    max: 3
+                });
+            }
+            if (system.ppCost !== undefined) {
+                metaFields.push({
+                    type: 'number',
+                    name: 'system.ppCost',
+                    value: system.ppCost,
+                    label: 'PP',
+                    min: 0,
+                    max: 20,
+                    placeholder: '0',
+                    hint: 'Power Point cost to use this augment'
+                });
+            }
+            break;
+
+        case 'weapon':
+            if (system.damage !== undefined) {
+                metaFields.push({
+                    type: 'text',
+                    name: 'system.damage',
+                    value: system.damage,
+                    label: 'Damage',
+                    placeholder: '1d8',
+                    hint: 'Weapon damage dice (e.g., 1d8, 2d6)'
+                });
+            }
+            if (system.modifier !== undefined) {
+                metaFields.push({
+                    type: 'number',
+                    name: 'system.modifier',
+                    value: system.modifier,
+                    label: 'Modifier',
+                    min: -10,
+                    max: 20,
+                    placeholder: '0',
+                    hint: 'Attack modifier bonus/penalty'
+                });
+            }
+            break;
+
+        case 'armor':
+            if (system.armorClass !== undefined) {
+                metaFields.push({
+                    type: 'number',
+                    name: 'system.armorClass',
+                    value: system.armorClass,
+                    label: 'AC',
+                    min: 10,
+                    max: 25,
+                    placeholder: '10',
+                    hint: 'Armor Class defense value'
+                });
+            }
+            if (system.threshold !== undefined) {
+                metaFields.push({
+                    type: 'number',
+                    name: 'system.threshold',
+                    value: system.threshold,
+                    label: 'Threshold',
+                    min: 0,
+                    max: 20,
+                    placeholder: '0',
+                    hint: 'Damage threshold before penetration'
+                });
+            }
+            break;
+
+        case 'gear':
+            if (system.weight !== undefined) {
+                metaFields.push({
+                    type: 'number',
+                    name: 'system.weight',
+                    value: system.weight,
+                    label: 'Weight',
+                    min: 0,
+                    step: 0.1,
+                    placeholder: '0',
+                    hint: 'Weight in pounds'
+                });
+            }
+            if (system.cost !== undefined) {
+                metaFields.push({
+                    type: 'number',
+                    name: 'system.cost',
+                    value: system.cost,
+                    label: 'Cost',
+                    min: 0,
+                    placeholder: '0',
+                    hint: 'Cost in credits'
+                });
+            }
+            break;
+
+        case 'feature':
+            if (system.powerPointCost !== undefined) {
+                metaFields.push({
+                    type: 'number',
+                    name: 'system.powerPointCost',
+                    value: system.powerPointCost,
+                    label: 'PP Cost',
+                    min: 0,
+                    max: 20,
+                    placeholder: '0',
+                    hint: 'Power Point cost to use this feature'
+                });
+            }
+            if (system.isActive !== undefined) {
+                metaFields.push({
+                    type: 'checkbox',
+                    name: 'system.isActive',
+                    checked: system.isActive,
+                    label: 'Active',
+                    hint: 'Is this an active feature?'
+                });
+            }
+            break;
+
+        case 'trait':
+            // Trait preview (if color and name exist)
+            if (system.color && item.name) {
+                metaFields.push({
+                    type: 'trait-preview',
+                    trait: system,
+                    itemName: item.name,
+                    label: 'Preview'
+                });
+            }
+            break;
+
+        default:
+            // No meta fields for unknown types
+            break;
+    }
+
+    return metaFields;
 } 

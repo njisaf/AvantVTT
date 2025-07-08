@@ -1,0 +1,119 @@
+{{!--
+Field Renderer Partial - Universal Field Rendering
+
+This partial renders any field type from the bodyFields array using
+the appropriate component partial. It acts as a dispatcher to the
+correct component based on field.type.
+
+Required context:
+- field: Field object with type, name, value, and other properties
+- editable: Whether the sheet is editable
+- displayTraits: For traits fields only
+
+Supported field types:
+- description: textarea with rich text editing
+- textarea: basic textarea
+- text: text input
+- number: number input
+- select: dropdown selection
+- checkbox: checkbox input
+- uses-counter: current/max counter
+- traits: trait chip input
+--}}
+
+{{#if (eq field.type "description")}}
+{{!-- Description field with rich text editing --}}
+{{> "systems/avant/templates/shared/partials/textarea-field.hbs"
+name=field.name
+value=field.value
+label=field.label
+rows=field.rows
+placeholder=field.placeholder
+hint=field.hint
+class=field.class}}
+
+{{else if (eq field.type "textarea")}}
+{{!-- Basic textarea field --}}
+{{> "systems/avant/templates/shared/partials/textarea-field.hbs"
+name=field.name
+value=field.value
+label=field.label
+rows=field.rows
+placeholder=field.placeholder
+hint=field.hint
+class=field.class}}
+
+{{else if (eq field.type "text")}}
+{{!-- Text input field --}}
+{{> "systems/avant/templates/shared/partials/text-field.hbs"
+name=field.name
+value=field.value
+label=field.label
+placeholder=field.placeholder
+hint=field.hint
+required=field.required
+maxlength=field.maxlength
+class=field.class}}
+
+{{else if (eq field.type "number")}}
+{{!-- Number input field --}}
+{{> "systems/avant/templates/shared/partials/number-field.hbs"
+name=field.name
+value=field.value
+label=field.label
+min=field.min
+max=field.max
+step=field.step
+placeholder=field.placeholder
+hint=field.hint
+class=field.class}}
+
+{{else if (eq field.type "select")}}
+{{!-- Select dropdown field --}}
+{{> "systems/avant/templates/shared/partials/select-field.hbs"
+name=field.name
+value=field.value
+label=field.label
+options=field.options
+hint=field.hint
+required=field.required
+class=field.class}}
+
+{{else if (eq field.type "checkbox")}}
+{{!-- Checkbox field --}}
+{{> "systems/avant/templates/shared/partials/checkbox-field.hbs"
+name=field.name
+checked=field.checked
+label=field.label
+hint=field.hint
+class=field.class}}
+
+{{else if (eq field.type "uses-counter")}}
+{{!-- Uses counter field --}}
+{{> "systems/avant/templates/shared/partials/uses-counter.hbs"
+name=field.name
+current=field.current
+max=field.max
+label=field.label
+hint=field.hint
+class=field.class}}
+
+{{else if (eq field.type "traits")}}
+{{!-- Traits field --}}
+{{> "systems/avant/templates/shared/partials/traits-field.hbs"
+name=field.name
+displayTraits=field.displayTraits
+label=field.label
+hint=field.hint
+editable=editable
+class=field.class}}
+
+{{else}}
+{{!-- Fallback for unknown field types --}}
+<div class="unknown-field-type" data-field-type="{{field.type}}">
+    <label class="form-label">{{field.label}}</label>
+    <div class="unknown-field-message">
+        Unsupported field type: {{field.type}}
+    </div>
+</div>
+{{/if}}

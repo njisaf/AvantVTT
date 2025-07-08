@@ -1,0 +1,47 @@
+{{!--
+Item Body Partial - Consistent Body Layout
+
+This partial provides a standardized body layout for all item sheets.
+It renders fields in row-containers based on the bodyFields array,
+automatically organizing fields into rows of max 2 items each.
+
+Required context:
+- bodyFields: Array of field objects prepared by prepareItemBodyFields()
+- editable: Whether the sheet is editable
+- displayTraits: Prepared trait display data (for traits fields)
+
+Features:
+- Auto-chunking into rows of max 2 fields
+- Full-width support for description and traits
+- All component types supported (text, number, select, textarea, etc.)
+- Responsive design with mobile support
+--}}
+
+<section class="sheet-body">
+    {{#if bodyFields}}
+    {{#each bodyFields as |field|}}
+    {{#if field.fullWidth}}
+    {{!-- Full-width fields get their own container --}}
+    <div class="row-container full-width">
+        {{> "systems/avant/templates/shared/partials/render-field.hbs" field=field editable=editable
+        displayTraits=displayTraits}}
+    </div>
+    {{else}}
+    {{!-- Regular fields - we'll chunk them in the template logic --}}
+    {{!-- Store non-full-width fields for chunking --}}
+    {{/if}}
+    {{/each}}
+
+    {{!-- Render non-full-width fields in chunked rows --}}
+    {{#with (filterArray bodyFields 'fullWidth' false)}}
+    {{#each (chunk this 2) as |fieldRow rowIndex|}}
+    <div class="row-container" data-row="{{add rowIndex 1}}">
+        {{#each fieldRow as |field|}}
+        {{> "systems/avant/templates/shared/partials/render-field.hbs" field=field editable=editable
+        displayTraits=displayTraits}}
+        {{/each}}
+    </div>
+    {{/each}}
+    {{/with}}
+    {{/if}}
+</section>

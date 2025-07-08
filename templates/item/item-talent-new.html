@@ -1,99 +1,69 @@
-{{!-- 
-  Talent Item Sheet Template - Phase 3 Component Library Version
-  
-  This template uses the unified component library to provide a clean,
-  accessible, and maintainable talent sheet experience. It replaces the
-  legacy talent template with modern component-based architecture.
-  
-  Features:
-  - Component library partials for consistent styling
-  - Single-content layout without tabs
-  - Enhanced accessibility with proper ARIA support
-  - AP selector with progressive functionality
-  - Trait chip input with autocomplete
-  - Comprehensive form validation
+{{!--
+Talent Item Sheet Template - Phase 3 Component Library Version
+
+This template uses the unified component library to provide a clean,
+accessible, and maintainable talent sheet experience. It replaces the
+legacy talent template with modern component-based architecture.
+
+Features:
+- Component library partials for consistent styling
+- Single-content layout without tabs
+- Enhanced accessibility with proper ARIA support
+- AP selector with progressive functionality
+- Trait chip input with autocomplete
+- Comprehensive form validation
 --}}
 
 <div class="item-sheet talent-sheet flexcol" autocomplete="off" data-application-part="form">
-    {{!-- Header Section --}}
-    <header class="sheet-header">
-        <div class="header-main">
-            {{!-- Image Upload Component --}}
-            {{> "systems/avant/templates/shared/partials/image-upload.hbs" 
-                src=item.img 
-                alt=item.name 
-                title=item.name 
-                size=64 
-                class="talent-image"}}
-            
-            {{!-- Name Field --}}
-            {{> "systems/avant/templates/shared/partials/text-field.hbs" 
-                name="name" 
-                value=item.name 
-                label="Talent Name" 
-                placeholder="Enter talent name..." 
-                required=true 
-                class="talent-name-field"}}
-        </div>
-        
-        <div class="header-costs">
-            {{!-- AP Selector Component --}}
-            {{> "systems/avant/templates/shared/partials/ap-selector.hbs" 
-                name="system.apCost" 
-                value=system.apCost 
-                label="AP" 
-                hint="Action Point cost to use this talent" 
-                max=3 
-                class="talent-ap-selector"}}
-        </div>
-    </header>
+    {{!-- Header Section - Using Consistent Layout --}}
+    {{> "systems/avant/templates/shared/partials/item-header.hbs"}}
 
     {{!-- Single Content Layout --}}
     {{#> "systems/avant/templates/shared/partials/single-content.hbs" class="talent-content"}}
-        
-        {{!-- Description Field --}}
-        {{> "systems/avant/templates/shared/partials/textarea-field.hbs" 
-            name="system.description" 
-            value=system.description 
-            label="Description" 
-            placeholder="Enter detailed description of this talent..." 
-            rows=6 
-            maxlength=2000 
-            hint="Describe what this talent does and how the character acquired it" 
-            class="talent-description"}}
-        
-        {{!-- Backstory Field --}}
-        {{> "systems/avant/templates/shared/partials/textarea-field.hbs" 
-            name="system.backstory" 
-            value=system.backstory 
-            label="Backstory" 
-            placeholder="How did your character learn this talent? (Optional)" 
-            rows=3 
-            maxlength=1000 
-            hint="Optional background story about how this talent was acquired" 
-            class="talent-backstory"}}
-        
-        {{!-- Form Row for Level Requirement --}}
-        {{#> "systems/avant/templates/shared/partials/form-row.hbs" class="talent-requirements"}}
-            {{> "systems/avant/templates/shared/partials/number-field.hbs" 
-                name="system.levelRequirement" 
-                value=system.levelRequirement 
-                label="Level Required" 
-                min=1 
-                max=20 
-                placeholder="1" 
-                hint="Minimum character level to learn this talent" 
-                class="talent-level-field"}}
-        {{/"systems/avant/templates/shared/partials/form-row.hbs"}}
-        
-        {{!-- Traits Field --}}
-        {{> "systems/avant/templates/shared/partials/traits-field.hbs" 
-            name="system.traits" 
-            displayTraits=displayTraits 
-            label="Traits" 
-            hint="Add traits to categorize and enhance this talent" 
-            editable=editable 
-            class="talent-traits"}}
-        
+
+    {{!-- Description Field --}}
+    {{> "systems/avant/templates/shared/partials/textarea-field.hbs"
+    name="system.description"
+    value=system.description
+    label="Description"
+    placeholder="Enter detailed description of this talent..."
+    rows=6
+    maxlength=2000
+    hint="Describe what this talent does and how the character acquired it"
+    class="talent-description"}}
+
+    {{!-- Backstory Field --}}
+    {{> "systems/avant/templates/shared/partials/textarea-field.hbs"
+    name="system.backstory"
+    value=system.backstory
+    label="Backstory"
+    placeholder="How did your character learn this talent? (Optional)"
+    rows=3
+    maxlength=1000
+    hint="Optional background story about how this talent was acquired"
+    class="talent-backstory"}}
+
+    {{!-- Form Row for Level Requirement --}}
+    {{#> "systems/avant/templates/shared/partials/form-row.hbs" class="talent-requirements"}}
+    {{> "systems/avant/templates/shared/partials/number-field.hbs"
+    name="system.levelRequirement"
+    value=system.levelRequirement
+    label="Level Required"
+    min=1
+    max=20
+    placeholder="1"
+    hint="Minimum character level to learn this talent"
+    class="talent-level-field"}}
+    {{/"systems/avant/templates/shared/partials/form-row.hbs"}}
+
+    {{!-- Traits Field --}}
+    {{> "systems/avant/templates/shared/partials/traits-field.hbs"
+    name="system.traits"
+    displayTraits=displayTraits
+    label="Traits"
+    hint="Add traits to categorize and enhance this talent"
+    editable=editable
+    class="talent-traits"}}
+
     {{/"systems/avant/templates/shared/partials/single-content.hbs"}}
-</div> 
+</div>
