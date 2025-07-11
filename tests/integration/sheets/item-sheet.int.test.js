@@ -9,8 +9,8 @@ import { jest } from '@jest/globals';
 // Setup FoundryVTT environment  
 import '../../setup.js';
 
-// Import the sheet class
-import { AvantItemSheet } from '../../../scripts/sheets/item-sheet.ts';
+// Import the sheet class factory
+import { createAvantItemSheet } from '../../../scripts/sheets/item-sheet.ts';
 
 describe('AvantItemSheet Integration Tests', () => {
     let itemSheet;
@@ -42,6 +42,7 @@ describe('AvantItemSheet Integration Tests', () => {
         mockHtml = global.jQuery(htmlElement);
 
         // Create sheet instance
+        const AvantItemSheet = createAvantItemSheet();
         itemSheet = new AvantItemSheet(mockItem, {});
         
         // Mock the isEditable getter to return true
@@ -104,7 +105,8 @@ describe('AvantItemSheet Integration Tests', () => {
 
         test('should not crash with non-editable sheet', () => {
             // Create a new sheet instance with isEditable = false
-            const nonEditableSheet = new AvantItemSheet(mockItem, {});
+            const AvantItemSheetClass = createAvantItemSheet();
+            const nonEditableSheet = new AvantItemSheetClass(mockItem, {});
             Object.defineProperty(nonEditableSheet, 'isEditable', {
                 get: () => false,
                 configurable: true
@@ -148,7 +150,7 @@ describe('AvantItemSheet Integration Tests', () => {
 
             // Should not throw even if roll logic fails
             expect(async () => {
-                await itemSheet._onRoll(mockEvent);
+                await itemSheet.onRoll(mockEvent, mockEvent.currentTarget);
             }).not.toThrow();
 
             expect(mockEvent.preventDefault).toHaveBeenCalled();
@@ -216,7 +218,7 @@ describe('AvantItemSheet Integration Tests', () => {
             };
 
             expect(async () => {
-                await itemSheet._onRoll(mockEvent);
+                await itemSheet.onRoll(mockEvent, mockEvent.currentTarget);
             }).not.toThrow();
         });
     });

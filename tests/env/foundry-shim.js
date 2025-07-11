@@ -17,6 +17,43 @@ import { TextEncoder, TextDecoder } from 'util';
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
 
+// Add DragEvent and DataTransfer for drag-and-drop tests
+global.DragEvent = class DragEvent extends Event {
+  constructor(type, eventInitDict = {}) {
+    super(type, eventInitDict);
+    this.dataTransfer = eventInitDict.dataTransfer || new DataTransfer();
+  }
+};
+
+global.DataTransfer = class DataTransfer {
+  constructor() {
+    this.data = {};
+    this.files = [];
+    this.types = [];
+  }
+  
+  setData(format, data) {
+    this.data[format] = data;
+    if (!this.types.includes(format)) {
+      this.types.push(format);
+    }
+  }
+  
+  getData(format) {
+    return this.data[format] || '';
+  }
+  
+  clearData(format) {
+    if (format) {
+      delete this.data[format];
+      this.types = this.types.filter(t => t !== format);
+    } else {
+      this.data = {};
+      this.types = [];
+    }
+  }
+};
+
 // Fix JSDOM initialization issues before any other setup
 if (typeof window !== 'undefined' && typeof document !== 'undefined') {
   // Ensure document has the proper EventTarget methods
@@ -1208,51 +1245,146 @@ if (typeof window !== 'undefined') {
   window.foundry = global.foundry;
 }
 
-// Mock the AvantItemSheet for testing
-global.AvantItemSheet = class MockAvantItemSheet {
-  constructor(document, options = {}) {
-    this.document = document;
-    this.options = { ...this.constructor.DEFAULT_OPTIONS, ...options };
-    this.element = null;
-  }
-  
-  static get DEFAULT_OPTIONS() {
+// Add missing FoundryVTT v13 utilities
+global.fromUuid = async (uuid) => {
+  return {
+    id: uuid,
+    name: `Mock Item ${uuid}`,
+    type: 'trait',
+    system: {
+      traitId: uuid,
+      description: 'Mock trait description'
+    }
+  };
+};
+
+// Enhanced TextEditor mock for v13
+global.TextEditor = {
+  getDragEventData: (event) => {
     return {
-      classes: ['avant', 'item-sheet'],
-      tag: 'div',
-      window: {
-        title: 'Mock Item Sheet',
-        icon: 'fas fa-file',
-        resizable: true
-      },
-      actions: {}
+      type: 'Item',
+      uuid: 'mock-uuid-123',
+      data: { name: 'Mock Item' }
     };
-  }
+  },
   
-  static get defaultOptions() {
-    return this.DEFAULT_OPTIONS;
-  }
-  
-  render(options = {}) {
-    return Promise.resolve(this);
-  }
-  
-  close() {
-    return Promise.resolve();
-  }
-  
-  _prepareSubmitData(event, form, formData) {
-    return formData;
-  }
-  
-  _onSubmit(event, form, formData) {
-    return this._prepareSubmitData(event, form, formData);
-  }
-  
-  _onDrop(event) {
-    return Promise.resolve();
+  enrichHTML: async (content, options = {}) => {
+    return content || '';
   }
 };
+
+// Mock game object for testing
+global.game = {
+  avant: {
+    initializationManager: {
+      waitForService: async (serviceName, timeout = 2000) => {
+        if (serviceName === 'traitProvider') {
+          return {
+            getAll: async () => ({
+              success: true,
+              data: [
+                { id: 'fire', name: 'Fire', color: '#ff0000', icon: 'fas fa-fire' },
+                { id: 'water', name: 'Water', color: '#0000ff', icon: 'fas fa-water' },
+                { id: 'earth', name: 'Earth', color: '#8b4513', icon: 'fas fa-mountain' }
+              ]
+            }),
+            findByReference: async (reference) => ({
+              success: true,
+              data: {
+                id: reference,
+                name: reference.charAt(0).toUpperCase() + reference.slice(1),
+                color: '#6c757d',
+                icon: 'fas fa-tag'
+              },
+              metadata: { matchType: 'exact' }
+            })
+          };
+        }
+        return null;
+      },
+      getService: (serviceName) => {
+        return global.game.avant.initializationManager.waitForService(serviceName, 0);
+      }
+    }
+  }
+};
+
+// Enhanced ApplicationV2 mocking for Phase 5 testing
+global.createAvantItemSheet = () => {
+  return class MockAvantItemSheet {
+    constructor(document, options = {}) {
+      this.document = document;
+      this.options = { ...this.constructor.DEFAULT_OPTIONS, ...options };
+      this.element = null;
+      this.isEditable = true;
+    }
+    
+    static get DEFAULT_OPTIONS() {
+      return {
+        classes: ['avant', 'item-sheet'],
+        tag: 'div',
+        window: {
+          title: 'Mock Item Sheet',
+          icon: 'fas fa-file',
+          resizable: true
+        },
+        actions: {}
+      };
+    }
+    
+    static get defaultOptions() {
+      return this.DEFAULT_OPTIONS;
+    }
+    
+    get parts() {
+      return {
+        form: {
+          template: 'systems/avant/templates/item/item-talent-new.html'
+        }
+      };
+    }
+    
+    async _prepareContext(options) {
+      return {
+        item: this.document.toObject(false),
+        system: this.document.system || {},
+        flags: this.document.flags || {},
+        editable: this.isEditable,
+        owner: this.document.isOwner || true,
+        displayTraits: [],
+        metaFields: [],
+        bodyFields: []
+      };
+    }
+    
+    async _renderHTML(context, options) {
+      return '<div class="mock-item-sheet">Mock HTML</div>';
+    }
+    
+    render(options = {}) {
+      return Promise.resolve(this);
+    }
+    
+    close() {
+      return Promise.resolve();
+    }
+    
+    _prepareSubmitData(event, form, formData) {
+      return formData;
+    }
+    
+    _onSubmit(event, form, formData) {
+      return this._prepareSubmitData(event, form, formData);
+    }
+    
+    _onDrop(event) {
+      return Promise.resolve();
+    }
+  };
+};
+
+// Mock the AvantItemSheet for testing
+global.AvantItemSheet = global.createAvantItemSheet();
 
 // Mock the AvantActorSheet for testing
 global.AvantActorSheet = class MockAvantActorSheet {

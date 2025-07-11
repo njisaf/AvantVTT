@@ -20,7 +20,7 @@ const mockItemSheetUtils = {
 };
 
 // Import the sheet class
-import { AvantItemSheet } from '../../scripts/sheets/item-sheet.ts';
+import { createAvantItemSheet } from '../../scripts/sheets/item-sheet.ts';
 
 // Use manual mock as ItemSheetUtils
 const ItemSheetUtils = mockItemSheetUtils;
@@ -43,6 +43,7 @@ describe('Item Sheet Wrapper Integration', () => {
         });
         
         // Create item sheet instance
+        const AvantItemSheet = createAvantItemSheet();
         itemSheet = new AvantItemSheet(mockItem);
         
         // Create jQuery-wrapped HTML element for v13 compatibility
@@ -187,7 +188,8 @@ describe('Item Sheet Wrapper Integration', () => {
         test('sheet handles missing item data gracefully', async () => {
             // ARRANGE: Create sheet with minimal item
             const minimalItem = createMockItem({ name: 'Empty Item', type: 'gear' });
-            const minimalSheet = new AvantItemSheet(minimalItem);
+            const AvantItemSheetClass = createAvantItemSheet();
+            const minimalSheet = new AvantItemSheetClass(minimalItem);
             
             // ACT: Get data should not throw
             let data;
@@ -201,7 +203,8 @@ describe('Item Sheet Wrapper Integration', () => {
         
         test('sheet handles utility function failures', async () => {
             // ARRANGE: Create sheet that might encounter errors
-            const errorSheet = new AvantItemSheet(mockItem);
+            const AvantItemSheetErrorClass = createAvantItemSheet();
+            const errorSheet = new AvantItemSheetErrorClass(mockItem);
             
             // ACT: Test that methods don't crash completely
             let data;

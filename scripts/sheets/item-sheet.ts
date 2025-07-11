@@ -36,7 +36,7 @@
  */
 
 import { ValidationUtils } from '../utils/validation.js';
-import { executeRoll, processFormData } from '../logic/item-sheet.js';
+import { executeRoll, processFormData } from '../logic/item-sheet.ts';
 import { prepareTemplateData, extractItemFormData, prepareItemHeaderMetaFields, prepareItemBodyFields } from '../logic/item-sheet-utils.js';
 import { logger } from '../utils/logger.js';
 import { initializeApSelector } from './ap-selector-handler';

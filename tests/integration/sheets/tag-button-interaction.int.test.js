@@ -29,18 +29,25 @@ describe('Tag Button Interaction Integration Tests', () => {
       dispatchEvent: jest.fn()
     };
 
-    // Mock HTML structure
+    // Mock HTML structure with querySelector for native DOM methods
     mockHtml = {
       find: jest.fn((selector) => {
         if (selector === 'input[name="system.tags"]') {
           return { 0: tagsInput };
         }
         return { each: jest.fn() };
+      }),
+      querySelector: jest.fn((selector) => {
+        if (selector === 'input[name="system.tags"]') {
+          return tagsInput;
+        }
+        return null;
       })
     };
 
     // Import and create item sheet
-    const { AvantItemSheet } = await import('../../../scripts/sheets/item-sheet.ts');
+    const { createAvantItemSheet } = await import('../../../scripts/sheets/item-sheet.ts');
+    const AvantItemSheet = createAvantItemSheet();
     itemSheet = new AvantItemSheet(mockItem, {});
     itemSheet.element = mockHtml;
   });
@@ -48,7 +55,7 @@ describe('Tag Button Interaction Integration Tests', () => {
   test('tag button adds single tag correctly', async () => {
     // Arrange
     const button = {
-      dataset: { tags: 'weapon' },
+      dataset: { tag: 'weapon' },
       classList: { add: jest.fn(), remove: jest.fn() }
     };
     const mockEvent = {
@@ -58,7 +65,7 @@ describe('Tag Button Interaction Integration Tests', () => {
     };
 
     // Act
-    await itemSheet._onTagExampleClick(mockEvent);
+    await itemSheet.onTagExampleClick(mockEvent, mockEvent.currentTarget);
 
     // Assert
     expect(tagsInput.value).toBe('weapon');
@@ -66,23 +73,38 @@ describe('Tag Button Interaction Integration Tests', () => {
   });
 
   test('tag button adds multiple tags correctly', async () => {
-    // Arrange
-    const button = {
-      dataset: { tags: 'weapon,armor' },
+    // Arrange - Add first tag
+    const button1 = {
+      dataset: { tag: 'weapon' },
       classList: { add: jest.fn(), remove: jest.fn() }
     };
-    const mockEvent = {
+    const mockEvent1 = {
       preventDefault: jest.fn(),
       stopPropagation: jest.fn(),
-      currentTarget: button
+      currentTarget: button1
     };
 
-    // Act
-    await itemSheet._onTagExampleClick(mockEvent);
+    // Act - Add first tag
+    await itemSheet.onTagExampleClick(mockEvent1, mockEvent1.currentTarget);
+
+    // Arrange - Add second tag
+    const button2 = {
+      dataset: { tag: 'armor' },
+      classList: { add: jest.fn(), remove: jest.fn() }
+    };
+    const mockEvent2 = {
+      preventDefault: jest.fn(),
+      stopPropagation: jest.fn(),
+      currentTarget: button2
+    };
+
+    // Act - Add second tag
+    await itemSheet.onTagExampleClick(mockEvent2, mockEvent2.currentTarget);
 
     // Assert
-    expect(tagsInput.value).toBe('weapon,armor');
-    expect(button.classList.add).toHaveBeenCalledWith('selected');
+    expect(tagsInput.value).toBe('weapon, armor');
+    expect(button1.classList.add).toHaveBeenCalledWith('selected');
+    expect(button2.classList.add).toHaveBeenCalledWith('selected');
   });
 
   test('tag button removes existing tags correctly', async () => {
@@ -90,7 +112,7 @@ describe('Tag Button Interaction Integration Tests', () => {
     tagsInput.value = 'weapon,armor,gear';
     
     const button = {
-      dataset: { tags: 'weapon,armor' },
+      dataset: { tag: 'weapon' },
       classList: { add: jest.fn(), remove: jest.fn() }
     };
     const mockEvent = {
@@ -100,10 +122,10 @@ describe('Tag Button Interaction Integration Tests', () => {
     };
 
     // Act
-    await itemSheet._onTagExampleClick(mockEvent);
+    await itemSheet.onTagExampleClick(mockEvent, mockEvent.currentTarget);
 
     // Assert
-    expect(tagsInput.value).toBe('gear');
+    expect(tagsInput.value).toBe('armor, gear');
     expect(button.classList.remove).toHaveBeenCalledWith('selected');
   });
 });

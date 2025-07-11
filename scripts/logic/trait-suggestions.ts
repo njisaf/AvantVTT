@@ -410,6 +410,89 @@ export function groupSuggestionsByCategory(
 }
 
 /**
+ * PHASE 4 UTILITY FUNCTION
+ * 
+ * Check if trait ID is legitimate
+ * 
+ * Validates trait IDs to ensure they are legitimate and not corrupted.
+ * 
+ * @param traitId - Trait ID to validate
+ * @returns True if trait ID is legitimate
+ */
+export function isLegitimateTraitId(traitId: any): boolean {
+    // Check basic type and existence
+    if (typeof traitId !== 'string' || !traitId) {
+        return false;
+    }
+
+    // Check for obvious corruption patterns
+    if (traitId.startsWith('[') || traitId.startsWith('{') || traitId.includes('"')) {
+        return false;
+    }
+
+    // Check reasonable length
+    if (traitId.length > 100) {
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * PHASE 4 UTILITY FUNCTION
+ * 
+ * Generate fallback trait name from ID
+ * 
+ * Generates a human-readable trait name from a trait ID when the actual name is not available.
+ * 
+ * @param traitId - Trait ID to generate name from
+ * @returns Generated trait name
+ */
+export function generateFallbackTraitName(traitId: any): string {
+    // Handle invalid input
+    if (!traitId || typeof traitId !== 'string') {
+        return 'Unknown Trait';
+    }
+
+    // Handle corrupted data
+    if (traitId.startsWith('[') || traitId.startsWith('{') || traitId.includes('"')) {
+        return 'Corrupted Trait';
+    }
+
+    // Handle very long IDs
+    if (traitId.length > 20) {
+        return 'Custom Trait';
+    }
+
+    // Convert various naming conventions to readable names
+    let name = traitId;
+
+    // Handle kebab-case
+    if (name.includes('-')) {
+        name = name.split('-').map(word => 
+            word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        ).join(' ');
+    }
+    // Handle snake_case
+    else if (name.includes('_')) {
+        name = name.split('_').map(word => 
+            word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        ).join(' ');
+    }
+    // Handle camelCase
+    else if (/[a-z][A-Z]/.test(name)) {
+        name = name.replace(/([a-z])([A-Z])/g, '$1 $2');
+        name = name.charAt(0).toUpperCase() + name.slice(1);
+    }
+    // Handle single word
+    else {
+        name = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+    }
+
+    return name;
+}
+
+/**
  * PHASE 4 ORCHESTRATION FUNCTION
  * 
  * Generate trait suggestions for query

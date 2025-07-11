@@ -6,18 +6,70 @@
  */
 
 /**
+ * Roll data interface for dice expressions
+ */
+export interface RollData {
+    /** The dice expression (e.g., "1d20+5") */
+    roll: string;
+    /** Optional label for the roll */
+    label?: string;
+}
+
+/**
+ * Item data interface for roll context
+ */
+export interface ItemData {
+    /** The name of the item */
+    name: string;
+}
+
+/**
+ * Available roll modes in FoundryVTT
+ */
+export type RollMode = 'publicroll' | 'blindroll' | 'gmroll' | 'selfroll';
+
+/**
+ * Roll message configuration
+ */
+export interface RollMessage {
+    /** Flavor text for the roll */
+    flavor: string;
+    /** Roll mode to use */
+    rollMode: RollMode;
+}
+
+/**
+ * Roll execution result
+ */
+export interface RollResult {
+    /** The dice expression to roll */
+    rollExpression: string;
+    /** Message configuration */
+    message: RollMessage;
+}
+
+/**
+ * Form data input type (flat key-value pairs)
+ */
+export type FormDataInput = Record<string, unknown>;
+
+/**
+ * Processed form data output (nested objects)
+ */
+export type ProcessedFormData = Record<string, unknown>;
+
+/**
  * Validates roll data to ensure it contains necessary information for a roll
  * 
  * This function checks if the roll data has a valid dice expression that can
  * be used to create a dice roll. It doesn't validate the actual dice syntax,
  * just that a non-empty roll expression exists.
  * 
- * @param {Object} rollData - The roll data object containing roll information
- * @param {string} rollData.roll - The dice expression (e.g., "1d20+5")
- * @param {string} [rollData.label] - Optional label for the roll
- * @returns {boolean} True if roll data is valid, false otherwise
+ * @param rollData - The roll data object containing roll information
+ * @returns True if roll data is valid, false otherwise
  * 
  * @example
+ * ```typescript
  * // Valid roll data
  * const valid = validateRollData({ roll: "1d6+2", label: "Damage" });
  * // Result: true
@@ -25,13 +77,15 @@
  * // Invalid roll data (missing roll)
  * const invalid = validateRollData({ label: "Attack" });
  * // Result: false
+ * ```
  */
-export function validateRollData(rollData) {
+export function validateRollData(rollData: unknown): rollData is RollData {
     if (!rollData || typeof rollData !== 'object') {
         return false;
     }
     
-    const roll = rollData.roll;
+    const data = rollData as Record<string, unknown>;
+    const roll = data.roll;
     return typeof roll === 'string' && roll.trim().length > 0;
 }
 
@@ -42,14 +96,13 @@ export function validateRollData(rollData) {
  * displaying the roll result. It determines the appropriate flavor text
  * (either from a provided label or the item name) and sets the roll mode.
  * 
- * @param {Object} rollData - The roll data object
- * @param {string} rollData.roll - The dice expression
- * @param {string} [rollData.label] - Optional label for the roll
- * @param {string} itemName - The name of the item being rolled
- * @param {string} [rollMode='publicroll'] - The roll mode to use
- * @returns {Object} Message configuration object
+ * @param rollData - The roll data object
+ * @param itemName - The name of the item being rolled (optional)
+ * @param rollMode - The roll mode to use (defaults to 'publicroll')
+ * @returns Message configuration object
  * 
  * @example
+ * ```typescript
  * // With label
  * const msg1 = createRollMessage({ roll: "1d8", label: "Damage" }, "Sword");
  * // Result: { flavor: "Damage", rollMode: "publicroll" }
@@ -57,8 +110,13 @@ export function validateRollData(rollData) {
  * // Without label (uses item name)
  * const msg2 = createRollMessage({ roll: "1d6" }, "Dagger");
  * // Result: { flavor: "Dagger", rollMode: "publicroll" }
+ * ```
  */
-export function createRollMessage(rollData, itemName, rollMode = 'publicroll') {
+export function createRollMessage(
+    rollData: RollData, 
+    itemName?: string, 
+    rollMode: RollMode = 'publicroll'
+): RollMessage {
     const flavor = rollData.label || itemName || '';
     
     return {
@@ -74,15 +132,13 @@ export function createRollMessage(rollData, itemName, rollMode = 'publicroll') {
  * a dice roll. It validates the input and prepares the roll configuration
  * but doesn't actually execute the roll (that's handled by the sheet wrapper).
  * 
- * @param {Object} rollData - The roll data from the UI element
- * @param {string} rollData.roll - The dice expression to roll
- * @param {string} [rollData.label] - Optional label for the roll
- * @param {Object} itemData - The item data object
- * @param {string} itemData.name - The name of the item
- * @param {string} [rollMode='publicroll'] - The roll mode to use
- * @returns {Object|null} Roll configuration object or null if invalid
+ * @param rollData - The roll data from the UI element
+ * @param itemData - The item data object (optional)
+ * @param rollMode - The roll mode to use (defaults to 'publicroll')
+ * @returns Roll configuration object or null if invalid
  * 
  * @example
+ * ```typescript
  * // Valid roll
  * const rollConfig = executeRoll(
  *     { roll: "1d6+2", label: "Damage" },
@@ -92,16 +148,22 @@ export function createRollMessage(rollData, itemName, rollMode = 'publicroll') {
  * //   rollExpression: "1d6+2",
  * //   message: { flavor: "Damage", rollMode: "publicroll" }
  * // }
+ * ```
  */
-export function executeRoll(rollData, itemData, rollMode = 'publicroll') {
+export function executeRoll(
+    rollData: unknown, 
+    itemData?: ItemData, 
+    rollMode: RollMode = 'publicroll'
+): RollResult | null {
     // Validate the roll data
     if (!validateRollData(rollData)) {
         return null;
     }
     
     // Basic validation of dice expression format
+    // Only allow dice notation with basic math operations and parentheses
     const rollExpression = rollData.roll.trim();
-    if (!/^[0-9d+\-*\/\(\)\s]+$/i.test(rollExpression)) {
+    if (!/^[0-9d+\-*/() \s]+$/i.test(rollExpression)) {
         return null;
     }
     
@@ -121,11 +183,11 @@ export function executeRoll(rollData, itemData, rollMode = 'publicroll') {
  * it into nested objects with proper data type conversion. It handles numeric
  * conversion for appropriate fields and maintains the proper structure.
  * 
- * @param {Object} formData - Flat form data object from form submission
- * @param {string} itemType - The type of item being processed
- * @returns {Object} Processed nested object with converted data types
+ * @param formData - Flat form data object from form submission
+ * @returns Processed nested object with converted data types
  * 
  * @example
+ * ```typescript
  * // Input form data
  * const formData = {
  *     "system.damage": "10",
@@ -134,18 +196,21 @@ export function executeRoll(rollData, itemData, rollMode = 'publicroll') {
  * };
  * 
  * // Processed result
- * const result = processFormData(formData, "weapon");
+ * const result = processFormData(formData);
  * // Result: {
  * //   system: { damage: 10, weight: 5.5 },
  * //   name: "Iron Sword"
  * // }
+ * ```
  */
-export function processFormData(formData, itemType) {
+export function processFormData(
+    formData: FormDataInput | null | undefined
+): ProcessedFormData {
     if (!formData || typeof formData !== 'object') {
         return {};
     }
     
-    const result = {};
+    const result: ProcessedFormData = {};
     
     // Process each form field
     for (const [key, value] of Object.entries(formData)) {
@@ -153,13 +218,13 @@ export function processFormData(formData, itemType) {
         const segments = key.split('.');
         
         // Navigate/create the nested structure
-        let current = result;
+        let current: Record<string, unknown> = result;
         for (let i = 0; i < segments.length - 1; i++) {
             const segment = segments[i];
             if (!current[segment]) {
                 current[segment] = {};
             }
-            current = current[segment];
+            current = current[segment] as Record<string, unknown>;
         }
         
         // Set the final value with appropriate type conversion
@@ -177,11 +242,10 @@ export function processFormData(formData, itemType) {
  * and converts it accordingly. It handles numbers, booleans, and preserves
  * strings when appropriate.
  * 
- * @param {string} value - The string value to convert
- * @returns {number|boolean|string} The converted value
- * @private
+ * @param value - The value to convert
+ * @returns The converted value with appropriate type
  */
-function convertValue(value) {
+function convertValue(value: unknown): unknown {
     if (typeof value !== 'string') {
         return value;
     }
@@ -200,4 +264,4 @@ function convertValue(value) {
     
     // Return as string if no conversion applies
     return value;
-} 
+}
