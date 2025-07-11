@@ -6,6 +6,7 @@
   "scripts": {
     "build": "npm run clean:dist && npm run build:scss:dist && npm run build:ts && npm run build:packs && npm run ci:validate && npm run validate:partials && npm run validate:templates",
     "build:ts": "tsc --noEmit && vite build",
+    "deploy": "scripts/deployment/build-and-deploy.sh",
     "ci:validate": "node scripts/ci-path-validation.js",
     "validate:partials": "node scripts/validate-partials.js",
     "validate:templates": "node scripts/ci-template-validation.js",

@@ -365,7 +365,7 @@ export function createAvantItemSheet() {
             };
 
             // Use specific template if available, otherwise fall back to universal
-            const templatePath = specificTemplates[itemType] || "systems/avant/templates/item-sheet.html";
+            const templatePath = specificTemplates[itemType] || "systems/avant/templates/item/universal-item-sheet.html";
 
             const partsConfig = {
                 form: {
@@ -561,6 +561,41 @@ export function createAvantItemSheet() {
                     traitsCount: context.displayTraits?.length || 0,
                     traitNames: context.displayTraits?.map((t: any) => t.name) || []
                 });
+
+                // WORKAROUND: Since Handlebars context passing fails, override system.traits with enhanced data
+                // This allows the template to use the enhanced trait data directly through the 'value' parameter
+                if (context.displayTraits && context.displayTraits.length > 0) {
+                    // Store original trait IDs for form submission
+                    context.system.originalTraits = context.system.traits;
+                    // Replace system.traits with enhanced trait objects for display
+                    context.system.traits = context.displayTraits;
+                    
+                    console.log('🔧 WORKAROUND | Enhanced trait data passed through system.traits:', {
+                        originalTraits: context.system.originalTraits,
+                        enhancedTraits: context.system.traits.map((t: any) => ({
+                            id: t.id,
+                            name: t.name,
+                            color: t.color,
+                            icon: t.icon
+                        }))
+                    });
+                }
+
+                // DEEP DEBUGGING: Log the exact structure of displayTraits for template
+                console.log('🔧 CONTEXT DEEP DEBUG | displayTraits structure:', {
+                    isArray: Array.isArray(context.displayTraits),
+                    length: context.displayTraits?.length || 0,
+                    firstTraitStructure: context.displayTraits?.[0] ? {
+                        id: context.displayTraits[0].id,
+                        name: context.displayTraits[0].name,
+                        color: context.displayTraits[0].color,
+                        textColor: context.displayTraits[0].textColor,
+                        icon: context.displayTraits[0].icon,
+                        source: context.displayTraits[0].source,
+                        allKeys: Object.keys(context.displayTraits[0])
+                    } : null,
+                    fullData: context.displayTraits
+                });
             } catch (error) {
                 logger.error('AvantItemSheet | Failed to prepare trait display data:', error);
                 // Fallback to empty array to prevent template errors
@@ -587,7 +622,8 @@ export function createAvantItemSheet() {
                 itemName: this.document?.name || 'Unknown',
                 itemType: this.document?.type || 'Unknown',
                 traitIds,
-                traitCount: traitIds.length
+                traitCount: traitIds.length,
+                traitIdTypes: traitIds.map((id: string) => ({ id, type: typeof id, length: id?.length || 0 }))
             });
 
             // CRITICAL: Always return displayable data, never empty
@@ -631,24 +667,51 @@ export function createAvantItemSheet() {
                             const result = await traitProvider.getAll();
 
                             if (result.success && result.data) {
-                                const allTraits = result.data;
+                                // CRITICAL FIX: Use findByReference instead of exact ID matching
+                                // This allows flexible trait lookup (Fire, avant-trait-fire, etc.)
+                                const enhancedTraits = await Promise.all(traitIds.map(async (traitId: string) => {
+                                    try {
+                                        // Use the enhanced findByReference method for flexible trait lookup
+                                        const traitResult = await traitProvider.findByReference(traitId);
 
-                                // Enhance each trait with rich data
-                                const enhancedTraits = traitIds.map((traitId: string) => {
-                                    const trait = allTraits.find((t: any) => t.id === traitId);
-                                    if (trait) {
-                                        return {
-                                            id: traitId,
-                                            name: trait.name,
-                                            color: trait.color || '#00E0DC',
-                                            textColor: trait.textColor || '#000000',
-                                            icon: trait.icon || 'fas fa-tag',
-                                            description: trait.description || trait.name,
-                                            displayId: traitId,
-                                            source: 'service'
-                                        };
-                                    } else {
-                                        // Keep fallback for missing traits
+                                        if (traitResult.success && traitResult.data) {
+                                            const trait = traitResult.data;
+                                            const matchType = traitResult.metadata?.matchType || 'unknown';
+
+                                            return {
+                                                id: trait.id,
+                                                name: trait.name,
+                                                color: trait.color || '#00E0DC', // Fallback to primary accent
+                                                textColor: trait.textColor || '#000000', // Explicit text color
+                                                icon: trait.icon || 'fas fa-tag',
+                                                description: trait.description,
+                                                displayId: traitId,
+                                                matchType: matchType,
+                                                source: 'service'
+                                            };
+                                        } else {
+                                            // Only log warning for legitimate trait IDs, not corrupted data
+                                            if (traitId && typeof traitId === 'string' && !traitId.startsWith('[') && !traitId.startsWith('{')) {
+                                                logger.warn('AvantItemSheet | Trait not found in provider:', traitId);
+                                            } else {
+                                                logger.debug('AvantItemSheet | Skipping corrupted trait data:', traitId);
+                                            }
+
+                                            // Keep fallback for missing traits
+                                            return fallbackTraits.find((f: any) => f.id === traitId) || {
+                                                id: traitId,
+                                                name: this._generateFallbackTraitName(traitId),
+                                                displayId: traitId,
+                                                color: '#6C757D',
+                                                textColor: '#FFFFFF',
+                                                icon: 'fas fa-tag',
+                                                description: `Unknown trait: ${traitId}`,
+                                                source: 'fallback'
+                                            };
+                                        }
+                                    } catch (error) {
+                                        logger.warn('AvantItemSheet | Error looking up trait:', traitId, error);
+                                        // Return fallback on error
                                         return fallbackTraits.find((f: any) => f.id === traitId) || {
                                             id: traitId,
                                             name: this._generateFallbackTraitName(traitId),
@@ -660,12 +723,19 @@ export function createAvantItemSheet() {
                                             source: 'fallback'
                                         };
                                     }
-                                });
+                                }));
 
                                 logger.debug('AvantItemSheet | Enhanced trait display data:', {
                                     enhancedCount: enhancedTraits.filter((t: any) => t.source === 'service').length,
                                     fallbackCount: enhancedTraits.filter((t: any) => t.source === 'fallback').length,
-                                    totalCount: enhancedTraits.length
+                                    totalCount: enhancedTraits.length,
+                                    traitDetails: enhancedTraits.map((t: any) => ({
+                                        id: t.id,
+                                        name: t.name,
+                                        source: t.source,
+                                        matchType: t.matchType,
+                                        color: t.color
+                                    }))
                                 });
 
                                 return enhancedTraits;

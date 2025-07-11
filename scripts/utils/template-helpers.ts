@@ -283,14 +283,18 @@ export async function registerAvantHandlebarsHelpers(Handlebars: any): Promise<v
     // Helper to get trait styling from rich trait object (used in displayTraits branch)
     if (!Handlebars.helpers.traitChipStyle) {
         Handlebars.registerHelper('traitChipStyle', function (trait: any) {
+            console.log('🔧 TRAIT HELPER DEBUG | traitChipStyle called with:', trait);
             if (!trait) return '--trait-color: #6C757D; --trait-text-color: #000000;';
 
             if (trait.color) {
                 const textColor = isLightColor(trait.color) ? '#000000' : '#FFFFFF';
-                return `--trait-color: ${trait.color}; --trait-text-color: ${textColor};`;
+                const result = `--trait-color: ${trait.color}; --trait-text-color: ${textColor};`;
+                console.log('🔧 TRAIT HELPER DEBUG | traitChipStyle returning:', result);
+                return result;
             }
 
             // Fallback styling
+            console.log('🔧 TRAIT HELPER DEBUG | traitChipStyle using fallback styling');
             return '--trait-color: #6C757D; --trait-text-color: #000000;';
         });
     }
@@ -298,12 +302,23 @@ export async function registerAvantHandlebarsHelpers(Handlebars: any): Promise<v
     // Helper to get trait data attributes from rich trait object
     if (!Handlebars.helpers.traitChipData) {
         Handlebars.registerHelper('traitChipData', function (trait: any) {
+            console.log('🔧 TRAIT HELPER DEBUG | traitChipData called with:', trait);
             if (!trait) return 'data-trait-type="unknown" data-trait-source="fallback"';
 
             const traitType = trait.type || trait.category || 'custom';
             const traitSource = trait.source || (trait.id?.startsWith('system_trait_') ? 'system' : 'custom');
 
-            return `data-trait-id="${trait.id}" data-trait-type="${traitType}" data-trait-source="${traitSource}"`;
+            // Build base attributes
+            let result = `data-trait-id="${trait.id}" data-trait-type="${traitType}" data-trait-source="${traitSource}"`;
+            
+            // Only add data-color and data-text-color if trait has a color (for CSS selector matching)
+            if (trait.color) {
+                const textColor = isLightColor(trait.color) ? '#000000' : '#FFFFFF';
+                result += ` data-color="${trait.color}" data-text-color="${textColor}"`;
+            }
+            
+            console.log('🔧 TRAIT HELPER DEBUG | traitChipData returning:', result);
+            return result;
         });
     }
 
@@ -473,54 +488,30 @@ export async function registerAvantHandlebarsHelpers(Handlebars: any): Promise<v
     }
 
     // =============================================================================
-    // TRAIT ACCESSIBILITY HELPERS
+    // TRAIT ACCESSIBILITY HELPERS - REMOVED DUPLICATE REGISTRATIONS
+    // =============================================================================
+    //
+    // CRITICAL FIX: The trait helpers were being registered twice in this file.
+    // The first registration (lines 284-308) was correct and used isLightColor()
+    // to determine text color automatically. The second registration (here) was
+    // incorrect and expected a textColor property that doesn't exist on trait objects.
+    //
+    // The duplicate registration was overriding the working helpers with broken ones.
+    // This section has been removed to prevent the override.
+    //
+    // The working helpers are registered earlier in this file (lines 284-308).
     // =============================================================================
 
-    // Trait chip styling helper
-    if (!Handlebars.helpers.traitChipStyle) {
-        Handlebars.registerHelper('traitChipStyle', function (trait: any) {
-            console.log('🔧 TRAIT HELPER DEBUG | traitChipStyle called with:', trait);
-
-            if (!trait || !trait.color) {
-                console.log('🔧 TRAIT HELPER DEBUG | traitChipStyle - no trait or color, using fallback');
-                return '--trait-color: #6C757D; --trait-text-color: #000000;';
-            }
-
-            // Validate color format
-            if (!trait.color || typeof trait.color !== 'string') {
-                console.warn(`Invalid trait color format: ${trait.color}. Using fallback.`);
-                return '--trait-color: #6C757D; --trait-text-color: #000000;';
-            }
-
-            // Use explicit textColor if provided, otherwise default to black
-            const textColor = trait.textColor || '#000000';
-            const result = `--trait-color: ${trait.color}; --trait-text-color: ${textColor};`;
-            console.log('🔧 TRAIT HELPER DEBUG | traitChipStyle result:', result);
-            return result;
-        });
-    }
-
-    // Trait chip data attributes helper
-    if (!Handlebars.helpers.traitChipData) {
-        Handlebars.registerHelper('traitChipData', function (trait: any) {
-            console.log('🔧 TRAIT HELPER DEBUG | traitChipData called with:', trait);
-
-            if (!trait || !trait.color) {
-                console.log('🔧 TRAIT HELPER DEBUG | traitChipData - no trait or color, using fallback');
-                return 'data-color="#6C757D" data-text-color="#000000"';
-            }
-
-            // Validate color format
-            if (!trait.color || typeof trait.color !== 'string') {
-                console.warn(`Invalid trait color format in data attributes: ${trait.color}. Using fallback.`);
-                return 'data-color="#6C757D" data-text-color="#000000"';
-            }
-
-            // Use explicit textColor if provided, otherwise default to black
-            const textColor = trait.textColor || '#000000';
-            const result = `data-color="${trait.color}" data-text-color="${textColor}"`;
-            console.log('🔧 TRAIT HELPER DEBUG | traitChipData result:', result);
-            return result;
+    // Debug helper to trace template rendering flow
+    if (!Handlebars.helpers.debugContext) {
+        Handlebars.registerHelper('debugContext', function (label: string, context: any) {
+            console.log(`🔧 TEMPLATE DEBUG | ${label}:`, {
+                hasDisplayTraits: !!context,
+                contextType: typeof context,
+                contextLength: context ? context.length : 0,
+                contextValue: context
+            });
+            return '';
         });
     }
 

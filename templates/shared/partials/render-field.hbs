@@ -111,9 +111,24 @@ class=field.class}}
 
 {{else if (eq field.type "traits")}}
 {{!-- Traits field --}}
+<script>
+console.log('🔧 RENDER-FIELD DEBUG | Traits field context:', {
+  fieldType: field.type,
+  fieldName: field.name,
+  fieldValue: field.value,
+  fieldValueType: typeof field.value,
+  fieldValueLength: field.value ? field.value.length : 0,
+  hasDisplayTraits: !!displayTraits,
+  displayTraitsType: typeof displayTraits,
+  displayTraitsLength: displayTraits ? displayTraits.length : 0,
+  displayTraitsData: displayTraits,
+  editable: editable
+});
+</script>
 {{> "systems/avant/templates/shared/partials/traits-field"
 name=field.name
-displayTraits=field.displayTraits
+displayTraits=displayTraits
+value=field.value
 label=field.label
 hint=field.hint
 editable=editable

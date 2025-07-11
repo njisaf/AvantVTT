@@ -20,6 +20,9 @@ import type {
     ServiceRegistry
 } from '../types/core/initialization.js';
 
+// Import template helpers statically to ensure they're bundled
+import { initializeHandlebarsHelpers } from './template-helpers.js';
+
 /**
  * Service registration and dependency management for FoundryVTT systems
  * Prevents load order issues by ensuring dependencies are met before initialization
@@ -757,7 +760,6 @@ export class FoundryInitializationHelper {
 
             // Register all Handlebars helpers through dedicated helper module
             // These provide custom helper functions like {{traitChipStyle}}, {{localize}}, etc.
-            const { initializeHandlebarsHelpers } = await import('./template-helpers');
             const helpersRegistered = await initializeHandlebarsHelpers();
 
             if (!helpersRegistered) {

@@ -15,7 +15,11 @@ Required: name, label
 Optional: hint, class, editable (defaults to true), displayTraits
 --}}
 
-{{!-- REMOVED DEBUG HELPERS - they were causing template rendering failures --}}
+{{!-- DEBUGGING: Use Handlebars helper to trace context (inline JS disabled in FoundryVTT v13+) --}}
+{{debugContext "TRAITS-FIELD displayTraits" displayTraits}}
+{{debugContext "TRAITS-FIELD testTraits" testTraits}}
+{{debugContext "TRAITS-FIELD traitsData" traitsData}}
+{{debugContext "TRAITS-FIELD value" value}}
 
 <div class="form-group {{#if class}}{{class}}{{/if}}">
     <label for="{{name}}" class="form-label">
@@ -26,28 +30,30 @@ Optional: hint, class, editable (defaults to true), displayTraits
     <!-- Edit mode: Trait chip input with autocomplete -->
     <div class="trait-chip-input">
         <div class="trait-chips">
-            {{!-- Process displayTraits if available, otherwise fallback to value (raw IDs) --}}
-            {{#if displayTraits}}
-            {{#each displayTraits as |trait|}}
-            <div class="trait-chip" style="{{traitChipStyle trait}}" {{traitChipData trait}}>
-                {{#if trait.icon}}<i class="{{trait.icon}}" aria-hidden="true"></i>{{/if}}
-                <span class="trait-name">{{trait.name}}</span>
-                <button type="button" class="trait-remove" data-action="removeTrait" data-trait-id="{{trait.id}}"
-                    aria-label="Remove {{trait.name}}">
+            {{!-- Smart trait display: detect enhanced objects vs raw IDs in value parameter --}}
+            {{#if value}}
+            {{#each value as |traitItem|}}
+            {{#if traitItem.name}}
+            {{!-- Enhanced trait object with name, color, icon --}}
+            <div class="trait-chip" style="background-color: {{traitItem.color}}; color: {{traitItem.textColor}};" data-trait-id="{{traitItem.id}}" data-trait-type="{{traitItem.type}}" data-trait-source="{{traitItem.source}}">
+                {{#if traitItem.icon}}<i class="{{traitItem.icon}}" aria-hidden="true"></i>{{/if}}
+                <span class="trait-name">{{traitItem.name}}</span>
+                <button type="button" class="trait-remove" data-action="removeTrait" data-trait-id="{{traitItem.id}}"
+                    aria-label="Remove {{traitItem.name}}">
                     <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
-            {{/each}}
-            {{else if value}}
-            {{#each value as |traitId|}}
-            <div class="trait-chip" style="{{traitChipStyleFromId traitId}}" data-trait-id="{{traitId}}">
-                {{#if (traitIconFromId traitId)}}<i class="{{traitIconFromId traitId}}" aria-hidden="true"></i>{{/if}}
-                <span class="trait-name">{{traitNameFromId traitId}}</span>
-                <button type="button" class="trait-remove" data-action="removeTrait" data-trait-id="{{traitId}}"
-                    aria-label="Remove {{traitNameFromId traitId}}">
+            {{else}}
+            {{!-- Raw trait ID - use fallback helpers --}}
+            <div class="trait-chip" style="{{traitChipStyleFromId traitItem}}" data-trait-id="{{traitItem}}">
+                {{#if (traitIconFromId traitItem)}}<i class="{{traitIconFromId traitItem}}" aria-hidden="true"></i>{{/if}}
+                <span class="trait-name">{{traitNameFromId traitItem}}</span>
+                <button type="button" class="trait-remove" data-action="removeTrait" data-trait-id="{{traitItem}}"
+                    aria-label="Remove {{traitNameFromId traitItem}}">
                     <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
+            {{/if}}
             {{/each}}
             {{/if}}
         </div>
@@ -70,28 +76,36 @@ Optional: hint, class, editable (defaults to true), displayTraits
     {{else}}
     <!-- Read-only mode: Display trait chips without input -->
     <div class="trait-display">
-        {{#if displayTraits}}
-        {{#each displayTraits as |trait|}}
-        <div class="trait-chip trait-chip-readonly" style="{{traitChipStyle trait}}" {{traitChipData trait}}>
-            {{#if trait.icon}}<i class="{{trait.icon}}" aria-hidden="true"></i>{{/if}}
-            <span class="trait-name">{{trait.name}}</span>
+        {{#if value}}
+        {{#each value as |traitItem|}}
+        {{#if traitItem.name}}
+        {{!-- Enhanced trait object with name, color, icon --}}
+        <div class="trait-chip trait-chip-readonly" style="background-color: {{traitItem.color}}; color: {{traitItem.textColor}};" data-trait-id="{{traitItem.id}}" data-trait-type="{{traitItem.type}}" data-trait-source="{{traitItem.source}}">
+            {{#if traitItem.icon}}<i class="{{traitItem.icon}}" aria-hidden="true"></i>{{/if}}
+            <span class="trait-name">{{traitItem.name}}</span>
         </div>
-        {{/each}}
-        {{else if value}}
-        {{#each value as |traitId|}}
-        <div class="trait-chip trait-chip-readonly" style="{{traitChipStyleFromId traitId}}"
-            data-trait-id="{{traitId}}">
-            {{#if (traitIconFromId traitId)}}<i class="{{traitIconFromId traitId}}" aria-hidden="true"></i>{{/if}}
-            <span class="trait-name">{{traitNameFromId traitId}}</span>
+        {{else}}
+        {{!-- Raw trait ID - use fallback helpers --}}
+        <div class="trait-chip trait-chip-readonly" style="{{traitChipStyleFromId traitItem}}"
+            data-trait-id="{{traitItem}}">
+            {{#if (traitIconFromId traitItem)}}<i class="{{traitIconFromId traitItem}}" aria-hidden="true"></i>{{/if}}
+            <span class="trait-name">{{traitNameFromId traitItem}}</span>
         </div>
+        {{/if}}
         {{/each}}
         {{/if}}
     </div>
     {{/if}}
 
     <!-- Hidden inputs to store the actual trait IDs as array -->
-    {{#each value as |traitId|}}
-    <input type="hidden" name="{{../name}}[]" value="{{traitId}}">
+    {{#each value as |traitItem|}}
+    {{#if traitItem.name}}
+    {{!-- Enhanced trait object - use the ID --}}
+    <input type="hidden" name="{{../name}}[]" value="{{traitItem.id}}">
+    {{else}}
+    {{!-- Raw trait ID --}}
+    <input type="hidden" name="{{../name}}[]" value="{{traitItem}}">
+    {{/if}}
     {{/each}}
 
     {{#if hint}}

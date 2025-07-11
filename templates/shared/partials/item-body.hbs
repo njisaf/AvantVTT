@@ -23,6 +23,18 @@ Features:
     {{#if field.fullWidth}}
     {{!-- Full-width fields get their own container --}}
     <div class="row-container full-width">
+        {{#if (eq field.type "traits")}}
+        <script>
+        console.log('🔧 ITEM-BODY DEBUG | Full-width traits field:', {
+          fieldType: field.type,
+          fieldName: field.name,
+          hasDisplayTraits: !!displayTraits,
+          displayTraitsType: typeof displayTraits,
+          displayTraitsLength: displayTraits ? displayTraits.length : 0,
+          displayTraitsPreview: displayTraits ? displayTraits.slice(0, 2) : null
+        });
+        </script>
+        {{/if}}
         {{> "systems/avant/templates/shared/partials/render-field" field=field editable=editable
         displayTraits=displayTraits}}
     </div>
@@ -37,6 +49,19 @@ Features:
     {{#each (chunk this 2) as |fieldRow rowIndex|}}
     <div class="row-container" data-row="{{add rowIndex 1}}">
         {{#each fieldRow as |field|}}
+        {{#if (eq field.type "traits")}}
+        <script>
+        console.log('🔧 ITEM-BODY DEBUG | Chunked traits field:', {
+          fieldType: field.type,
+          fieldName: field.name,
+          rowIndex: {{rowIndex}},
+          hasDisplayTraits: !!displayTraits,
+          displayTraitsType: typeof displayTraits,
+          displayTraitsLength: displayTraits ? displayTraits.length : 0,
+          displayTraitsPreview: displayTraits ? displayTraits.slice(0, 2) : null
+        });
+        </script>
+        {{/if}}
         {{> "systems/avant/templates/shared/partials/render-field" field=field editable=editable
         displayTraits=displayTraits}}
         {{/each}}
