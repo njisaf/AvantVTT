@@ -16,12 +16,12 @@ Features:
 
 <div class="item-sheet trait-sheet flexcol" autocomplete="off" data-application-part="form">
     {{!-- Header Section - Using Consistent Layout --}}
-    {{> "systems/avant/templates/shared/partials/item-header.hbs"}}
+    {{> "systems/avant/templates/shared/partials/item-header"}}
 
     {{!-- Body Section --}}
     <div class="sheet-body">
         {{!-- Description Field --}}
-        {{> "systems/avant/templates/shared/partials/textarea-field.hbs"
+        {{> "systems/avant/templates/shared/partials/textarea-field"
         name="system.description"
         value=system.description
         label="Description"
@@ -32,7 +32,7 @@ Features:
         {{!-- Color and Icon Row --}}
         <div class="form-row">
             {{!-- Trait Color Field --}}
-            {{> "systems/avant/templates/shared/partials/text-field.hbs"
+            {{> "systems/avant/templates/shared/partials/text-field"
             name="system.color"
             value=system.color
             label="Color"
@@ -42,7 +42,7 @@ Features:
             class="trait-color"}}
 
             {{!-- Trait Icon Field --}}
-            {{> "systems/avant/templates/shared/partials/text-field.hbs"
+            {{> "systems/avant/templates/shared/partials/text-field"
             name="system.icon"
             value=system.icon
             label="Icon"
@@ -54,7 +54,7 @@ Features:
         {{!-- Rarity and Local Key Row --}}
         <div class="form-row">
             {{!-- Rarity Selection --}}
-            {{> "systems/avant/templates/shared/partials/select-field.hbs"
+            {{> "systems/avant/templates/shared/partials/select-field"
             name="system.rarity"
             value=system.rarity
             label="Rarity"
@@ -70,7 +70,7 @@ Features:
             class="trait-rarity"}}
 
             {{!-- Localization Key --}}
-            {{> "systems/avant/templates/shared/partials/text-field.hbs"
+            {{> "systems/avant/templates/shared/partials/text-field"
             name="system.localKey"
             value=system.localKey
             label="Local Key"
@@ -80,7 +80,7 @@ Features:
         </div>
 
         {{!-- Text Color Field --}}
-        {{> "systems/avant/templates/shared/partials/text-field.hbs"
+        {{> "systems/avant/templates/shared/partials/text-field"
         name="system.textColor"
         value=system.textColor
         label="Text Color"

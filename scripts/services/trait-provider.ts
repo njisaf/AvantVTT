@@ -342,6 +342,7 @@ export class TraitProvider {
    * 3. **Case-Insensitive Name**: "FIRE" → finds trait where trait.name.toLowerCase() === "fire"
    * 4. **Legacy System ID**: "system_trait_fire" → legacy format support
    * 5. **Partial Name Match**: "fir" → finds trait where trait.name includes "fir"
+   * 6. **Custom Trait Fallback**: Generate placeholder trait for unknown custom IDs
    * 
    * REAL-WORLD EXAMPLE:
    * - User adds "Fire" trait to an item (stores as "Fire" string)
@@ -430,6 +431,46 @@ export class TraitProvider {
         if (trait) {
           matchType = 'normalized_name';
         }
+      }
+
+      // Strategy 6: Custom trait fallback
+      if (!trait) {
+        console.log(`🏷️ TraitProvider | Creating fallback trait for unknown reference: ${reference}`);
+
+        // Use the actual reference as the ID, or clean it up for display
+        const fallbackId = reference;
+        const fallbackName = cleanReference.replace(/[_-]/g, ' ')
+          .replace(/\b\w/g, l => l.toUpperCase()); // Title case
+
+        const placeholderTrait: Trait = {
+          id: fallbackId,
+          name: fallbackName,
+          color: '#6C757D', // Bootstrap secondary gray
+          icon: 'fas fa-tag', // Tag icon for unknown traits
+          localKey: `CUSTOM.Trait.${cleanReference.replace(/[^a-zA-Z0-9]/g, '')}`,
+          description: `Custom trait: ${fallbackName}`,
+          textColor: '#FFFFFF', // White text on gray background
+          source: 'world',
+          tags: ['custom', 'fallback'],
+          item: {
+            _id: fallbackId,
+            name: fallbackName,
+            type: 'trait',
+            system: {
+              color: '#6C757D',
+              icon: 'fas fa-tag',
+              localKey: `CUSTOM.Trait.${cleanReference.replace(/[^a-zA-Z0-9]/g, '')}`,
+              description: `Custom trait: ${fallbackName}`,
+              textColor: '#FFFFFF',
+              tags: ['custom', 'fallback']
+            },
+            img: undefined,
+            sort: 0,
+            flags: {}
+          }
+        };
+        trait = placeholderTrait;
+        matchType = 'custom_fallback';
       }
 
       return {

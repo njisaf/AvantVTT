@@ -428,6 +428,30 @@ export class FoundryInitializationHelper {
      * @param manager - Manager instance
      */
     static registerFoundryServices(manager: InitializationManager): void {
+        // System Settings Service - no dependencies, foundational service
+        manager.registerService('systemSettings', async () => {
+            const game = (globalThis as any).game;
+            if (!game?.settings) {
+                throw new Error('FoundryVTT settings not available');
+            }
+
+            // Register the drag-and-drop trait input feature flag
+            game.settings.register('avant', 'enableDragTraitInput', {
+                name: 'Enable Drag-and-Drop Trait Input',
+                hint: 'Allow dragging traits from the compendium onto item sheets instead of using text input (experimental)',
+                scope: 'world',
+                config: true,
+                type: Boolean,
+                default: false,
+                onChange: (value: boolean) => {
+                    console.log(`🏷️ Avant | Drag-and-drop trait input ${value ? 'enabled' : 'disabled'}`);
+                }
+            });
+
+            console.log('✅ InitializationManager | System settings registered');
+            return { success: true };
+        }, [], { phase: 'init', critical: true });
+
         // Tag Registry Service - no dependencies, foundational service
         manager.registerService('tagRegistry', async () => {
             const { TagRegistryService } = await import('../services/tag-registry-service.ts');
@@ -638,8 +662,41 @@ export class FoundryInitializationHelper {
             // This makes them available for {{> "template-path"}} references
             console.log('🔧 Template Loading | About to load templates:', templatePaths);
 
-            await (globalThis as any).foundry.applications.handlebars.loadTemplates(templatePaths);
-            console.log(`✅ Template Loading | Loaded ${templatePaths.length} templates successfully`);
+            try {
+                // CRITICAL: Wrap template loading in proper error handling
+                await (globalThis as any).foundry.applications.handlebars.loadTemplates(templatePaths);
+                console.log(`✅ Template Loading | Successfully loaded ${templatePaths.length} templates`);
+
+                // FIX: FoundryVTT v13 template loading registers partials with full paths including .hbs
+                // But our template references look for them without .hbs extensions
+                // We need to create aliases without the .hbs extension
+                const handlebars = (globalThis as any).Handlebars;
+                if (handlebars && handlebars.partials) {
+                    console.log('🔧 Template Loading | Creating .hbs extension aliases for partials...');
+
+                    const partialsToAlias = templatePaths.filter(path => path.endsWith('.hbs'));
+                    let aliasesCreated = 0;
+
+                    for (const fullPath of partialsToAlias) {
+                        const aliasPath = fullPath.replace(/\.hbs$/, '');
+
+                        // Check if template is loaded with .hbs extension
+                        if (handlebars.partials[fullPath]) {
+                            // Create alias without .hbs extension
+                            handlebars.partials[aliasPath] = handlebars.partials[fullPath];
+                            aliasesCreated++;
+                            console.log(`✅ Template Loading | Created alias: "${aliasPath}" -> "${fullPath}"`);
+                        } else {
+                            console.warn(`⚠️ Template Loading | Template not found for aliasing: "${fullPath}"`);
+                        }
+                    }
+
+                    console.log(`✅ Template Loading | Created ${aliasesCreated} template aliases`);
+                }
+            } catch (error) {
+                console.error('❌ Template Loading | CRITICAL ERROR during template loading:', error);
+                throw new Error(`Template loading failed: ${error instanceof Error ? error.message : String(error)}`);
+            }
 
             // DEBUGGING: Check what's actually registered in Handlebars partials
             const handlebars = (globalThis as any).Handlebars;
@@ -647,33 +704,55 @@ export class FoundryInitializationHelper {
                 console.log('🔍 Debug | Handlebars partials registry keys:', Object.keys(handlebars.partials));
 
                 // Specifically check for our problematic partial
-                const imageUploadKey = 'systems/avant/templates/shared/partials/image-upload';
-                const imageUploadRegistered = handlebars.partials[imageUploadKey];
-                console.log(`🔍 Debug | image-upload partial registered:`, !!imageUploadRegistered);
+                const rowTalentAugmentKey = 'systems/avant/templates/actor/row-talent-augment';
+                const rowTalentAugmentRegistered = handlebars.partials[rowTalentAugmentKey];
+                console.log(`🔍 Debug | row-talent-augment partial registered:`, !!rowTalentAugmentRegistered);
 
-                if (imageUploadRegistered) {
-                    console.log(`🔍 Debug | image-upload partial type:`, typeof imageUploadRegistered);
+                if (rowTalentAugmentRegistered) {
+                    console.log(`🔍 Debug | row-talent-augment partial type:`, typeof rowTalentAugmentRegistered);
+                    console.log(`🔍 Debug | row-talent-augment partial content preview:`,
+                        typeof rowTalentAugmentRegistered === 'string' ?
+                            rowTalentAugmentRegistered.substring(0, 100) + '...' :
+                            '[Function]'
+                    );
                 } else {
                     console.log('🔍 Debug | Checking alternative partial names...');
                     // Check if it's registered under a different name
                     const alternativeKeys = Object.keys(handlebars.partials).filter(key =>
-                        key.includes('image-upload')
+                        key.includes('row-talent-augment') || key.includes('talent-augment')
                     );
-                    console.log('🔍 Debug | Found image-upload alternatives:', alternativeKeys);
+                    console.log('🔍 Debug | Found row-talent-augment alternatives:', alternativeKeys);
+
+                    // Log all partials that start with systems/avant/templates/actor/
+                    const actorPartials = Object.keys(handlebars.partials).filter(key =>
+                        key.startsWith('systems/avant/templates/actor/')
+                    );
+                    console.log('🔍 Debug | Actor partial keys found:', actorPartials);
                 }
             } else {
-                console.warn('🔍 Debug | Handlebars partials registry not accessible');
+                console.error('❌ Debug | Handlebars partials registry not accessible');
             }
 
             // DEBUGGING: Also check FoundryVTT's template cache
             const foundryTemplates = (globalThis as any).foundry?.applications?.handlebars;
             if (foundryTemplates && foundryTemplates.getTemplate) {
                 try {
-                    const imageUploadTemplate = foundryTemplates.getTemplate('systems/avant/templates/shared/partials/image-upload');
-                    console.log('🔍 Debug | FoundryVTT template cache has image-upload:', !!imageUploadTemplate);
+                    const rowTalentAugmentTemplate = foundryTemplates.getTemplate('systems/avant/templates/actor/row-talent-augment');
+                    console.log('🔍 Debug | FoundryVTT template cache has row-talent-augment:', !!rowTalentAugmentTemplate);
                 } catch (error) {
                     console.log('🔍 Debug | FoundryVTT template cache error:', (error as Error).message);
                 }
+            }
+
+            // ADDITIONAL DEBUG: Check if the file actually exists by testing one template
+            try {
+                const testTemplate = await (globalThis as any).foundry.applications.handlebars.renderTemplate(
+                    'systems/avant/templates/actor/row-talent-augment',
+                    { item: { _id: 'test', name: 'Test Item', type: 'talent' } }
+                );
+                console.log('🔍 Debug | Direct template render test - SUCCESS');
+            } catch (error) {
+                console.error('❌ Debug | Direct template render test - FAILED:', error);
             }
 
             // Register all Handlebars helpers through dedicated helper module
@@ -695,6 +774,30 @@ export class FoundryInitializationHelper {
             return AvantChatContextMenu;
         }, [], { phase: 'ready', critical: false });
 
+        // Trait Provider - init phase, handles trait data from compendium packs
+        // CRITICAL FIX: Moved from 'ready' to 'init' phase so it's available when item sheets render
+        manager.registerService('traitProvider', async () => {
+            const { TraitProvider } = await import('../services/trait-provider.ts');
+            const traitProvider = TraitProvider.getInstance();
+            await traitProvider.initialize();
+            return traitProvider;
+        }, [], { phase: 'init', critical: false });
+
+        // Compendium Validation Service - ready phase, validates compendiums for drag-and-drop
+        manager.registerService('compendiumValidation', async () => {
+            const { validateAllCompendiums } = await import('../dev/assert-trait-compendium.ts');
+
+            try {
+                await validateAllCompendiums();
+                console.log('✅ InitializationManager | Compendium validation passed - drag-and-drop ready');
+                return { success: true, validated: true };
+            } catch (error) {
+                console.warn('⚠️ InitializationManager | Compendium validation failed:', error);
+                // Non-critical - don't fail system initialization
+                return { success: false, error: error instanceof Error ? error.message : String(error), validated: false };
+            }
+        }, [], { phase: 'ready', critical: false });
+
         // Trait Seeder - ready phase, auto-seeds system pack if needed
         manager.registerService('traitSeeder', async () => {
             const { seedSystemPackIfNeeded } = await import('../utils/trait-seeder.ts');
@@ -702,14 +805,6 @@ export class FoundryInitializationHelper {
             console.log('🌱 FoundryInitializationHelper | Trait seeding result:', seedingResult);
             return seedingResult;
         }, [], { phase: 'ready', critical: false });
-
-        // Trait Provider - ready phase, handles trait data from compendium packs
-        manager.registerService('traitProvider', async () => {
-            const { TraitProvider } = await import('../services/trait-provider.ts');
-            const traitProvider = TraitProvider.getInstance();
-            await traitProvider.initialize();
-            return traitProvider;
-        }, ['traitSeeder'], { phase: 'ready', critical: false });
 
         // Remote Trait Service - DEPRECATED in Phase 2
         // Service registration removed to eliminate runtime references

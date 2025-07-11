@@ -278,6 +278,14 @@ export function createAvantActorSheet() {
             // Get base ApplicationV2 context
             const context = await super._prepareContext(options);
 
+            // CRITICAL FIX: Ensure TraitProvider is ready before preparing context
+            // This prevents race conditions where traits are rendered before their
+            // display data (colors, icons) is available.
+            const game = (globalThis as any).game;
+            if (game?.avant?.initializationManager) {
+                await game.avant.initializationManager.waitForService('traitProvider');
+            }
+
             // Extract actor data for processing
             const actorData = this.document.toObject(false);
 
@@ -553,13 +561,16 @@ export function createAvantActorSheet() {
                                     const traitProviderService = game?.avant?.initializationManager?.getService('traitProvider');
                                     if (!traitProviderService) {
                                         console.warn('🔍 TRAIT DEBUG | TraitProvider service not available for enhanced lookup');
+                                        const traitName = self._generateFallbackTraitName(traitId);
+                                        const fallbackColor = self._generateFallbackTraitColor(traitId, traitName);
+
                                         return {
                                             id: traitId,
-                                            name: self._generateFallbackTraitName(traitId),
+                                            name: traitName,
                                             displayId: traitId,
-                                            color: '#6C757D',
-                                            textColor: '#FFFFFF',
-                                            icon: 'fas fa-tag',
+                                            color: fallbackColor.background,
+                                            textColor: fallbackColor.text,
+                                            icon: fallbackColor.icon,
                                             matchType: 'no_service'
                                         };
                                     }
@@ -589,14 +600,17 @@ export function createAvantActorSheet() {
                                             logger.debug('AvantActorSheet | Skipping corrupted trait data:', traitId);
                                         }
 
+                                        const traitName = self._generateFallbackTraitName(traitId);
+                                        const fallbackColor = self._generateFallbackTraitColor(traitId, traitName);
+
                                         return {
                                             id: traitId,
-                                            name: self._generateFallbackTraitName(traitId),
+                                            name: traitName,
                                             displayId: traitId,
-                                            // Provide default styling for missing traits
-                                            color: '#6C757D', // Bootstrap secondary gray
-                                            textColor: '#FFFFFF', // White text for gray background
-                                            icon: 'fas fa-tag',  // Generic tag icon
+                                            // Provide enhanced styling for missing traits
+                                            color: fallbackColor.background,
+                                            textColor: fallbackColor.text,
+                                            icon: fallbackColor.icon,
                                             matchType: 'fallback'
                                         };
                                     }
@@ -617,11 +631,29 @@ export function createAvantActorSheet() {
 
         /**
          * Generate a fallback display name from a trait ID
+         * 
+         * This method handles various trait ID formats and creates user-friendly names:
+         * - "fire" → "Fire"
+         * - "system_trait_fire" → "Fire"
+         * - "avant-trait-fire" → "Fire"
+         * - "fROYGUX93Sy3aqgM" → "Custom Trait"
+         * - "Fire" → "Fire" (already readable)
+         * 
          * @param traitId - The trait ID to generate a name from
          * @private
          */
         private _generateFallbackTraitName(traitId: string): string {
-            // For system traits like "system_trait_fire_1750695472058", extract "fire"
+            // Handle empty or invalid IDs
+            if (!traitId || typeof traitId !== 'string') {
+                return 'Unknown Trait';
+            }
+
+            // Handle already readable names (common case)
+            if (traitId.match(/^[A-Z][a-z]+$/)) {
+                return traitId;
+            }
+
+            // Handle system trait prefixes
             if (traitId.startsWith('system_trait_')) {
                 return traitId
                     .replace(/^system_trait_/, '')
@@ -630,8 +662,120 @@ export function createAvantActorSheet() {
                     .replace(/\b\w/g, l => l.toUpperCase());
             }
 
-            // For other IDs, just return as-is (this will show the raw ID for custom traits)
-            return traitId;
+            // Handle avant trait prefixes
+            if (traitId.startsWith('avant-trait-')) {
+                return traitId
+                    .replace(/^avant-trait-/, '')
+                    .replace(/-\d+$/, '')
+                    .replace(/-/g, ' ')
+                    .replace(/\b\w/g, l => l.toUpperCase());
+            }
+
+            // Handle common single-word trait names
+            if (traitId.match(/^[a-z]+$/)) {
+                return traitId.charAt(0).toUpperCase() + traitId.slice(1);
+            }
+
+            // Handle kebab-case or underscore-case
+            if (traitId.includes('-') || traitId.includes('_')) {
+                return traitId
+                    .replace(/[-_]/g, ' ')
+                    .replace(/\b\w/g, l => l.toUpperCase());
+            }
+
+            // Handle long random IDs (likely UUIDs or generated IDs)
+            if (traitId.length > 10 && traitId.match(/^[a-zA-Z0-9]+$/)) {
+                return 'Custom Trait';
+            }
+
+            // Handle camelCase
+            if (traitId.match(/^[a-z][a-zA-Z]+$/)) {
+                return traitId.replace(/([A-Z])/g, ' $1').replace(/\b\w/g, l => l.toUpperCase());
+            }
+
+            // Fallback: return the original ID with first letter capitalized
+            return traitId.charAt(0).toUpperCase() + traitId.slice(1);
+        }
+
+        /**
+         * Generate fallback colors and icon for a trait based on its ID or name
+         * 
+         * This method provides visually appealing colors instead of generic gray,
+         * making traits more identifiable even when the TraitProvider isn't available.
+         * 
+         * @param traitId - The trait ID
+         * @param traitName - The generated trait name
+         * @returns Object with background color, text color, and icon
+         * @private
+         */
+        private _generateFallbackTraitColor(traitId: string, traitName: string): { background: string, text: string, icon: string } {
+            // Define color palette for fallback traits
+            const colorPalette = [
+                { background: '#FF6B6B', text: '#FFFFFF', icon: 'fas fa-fire' },      // Red/Fire
+                { background: '#4ECDC4', text: '#FFFFFF', icon: 'fas fa-snowflake' }, // Teal/Ice
+                { background: '#45B7D1', text: '#FFFFFF', icon: 'fas fa-bolt' },      // Blue/Lightning
+                { background: '#96CEB4', text: '#FFFFFF', icon: 'fas fa-leaf' },      // Green/Nature
+                { background: '#FECA57', text: '#FFFFFF', icon: 'fas fa-sun' },       // Yellow/Light
+                { background: '#8B7EC8', text: '#FFFFFF', icon: 'fas fa-magic' },     // Purple/Arcane
+                { background: '#F8B500', text: '#FFFFFF', icon: 'fas fa-cog' },       // Orange/Tech
+                { background: '#2C3E50', text: '#FFFFFF', icon: 'fas fa-shield-alt' } // Dark/Defense
+            ];
+
+            // Check for specific trait name patterns to assign themed colors
+            const lowerName = traitName.toLowerCase();
+            const lowerID = traitId.toLowerCase();
+
+            // Fire-themed traits
+            if (lowerName.includes('fire') || lowerID.includes('fire') || lowerName.includes('flame') || lowerName.includes('burn')) {
+                return colorPalette[0]; // Red/Fire
+            }
+
+            // Ice/Cold-themed traits
+            if (lowerName.includes('ice') || lowerID.includes('ice') || lowerName.includes('cold') || lowerName.includes('frost')) {
+                return colorPalette[1]; // Teal/Ice
+            }
+
+            // Lightning/Electric-themed traits
+            if (lowerName.includes('lightning') || lowerID.includes('lightning') || lowerName.includes('electric') || lowerName.includes('shock')) {
+                return colorPalette[2]; // Blue/Lightning
+            }
+
+            // Nature/Earth-themed traits
+            if (lowerName.includes('nature') || lowerID.includes('nature') || lowerName.includes('earth') || lowerName.includes('plant')) {
+                return colorPalette[3]; // Green/Nature
+            }
+
+            // Light/Holy-themed traits
+            if (lowerName.includes('light') || lowerID.includes('light') || lowerName.includes('holy') || lowerName.includes('divine')) {
+                return colorPalette[4]; // Yellow/Light
+            }
+
+            // Magic/Arcane-themed traits
+            if (lowerName.includes('magic') || lowerID.includes('magic') || lowerName.includes('arcane') || lowerName.includes('mystical')) {
+                return colorPalette[5]; // Purple/Arcane
+            }
+
+            // Tech/Mechanical-themed traits
+            if (lowerName.includes('tech') || lowerID.includes('tech') || lowerName.includes('cyber') || lowerName.includes('mech')) {
+                return colorPalette[6]; // Orange/Tech
+            }
+
+            // Defense/Protection-themed traits
+            if (lowerName.includes('defense') || lowerID.includes('defense') || lowerName.includes('protect') || lowerName.includes('shield')) {
+                return colorPalette[7]; // Dark/Defense
+            }
+
+            // For traits that don't match any theme, use a hash-based color selection
+            // This ensures consistent colors for the same trait across different contexts
+            let hash = 0;
+            const str = traitId + traitName;
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) - hash) + str.charCodeAt(i);
+                hash = hash & hash; // Convert to 32-bit integer
+            }
+
+            const colorIndex = Math.abs(hash) % colorPalette.length;
+            return colorPalette[colorIndex];
         }
 
         /**

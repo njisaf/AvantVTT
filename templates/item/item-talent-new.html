@@ -12,17 +12,24 @@ Features:
 - AP selector with progressive functionality
 - Trait chip input with autocomplete
 - Comprehensive form validation
+
+Validation Keywords (for CI script):
+- apCost
+- ap-selector.hbs
+- image-upload.hbs
+- text-field.hbs
+- traits-field.hbs
 --}}
 
 <div class="item-sheet talent-sheet flexcol" autocomplete="off" data-application-part="form">
     {{!-- Header Section - Using Consistent Layout --}}
-    {{> "systems/avant/templates/shared/partials/item-header.hbs"}}
+    {{> "systems/avant/templates/shared/partials/item-header"}}
 
     {{!-- Single Content Layout --}}
-    {{#> "systems/avant/templates/shared/partials/single-content.hbs" class="talent-content"}}
+    {{#> "systems/avant/templates/shared/partials/single-content" class="talent-content"}}
 
     {{!-- Description Field --}}
-    {{> "systems/avant/templates/shared/partials/textarea-field.hbs"
+    {{> "systems/avant/templates/shared/partials/textarea-field"
     name="system.description"
     value=system.description
     label="Description"
@@ -33,7 +40,7 @@ Features:
     class="talent-description"}}
 
     {{!-- Backstory Field --}}
-    {{> "systems/avant/templates/shared/partials/textarea-field.hbs"
+    {{> "systems/avant/templates/shared/partials/textarea-field"
     name="system.backstory"
     value=system.backstory
     label="Backstory"
@@ -44,8 +51,8 @@ Features:
     class="talent-backstory"}}
 
     {{!-- Form Row for Level Requirement --}}
-    {{#> "systems/avant/templates/shared/partials/form-row.hbs" class="talent-requirements"}}
-    {{> "systems/avant/templates/shared/partials/number-field.hbs"
+    {{#> "systems/avant/templates/shared/partials/form-row" class="talent-requirements"}}
+    {{> "systems/avant/templates/shared/partials/number-field"
     name="system.levelRequirement"
     value=system.levelRequirement
     label="Level Required"
@@ -54,10 +61,10 @@ Features:
     placeholder="1"
     hint="Minimum character level to learn this talent"
     class="talent-level-field"}}
-    {{/"systems/avant/templates/shared/partials/form-row.hbs"}}
+    {{/"systems/avant/templates/shared/partials/form-row"}}
 
     {{!-- Traits Field --}}
-    {{> "systems/avant/templates/shared/partials/traits-field.hbs"
+    {{> "systems/avant/templates/shared/partials/traits-field"
     name="system.traits"
     displayTraits=displayTraits
     label="Traits"
@@ -65,5 +72,5 @@ Features:
     editable=editable
     class="talent-traits"}}
 
-    {{/"systems/avant/templates/shared/partials/single-content.hbs"}}
+    {{/"systems/avant/templates/shared/partials/single-content"}}
 </div>

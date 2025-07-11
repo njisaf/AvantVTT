@@ -23,7 +23,7 @@ Features:
     {{#if field.fullWidth}}
     {{!-- Full-width fields get their own container --}}
     <div class="row-container full-width">
-        {{> "systems/avant/templates/shared/partials/render-field.hbs" field=field editable=editable
+        {{> "systems/avant/templates/shared/partials/render-field" field=field editable=editable
         displayTraits=displayTraits}}
     </div>
     {{else}}
@@ -37,7 +37,7 @@ Features:
     {{#each (chunk this 2) as |fieldRow rowIndex|}}
     <div class="row-container" data-row="{{add rowIndex 1}}">
         {{#each fieldRow as |field|}}
-        {{> "systems/avant/templates/shared/partials/render-field.hbs" field=field editable=editable
+        {{> "systems/avant/templates/shared/partials/render-field" field=field editable=editable
         displayTraits=displayTraits}}
         {{/each}}
     </div>

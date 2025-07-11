@@ -18,12 +18,12 @@ Features:
 
 <div class="item-sheet armor-sheet flexcol" autocomplete="off" data-application-part="form">
     {{!-- Header Section - Using Consistent Layout --}}
-    {{> "systems/avant/templates/shared/partials/item-header.hbs"}}
+    {{> "systems/avant/templates/shared/partials/item-header"}}
 
     {{!-- Body Section --}}
     <div class="sheet-body">
         {{!-- Description Field --}}
-        {{> "systems/avant/templates/shared/partials/textarea-field.hbs"
+        {{> "systems/avant/templates/shared/partials/textarea-field"
         name="system.description"
         value=system.description
         label="Description"
@@ -34,7 +34,7 @@ Features:
         {{!-- Stats Row --}}
         <div class="form-row">
             {{!-- Ability Selection --}}
-            {{> "systems/avant/templates/shared/partials/select-field.hbs"
+            {{> "systems/avant/templates/shared/partials/select-field"
             name="system.ability"
             value=system.ability
             label="Ability"
@@ -48,7 +48,7 @@ Features:
             class="armor-ability"}}
 
             {{!-- Modifier Field --}}
-            {{> "systems/avant/templates/shared/partials/number-field.hbs"
+            {{> "systems/avant/templates/shared/partials/number-field"
             name="system.modifier"
             value=system.modifier
             label="Modifier"
@@ -62,7 +62,7 @@ Features:
         {{!-- Physical Properties Row --}}
         <div class="form-row">
             {{!-- Weight Field --}}
-            {{> "systems/avant/templates/shared/partials/number-field.hbs"
+            {{> "systems/avant/templates/shared/partials/number-field"
             name="system.weight"
             value=system.weight
             label="Weight"
@@ -73,7 +73,7 @@ Features:
             class="armor-weight"}}
 
             {{!-- Cost Field --}}
-            {{> "systems/avant/templates/shared/partials/number-field.hbs"
+            {{> "systems/avant/templates/shared/partials/number-field"
             name="system.cost"
             value=system.cost
             label="Cost"
@@ -84,7 +84,7 @@ Features:
         </div>
 
         {{!-- Traits Field --}}
-        {{> "systems/avant/templates/shared/partials/traits-field.hbs"
+        {{> "systems/avant/templates/shared/partials/traits-field"
         name="system.traits"
         displayTraits=displayTraits
         label="Traits"

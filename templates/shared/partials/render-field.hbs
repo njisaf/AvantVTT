@@ -24,7 +24,7 @@ Supported field types:
 
 {{#if (eq field.type "description")}}
 {{!-- Description field with rich text editing --}}
-{{> "systems/avant/templates/shared/partials/textarea-field.hbs"
+{{> "systems/avant/templates/shared/partials/textarea-field"
 name=field.name
 value=field.value
 label=field.label
@@ -35,7 +35,7 @@ class=field.class}}
 
 {{else if (eq field.type "textarea")}}
 {{!-- Basic textarea field --}}
-{{> "systems/avant/templates/shared/partials/textarea-field.hbs"
+{{> "systems/avant/templates/shared/partials/textarea-field"
 name=field.name
 value=field.value
 label=field.label
@@ -46,7 +46,7 @@ class=field.class}}
 
 {{else if (eq field.type "text")}}
 {{!-- Text input field --}}
-{{> "systems/avant/templates/shared/partials/text-field.hbs"
+{{> "systems/avant/templates/shared/partials/text-field"
 name=field.name
 value=field.value
 label=field.label
@@ -58,7 +58,7 @@ class=field.class}}
 
 {{else if (eq field.type "number")}}
 {{!-- Number input field --}}
-{{> "systems/avant/templates/shared/partials/number-field.hbs"
+{{> "systems/avant/templates/shared/partials/number-field"
 name=field.name
 value=field.value
 label=field.label
@@ -71,7 +71,7 @@ class=field.class}}
 
 {{else if (eq field.type "select")}}
 {{!-- Select dropdown field --}}
-{{> "systems/avant/templates/shared/partials/select-field.hbs"
+{{> "systems/avant/templates/shared/partials/select-field"
 name=field.name
 value=field.value
 label=field.label
@@ -82,7 +82,7 @@ class=field.class}}
 
 {{else if (eq field.type "checkbox")}}
 {{!-- Checkbox field --}}
-{{> "systems/avant/templates/shared/partials/checkbox-field.hbs"
+{{> "systems/avant/templates/shared/partials/checkbox-field"
 name=field.name
 checked=field.checked
 label=field.label
@@ -91,7 +91,7 @@ class=field.class}}
 
 {{else if (eq field.type "ap-selector")}}
 {{!-- Action Point selector with visual dots --}}
-{{> "systems/avant/templates/shared/partials/ap-selector.hbs"
+{{> "systems/avant/templates/shared/partials/ap-selector"
 name=field.name
 value=field.value
 label=field.label
@@ -101,7 +101,7 @@ class=field.class}}
 
 {{else if (eq field.type "uses-counter")}}
 {{!-- Uses counter field --}}
-{{> "systems/avant/templates/shared/partials/uses-counter.hbs"
+{{> "systems/avant/templates/shared/partials/uses-counter"
 name=field.name
 current=field.current
 max=field.max
@@ -111,7 +111,7 @@ class=field.class}}
 
 {{else if (eq field.type "traits")}}
 {{!-- Traits field --}}
-{{> "systems/avant/templates/shared/partials/traits-field.hbs"
+{{> "systems/avant/templates/shared/partials/traits-field"
 name=field.name
 displayTraits=field.displayTraits
 label=field.label

@@ -20,7 +20,7 @@ Features:
     {{!-- Row 1: Icon + Name (Always present) --}}
     <div class="header-main row-container">
         {{!-- Image Upload Component --}}
-        {{> "systems/avant/templates/shared/partials/image-upload.hbs"
+        {{> "systems/avant/templates/shared/partials/image-upload"
         src=item.img
         alt=item.name
         title=item.name
@@ -28,7 +28,7 @@ Features:
         class="item-icon"}}
 
         {{!-- Name Field --}}
-        {{> "systems/avant/templates/shared/partials/text-field.hbs"
+        {{> "systems/avant/templates/shared/partials/text-field"
         name="name"
         value=item.name
         label="Item Name"
@@ -44,7 +44,7 @@ Features:
         {{#each fieldRow as |field fieldIndex|}}
         {{#if (eq field.type "ap-selector")}}
         {{!-- AP Selector Component --}}
-        {{> "systems/avant/templates/shared/partials/ap-selector.hbs"
+        {{> "systems/avant/templates/shared/partials/ap-selector"
         name=field.name
         value=field.value
         label=field.label
@@ -54,7 +54,7 @@ Features:
 
         {{else if (eq field.type "number")}}
         {{!-- Number Field Component --}}
-        {{> "systems/avant/templates/shared/partials/number-field.hbs"
+        {{> "systems/avant/templates/shared/partials/number-field"
         name=field.name
         value=field.value
         label=field.label
@@ -67,7 +67,7 @@ Features:
 
         {{else if (eq field.type "text")}}
         {{!-- Text Field Component --}}
-        {{> "systems/avant/templates/shared/partials/text-field.hbs"
+        {{> "systems/avant/templates/shared/partials/text-field"
         name=field.name
         value=field.value
         label=field.label
@@ -77,7 +77,7 @@ Features:
 
         {{else if (eq field.type "checkbox")}}
         {{!-- Checkbox Field Component --}}
-        {{> "systems/avant/templates/shared/partials/checkbox-field.hbs"
+        {{> "systems/avant/templates/shared/partials/checkbox-field"
         name=field.name
         checked=field.checked
         label=field.label

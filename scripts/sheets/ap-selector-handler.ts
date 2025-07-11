@@ -247,7 +247,7 @@ export function getApSelectorValue(selector: HTMLElement): number {
  * @param {HTMLElement} selector - The AP selector container
  * @param {number} apCost - The new AP cost value
  */
-export function setApSelectorValue(selector: HTMLElement, apCost: number): void {
+export function setApSelectorValue(selector: HTMLElement, apCost: number, options: { triggerChange?: boolean } = {}): void {
     const hiddenInput = selector.querySelector('input[type="hidden"]') as HTMLInputElement;
 
     if (!hiddenInput) {
@@ -259,8 +259,10 @@ export function setApSelectorValue(selector: HTMLElement, apCost: number): void 
     hiddenInput.value = validatedCost.toString();
     updateApSelectorVisual(selector, validatedCost);
 
-    // Trigger change event
-    hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
+    // Trigger change event only if not explicitly suppressed
+    if (options.triggerChange !== false) {
+        hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
+    }
 }
 
 /**
@@ -274,7 +276,7 @@ export function resetApSelectors(form: HTMLElement): void {
     const apSelectors = form.querySelectorAll('.ap-selector') as NodeListOf<HTMLElement>;
 
     apSelectors.forEach(selector => {
-        setApSelectorValue(selector, 0);
+        setApSelectorValue(selector, 0, { triggerChange: false });
     });
 }
 

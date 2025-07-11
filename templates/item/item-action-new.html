@@ -15,13 +15,13 @@ Features:
 
 <div class="item-sheet action-sheet flexcol" autocomplete="off" data-application-part="form">
     {{!-- Header Section - Using Consistent Layout --}}
-    {{> "systems/avant/templates/shared/partials/item-header.hbs"}}
+    {{> "systems/avant/templates/shared/partials/item-header"}}
 
     {{!-- Single Content Layout --}}
     <div class="sheet-body">
-        {{#> "systems/avant/templates/shared/partials/single-content.hbs"}}
+        {{#> "systems/avant/templates/shared/partials/single-content"}}
         {{!-- Description Field --}}
-        {{> "systems/avant/templates/shared/partials/textarea-field.hbs"
+        {{> "systems/avant/templates/shared/partials/textarea-field"
         name="system.description"
         value=system.description
         label="Description"
@@ -31,13 +31,13 @@ Features:
         class="action-description"}}
 
         {{!-- Traits Field --}}
-        {{> "systems/avant/templates/shared/partials/traits-field.hbs"
+        {{> "systems/avant/templates/shared/partials/traits-field"
         name="system.traits"
         displayTraits=displayTraits
         label="Traits"
         hint="Add traits to categorize this action"
         editable=editable
         class="action-traits"}}
-        {{/"systems/avant/templates/shared/partials/single-content.hbs"}}
+        {{/"systems/avant/templates/shared/partials/single-content"}}
     </div>
 </div>

@@ -18,7 +18,7 @@ Features:
     {{!-- Row 1: Icon + Name (ONLY content in header) --}}
     <div class="header-main row-container">
         {{!-- Image Upload Component --}}
-        {{> "systems/avant/templates/shared/partials/image-upload.hbs"
+        {{> "systems/avant/templates/shared/partials/image-upload"
         src=item.img
         alt=item.name
         title=item.name
@@ -26,7 +26,7 @@ Features:
         class="item-icon"}}
 
         {{!-- Name Field --}}
-        {{> "systems/avant/templates/shared/partials/text-field.hbs"
+        {{> "systems/avant/templates/shared/partials/text-field"
         name="name"
         value=item.name
         label="Item Name"

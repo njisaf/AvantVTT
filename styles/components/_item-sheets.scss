@@ -50,7 +50,7 @@
 }
 
 // ============================================================================
-// HEADER STYLES - Enhanced Specificity for FoundryVTT Override
+// HEADER STYLES - Clean 20-80 Layout for Image + Name
 // ============================================================================
 
 .item-sheet .sheet-header {
@@ -59,11 +59,47 @@
     flex-direction: column !important;
     gap: var(--space-sm, 8px) !important;
     padding: var(--space-md, 12px);
+    background: var(--theme-bg-secondary, #2A2A2A);
+    border-bottom: 1px solid var(--theme-border-primary, #404040);
+
+    // Row container for image + name in 20-80 layout
+    .row-container {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: flex-start !important;
+        gap: var(--space-md, 12px) !important;
+        width: 100% !important;
+
+        // Image upload section (20% width)
+        .form-group--image-upload {
+            flex: 0 0 20% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
+        // Name field section (80% width)
+        .form-group--text-field {
+            flex: 1 1 80% !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+    }
 
     // Responsive behavior
     @media (max-width: 480px) {
         gap: var(--space-xs, 4px) !important;
         padding: var(--space-sm, 8px);
+
+        .row-container {
+            flex-direction: column !important;
+
+            .form-group--image-upload,
+            .form-group--text-field {
+                flex: 1 1 auto !important;
+                width: 100% !important;
+            }
+        }
     }
 }
 
@@ -93,10 +129,348 @@
 }
 
 // ============================================================================
-// ROW CONTAINER STYLES - New Consistent Layout System
+// APPLICATIONV2 INTEGRATION - High Specificity Overrides
+// ============================================================================
+// 
+// These styles ensure the base item sheet layout takes precedence over the
+// ApplicationV2 specific styles. Using maximum specificity to override any
+// remaining conflicts from the ApplicationV2 file.
+
+// ApplicationV2 Item Sheets - Base Layout Override
+.application.sheet.avant.item {
+
+    // Window content container
+    .window-content {
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100% !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+
+        // Main item sheet container
+        .item-sheet {
+            display: flex !important;
+            flex-direction: column !important;
+            height: 100% !important;
+            padding: 0 !important;
+            background: var(--theme-bg-primary, #2a2a2a) !important;
+            color: var(--theme-text-primary, #ffffff) !important;
+
+            // HEADER LAYOUT - Force column layout with row containers
+            .sheet-header {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: var(--space-sm, 8px) !important;
+                padding: var(--space-md, 12px) !important;
+                background: var(--theme-bg-secondary, #333) !important;
+                border-bottom: 1px solid var(--theme-border-primary, #555) !important;
+                flex-shrink: 0 !important;
+                height: auto !important;
+                min-height: auto !important;
+                max-height: none !important;
+
+                // Row container for image + name (20-80 layout)
+                .row-container {
+                    display: flex !important;
+                    flex-direction: row !important;
+                    align-items: center !important;
+                    gap: var(--space-md, 12px) !important;
+                    width: 100% !important;
+
+                    // Image upload section (20% width)
+                    .form-group--image-upload {
+                        flex: 0 0 20% !important;
+                        display: flex !important;
+                        justify-content: center !important;
+                        align-items: center !important;
+
+                        .image-upload {
+                            position: relative !important;
+
+                            .image-upload__img {
+                                width: 64px !important;
+                                height: 64px !important;
+                                border: 2px solid var(--theme-accent-primary, #00e0dc) !important;
+                                cursor: pointer !important;
+                                border-radius: 4px !important;
+                                object-fit: cover !important;
+                                transition: all 0.3s ease !important;
+
+                                &:hover {
+                                    border-color: var(--theme-accent-secondary, #4ce2e1) !important;
+                                    box-shadow: 0 0 8px rgba(0, 224, 220, 0.3) !important;
+                                }
+                            }
+
+                            .image-upload__overlay {
+                                position: absolute !important;
+                                top: 0 !important;
+                                left: 0 !important;
+                                right: 0 !important;
+                                bottom: 0 !important;
+                                background: rgba(0, 0, 0, 0.7) !important;
+                                display: flex !important;
+                                align-items: center !important;
+                                justify-content: center !important;
+                                opacity: 0 !important;
+                                transition: opacity 0.3s ease !important;
+                                border-radius: 4px !important;
+
+                                i {
+                                    color: var(--theme-accent-primary, #00e0dc) !important;
+                                    font-size: 16px !important;
+                                }
+                            }
+
+                            &:hover .image-upload__overlay {
+                                opacity: 1 !important;
+                            }
+                        }
+                    }
+
+                    // Name field section (80% width)
+                    .form-group--text-field {
+                        flex: 1 !important;
+                        display: flex !important;
+                        flex-direction: column !important;
+                        gap: var(--space-xs, 4px) !important;
+
+                        .form-label {
+                            font-family: var(--theme-font-display, "Orbitron", monospace) !important;
+                            font-size: 10px !important;
+                            font-weight: 600 !important;
+                            color: var(--theme-text-secondary, #aaa) !important;
+                            text-transform: uppercase !important;
+                            letter-spacing: 0.5px !important;
+                            margin: 0 !important;
+                        }
+
+                        .form-input {
+                            background: var(--theme-bg-tertiary, #444) !important;
+                            border: 1px solid var(--theme-border-primary, #555) !important;
+                            color: var(--theme-text-primary, #ffffff) !important;
+                            font-size: 16px !important;
+                            font-weight: bold !important;
+                            padding: 8px !important;
+                            width: 100% !important;
+                            border-radius: 4px !important;
+                            transition: all 0.3s ease !important;
+
+                            &:focus {
+                                border-color: var(--theme-accent-primary, #00e0dc) !important;
+                                outline: none !important;
+                                box-shadow: 0 0 8px rgba(0, 224, 220, 0.3) !important;
+                            }
+
+                            &::placeholder {
+                                color: var(--theme-text-secondary, #aaa) !important;
+                                opacity: 0.7 !important;
+                            }
+                        }
+                    }
+                }
+
+                // AP Selector row (full width)
+                .ap-selector-row {
+                    display: flex !important;
+                    justify-content: center !important;
+                    align-items: center !important;
+                    width: 100% !important;
+                    padding-top: var(--space-sm, 8px) !important;
+                }
+            }
+
+            // Tab and body styles remain the same
+            .sheet-tabs {
+                background: var(--theme-bg-secondary, #333) !important;
+                border-bottom: 1px solid var(--theme-border-primary, #555) !important;
+                display: flex !important;
+                flex-shrink: 0 !important;
+
+                .item {
+                    padding: 8px 16px !important;
+                    background: transparent !important;
+                    border: none !important;
+                    color: var(--theme-text-secondary, #aaa) !important;
+                    font-size: 12px !important;
+                    font-weight: 600 !important;
+                    text-transform: uppercase !important;
+                    cursor: pointer !important;
+                    transition: all 0.2s ease !important;
+
+                    &:hover {
+                        background: rgba(0, 224, 220, 0.1) !important;
+                        color: var(--theme-accent-primary, #00e0dc) !important;
+                    }
+
+                    &.active {
+                        background: var(--theme-bg-primary, #2a2a2a) !important;
+                        color: var(--theme-text-primary, #ffffff) !important;
+                        border-bottom: 2px solid var(--theme-accent-primary, #00e0dc) !important;
+                    }
+                }
+            }
+
+            .sheet-body {
+                flex: 1 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                overflow-y: auto !important;
+                background: var(--theme-bg-primary, #2a2a2a) !important;
+
+                .tab {
+                    padding: 15px !important;
+                    display: none !important;
+
+                    &.active {
+                        display: block !important;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ============================================================================
+// HEADER MAIN ROW - 20-80 Layout (Image + Name)
 // ============================================================================
 
-.item-sheet .sheet-header .row-container {
+.item-sheet .sheet-header .header-main {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: var(--space-md, 12px) !important;
+    width: 100% !important;
+
+    // Image section - 20% width (fixed)
+    .item-icon,
+    .form-group--image-upload {
+        flex: 0 0 20% !important;
+        max-width: 20% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+
+        // Image upload component styling
+        .image-upload {
+            width: 48px !important;
+            height: 48px !important;
+            position: relative !important;
+            cursor: pointer !important;
+
+            &__img {
+                width: 48px !important;
+                height: 48px !important;
+                border-radius: var(--border-radius-md, 6px) !important;
+                border: 2px solid var(--theme-border-secondary, #555) !important;
+                object-fit: cover !important;
+                transition: border-color 0.2s ease !important;
+
+                &:hover {
+                    border-color: var(--theme-accent-primary, #00E0DC) !important;
+                }
+
+                &:focus {
+                    outline: 2px solid var(--theme-accent-primary, #00E0DC) !important;
+                    outline-offset: 2px !important;
+                }
+            }
+
+            &__overlay {
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                background: rgba(0, 0, 0, 0.5) !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                opacity: 0 !important;
+                transition: opacity 0.2s ease !important;
+                border-radius: var(--border-radius-md, 6px) !important;
+
+                i {
+                    color: var(--theme-accent-primary, #00E0DC) !important;
+                    font-size: 16px !important;
+                }
+            }
+
+            &:hover &__overlay {
+                opacity: 1 !important;
+            }
+        }
+    }
+
+    // Name section - 80% width (flexible)
+    .item-name-field,
+    .form-group--text-field {
+        flex: 1 1 80% !important;
+        max-width: 80% !important;
+        min-width: 0 !important;
+
+        // Form group styling
+        .form-label {
+            font-family: var(--theme-font-display, "Orbitron", monospace) !important;
+            font-size: 10px !important;
+            font-weight: 600 !important;
+            color: var(--theme-text-secondary, #BFBFBF) !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            margin-bottom: 4px !important;
+        }
+
+        .form-input {
+            width: 100% !important;
+            background: var(--theme-bg-tertiary, #333) !important;
+            border: 1px solid var(--theme-border-primary, #555) !important;
+            border-radius: var(--border-radius-sm, 4px) !important;
+            color: var(--theme-text-primary, #FFF) !important;
+            font-family: var(--theme-font-primary, "Exo 2", sans-serif) !important;
+            font-size: 14px !important;
+            padding: 8px !important;
+            transition: border-color 0.2s ease !important;
+
+            &:focus {
+                outline: none !important;
+                border-color: var(--theme-accent-primary, #00E0DC) !important;
+                box-shadow: 0 0 8px rgba(0, 224, 220, 0.3) !important;
+            }
+
+            &::placeholder {
+                color: var(--theme-text-muted, #888) !important;
+                opacity: 0.7 !important;
+            }
+        }
+    }
+
+    // Responsive behavior for mobile
+    @media (max-width: 480px) {
+        flex-direction: column !important;
+        gap: var(--space-sm, 8px) !important;
+
+        .item-icon,
+        .form-group--image-upload,
+        .item-name-field,
+        .form-group--text-field {
+            flex: none !important;
+            max-width: 100% !important;
+            width: 100% !important;
+        }
+
+        .item-icon,
+        .form-group--image-upload {
+            align-self: center !important;
+        }
+    }
+}
+
+// ============================================================================
+// ROW CONTAINER STYLES - Other Rows in Header
+// ============================================================================
+
+.item-sheet .sheet-header .row-container:not(.header-main) {
     display: flex !important;
     flex-direction: row !important;
     gap: var(--space-md, 12px) !important;
@@ -106,44 +480,28 @@
     // Child elements are equal width by default
     >* {
         flex: 1 1 0 !important;
-        min-width: 0 !important; // Prevent overflow
+        min-width: 0 !important;
     }
 
-    // CRITICAL FIX: Form groups inside row containers should display inline
-    // Override the column behavior from form-components.scss
+    // Form groups inside row containers
     .form-group {
         display: flex !important;
-        flex-direction: column !important; // Keep internal structure vertical
+        flex-direction: column !important;
         align-items: stretch !important;
         justify-content: flex-start !important;
-        margin-bottom: 0 !important; // Remove bottom margin within rows
-
-        // Ensure form groups take equal space within the row
+        margin-bottom: 0 !important;
         flex: 1 1 0 !important;
         min-width: 0 !important;
     }
 
-    // Special handling for image upload form groups
-    .form-group--image-upload {
-        flex: 0 0 auto !important; // Don't stretch the image upload
-        align-items: center !important;
-        justify-content: center !important;
-    }
-
-    // Special handling for text field form groups
-    .form-group--text-field {
-        flex: 1 !important; // Text fields should take remaining space
-        min-width: 0 !important;
-    }
-
-    // Responsive behavior for mobile
+    // Responsive behavior - stack on mobile
     @media (max-width: 480px) {
-        gap: var(--space-sm, 8px) !important;
         flex-direction: column !important;
-        align-items: stretch !important;
+        gap: var(--space-sm, 8px) !important;
 
         >* {
             flex: none !important;
+            width: 100% !important;
         }
 
         .form-group {
@@ -581,6 +939,154 @@
 // ============================================================================
 // FIELD TYPE SPECIFIC STYLES
 // ============================================================================
+
+// ============================================================================
+// TRAIT CHIP SYSTEM STYLES
+// ============================================================================
+
+// Trait chip input system styling - integrated from V2 file
+.trait-chip-input {
+    background: var(--theme-bg-tertiary, #444) !important;
+    border: 1px solid var(--theme-border-primary, #555) !important;
+    border-radius: 4px !important;
+    padding: 4px !important;
+
+    .trait-chips {
+        display: flex !important;
+        flex-wrap: wrap !important; // KEY FIX: Allows trait chips to wrap properly
+        gap: 4px !important;
+        margin-bottom: 4px !important;
+
+        .trait-chip {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 4px !important;
+            padding: 4px 8px !important;
+            border-radius: 12px !important;
+            font-size: 10px !important;
+            font-weight: 500 !important;
+            line-height: 1.2 !important;
+            white-space: nowrap !important;
+
+            .trait-name {
+                color: inherit !important;
+            }
+
+            .trait-remove {
+                background: none !important;
+                border: none !important;
+                color: inherit !important;
+                font-size: 12px !important;
+                cursor: pointer !important;
+                padding: 0 !important;
+                margin-left: 4px !important;
+                opacity: 0.7 !important;
+                width: 16px !important;
+                height: 16px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                border-radius: 50% !important;
+                transition: all 0.2s ease !important;
+
+                &:hover {
+                    opacity: 1 !important;
+                    background: rgba(0, 0, 0, 0.2) !important;
+                }
+
+                &:focus {
+                    outline: 1px solid currentColor !important;
+                    outline-offset: 1px !important;
+                }
+            }
+        }
+    }
+
+    .trait-input-container {
+        position: relative !important;
+
+        .trait-autocomplete {
+            background: transparent !important;
+            border: none !important;
+            color: var(--theme-text-primary, #ffffff) !important;
+            padding: 4px !important;
+            width: 100% !important;
+            min-height: 24px !important;
+            font-size: 12px !important;
+
+            &::placeholder {
+                color: var(--theme-text-secondary, #aaa) !important;
+            }
+
+            &:focus {
+                outline: none !important;
+                box-shadow: none !important;
+            }
+        }
+
+        .trait-suggestions {
+            position: absolute !important;
+            top: 100% !important;
+            left: 0 !important;
+            right: 0 !important;
+            background: var(--theme-bg-secondary, #333) !important;
+            border: 1px solid var(--theme-border-primary, #555) !important;
+            border-radius: 4px !important;
+            max-height: 200px !important;
+            overflow-y: auto !important;
+            z-index: 1000 !important;
+            display: none !important;
+
+            &.visible {
+                display: block !important;
+            }
+
+            .trait-suggestion {
+                padding: 8px 12px !important;
+                cursor: pointer !important;
+                color: var(--theme-text-primary, #ffffff) !important;
+                border-bottom: 1px solid var(--theme-border-primary, #555) !important;
+                transition: background-color 0.2s ease !important;
+
+                &:hover {
+                    background: var(--theme-bg-primary, #2a2a2a) !important;
+                }
+
+                &:last-child {
+                    border-bottom: none !important;
+                }
+            }
+        }
+    }
+}
+
+// Light theme variant for trait chips
+.avant.theme-light .trait-chip-input {
+    background: var(--color-background-secondary, #f9f9f9) !important;
+    border: 1px solid var(--color-border-primary, #cccccc) !important;
+
+    .trait-input-container .trait-autocomplete {
+        color: var(--color-text-primary, #000000) !important;
+
+        &::placeholder {
+            color: var(--color-text-muted, #666666) !important;
+        }
+    }
+
+    .trait-input-container .trait-suggestions {
+        background: var(--color-background-primary, #ffffff) !important;
+        border: 1px solid var(--color-border-primary, #cccccc) !important;
+
+        .trait-suggestion {
+            color: var(--color-text-primary, #000000) !important;
+            border-bottom: 1px solid var(--color-border-primary, #cccccc) !important;
+
+            &:hover {
+                background: var(--color-background-secondary, #f9f9f9) !important;
+            }
+        }
+    }
+}
 
 // Unknown field type fallback styling
 .unknown-field-type {

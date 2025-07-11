@@ -1,50 +1,52 @@
 /**
- * @fileoverview Handlebars Template Helpers Registration
- * @description Centralized registration of all custom Handlebars helpers for the Avant system
- * @version 2.1.0 - FoundryVTT Helper Conflict Resolution
- * @author Avant Development Team
- * 
- * STAGE 4 LESSONS LEARNED (SUCCESSFULLY RESOLVED):
- * 
- * 🔍 CRITICAL DEBUGGING INSIGHTS:
- * 1. Missing helpers cause COMPLETE template rendering failure with clear error messages
- * 2. Helper registration must happen BEFORE any template rendering occurs
- * 3. FoundryVTT v13 is more strict about helper dependencies than previous versions
- * 4. Complex template expressions like {{#each (range 1 (add (or max 3) 1))}} require ALL helpers
- * 
- * 🚨 FOUNDRY HELPER CONFLICTS DISCOVERED & RESOLVED (January 2025):
- * 1. FoundryVTT v13 has built-in helpers that conflict with custom helper names
- * 2. Built-in 'or' helper performs boolean evaluation, not value selection
- * 3. This caused AP selector button generation to completely fail
- * 4. SOLUTION: Force-override conflicting helpers + provide unique fallback names
- * 5. LESSON: Always test helpers in actual FoundryVTT environment, not just build validation
- * 
- * 🎯 HELPER DESIGN PATTERNS:
- * 1. Always check if helper exists before registering (avoid conflicts)
- * 2. Use defensive parameter parsing (parseFloat, parseInt with fallbacks)
- * 3. Document helper usage clearly for future developers
- * 4. Keep helpers pure and predictable (same input = same output)
- * 5. Provide fallback helpers with unique names for critical functionality
- * 
- * 🚨 RUNTIME FAILURE POINTS:
- * 1. AP Selector template requires: add, range, avantOr helpers for iteration logic
- * 2. Template partials require .hbs extensions in FoundryVTT v13
- * 3. Helper registration timing is critical in initialization sequence
- * 4. Helper conflicts can cause silent failures with unexpected results
- * 
- * ✅ STAGE 2 UNIVERSAL ITEM SHEET SUCCESS:
- * All issues resolved! AP selectors now generate clickable visual dots correctly.
- * Universal item sheet architecture is fully functional across all item types.
- * 
- * 💡 DEBUGGING METHODOLOGY THAT WORKED:
- * 1. Check browser console for specific "Missing helper: X" errors
- * 2. Search codebase for helper usage patterns
- * 3. Implement missing helpers with proper validation
- * 4. Test deployment immediately after each fix
- * 5. Verify with actual template rendering, not just build validation
- * 6. Add comprehensive debug logging to trace helper execution
- * 7. Compare expected vs actual helper return values
+ * Template helpers for the Avant Native system
+ * Provides utility functions for Handlebars templates
  */
+
+// =============================================================================
+// UTILITY FUNCTIONS
+// =============================================================================
+
+/**
+ * Check if a color is light (for determining text contrast)
+ * @param color - Hex color string (e.g., '#FF0000' or '#f00')
+ * @returns true if the color is light, false if dark
+ */
+function isLightColor(color: string): boolean {
+    if (!color) return false;
+
+    // Remove # if present
+    const hex = color.replace('#', '');
+
+    // Handle 3-digit hex colors
+    let r, g, b;
+    if (hex.length === 3) {
+        r = parseInt(hex[0] + hex[0], 16);
+        g = parseInt(hex[1] + hex[1], 16);
+        b = parseInt(hex[2] + hex[2], 16);
+    } else if (hex.length === 6) {
+        r = parseInt(hex.substring(0, 2), 16);
+        g = parseInt(hex.substring(2, 4), 16);
+        b = parseInt(hex.substring(4, 6), 16);
+    } else {
+        return false; // Invalid hex color
+    }
+
+    // Calculate luminance using standard formula
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+    // Return true if luminance is greater than 0.5 (light color)
+    return luminance > 0.5;
+}
+
+/**
+ * Initialize template helpers for the Avant Native system
+ */
+export function initializeTemplateHelpers(): void {
+    // This function is now empty as all helper registration is handled by registerAvantHandlebarsHelpers
+    // and called from initializeHandlebarsHelpers.
+    // Keeping it here for now, but it will be removed once all helper registration is centralized.
+}
 
 /**
  * Register all custom Handlebars helpers for the Avant system
@@ -275,13 +277,212 @@ export async function registerAvantHandlebarsHelpers(Handlebars: any): Promise<v
     }
 
     // =============================================================================
+    // TRAIT DISPLAY HELPERS - RICH TRAIT OBJECT PROCESSING
+    // =============================================================================
+
+    // Helper to get trait styling from rich trait object (used in displayTraits branch)
+    if (!Handlebars.helpers.traitChipStyle) {
+        Handlebars.registerHelper('traitChipStyle', function (trait: any) {
+            if (!trait) return '--trait-color: #6C757D; --trait-text-color: #000000;';
+
+            if (trait.color) {
+                const textColor = isLightColor(trait.color) ? '#000000' : '#FFFFFF';
+                return `--trait-color: ${trait.color}; --trait-text-color: ${textColor};`;
+            }
+
+            // Fallback styling
+            return '--trait-color: #6C757D; --trait-text-color: #000000;';
+        });
+    }
+
+    // Helper to get trait data attributes from rich trait object
+    if (!Handlebars.helpers.traitChipData) {
+        Handlebars.registerHelper('traitChipData', function (trait: any) {
+            if (!trait) return 'data-trait-type="unknown" data-trait-source="fallback"';
+
+            const traitType = trait.type || trait.category || 'custom';
+            const traitSource = trait.source || (trait.id?.startsWith('system_trait_') ? 'system' : 'custom');
+
+            return `data-trait-id="${trait.id}" data-trait-type="${traitType}" data-trait-source="${traitSource}"`;
+        });
+    }
+
+    // =============================================================================
+    // TRAIT DISPLAY HELPERS - ID TO DISPLAY DATA CONVERSION (FALLBACK)
+    // =============================================================================
+
+    // Helper to get trait styling from ID
+    if (!Handlebars.helpers.traitChipStyleFromId) {
+        Handlebars.registerHelper('traitChipStyleFromId', function (traitId: string) {
+            if (!traitId) return '--trait-color: #6C757D; --trait-text-color: #000000;';
+
+            try {
+                const initManager = (game as any)?.avant?.initializationManager;
+                if (initManager) {
+                    // Use synchronous getService for template helpers since we can't await in handlebars
+                    const traitProvider = initManager.getService('traitProvider');
+                    if (traitProvider && typeof traitProvider.getTraitById === 'function') {
+                        const trait = traitProvider.getTraitById(traitId);
+                        if (trait?.color) {
+                            const textColor = isLightColor(trait.color) ? '#000000' : '#FFFFFF';
+                            return `--trait-color: ${trait.color}; --trait-text-color: ${textColor};`;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to get trait style for ID:', traitId, error);
+            }
+
+            // Fallback styling
+            return '--trait-color: #6C757D; --trait-text-color: #000000;';
+        });
+    }
+
+    // Helper to get trait name from ID
+    if (!Handlebars.helpers.traitNameFromId) {
+        Handlebars.registerHelper('traitNameFromId', function (traitId: string) {
+            if (!traitId) return traitId;
+
+            try {
+                const traitProvider = (game as any)?.avant?.initializationManager?.getService('traitProvider');
+                if (traitProvider && typeof traitProvider.getTraitById === 'function') {
+                    const trait = traitProvider.getTraitById(traitId);
+                    if (trait?.name) {
+                        return trait.name;
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to get trait name for ID:', traitId, error);
+            }
+
+            // Fallback: return the ID itself
+            return traitId;
+        });
+    }
+
+    // Helper to get trait data from ID
+    if (!Handlebars.helpers.traitDataFromId) {
+        Handlebars.registerHelper('traitDataFromId', function (traitId: string) {
+            if (!traitId) return { id: traitId, name: traitId, color: '#6C757D', icon: '' };
+
+            try {
+                const traitProvider = (game as any)?.avant?.initializationManager?.getService('traitProvider');
+                if (traitProvider && typeof traitProvider.getTraitById === 'function') {
+                    const trait = traitProvider.getTraitById(traitId);
+                    if (trait) {
+                        return {
+                            id: trait.id,
+                            name: trait.name || traitId,
+                            color: trait.color || '#6C757D',
+                            icon: trait.icon || ''
+                        };
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to get trait data for ID:', traitId, error);
+            }
+
+            // Fallback data
+            return { id: traitId, name: traitId, color: '#6C757D', icon: '' };
+        });
+    }
+
+    // Helper to get trait icon from ID
+    if (!Handlebars.helpers.traitIconFromId) {
+        Handlebars.registerHelper('traitIconFromId', function (traitId: string) {
+            if (!traitId) return '';
+
+            try {
+                const traitProvider = (game as any)?.avant?.initializationManager?.getService('traitProvider');
+                if (traitProvider && typeof traitProvider.getTraitById === 'function') {
+                    const trait = traitProvider.getTraitById(traitId);
+                    if (trait?.icon) {
+                        return trait.icon;
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to get trait icon for ID:', traitId, error);
+            }
+
+            // Fallback: no icon
+            return '';
+        });
+    }
+
+    // =============================================================================
+    // DEBUG HELPERS FOR TRAIT TEMPLATE INVESTIGATION
+    // =============================================================================
+
+    // DEBUG: Remove these debug helpers as they're causing template rendering issues
+    // These were added during debugging but are now interfering with production rendering
+
+    /*
+    // Debug helper to track template data flow
+    if (!Handlebars.helpers.debugLog) {
+        Handlebars.registerHelper('debugLog', function (this: any, message: string, data: any) {
+            console.log(`🔧 TEMPLATE DEBUG | ${message}:`, data);
+            console.log(`🔧 TEMPLATE DEBUG | Full context at debugLog:`, this);
+            console.log(`🔧 TEMPLATE DEBUG | Context keys at debugLog:`, Object.keys(this || {}));
+            return '';
+        });
+    }
+
+    // Debug helper to check array length
+    if (!Handlebars.helpers.debugArrayLength) {
+        Handlebars.registerHelper('debugArrayLength', function (array: any[], label: string) {
+            const length = Array.isArray(array) ? array.length : 0;
+            console.log(`🔧 TEMPLATE DEBUG | Array length for ${label}: ${length}`);
+            return '';
+        });
+    }
+
+    // Debug helper to check if we're about to start an each loop
+    if (!Handlebars.helpers.debugEachStart) {
+        Handlebars.registerHelper('debugEachStart', function (array: any[], label: string) {
+            console.log(`🔧 TEMPLATE DEBUG | About to start each loop: ${label}`, array);
+            return '';
+        });
+    }
+
+    // Debug helper to check if we've finished an each loop
+    if (!Handlebars.helpers.debugEachEnd) {
+        Handlebars.registerHelper('debugEachEnd', function (array: any[], label: string) {
+            console.log(`🔧 TEMPLATE DEBUG | Finished each loop: ${label}`, array);
+            return '';
+        });
+    }
+    */
+
+    // =============================================================================
+    // UTILITY HELPERS
+    // =============================================================================
+
+    // Helper to check if a color is light (for text contrast)
+    if (!Handlebars.helpers.isLightColor) {
+        Handlebars.registerHelper('isLightColor', function (color: string) {
+            return isLightColor(color);
+        });
+    }
+
+    // Helper to join array elements
+    if (!Handlebars.helpers.join) {
+        Handlebars.registerHelper('join', function (array: any[], separator: string = ', ') {
+            if (!Array.isArray(array)) return '';
+            return array.join(separator);
+        });
+    }
+
+    // =============================================================================
     // TRAIT ACCESSIBILITY HELPERS
     // =============================================================================
 
     // Trait chip styling helper
     if (!Handlebars.helpers.traitChipStyle) {
         Handlebars.registerHelper('traitChipStyle', function (trait: any) {
+            console.log('🔧 TRAIT HELPER DEBUG | traitChipStyle called with:', trait);
+
             if (!trait || !trait.color) {
+                console.log('🔧 TRAIT HELPER DEBUG | traitChipStyle - no trait or color, using fallback');
                 return '--trait-color: #6C757D; --trait-text-color: #000000;';
             }
 
@@ -293,14 +494,19 @@ export async function registerAvantHandlebarsHelpers(Handlebars: any): Promise<v
 
             // Use explicit textColor if provided, otherwise default to black
             const textColor = trait.textColor || '#000000';
-            return `--trait-color: ${trait.color}; --trait-text-color: ${textColor};`;
+            const result = `--trait-color: ${trait.color}; --trait-text-color: ${textColor};`;
+            console.log('🔧 TRAIT HELPER DEBUG | traitChipStyle result:', result);
+            return result;
         });
     }
 
     // Trait chip data attributes helper
     if (!Handlebars.helpers.traitChipData) {
         Handlebars.registerHelper('traitChipData', function (trait: any) {
+            console.log('🔧 TRAIT HELPER DEBUG | traitChipData called with:', trait);
+
             if (!trait || !trait.color) {
+                console.log('🔧 TRAIT HELPER DEBUG | traitChipData - no trait or color, using fallback');
                 return 'data-color="#6C757D" data-text-color="#000000"';
             }
 
@@ -312,7 +518,9 @@ export async function registerAvantHandlebarsHelpers(Handlebars: any): Promise<v
 
             // Use explicit textColor if provided, otherwise default to black
             const textColor = trait.textColor || '#000000';
-            return `data-color="${trait.color}" data-text-color="${textColor}"`;
+            const result = `data-color="${trait.color}" data-text-color="${textColor}"`;
+            console.log('🔧 TRAIT HELPER DEBUG | traitChipData result:', result);
+            return result;
         });
     }
 

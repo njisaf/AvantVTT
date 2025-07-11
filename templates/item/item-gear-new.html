@@ -16,13 +16,13 @@ Features:
 
 <div class="item-sheet gear-sheet flexcol" autocomplete="off" data-application-part="form">
     {{!-- Header Section - Using Consistent Layout --}}
-    {{> "systems/avant/templates/shared/partials/item-header.hbs"}}
+    {{> "systems/avant/templates/shared/partials/item-header"}}
 
     {{!-- Single Content Layout --}}
     <div class="sheet-body">
         {{#> "systems/avant/templates/shared/partials/single-content.hbs"}}
         {{!-- Description Field --}}
-        {{> "systems/avant/templates/shared/partials/textarea-field.hbs"
+        {{> "systems/avant/templates/shared/partials/textarea-field"
         name="system.description"
         value=system.description
         label="Description"
@@ -32,7 +32,7 @@ Features:
         class="gear-description"}}
 
         {{!-- Traits Field --}}
-        {{> "systems/avant/templates/shared/partials/traits-field.hbs"
+        {{> "systems/avant/templates/shared/partials/traits-field"
         name="system.traits"
         displayTraits=displayTraits
         label="Traits"

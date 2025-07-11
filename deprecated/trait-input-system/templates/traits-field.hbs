@@ -1,0 +1,72 @@
+{{!--
+DEPRECATED: Trait Input Field Component
+
+This template contains the legacy trait input system that has been deprecated
+in favor of drag-and-drop functionality. The code is preserved here for
+potential restoration but should not be used in new development.
+
+DEPRECATION NOTICE:
+This trait input template has been deprecated in favor of native FoundryVTT drag-and-drop.
+The code is preserved here for potential restoration but should not be used in new development.
+
+RESTORATION INSTRUCTIONS:
+1. Copy trait input HTML back to traits-field.hbs
+2. Restore trait input CSS classes and styling
+3. Re-add trait input event listeners in item-sheet.ts
+4. Update template helpers to support autocomplete functionality
+
+ORIGINAL LOCATION: avantVtt/templates/shared/partials/traits-field.hbs (lines 25-58)
+--}}
+
+{{!-- DEPRECATED: Trait chip input with autocomplete --}}
+<div class="trait-chip-input">
+    <div class="trait-chips">
+        {{!-- Process displayTraits if available, otherwise fallback to value (raw IDs) --}}
+        {{#if displayTraits}}
+        {{#each displayTraits as |trait|}}
+        <div class="trait-chip" style="{{traitChipStyle trait}}" {{traitChipData trait}}>
+            {{#if trait.icon}}<i class="{{trait.icon}}" aria-hidden="true"></i>{{/if}}
+            <span class="trait-name">{{trait.name}}</span>
+            <button type="button" class="trait-remove" data-action="removeTrait" data-trait-id="{{trait.id}}"
+                aria-label="Remove {{trait.name}}">
+                <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+        </div>
+        {{/each}}
+        {{else if value}}
+        {{#each value as |traitId|}}
+        <div class="trait-chip" style="{{traitChipStyleFromId traitId}}" data-trait-id="{{traitId}}">
+            {{#if (traitIconFromId traitId)}}<i class="{{traitIconFromId traitId}}" aria-hidden="true"></i>{{/if}}
+            <span class="trait-name">{{traitNameFromId traitId}}</span>
+            <button type="button" class="trait-remove" data-action="removeTrait" data-trait-id="{{traitId}}"
+                aria-label="Remove {{traitNameFromId traitId}}">
+                <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+        </div>
+        {{/each}}
+        {{/if}}
+    </div>
+
+    {{!-- DEPRECATED: Trait autocomplete input container --}}
+    <div class="trait-input-container">
+        <input type="text" class="trait-autocomplete" placeholder="Type to add traits..." autocomplete="off"
+            data-target="{{name}}" {{#if hint}}aria-describedby="{{name}}-hint" {{/if}}>
+        <div class="trait-suggestions" style="display: none;"></div>
+    </div>
+</div>
+
+{{!-- Template Usage Documentation:
+
+DEPRECATED USAGE (for restoration reference only):
+{{> "systems/avant/templates/shared/partials/traits-field"
+name="system.traits"
+displayTraits=displayTraits
+label="Traits"
+hint="Add traits to categorize this item"
+class="custom-class"
+editable=editable
+}}
+
+NEW RECOMMENDED APPROACH:
+Use drag-and-drop from compendium with standard FoundryVTT patterns
+--}}

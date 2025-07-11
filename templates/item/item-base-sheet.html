@@ -129,9 +129,9 @@
                      {{#unless tab.active}}aria-hidden="true"{{/unless}}>
                     
                     {{#if (eq tab.id "description")}}
-                        {{> "systems/avant/templates/shared/partials/description-tab.hbs"}}
+                        {{> "systems/avant/templates/shared/partials/description-tab"}}
                     {{else if (eq tab.id "details")}}
-                        {{> "systems/avant/templates/shared/partials/details-tab.hbs"}}
+                        {{> "systems/avant/templates/shared/partials/details-tab"}}
                     {{else}}
                         <!-- Custom tab content placeholder -->
                         <div class="item-sheet__custom-tab" data-tab-id="{{tab.id}}">
@@ -145,7 +145,7 @@
             <div class="item-sheet__single-content">
                 {{#> "systems/avant/templates/shared/partials/single-content.hbs"}}
                     {{!-- Default single content layout for items without tabs --}}
-                    {{> "systems/avant/templates/shared/partials/textarea-field.hbs" 
+                    {{> "systems/avant/templates/shared/partials/textarea-field" 
                         name="system.description" 
                         value=system.description 
                         label="Description" 
@@ -154,7 +154,7 @@
                         hint="Detailed description of the item" 
                         class="item-description"}}
                     
-                    {{> "systems/avant/templates/shared/partials/traits-field.hbs" 
+                    {{> "systems/avant/templates/shared/partials/traits-field" 
                         name="system.traits" 
                         displayTraits=displayTraits 
                         label="Traits" 

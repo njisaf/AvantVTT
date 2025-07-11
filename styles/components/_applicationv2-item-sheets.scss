@@ -1,14 +1,24 @@
 // ============================================================================
-// ApplicationV2 Item Sheet Styles
+// ApplicationV2 Item Sheet Styles - INTEGRATION IN PROGRESS
 // ============================================================================
-// This file contains CSS specific to FoundryVTT v13 ApplicationV2 item sheets.
-// Added during V2 migration to resolve empty sheet content and tab functionality.
 // 
-// Key fixes:
-// - CSS selector compatibility (.application.sheet.avant.item)
-// - Tab visibility management (active/inactive states)
-// - Form element styling and layout
-// - Theme integration with CSS custom properties
+// ⚠️  DEPRECATION NOTICE: This file is being integrated into _item-sheets.scss
+// 
+// The styles in this file are causing conflicts with the base item sheet styles.
+// Key conflicts:
+// - .sheet-header using different layout structure (.profile-img vs .row-container)
+// - Heavy use of !important declarations overriding base styles
+// - Template structure mismatch (expects .charname vs modern form components)
+// 
+// MIGRATION STATUS:
+// - [ ] Header styles integrated into base file
+// - [ ] Tab styles consolidated 
+// - [ ] Form styles unified
+// - [ ] Template structure aligned
+// - [ ] File marked for removal
+// 
+// Until integration is complete, most styles are commented out to prevent conflicts.
+// ============================================================================
 
 // ApplicationV2 Item Sheets - Specific targeting for v13 compatibility
 .application.sheet.avant.item {
@@ -39,7 +49,9 @@
       padding: 0 !important;
       height: 100% !important;
 
-      // Sheet header with item image and name
+      // HEADER STYLES COMMENTED OUT - INTEGRATED INTO BASE FILE
+      // Uncomment and modify after integration is complete
+      /*
       .sheet-header {
         background: var(--theme-bg-secondary, #333) !important;
         border-bottom: 1px solid var(--theme-border-primary, #555) !important;
@@ -50,126 +62,8 @@
         gap: var(--space-sm, 8px) !important;
         padding: 10px !important;
         flex-shrink: 0 !important;
-
-        .profile-img {
-          width: 64px !important;
-          height: 64px !important;
-          border: 2px solid var(--theme-accent-primary, #00e0dc) !important;
-          cursor: pointer !important;
-          flex-shrink: 0 !important;
-        }
-
-        .header-fields {
-          flex: 1 !important;
-          margin-left: 10px !important;
-
-          .charname {
-            margin: 0 !important;
-
-            input {
-              background: var(--theme-bg-tertiary, #444) !important;
-              border: 1px solid var(--theme-border-primary, #555) !important;
-              color: var(--theme-text-primary, #ffffff) !important;
-              font-size: 16px !important;
-              font-weight: bold !important;
-              padding: 8px !important;
-              width: 100% !important;
-
-              &:focus {
-                border-color: var(--theme-accent-primary, #00e0dc) !important;
-                outline: none !important;
-                box-shadow: 0 0 8px rgba(0, 224, 220, 0.3) !important;
-              }
-            }
-          }
-        }
-
-        // AP Selector in Item Sheet Header
-        .header-costs {
-          display: flex !important;
-          align-items: center !important;
-          gap: 12px !important;
-          flex-shrink: 0 !important;
-
-          .ap-selector {
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: center !important;
-            gap: 4px !important;
-
-            .ap-selector__label {
-              font-family: var(--theme-font-display, "Orbitron", monospace) !important;
-              font-size: 10px !important;
-              font-weight: 600 !important;
-              color: var(--theme-text-secondary, #BFBFBF) !important;
-              text-transform: uppercase !important;
-              letter-spacing: 0.5px !important;
-            }
-
-            .ap-selector__icons {
-              display: flex !important;
-              gap: 3px !important;
-
-              .ap-icon {
-                width: 16px !important;
-                height: 16px !important;
-                border-radius: 50% !important;
-                background: transparent !important;
-                border: 1px solid var(--theme-accent-primary, #00E0DC) !important;
-                color: var(--theme-accent-primary, #00E0DC) !important;
-                cursor: pointer !important;
-                transition: all 0.3s ease !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                padding: 0 !important;
-
-                &:hover {
-                  background: var(--theme-accent-primary, #00E0DC) !important;
-                  color: var(--theme-bg-primary, #1C1C1C) !important;
-                }
-
-                // Filled state (progressive system)
-                &.ap-icon--filled {
-                  background: var(--theme-accent-primary, #00E0DC) !important;
-                  color: var(--theme-bg-primary, #1C1C1C) !important;
-                }
-
-                // Empty state
-                &.ap-icon--empty {
-                  background: transparent !important;
-                  color: var(--theme-accent-primary, #00E0DC) !important;
-                  opacity: 0.5 !important;
-                }
-
-                // Selected state (for the highest active button)
-                &.ap-icon--selected {
-                  background: var(--theme-accent-primary, #00E0DC) !important;
-                  color: var(--theme-bg-primary, #1C1C1C) !important;
-                  box-shadow: 0 0 8px rgba(0, 224, 220, 0.5) !important;
-                }
-
-                i {
-                  font-size: 8px !important;
-                }
-              }
-            }
-          }
-
-          // PP cost display for augments
-          .pp-cost {
-            background: var(--theme-accent-secondary, #4CE2E1) !important;
-            color: var(--theme-bg-primary, #1C1C1C) !important;
-            font-family: var(--theme-font-display, "Orbitron", monospace) !important;
-            font-size: 10px !important;
-            font-weight: 600 !important;
-            padding: 3px 8px !important;
-            border-radius: 12px !important;
-            white-space: nowrap !important;
-            letter-spacing: 0.5px !important;
-          }
-        }
       }
+      */
 
       // Tab navigation system
       .sheet-tabs {
@@ -287,15 +181,68 @@
               border-radius: 4px !important;
               padding: 4px !important;
 
-              .trait-chip-input__field {
-                background: transparent !important;
-                border: none !important;
+              .trait-chips {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                gap: 4px !important;
+                margin-bottom: 4px !important;
 
-                .trait-chip-input__input {
+                .trait-chip {
+                  display: inline-flex !important;
+                  align-items: center !important;
+                  gap: 4px !important;
+                  padding: 4px 8px !important;
+                  border-radius: 12px !important;
+                  font-size: 10px !important;
+                  font-weight: 500 !important;
+                  line-height: 1.2 !important;
+                  white-space: nowrap !important;
+
+                  .trait-name {
+                    color: inherit !important;
+                  }
+
+                  .trait-remove {
+                    background: none !important;
+                    border: none !important;
+                    color: inherit !important;
+                    font-size: 12px !important;
+                    cursor: pointer !important;
+                    padding: 0 !important;
+                    margin-left: 4px !important;
+                    opacity: 0.7 !important;
+                    width: 16px !important;
+                    height: 16px !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    border-radius: 50% !important;
+                    transition: all 0.2s ease !important;
+
+                    &:hover {
+                      opacity: 1 !important;
+                      background: rgba(0, 0, 0, 0.2) !important;
+                    }
+
+                    &:focus {
+                      outline: 1px solid currentColor !important;
+                      outline-offset: 1px !important;
+                    }
+                  }
+                }
+              }
+
+              .trait-input-container {
+                position: relative !important;
+
+                .trait-autocomplete {
                   background: transparent !important;
                   border: none !important;
                   color: var(--theme-text-primary, #ffffff) !important;
                   padding: 4px !important;
+                  width: 100% !important;
+                  min-height: 24px !important;
+                  font-size: 12px !important;
 
                   &::placeholder {
                     color: var(--theme-text-secondary, #aaa) !important;
@@ -306,12 +253,40 @@
                     box-shadow: none !important;
                   }
                 }
-              }
 
-              .trait-chip-input__dropdown {
-                background: var(--theme-bg-secondary, #333) !important;
-                border: 1px solid var(--theme-border-primary, #555) !important;
-                color: var(--theme-text-primary, #ffffff) !important;
+                .trait-suggestions {
+                  position: absolute !important;
+                  top: 100% !important;
+                  left: 0 !important;
+                  right: 0 !important;
+                  background: var(--theme-bg-secondary, #333) !important;
+                  border: 1px solid var(--theme-border-primary, #555) !important;
+                  border-radius: 4px !important;
+                  max-height: 200px !important;
+                  overflow-y: auto !important;
+                  z-index: 1000 !important;
+                  display: none !important;
+
+                  &.visible {
+                    display: block !important;
+                  }
+
+                  .trait-suggestion {
+                    padding: 8px 12px !important;
+                    cursor: pointer !important;
+                    color: var(--theme-text-primary, #ffffff) !important;
+                    border-bottom: 1px solid var(--theme-border-primary, #555) !important;
+                    transition: background-color 0.2s ease !important;
+
+                    &:hover {
+                      background: var(--theme-bg-primary, #2a2a2a) !important;
+                    }
+
+                    &:last-child {
+                      border-bottom: none !important;
+                    }
+                  }
+                }
               }
             }
           }

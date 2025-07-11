@@ -313,7 +313,7 @@ export function extractItemFormData(formData: unknown): Record<string, unknown> 
 
     const formObj = formData as Record<string, unknown>;
     const result: Record<string, any> = {};
-    const arrayFields = new Map<string, unknown[]>(); // Track array fields separately
+    const arrayFields = new Map<string, unknown[]>();
 
     // First pass: collect all values, identifying array fields
     for (const [key, value] of Object.entries(formObj)) {
@@ -322,15 +322,26 @@ export function extractItemFormData(formData: unknown): Record<string, unknown> 
         const cleanKey = isArrayField ? key.slice(0, -2) : key; // Remove [] suffix
 
         if (isArrayField) {
-            // Handle array field
+            // Handle array field - FIXED: properly handle multiple values with same key
             if (!arrayFields.has(cleanKey)) {
                 arrayFields.set(cleanKey, []);
             }
-            // Support both single values and arrays from FormData
+
+            // CRITICAL FIX: Support both single values and arrays from FormData
+            // When FormData has multiple entries with same key (like system.traits[])
+            // it can come in as either:
+            // 1. A single value: 'fire'
+            // 2. An array of values: ['fire', 'ice', 'lightning']
+            // 3. Object with multiple same keys gets converted to array by calling code
+
+            const arrayField = arrayFields.get(cleanKey)!;
+
             if (Array.isArray(value)) {
-                arrayFields.get(cleanKey)!.push(...value);
-            } else {
-                arrayFields.get(cleanKey)!.push(value);
+                // Already an array - add all values
+                arrayField.push(...value);
+            } else if (value !== undefined && value !== null) {
+                // Single value - add it to array
+                arrayField.push(value);
             }
         } else {
             // Handle regular field - split key into path segments
@@ -461,6 +472,62 @@ function convertFormValue(value: unknown): number | boolean | string {
 
     // Return as string if no conversion applies
     return value;
+}
+
+/**
+ * Apply trait drop to an item (Phase 2 Drag-and-Drop Feature)
+ *
+ * This pure function handles the business logic for adding a trait to an item
+ * via drag-and-drop. It validates the operation, checks for duplicates, and
+ * respects optional limits while providing clear error messages.
+ *
+ * REFACTORED: Now uses the unified drag-drop utilities for consistent behavior
+ * across all item types and scenarios.
+ *
+ * @param item - The target item document
+ * @param droppedTrait - The trait item being dropped
+ * @param opts - Optional configuration
+ * @returns Promise that resolves when trait is applied
+ *
+ * @example
+ * ```typescript
+ * // Basic usage
+ * const result = await applyTraitDrop(targetItem, fireTraitItem);
+ * if (result.success) {
+ *     await targetItem.update({ 'system.traits': result.traits });
+ * }
+ * ```
+ */
+export async function applyTraitDrop(
+    item: any,
+    droppedTrait: any,
+    opts: { limit?: number; enableLogging?: boolean } = {}
+): Promise<{ success: boolean; error?: string; traits?: string[]; duplicate?: boolean }> {
+    const { limit, enableLogging = false } = opts;
+
+    // Import drag-drop utilities dynamically to avoid circular dependencies
+    const { handleTraitDrop, convertToLegacyFormat } = await import('./drag-drop');
+
+    // Get current traits
+    const currentTraits = Array.isArray(item.system.traits) ? [...item.system.traits] : [];
+
+    // Use the generic drag-drop handler with trait-specific configuration
+    const result = handleTraitDrop(
+        droppedTrait,
+        currentTraits,
+        limit,
+        enableLogging
+    );
+
+    if (!result.success) {
+        return convertToLegacyFormat(result);
+    }
+
+    // Add the new trait to the list
+    const newTraits = [...currentTraits, result.id!];
+
+    // Return in the expected legacy format
+    return convertToLegacyFormat(result, newTraits);
 }
 
 /**

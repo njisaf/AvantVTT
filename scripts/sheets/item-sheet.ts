@@ -42,6 +42,9 @@ import { logger } from '../utils/logger.js';
 import { initializeApSelector } from './ap-selector-handler';
 
 // Import trait utilities
+// DEPRECATION NOTICE: Trait input imports moved to deprecated folder
+// These imports are stubbed to maintain build compatibility
+// See: deprecated/trait-input-system/ for original implementations
 import { addTraitToList, removeTraitFromList, generateTraitSuggestions, validateTraitList } from '../logic/trait-utils.ts';
 import { renderTraitSuggestion } from '../logic/chat/trait-renderer.ts';
 
@@ -138,19 +141,20 @@ export function createAvantItemSheet() {
         /** The item document associated with this sheet */
         declare document: any;
 
-        /** Current trait input state */
+        /** 
+         * @deprecated Trait input state has been deprecated
+         * Original implementation in deprecated/trait-input-system/logic/item-sheet-trait-input.ts
+         */
         private traitInputState: {
             availableTraits: any[];
             currentInput: string;
             selectedIndex: number;
             isDropdownOpen: boolean;
-            optimisticUpdate: boolean; // Track if we're in the middle of an optimistic update
         } = {
                 availableTraits: [],
                 currentInput: '',
                 selectedIndex: -1,
-                isDropdownOpen: false,
-                optimisticUpdate: false
+                isDropdownOpen: false
             };
 
         /** Store original submitOnChange setting for restoration */
@@ -234,9 +238,15 @@ export function createAvantItemSheet() {
                 // 
                 // ================================================================================
 
-                roll: (event: Event, target: HTMLElement) => {
-                    const sheet = (target.closest('.app') as any)?.app as AvantItemSheet;
-                    return sheet?.onRoll(event, target);
+                // Image Upload Handler - connects to data-edit="img" elements
+                editImage: function (this: AvantItemSheet, event: Event, target: HTMLElement) {
+                    // Direct delegation to instance method - 'this' is automatically bound by ApplicationV2
+                    return this.onEditImage(event, target);
+                },
+
+                roll: function (this: AvantItemSheet, event: Event, target: HTMLElement) {
+                    // Direct delegation to instance method - 'this' is automatically bound by ApplicationV2
+                    return this.onRoll(event, target);
                 },
 
                 /**
@@ -275,17 +285,19 @@ export function createAvantItemSheet() {
                     return this.onRemoveTrait(event, target);
                 },
 
-                traitFieldClick: (event: Event, target: HTMLElement) => {
-                    const sheet = (target.closest('.app') as any)?.app as AvantItemSheet;
-                    return sheet?.onTraitFieldClick(event, target);
+                // DEPRECATED: Trait input action handlers moved to deprecated/trait-input-system/
+                // These handlers are stubbed to maintain build compatibility
+                traitFieldClick: function (this: AvantItemSheet, event: Event, target: HTMLElement) {
+                    console.warn('Trait input system is deprecated. Use drag-and-drop instead.');
+                    return Promise.resolve();
                 },
-                traitSuggestionClick: (event: Event, target: HTMLElement) => {
-                    const sheet = (target.closest('.app') as any)?.app as AvantItemSheet;
-                    return sheet?.onTraitSuggestionClick(event, target);
+                traitSuggestionClick: function (this: AvantItemSheet, event: Event, target: HTMLElement) {
+                    console.warn('Trait input system is deprecated. Use drag-and-drop instead.');
+                    return Promise.resolve();
                 },
-                tagExampleClick: (event: Event, target: HTMLElement) => {
-                    const sheet = (target.closest('.app') as any)?.app as AvantItemSheet;
-                    return sheet?.onTagExampleClick(event, target);
+                tagExampleClick: function (this: AvantItemSheet, event: Event, target: HTMLElement) {
+                    // Direct delegation to instance method - 'this' is automatically bound by ApplicationV2
+                    return this.onTagExampleClick(event, target);
                 }
             }
         };
@@ -316,34 +328,60 @@ export function createAvantItemSheet() {
         /**
          * Dynamic parts configuration based on item type
          * 
-         * This getter overrides the static PARTS configuration to provide dynamic
-         * template selection. In our case, we use a single aggregator template
-         * that internally includes the correct partial based on item type.
+         * EMERGENCY FIX: Using specific templates instead of universal aggregator
+         * The universal template system has multiple failure points causing blank forms.
          * 
          * TEMPLATE STRATEGY:
-         * - Single aggregator template (item-sheet.html) handles all item types
-         * - Template internally includes correct partial based on {{item.type}}
-         * - Prevents template path errors and simplifies maintenance
+         * - Use specific template for each item type (item-{type}-new.html)
+         * - These templates contain working form fields with proper system.* names
+         * - Fallback to universal template if specific template doesn't exist
          * 
          * @override
          */
         get parts() {
-            // Use the aggregator template for all item types – this template will internally
-            // include the correct partial based on `item.type` so we no longer need to build
-            // a dynamic path here. This prevents accidental fallback to the gear template.
+            const itemType = this.document?.type || 'unknown';
 
-            const templatePath = "systems/avant/templates/item-sheet.html";
-
-            logger.debug('AvantItemSheet | Parts getter called - Aggregator template path:', {
-                templatePath,
-                documentId: this.document?.id || 'unknown'
+            // DEBUGGING: Log everything about the parts getter call
+            logger.debug('AvantItemSheet | parts getter called - FULL DEBUG', {
+                documentExists: !!this.document,
+                documentType: this.document?.type,
+                documentId: this.document?.id,
+                documentName: this.document?.name,
+                thisExists: !!this,
+                constructorName: this.constructor.name,
+                itemType
             });
 
-            return {
+            // Map item types to specific templates that we know work
+            const specificTemplates: Record<string, string> = {
+                'talent': 'systems/avant/templates/item/item-talent-new.html',
+                'augment': 'systems/avant/templates/item/item-augment-new.html',
+                'weapon': 'systems/avant/templates/item/item-weapon-new.html',
+                'armor': 'systems/avant/templates/item/item-armor-new.html',
+                'action': 'systems/avant/templates/item/item-action-new.html',
+                'gear': 'systems/avant/templates/item/item-gear-new.html',
+                'feature': 'systems/avant/templates/item/item-feature-new.html',
+                'trait': 'systems/avant/templates/item/item-trait-new.html'
+            };
+
+            // Use specific template if available, otherwise fall back to universal
+            const templatePath = specificTemplates[itemType] || "systems/avant/templates/item-sheet.html";
+
+            const partsConfig = {
                 form: {
                     template: templatePath
                 }
             };
+
+            logger.debug('AvantItemSheet | parts getter returning configuration', {
+                itemType,
+                templatePath,
+                partsConfig,
+                specificTemplateExists: !!specificTemplates[itemType],
+                availableTemplates: Object.keys(specificTemplates)
+            });
+
+            return partsConfig;
         }
 
         /**
@@ -390,20 +428,8 @@ export function createAvantItemSheet() {
             return `${title} [${this.document?.type || "Item"}]`;
         }
 
-        /**
-         * Get the template path for this item type - Dynamic template selection
-         * 
-         * This getter provides the template path for ApplicationV2 rendering.
-         * We use the aggregator template pattern for simplicity.
-         * 
-         * @override
-         */
-        get template(): string {
-            // Always return the aggregator template which handles partial inclusion based on `item.type`.
-            const templatePath = "systems/avant/templates/item-sheet.html";
-            logger.debug('AvantItemSheet | Using aggregator template path:', templatePath);
-            return templatePath;
-        }
+        // REMOVED: Conflicting template getter that was causing ApplicationV2 template loading issues
+        // The parts configuration above provides the correct template path for each item type
 
         /**
          * Prepare context data for rendering the item sheet
@@ -528,13 +554,24 @@ export function createAvantItemSheet() {
                 context.enrichedDescription = '';
             }
 
-            // Prepare trait display data for template
-            await this._prepareTraitDisplayData(context);
+            // CRITICAL: Prepare trait display data for template with robust error handling
+            try {
+                context.displayTraits = await this._prepareTraitDisplayData();
+                logger.debug('AvantItemSheet | Trait display data prepared successfully:', {
+                    traitsCount: context.displayTraits?.length || 0,
+                    traitNames: context.displayTraits?.map((t: any) => t.name) || []
+                });
+            } catch (error) {
+                logger.error('AvantItemSheet | Failed to prepare trait display data:', error);
+                // Fallback to empty array to prevent template errors
+                context.displayTraits = [];
+            }
 
             logger.debug('AvantItemSheet | Context preparation complete:', {
                 finalContextKeys: Object.keys(context),
                 systemKeys: Object.keys(context.system || {}),
-                traitsCount: context.displayTraits?.length || 0
+                traitsCount: context.displayTraits?.length || 0,
+                hasTraits: !!(context.displayTraits && context.displayTraits.length > 0)
             });
 
             return context;
@@ -542,80 +579,139 @@ export function createAvantItemSheet() {
 
         /**
          * Prepare trait display data for template rendering
-         * @param context - The template context
          * @private
          */
-        private async _prepareTraitDisplayData(context: any): Promise<void> {
-            // Initialize display traits array
-            context.displayTraits = [];
-
-            const traitIds = context.system?.traits || [];
+        private async _prepareTraitDisplayData(): Promise<any[]> {
+            const traitIds = this.document?.system?.traits || [];
             logger.debug('AvantItemSheet | Preparing trait display data', {
-                itemName: context.item?.name || 'Unknown',
-                itemType: context.item?.type || 'Unknown',
-                traitIds
+                itemName: this.document?.name || 'Unknown',
+                itemType: this.document?.type || 'Unknown',
+                traitIds,
+                traitCount: traitIds.length
             });
 
+            // CRITICAL: Always return displayable data, never empty
             if (traitIds.length === 0) {
-                return;
+                logger.debug('AvantItemSheet | No traits to display');
+                return [];
             }
 
-            try {
-                // Get trait data from the TraitProvider
-                const game = (globalThis as any).game;
-                if (game?.avant?.initializationManager) {
-                    const traitProvider = game.avant.initializationManager.getService('traitProvider');
-                    if (traitProvider) {
-                        const result = await traitProvider.getAll();
-                        if (result.success && result.data) {
-                            const allTraits = result.data;
+            // STEP 1: Create immediate fallback display data (never fails)
+            const fallbackTraits = traitIds.map((traitId: string) => {
+                const traitName = this._generateFallbackTraitName(traitId);
+                const fallbackColor = this._generateFallbackTraitColor(traitId, traitName);
 
-                            // Map trait IDs to actual trait data
-                            context.displayTraits = traitIds.map((traitId: string) => {
-                                const trait = allTraits.find((t: any) => t.id === traitId);
-                                if (trait) {
-                                    return {
-                                        id: traitId,
-                                        name: trait.name,
-                                        color: trait.color,
-                                        icon: trait.icon,
-                                        description: trait.description,
-                                        displayId: traitId
-                                    };
-                                } else {
-                                    return {
-                                        id: traitId,
-                                        name: this._generateFallbackTraitName(traitId),
-                                        displayId: traitId,
-                                        color: '#6C757D',
-                                        icon: 'fas fa-tag'
-                                    };
-                                }
-                            });
-                            return;
+                return {
+                    id: traitId,
+                    name: traitName,
+                    displayId: traitId,
+                    color: fallbackColor.background,
+                    textColor: fallbackColor.text,
+                    icon: fallbackColor.icon,
+                    description: `Trait: ${traitName}`,
+                    source: 'fallback'
+                };
+            });
+
+            // STEP 2: Progressive enhancement with service data (if available)
+            try {
+                const game = (globalThis as any).game;
+                const initManager = game?.avant?.initializationManager;
+
+                if (initManager) {
+                    logger.debug('AvantItemSheet | Attempting to get TraitProvider service...');
+
+                    // CRITICAL FIX: Use waitForService with timeout instead of getService
+                    // This ensures we wait for the service to be ready rather than getting null
+                    try {
+                        const traitProvider = await initManager.waitForService('traitProvider', 2000);
+
+                        if (traitProvider) {
+                            logger.debug('AvantItemSheet | TraitProvider available, enhancing display data');
+                            const result = await traitProvider.getAll();
+
+                            if (result.success && result.data) {
+                                const allTraits = result.data;
+
+                                // Enhance each trait with rich data
+                                const enhancedTraits = traitIds.map((traitId: string) => {
+                                    const trait = allTraits.find((t: any) => t.id === traitId);
+                                    if (trait) {
+                                        return {
+                                            id: traitId,
+                                            name: trait.name,
+                                            color: trait.color || '#00E0DC',
+                                            textColor: trait.textColor || '#000000',
+                                            icon: trait.icon || 'fas fa-tag',
+                                            description: trait.description || trait.name,
+                                            displayId: traitId,
+                                            source: 'service'
+                                        };
+                                    } else {
+                                        // Keep fallback for missing traits
+                                        return fallbackTraits.find((f: any) => f.id === traitId) || {
+                                            id: traitId,
+                                            name: this._generateFallbackTraitName(traitId),
+                                            displayId: traitId,
+                                            color: '#6C757D',
+                                            textColor: '#FFFFFF',
+                                            icon: 'fas fa-tag',
+                                            description: `Unknown trait: ${traitId}`,
+                                            source: 'fallback'
+                                        };
+                                    }
+                                });
+
+                                logger.debug('AvantItemSheet | Enhanced trait display data:', {
+                                    enhancedCount: enhancedTraits.filter((t: any) => t.source === 'service').length,
+                                    fallbackCount: enhancedTraits.filter((t: any) => t.source === 'fallback').length,
+                                    totalCount: enhancedTraits.length
+                                });
+
+                                return enhancedTraits;
+                            }
                         }
+                    } catch (serviceError) {
+                        logger.warn('AvantItemSheet | TraitProvider service not ready or failed:', serviceError);
+                        // Fall through to fallback logic
                     }
+                } else {
+                    logger.warn('AvantItemSheet | InitializationManager not available');
                 }
             } catch (error) {
-                console.warn('AvantItemSheet | Error accessing TraitProvider:', error);
+                logger.warn('AvantItemSheet | Error enhancing trait display data:', error);
             }
 
-            // Fallback: create basic display data using ID parsing
-            context.displayTraits = traitIds.map((traitId: string) => ({
-                id: traitId,
-                name: this._generateFallbackTraitName(traitId),
-                displayId: traitId,
-                color: '#6C757D',
-                icon: 'fas fa-tag'
-            }));
+            // STEP 3: Always return at least fallback data
+            logger.debug('AvantItemSheet | Using fallback trait display data');
+            return fallbackTraits;
         }
 
         /**
          * Generate a fallback display name from a trait ID
+         * 
+         * This method handles various trait ID formats and creates user-friendly names:
+         * - "fire" → "Fire"
+         * - "system_trait_fire" → "Fire"
+         * - "avant-trait-fire" → "Fire"
+         * - "fROYGUX93Sy3aqgM" → "Custom Trait"
+         * - "Fire" → "Fire" (already readable)
+         * 
          * @param traitId - The trait ID to generate a name from
          * @private
          */
         private _generateFallbackTraitName(traitId: string): string {
+            // Handle empty or invalid IDs
+            if (!traitId || typeof traitId !== 'string') {
+                return 'Unknown Trait';
+            }
+
+            // Handle already readable names (common case)
+            if (traitId.match(/^[A-Z][a-z]+$/)) {
+                return traitId;
+            }
+
+            // Handle system trait prefixes
             if (traitId.startsWith('system_trait_')) {
                 return traitId
                     .replace(/^system_trait_/, '')
@@ -623,7 +719,121 @@ export function createAvantItemSheet() {
                     .replace(/_/g, ' ')
                     .replace(/\b\w/g, l => l.toUpperCase());
             }
-            return traitId;
+
+            // Handle avant trait prefixes
+            if (traitId.startsWith('avant-trait-')) {
+                return traitId
+                    .replace(/^avant-trait-/, '')
+                    .replace(/-\d+$/, '')
+                    .replace(/-/g, ' ')
+                    .replace(/\b\w/g, l => l.toUpperCase());
+            }
+
+            // Handle common single-word trait names
+            if (traitId.match(/^[a-z]+$/)) {
+                return traitId.charAt(0).toUpperCase() + traitId.slice(1);
+            }
+
+            // Handle kebab-case or underscore-case
+            if (traitId.includes('-') || traitId.includes('_')) {
+                return traitId
+                    .replace(/[-_]/g, ' ')
+                    .replace(/\b\w/g, l => l.toUpperCase());
+            }
+
+            // Handle long random IDs (likely UUIDs or generated IDs)
+            if (traitId.length > 10 && traitId.match(/^[a-zA-Z0-9]+$/)) {
+                return 'Custom Trait';
+            }
+
+            // Handle camelCase
+            if (traitId.match(/^[a-z][a-zA-Z]+$/)) {
+                return traitId.replace(/([A-Z])/g, ' $1').replace(/\b\w/g, l => l.toUpperCase());
+            }
+
+            // Fallback: return the original ID with first letter capitalized
+            return traitId.charAt(0).toUpperCase() + traitId.slice(1);
+        }
+
+        /**
+         * Generate fallback colors and icon for a trait based on its ID or name
+         * 
+         * This method provides visually appealing colors instead of generic gray,
+         * making traits more identifiable even when the TraitProvider isn't available.
+         * 
+         * @param traitId - The trait ID
+         * @param traitName - The generated trait name
+         * @returns Object with background color, text color, and icon
+         * @private
+         */
+        private _generateFallbackTraitColor(traitId: string, traitName: string): { background: string, text: string, icon: string } {
+            // Define color palette for fallback traits
+            const colorPalette = [
+                { background: '#FF6B6B', text: '#FFFFFF', icon: 'fas fa-fire' },      // Red/Fire
+                { background: '#4ECDC4', text: '#FFFFFF', icon: 'fas fa-snowflake' }, // Teal/Ice
+                { background: '#45B7D1', text: '#FFFFFF', icon: 'fas fa-bolt' },      // Blue/Lightning
+                { background: '#96CEB4', text: '#FFFFFF', icon: 'fas fa-leaf' },      // Green/Nature
+                { background: '#FECA57', text: '#FFFFFF', icon: 'fas fa-sun' },       // Yellow/Light
+                { background: '#8B7EC8', text: '#FFFFFF', icon: 'fas fa-magic' },     // Purple/Arcane
+                { background: '#F8B500', text: '#FFFFFF', icon: 'fas fa-cog' },       // Orange/Tech
+                { background: '#2C3E50', text: '#FFFFFF', icon: 'fas fa-shield-alt' } // Dark/Defense
+            ];
+
+            // Check for specific trait name patterns to assign themed colors
+            const lowerName = traitName.toLowerCase();
+            const lowerID = traitId.toLowerCase();
+
+            // Fire-themed traits
+            if (lowerName.includes('fire') || lowerID.includes('fire') || lowerName.includes('flame') || lowerName.includes('burn')) {
+                return colorPalette[0]; // Red/Fire
+            }
+
+            // Ice/Cold-themed traits
+            if (lowerName.includes('ice') || lowerID.includes('ice') || lowerName.includes('cold') || lowerName.includes('frost')) {
+                return colorPalette[1]; // Teal/Ice
+            }
+
+            // Lightning/Electric-themed traits
+            if (lowerName.includes('lightning') || lowerID.includes('lightning') || lowerName.includes('electric') || lowerName.includes('shock')) {
+                return colorPalette[2]; // Blue/Lightning
+            }
+
+            // Nature/Earth-themed traits
+            if (lowerName.includes('nature') || lowerID.includes('nature') || lowerName.includes('earth') || lowerName.includes('plant')) {
+                return colorPalette[3]; // Green/Nature
+            }
+
+            // Light/Holy-themed traits
+            if (lowerName.includes('light') || lowerID.includes('light') || lowerName.includes('holy') || lowerName.includes('divine')) {
+                return colorPalette[4]; // Yellow/Light
+            }
+
+            // Magic/Arcane-themed traits
+            if (lowerName.includes('magic') || lowerID.includes('magic') || lowerName.includes('arcane') || lowerName.includes('mystical')) {
+                return colorPalette[5]; // Purple/Arcane
+            }
+
+            // Tech/Mechanical-themed traits
+            if (lowerName.includes('tech') || lowerID.includes('tech') || lowerName.includes('cyber') || lowerName.includes('mech')) {
+                return colorPalette[6]; // Orange/Tech
+            }
+
+            // Defense/Protection-themed traits
+            if (lowerName.includes('defense') || lowerID.includes('defense') || lowerName.includes('protect') || lowerName.includes('shield')) {
+                return colorPalette[7]; // Dark/Defense
+            }
+
+            // For traits that don't match any theme, use a hash-based color selection
+            // This ensures consistent colors for the same trait across different contexts
+            let hash = 0;
+            const str = traitId + traitName;
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) - hash) + str.charCodeAt(i);
+                hash = hash & hash; // Convert to 32-bit integer
+            }
+
+            const colorIndex = Math.abs(hash) % colorPalette.length;
+            return colorPalette[colorIndex];
         }
 
         /**
@@ -633,10 +843,31 @@ export function createAvantItemSheet() {
          * @returns Rendered HTML content
          */
         async _renderHTML(context: any, options: any): Promise<string> {
-            logger.debug('AvantItemSheet | _renderHTML called', {
-                itemType: context.item?.type,
-                contextKeys: Object.keys(context || {}),
-                templatePath: this.options.template
+            // DEBUGGING: Comprehensive template path investigation
+            const partsConfig = this.parts;
+            const templateFromParts = partsConfig?.form?.template;
+            const templateFromOptions = this.options.template;
+            const templateFromContext = context?.template;
+
+            logger.debug('AvantItemSheet | _renderHTML called - TEMPLATE PATH INVESTIGATION', {
+                itemType: this.document?.type,
+                contextKeys: Object.keys(context),
+                templateFromParts: this.options.parts?.form?.template,
+                templateFromOptions: this.options.template,
+                templateFromContext: context.template,
+                partsConfig: this.options.parts || {},
+                partsKeys: Object.keys(this.options.parts || {}),
+                optionsKeys: Object.keys(this.options),
+                optionsTemplate: this.options.template,
+                documentExists: !!this.document,
+                documentType: this.document?.type,
+                documentId: this.document?.id,
+                documentName: this.document?.name,
+                hasDisplayTraits: !!context.displayTraits,
+                displayTraitsType: typeof context.displayTraits,
+                displayTraitsLength: context.displayTraits?.length || 0,
+                displayTraitsFirst: context.displayTraits?.[0],
+                actualTemplate: this.options.parts?.form?.template || this.options.template
             });
 
             try {
@@ -669,7 +900,29 @@ export function createAvantItemSheet() {
                     console.warn('🔧 RENDER DEBUG | Handlebars partials registry not accessible');
                 }
 
-                return await super._renderHTML(context, options);
+                // CRITICAL DIAGNOSTIC: Log the exact context being passed to template
+                console.log('🔧 TEMPLATE CONTEXT DEBUG | Full context being passed to template:', {
+                    hasDisplayTraits: !!context.displayTraits,
+                    displayTraitsType: typeof context.displayTraits,
+                    displayTraitsValue: context.displayTraits,
+                    displayTraitsLength: context.displayTraits?.length || 0,
+                    contextKeys: Object.keys(context),
+                    systemTraits: context.system?.traits,
+                    systemTraitsLength: context.system?.traits?.length || 0
+                });
+
+                // Call the parent _renderHTML method to perform the actual template rendering
+                const result = await super._renderHTML(context, options);
+
+                // CRITICAL DIAGNOSTIC: Log what happened after template rendering
+                console.log('🔧 TEMPLATE RENDER DEBUG | After template render:', {
+                    resultType: typeof result,
+                    resultKeys: Object.keys(result || {}),
+                    resultLength: result?.length || 0,
+                    resultPreview: typeof result === 'string' ? result.substring(0, 200) + '...' : 'Not a string'
+                });
+
+                return result;
             } catch (error) {
                 logger.error('AvantItemSheet | _renderHTML failed:', error);
                 throw error;
@@ -740,12 +993,6 @@ export function createAvantItemSheet() {
         _onRender(context: ItemSheetContext, options: any): void {
             super._onRender(context, options);
 
-            // OPTIMIZATION: Skip heavy operations during optimistic trait updates
-            if (this.traitInputState.optimisticUpdate) {
-                logger.debug('AvantItemSheet | Skipping heavy render operations during optimistic trait update');
-                return;
-            }
-
             // Detailed debugging of actual DOM content
             const windowContent = this.element?.querySelector('.window-content');
             const formElement = this.element?.querySelector('.item-sheet');
@@ -786,15 +1033,29 @@ export function createAvantItemSheet() {
             // Initialize tab functionality for ApplicationV2
             this._initializeTabs();
 
-            // Set up trait-specific listeners if editable
+            // CRITICAL: Set up trait-specific listeners if editable with validation
             if (this.isEditable) {
-                this._activateTraitListeners();
+                try {
+                    this._activateTraitListeners();
+                    this._activateDragDropListeners();
+                    logger.debug('AvantItemSheet | Trait listeners activated successfully');
+                } catch (error) {
+                    logger.error('AvantItemSheet | Failed to activate trait listeners:', error);
+                }
             }
+
+            // DIAGNOSTIC: Verify trait display after render
+            const traitChips = this.element.querySelectorAll('.trait-chip');
+            const traitInput = this.element.querySelector('.trait-autocomplete');
 
             logger.debug('AvantItemSheet | ApplicationV2 render completed', {
                 itemId: this.document.id,
                 itemType: this.document.type,
-                editable: this.isEditable
+                editable: this.isEditable,
+                traitChipsFound: traitChips.length,
+                traitInputFound: !!traitInput,
+                systemTraits: this.document.system?.traits || [],
+                systemTraitsCount: (this.document.system?.traits || []).length
             });
 
             // Initialize AP selector handler with debounced callback to prevent excessive re-rendering
@@ -901,35 +1162,264 @@ export function createAvantItemSheet() {
         }
 
         /**
-         * Activate trait-specific event listeners
-         * @private
+         * @deprecated Trait input listeners have been deprecated
+         * Original implementation in deprecated/trait-input-system/logic/item-sheet-trait-input.ts
          */
         private _activateTraitListeners(): void {
-            // Trait input field events
-            const traitInput = this.element.querySelector('.trait-chip-input__input') as HTMLInputElement;
-            if (traitInput) {
-                traitInput.addEventListener('input', this._onTraitInput.bind(this));
-                traitInput.addEventListener('keydown', this._onTraitInputKeydown.bind(this));
-                traitInput.addEventListener('focus', this._onTraitInputFocus.bind(this));
-                traitInput.addEventListener('blur', this._onTraitInputBlur.bind(this));
-            }
+            console.warn('Trait input system is deprecated. Use drag-and-drop instead.');
 
-            // Event delegation for dynamically created suggestion elements
-            const dropdown = this.element.querySelector('.trait-chip-input__dropdown');
-            if (dropdown) {
-                dropdown.addEventListener('click', (event: Event) => {
-                    const suggestion = (event.target as HTMLElement).closest('.trait-chip-input__suggestion') as HTMLElement;
-                    if (suggestion) {
-                        event.preventDefault();
-                        this.onTraitSuggestionClick(event, suggestion);
-                    }
-                });
-            }
-
-            // Update tag button states for trait sheets
+            // Update tag button states for trait sheets (non-deprecated functionality)
             if (this.document.type === 'trait') {
                 this._updateTagButtonStates();
             }
+        }
+
+        /**
+         * Activate drag-and-drop listeners for trait functionality (Phase 2 Feature)
+         * 
+         * This method sets up drag-and-drop event listeners for the trait drop zone.
+         * It checks the feature flag and only enables the functionality when the
+         * drag-and-drop feature is enabled in system settings.
+         * 
+         * @private
+         */
+        private _activateDragDropListeners(): void {
+            try {
+                // Check if drag-and-drop feature is enabled
+                const game = (globalThis as any).game;
+                const featureEnabled = game?.settings?.get('avant', 'enableDragTraitInput') || false;
+
+                const dropZone = this.element.querySelector('.trait-drop-zone') as HTMLElement;
+                const traitInputContainer = this.element.querySelector('.trait-input-container') as HTMLElement;
+
+                if (!dropZone) {
+                    logger.debug('AvantItemSheet | No drop zone found, skipping drag-drop setup');
+                    return;
+                }
+
+                if (featureEnabled) {
+                    // Show drop zone and hide text input
+                    dropZone.style.display = 'block';
+                    if (traitInputContainer) {
+                        traitInputContainer.style.display = 'none';
+                    }
+
+                    // Set up drag-drop event listeners
+                    this._setupDropZoneListeners(dropZone);
+                    logger.debug('AvantItemSheet | Drag-and-drop trait input enabled');
+                } else {
+                    // Hide drop zone and show text input
+                    dropZone.style.display = 'none';
+                    if (traitInputContainer) {
+                        traitInputContainer.style.display = 'block';
+                    }
+                    logger.debug('AvantItemSheet | Drag-and-drop trait input disabled, using text input');
+                }
+            } catch (error) {
+                logger.error('AvantItemSheet | Error setting up drag-drop listeners:', error);
+            }
+        }
+
+        /**
+         * Set up drop zone event listeners for drag-and-drop functionality
+         * 
+         * @param dropZone - The drop zone element
+         * @private
+         */
+        private _setupDropZoneListeners(dropZone: HTMLElement): void {
+            // Prevent default drag behaviors on the drop zone
+            dropZone.addEventListener('dragover', this._onDragOver.bind(this));
+            dropZone.addEventListener('dragenter', this._onDragEnter.bind(this));
+            dropZone.addEventListener('dragleave', this._onDragLeave.bind(this));
+            dropZone.addEventListener('drop', this._onDrop.bind(this));
+
+            logger.debug('AvantItemSheet | Drop zone listeners configured');
+        }
+
+        /**
+         * Handle drag over events on the drop zone
+         * @param event - The drag event
+         * @private
+         */
+        private _onDragOver(event: DragEvent): void {
+            event.preventDefault();
+            event.dataTransfer!.dropEffect = 'copy';
+
+            const dropZone = event.currentTarget as HTMLElement;
+            if (!dropZone.classList.contains('drag-hover')) {
+                dropZone.classList.add('drag-hover');
+            }
+        }
+
+        /**
+         * Handle drag enter events on the drop zone
+         * @param event - The drag event
+         * @private
+         */
+        private _onDragEnter(event: DragEvent): void {
+            event.preventDefault();
+            const dropZone = event.currentTarget as HTMLElement;
+            dropZone.classList.add('drag-hover');
+        }
+
+        /**
+         * Handle drag leave events on the drop zone
+         * @param event - The drag event
+         * @private
+         */
+        private _onDragLeave(event: DragEvent): void {
+            const dropZone = event.currentTarget as HTMLElement;
+
+            // Only remove hover state if we're leaving the drop zone entirely
+            if (!dropZone.contains(event.relatedTarget as Node)) {
+                dropZone.classList.remove('drag-hover');
+            }
+        }
+
+        /**
+         * Handle drop events on the drop zone
+         * @param event - The drop event
+         * @private
+         */
+        private async _onDrop(event: DragEvent): Promise<void> {
+            event.preventDefault();
+
+            const dropZone = event.currentTarget as HTMLElement;
+            dropZone.classList.remove('drag-hover');
+            dropZone.classList.add('drag-active');
+
+            try {
+                // Get the dropped data using FoundryVTT v13+ standard method
+                let data;
+                try {
+                    // Try modern v13+ approach first
+                    const dragDataText = event.dataTransfer?.getData('text/plain');
+                    if (dragDataText) {
+                        data = JSON.parse(dragDataText);
+                    } else {
+                        // If dragDataText is empty or falsy, we need to use legacy method
+                        throw new Error('No v13 drag data available');
+                    }
+                } catch (parseError) {
+                    // Fallback to legacy method if modern approach fails
+                    const TextEditor = (globalThis as any).TextEditor;
+                    if (TextEditor?.getDragEventData) {
+                        data = TextEditor.getDragEventData(event);
+                    } else {
+                        throw new Error('Unable to extract drag data - no compatible method available');
+                    }
+                }
+
+                logger.debug('AvantItemSheet | Drop data received:', data);
+
+                if (data.type === 'Item' && data.uuid) {
+                    await this._handleTraitDrop(data, dropZone);
+                } else {
+                    this._showDropError(dropZone, 'Only trait items can be dropped here');
+                }
+            } catch (error) {
+                logger.error('AvantItemSheet | Error handling drop:', error);
+                this._showDropError(dropZone, 'Failed to process dropped item');
+            } finally {
+                dropZone.classList.remove('drag-active');
+            }
+        }
+
+        /**
+         * Handle the actual trait drop logic
+         * @param data - The drag data containing the item UUID
+         * @param dropZone - The drop zone element for visual feedback
+         * @private
+         */
+        private async _handleTraitDrop(data: any, dropZone: HTMLElement): Promise<void> {
+            try {
+                // Resolve the dropped item from its UUID
+                const droppedItem = await (globalThis as any).fromUuid(data.uuid);
+
+                if (!droppedItem) {
+                    this._showDropError(dropZone, 'Could not find dropped item');
+                    return;
+                }
+
+                logger.debug('AvantItemSheet | Resolved dropped item:', {
+                    name: droppedItem.name,
+                    type: droppedItem.type,
+                    id: droppedItem.id
+                });
+
+                // Use the pure function to validate and process the drop
+                const { applyTraitDrop } = await import('../logic/item-sheet-utils.ts');
+                const result = await applyTraitDrop(this.document, droppedItem);
+
+                if (result.success && result.traits) {
+                    // Update the document with the new traits
+                    await this.document.update({ 'system.traits': result.traits });
+
+                    // Show success feedback
+                    this._showDropSuccess(dropZone, `Added trait: ${droppedItem.name}`);
+
+                    // Show notification
+                    const ui = (globalThis as any).ui;
+                    ui?.notifications?.info(`Added trait: ${droppedItem.name}`);
+
+                    logger.info('AvantItemSheet | Trait drop successful:', {
+                        targetItem: this.document.name,
+                        addedTrait: droppedItem.name,
+                        totalTraits: result.traits.length
+                    });
+                } else {
+                    // Show error feedback
+                    this._showDropError(dropZone, result.error || 'Failed to add trait');
+
+                    const ui = (globalThis as any).ui;
+                    ui?.notifications?.warn(result.error || 'Failed to add trait');
+                }
+            } catch (error) {
+                logger.error('AvantItemSheet | Error in trait drop handling:', error);
+                this._showDropError(dropZone, 'Unexpected error occurred');
+            }
+        }
+
+        /**
+         * Show success feedback on the drop zone
+         * @param dropZone - The drop zone element
+         * @param message - Success message
+         * @private
+         */
+        private _showDropSuccess(dropZone: HTMLElement, message: string): void {
+            dropZone.classList.add('drop-success');
+
+            // Update the drop zone text temporarily
+            const textElement = dropZone.querySelector('.drop-zone-text') as HTMLElement;
+            const originalText = textElement.textContent;
+            textElement.textContent = 'Trait added!';
+
+            // Reset after animation
+            setTimeout(() => {
+                dropZone.classList.remove('drop-success');
+                textElement.textContent = originalText;
+            }, 1000);
+        }
+
+        /**
+         * Show error feedback on the drop zone
+         * @param dropZone - The drop zone element
+         * @param message - Error message
+         * @private
+         */
+        private _showDropError(dropZone: HTMLElement, message: string): void {
+            dropZone.classList.add('drag-error');
+
+            // Update the drop zone text temporarily
+            const textElement = dropZone.querySelector('.drop-zone-text') as HTMLElement;
+            const originalText = textElement.textContent;
+            textElement.textContent = 'Cannot add this item';
+
+            // Reset after animation
+            setTimeout(() => {
+                dropZone.classList.remove('drag-error');
+                textElement.textContent = originalText;
+            }, 1000);
         }
 
         /**
@@ -1253,16 +1743,55 @@ export function createAvantItemSheet() {
             }
 
             try {
-                // Use pure function to execute the roll
-                const rollResult = await executeRoll(this.document, { rollType, name: this.document.name } as any) as any;
-                if (rollResult?.success) {
-                    logger.log(`AvantItemSheet | ${rollType} roll executed for ${this.document.name}`);
-                } else {
-                    FoundryUI.notify(rollResult?.error || 'Roll failed', 'error');
-                }
+                // Create roll data object from dataset
+                const rollData = {
+                    rollType,
+                    name: this.document.name
+                };
+
+                const result = await executeRoll(this.document, rollData as any);
+                logger.info('AvantItemSheet | Roll executed successfully:', result);
             } catch (error) {
-                logger.error('AvantItemSheet | Roll execution failed:', error);
+                logger.error('AvantItemSheet | Roll failed:', error);
                 FoundryUI.notify('Roll failed', 'error');
+            }
+        }
+
+        /**
+         * Handle image upload action - instance method
+         * @param event - The triggering event
+         * @param target - The target element (img element with data-edit="img")
+         */
+        async onEditImage(event: Event, target: HTMLElement): Promise<void> {
+            event.preventDefault();
+            if (!this.document) return;
+
+            try {
+                // Use FoundryVTT's built-in file picker for images
+                const fp = new (globalThis as any).FilePicker({
+                    type: "image",
+                    current: this.document.img || "",
+                    callback: async (path: string) => {
+                        // Update the document with the new image path
+                        await this.document.update({ img: path });
+
+                        // Update the img element immediately for visual feedback
+                        const imgElement = target as HTMLImageElement;
+                        if (imgElement && imgElement.tagName === 'IMG') {
+                            imgElement.src = path;
+                            imgElement.alt = this.document.name || 'Item Image';
+                            imgElement.title = this.document.name || 'Item Image';
+                        }
+
+                        FoundryUI.notify('Image updated successfully', 'info');
+                    }
+                });
+
+                // Show the file picker
+                fp.browse();
+            } catch (error) {
+                logger.error('AvantItemSheet | Image upload failed:', error);
+                FoundryUI.notify('Failed to upload image', 'error');
             }
         }
 
@@ -1292,17 +1821,15 @@ export function createAvantItemSheet() {
                 return;
             }
 
-            // Find the trait chip container by traversing up from the remove button
-            // Template structure: <span class="trait-chip"><button class="trait-chip__remove">
+            // FIXED: Find the trait chip container using correct template classes
             const chip = target.closest('.trait-chip') as HTMLElement;
             if (!chip) {
                 logger.error('AvantItemSheet | onRemoveTrait: Could not find trait chip element');
                 return;
             }
 
-            // Extract trait ID from the chip's data attribute
-            // This ID corresponds to either system traits or custom world traits
-            const traitId = chip.getAttribute('data-trait');
+            // FIXED: Extract trait ID from the correct data attribute used in template
+            const traitId = chip.getAttribute('data-trait-id');
             if (!traitId) {
                 logger.error('AvantItemSheet | onRemoveTrait: No trait ID found in chip data');
                 return;
@@ -1313,6 +1840,7 @@ export function createAvantItemSheet() {
 
             // Use trait utility function to safely remove the trait
             // This function handles array manipulation and validation
+            const { removeTraitFromList } = await import('../logic/trait-utils.ts');
             const result = removeTraitFromList(currentTraits, traitId);
 
             if (!result.success) {
@@ -1322,14 +1850,11 @@ export function createAvantItemSheet() {
 
             // Store chip data for potential rollback
             const chipHtml = chip.outerHTML;
-            const traitName = chip.querySelector('.trait-chip__text')?.textContent || traitId;
+            const traitName = chip.querySelector('.trait-name')?.textContent || traitId;
 
             try {
                 // Disable automatic form submission to prevent jarring page refresh
                 this._disableAutoSubmit();
-
-                // Set optimistic update flag to prevent unnecessary re-renders
-                this.traitInputState.optimisticUpdate = true;
 
                 // OPTIMISTIC UPDATE: Remove the chip immediately for instant feedback
                 this._removeTraitChipOptimistically(traitId);
@@ -1341,16 +1866,20 @@ export function createAvantItemSheet() {
 
                 // Log successful removal for debugging and audit trail
                 logger.info(`AvantItemSheet | Removed trait ${traitId} from ${this.document.name}`);
-                FoundryUI.notify(`Removed trait: ${traitName}`, 'info');
+
+                // Show success notification
+                const ui = (globalThis as any).ui;
+                ui?.notifications?.info(`Removed trait: ${traitName}`);
 
             } catch (error) {
                 // ROLLBACK: If save fails, restore the chip
                 logger.error('AvantItemSheet | Error updating document after trait removal:', error);
                 this._restoreTraitChipOptimistically(chipHtml, traitId);
-                FoundryUI.notify('Failed to remove trait', 'error');
+
+                const ui = (globalThis as any).ui;
+                ui?.notifications?.error('Failed to remove trait');
             } finally {
                 // Clear optimistic update flag and restore auto-submit
-                this.traitInputState.optimisticUpdate = false;
                 this._restoreAutoSubmit();
             }
         }
@@ -1573,15 +2102,21 @@ export function createAvantItemSheet() {
                 // Access TraitProvider service through the initialization manager
                 // This pattern ensures proper service availability in ApplicationV2
                 const game = (globalThis as any).game;
-                if (!game?.avant?.initializationManager) {
+                const initManager = game?.avant?.initializationManager;
+
+                if (!initManager) {
                     logger.warn('AvantItemSheet | InitializationManager not available for trait suggestions');
                     this._showNoTraitSuggestions('Service not available');
                     return;
                 }
 
-                const traitProvider = game.avant.initializationManager.getService('traitProvider');
-                if (!traitProvider) {
-                    logger.warn('AvantItemSheet | TraitProvider service not available');
+                // CRITICAL FIX: Use waitForService with timeout instead of getService
+                // This ensures we wait for the service to be ready rather than getting null
+                let traitProvider;
+                try {
+                    traitProvider = await initManager.waitForService('traitProvider', 2000);
+                } catch (serviceError) {
+                    logger.warn('AvantItemSheet | TraitProvider service not ready or failed:', serviceError);
                     this._showNoTraitSuggestions('Trait service unavailable');
                     return;
                 }
@@ -1742,15 +2277,20 @@ export function createAvantItemSheet() {
 
                 // Get available traits to validate the ID
                 const game = (globalThis as any).game;
-                if (!game?.avant?.initializationManager) {
+                const initManager = game?.avant?.initializationManager;
+
+                if (!initManager) {
                     logger.warn('AvantItemSheet | InitializationManager not available for trait validation');
                     FoundryUI.notify('Trait service not available', 'warn');
                     return;
                 }
 
-                const traitProvider = game.avant.initializationManager.getService('traitProvider');
-                if (!traitProvider) {
-                    logger.warn('AvantItemSheet | TraitProvider service not available for trait validation');
+                // CRITICAL FIX: Use waitForService with timeout instead of getService
+                let traitProvider;
+                try {
+                    traitProvider = await initManager.waitForService('traitProvider', 2000);
+                } catch (serviceError) {
+                    logger.warn('AvantItemSheet | TraitProvider service not ready or failed:', serviceError);
                     FoundryUI.notify('Trait service not ready', 'warn');
                     return;
                 }
@@ -1771,9 +2311,6 @@ export function createAvantItemSheet() {
                 if (result.success && result.changed) {
                     // Disable automatic form submission to prevent jarring page refresh
                     this._disableAutoSubmit();
-
-                    // Set optimistic update flag to prevent unnecessary re-renders
-                    this.traitInputState.optimisticUpdate = true;
 
                     // OPTIMISTIC UPDATE: Update the DOM immediately for instant feedback
                     this._addTraitChipOptimistically(traitResult.data);
@@ -1799,7 +2336,6 @@ export function createAvantItemSheet() {
                         FoundryUI.notify('Failed to save trait', 'error');
                     } finally {
                         // Clear optimistic update flag and restore auto-submit
-                        this.traitInputState.optimisticUpdate = false;
                         this._restoreAutoSubmit();
                     }
 
@@ -1822,36 +2358,60 @@ export function createAvantItemSheet() {
          */
         private _addTraitChipOptimistically(trait: any): void {
             try {
-                const traitContainer = this.element.querySelector('.trait-chip-input__field');
-                const traitInput = this.element.querySelector('.trait-chip-input__input');
-
-                if (!traitContainer || !traitInput) {
+                // FIXED: Use correct template container selectors
+                const traitContainer = this.element.querySelector('.trait-chips');
+                if (!traitContainer) {
                     logger.warn('AvantItemSheet | Cannot add trait chip - container not found');
                     return;
                 }
 
-                // Create the trait chip HTML using the same pattern as the template
+                // FIXED: Create the trait chip HTML using the same structure as the template
+                const textColor = trait.color ? (this._isLightColor(trait.color) ? '#000000' : '#FFFFFF') : '#000000';
                 const chipHtml = `
-                <span class="trait-chip trait-chip--removable" data-trait="${trait.id}" 
-                      style="--trait-color: ${trait.color || '#00E0DC'}; --trait-text-color: ${trait.textColor || '#000000'}; background-color: var(--trait-color); color: var(--trait-text-color);"
-                      title="${trait.description || trait.name}">
-                    ${trait.icon ? `<i class="trait-chip__icon ${trait.icon}" aria-hidden="true"></i>` : ''}
-                    <span class="trait-chip__text">${trait.name}</span>
-                    <button type="button" class="trait-chip__remove" data-action="removeTrait" aria-label="Remove trait">×</button>
-                </span>
+                <div class="trait-chip" style="--trait-color: ${trait.color || '#6C757D'}; --trait-text-color: ${textColor};" data-trait-id="${trait.id}">
+                    ${trait.icon ? `<i class="${trait.icon}" aria-hidden="true"></i>` : ''}
+                    <span class="trait-name">${trait.name}</span>
+                    <button type="button" class="trait-remove" data-action="removeTrait" data-trait-id="${trait.id}" aria-label="Remove ${trait.name}">
+                        <i class="fas fa-times" aria-hidden="true"></i>
+                    </button>
+                </div>
             `;
 
-                // Insert the chip before the input field
-                traitInput.insertAdjacentHTML('beforebegin', chipHtml);
-
-                // NOTE: Don't add hidden inputs during optimistic updates as they trigger 
-                // automatic form submission. The document.update() call will handle persistence.
-
-                logger.debug('AvantItemSheet | Optimistically added trait chip:', trait.name);
+                // Insert the chip into the trait container
+                traitContainer.insertAdjacentHTML('beforeend', chipHtml);
+                logger.debug('AvantItemSheet | Optimistically added trait chip:', trait.id);
 
             } catch (error) {
                 logger.error('AvantItemSheet | Error adding trait chip optimistically:', error);
             }
+        }
+
+        /**
+         * Helper method to determine if a color is light
+         * @param color - Hex color string
+         * @returns true if light, false if dark
+         * @private
+         */
+        private _isLightColor(color: string): boolean {
+            if (!color) return false;
+
+            const hex = color.replace('#', '');
+            let r, g, b;
+
+            if (hex.length === 3) {
+                r = parseInt(hex[0] + hex[0], 16);
+                g = parseInt(hex[1] + hex[1], 16);
+                b = parseInt(hex[2] + hex[2], 16);
+            } else if (hex.length === 6) {
+                r = parseInt(hex.substring(0, 2), 16);
+                g = parseInt(hex.substring(2, 4), 16);
+                b = parseInt(hex.substring(4, 6), 16);
+            } else {
+                return false;
+            }
+
+            const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+            return luminance > 0.5;
         }
 
         /**
@@ -1861,7 +2421,8 @@ export function createAvantItemSheet() {
          */
         private _removeTraitChipOptimistically(traitId: string): void {
             try {
-                const chipToRemove = this.element.querySelector(`[data-trait="${traitId}"]`);
+                // FIXED: Use correct data attribute selector
+                const chipToRemove = this.element.querySelector(`[data-trait-id="${traitId}"]`);
                 if (chipToRemove) {
                     chipToRemove.remove();
                     logger.debug('AvantItemSheet | Optimistically removed trait chip:', traitId);
@@ -1898,6 +2459,3 @@ export function createAvantItemSheet() {
 
     return AvantItemSheet;
 }
-
-// Note: The actual AvantItemSheet class is created by the createAvantItemSheet() factory function
-// when called by the initialization system. This ensures Foundry classes are available.

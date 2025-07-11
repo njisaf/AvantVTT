@@ -13,13 +13,13 @@ import type { Trait } from '../types/domain/trait.ts';
 export interface TraitOperationResult {
   /** Whether the operation was successful */
   success: boolean;
-  
+
   /** Updated trait list */
   traits: string[];
-  
+
   /** Error message if operation failed */
   error?: string;
-  
+
   /** Whether any changes were made */
   changed: boolean;
 }
@@ -30,19 +30,19 @@ export interface TraitOperationResult {
 export interface TraitFilterOptions {
   /** Search query to filter by name */
   query?: string;
-  
+
   /** Categories to filter by */
   categories?: string[];
-  
+
   /** Tags to filter by */
   tags?: string[];
-  
+
   /** Maximum number of results */
   maxResults?: number;
-  
+
   /** Case-sensitive search */
   caseSensitive?: boolean;
-  
+
   /** Whether to parse category prefixes from query (e.g., "weapon:fire" -> category="weapon", query="fire") */
   parseCategoryPrefixes?: boolean;
 }
@@ -53,19 +53,19 @@ export interface TraitFilterOptions {
 export interface TraitSuggestion {
   /** Trait ID */
   id: string;
-  
+
   /** Display name */
   name: string;
-  
+
   /** Display color */
   color: string;
-  
+
   /** Display icon */
   icon: string;
-  
+
   /** Match score (0-1, higher is better) */
   score: number;
-  
+
   /** Matched text for highlighting */
   matchedText?: string;
 }
@@ -95,7 +95,7 @@ export function addTraitToList(currentTraits: string[], traitIdToAdd: string): T
         changed: false
       };
     }
-    
+
     if (!traitIdToAdd || typeof traitIdToAdd !== 'string') {
       return {
         success: false,
@@ -104,7 +104,7 @@ export function addTraitToList(currentTraits: string[], traitIdToAdd: string): T
         changed: false
       };
     }
-    
+
     // Check if trait is already in the list
     if (currentTraits.includes(traitIdToAdd)) {
       return {
@@ -114,17 +114,17 @@ export function addTraitToList(currentTraits: string[], traitIdToAdd: string): T
         changed: false
       };
     }
-    
+
     // Add the trait to the end of the list
     const updatedTraits = [...currentTraits, traitIdToAdd];
-    
+
     return {
       success: true,
       traits: updatedTraits,
       error: undefined,
       changed: true
     };
-    
+
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     return {
@@ -161,7 +161,7 @@ export function removeTraitFromList(currentTraits: string[], traitIdToRemove: st
         changed: false
       };
     }
-    
+
     if (!traitIdToRemove || typeof traitIdToRemove !== 'string') {
       return {
         success: false,
@@ -170,7 +170,7 @@ export function removeTraitFromList(currentTraits: string[], traitIdToRemove: st
         changed: false
       };
     }
-    
+
     // Check if trait exists in the list
     if (!currentTraits.includes(traitIdToRemove)) {
       return {
@@ -180,17 +180,17 @@ export function removeTraitFromList(currentTraits: string[], traitIdToRemove: st
         changed: false
       };
     }
-    
+
     // Remove the trait from the list
     const updatedTraits = currentTraits.filter(id => id !== traitIdToRemove);
-    
+
     return {
       success: true,
       traits: updatedTraits,
       error: undefined,
       changed: true
     };
-    
+
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     return {
@@ -227,18 +227,18 @@ export function parseCategoryPrefix(query: string): {
     if (!query || typeof query !== 'string') {
       return { query: '', originalQuery: query || '' };
     }
-    
+
     const trimmed = query.trim();
     const colonIndex = trimmed.indexOf(':');
-    
+
     // No colon found, return original query
     if (colonIndex === -1 || colonIndex === 0) {
       return { query: trimmed, originalQuery: query };
     }
-    
+
     const potentialCategory = trimmed.substring(0, colonIndex).trim();
     const remainingQuery = trimmed.substring(colonIndex + 1).trim();
-    
+
     // Validate category name (alphanumeric + some special chars)
     if (/^[a-zA-Z0-9_-]+$/.test(potentialCategory)) {
       return {
@@ -247,10 +247,10 @@ export function parseCategoryPrefix(query: string): {
         originalQuery: query
       };
     }
-    
+
     // Invalid category format, return original query
     return { query: trimmed, originalQuery: query };
-    
+
   } catch (error) {
     console.error('Error parsing category prefix:', error);
     return { query: query || '', originalQuery: query || '' };
@@ -288,11 +288,11 @@ export function filterTraits(traits: Trait[], options: TraitFilterOptions = {}):
     if (!Array.isArray(traits)) {
       return [];
     }
-    
+
     let filtered = [...traits];
     let searchQuery = options.query;
     let searchCategories = options.categories ? [...options.categories] : [];
-    
+
     // Parse category prefixes if enabled
     if (options.parseCategoryPrefixes && searchQuery) {
       const parsed = parseCategoryPrefix(searchQuery);
@@ -301,21 +301,21 @@ export function filterTraits(traits: Trait[], options: TraitFilterOptions = {}):
         searchQuery = parsed.query;
       }
     }
-    
+
     // Filter by search query
     if (searchQuery && searchQuery.trim()) {
       const query = options.caseSensitive ? searchQuery.trim() : searchQuery.trim().toLowerCase();
-      
+
       filtered = filtered.filter(trait => {
         const name = options.caseSensitive ? trait.name : trait.name.toLowerCase();
-        const description = options.caseSensitive ? 
-          (trait.description || '') : 
+        const description = options.caseSensitive ?
+          (trait.description || '') :
           (trait.description || '').toLowerCase();
-        
+
         return name.includes(query) || description.includes(query);
       });
     }
-    
+
     // Filter by categories
     if (searchCategories.length > 0) {
       filtered = filtered.filter(trait => {
@@ -323,7 +323,7 @@ export function filterTraits(traits: Trait[], options: TraitFilterOptions = {}):
         return searchCategories.some(category => traitCategories.includes(category));
       });
     }
-    
+
     // Filter by tags
     if (options.tags && options.tags.length > 0) {
       filtered = filtered.filter(trait => {
@@ -331,14 +331,14 @@ export function filterTraits(traits: Trait[], options: TraitFilterOptions = {}):
         return options.tags!.some(tag => traitTags.includes(tag));
       });
     }
-    
+
     // Limit results
     if (options.maxResults && options.maxResults > 0) {
       filtered = filtered.slice(0, options.maxResults);
     }
-    
+
     return filtered;
-    
+
   } catch (error) {
     console.error('Error filtering traits:', error);
     return [];
@@ -347,84 +347,21 @@ export function filterTraits(traits: Trait[], options: TraitFilterOptions = {}):
 
 /**
  * Generate autocomplete suggestions for trait search.
- * 
- * This function takes an array of traits and a search query, then
- * returns ranked suggestions based on relevance.
- * 
+ * @deprecated This function has been moved to deprecated/trait-input-system/
+ * Use drag-and-drop from compendium instead of autocomplete input
  * @param traits - Array of available traits
  * @param query - Search query string
  * @param maxSuggestions - Maximum number of suggestions to return
- * @returns Array of trait suggestions with relevance scores
- * 
- * @example
- * const suggestions = generateTraitSuggestions(allTraits, 'fi', 5);
- * // Returns traits like 'Fire' ranked by relevance
+ * @returns Empty array (stubbed)
  */
 export function generateTraitSuggestions(
-  traits: Trait[], 
-  query: string, 
+  traits: Trait[],
+  query: string,
   maxSuggestions: number = 10
 ): TraitSuggestion[] {
-  try {
-    if (!Array.isArray(traits) || !query || query.trim().length === 0) {
-      return [];
-    }
-    
-    const searchQuery = query.trim().toLowerCase();
-    const suggestions: TraitSuggestion[] = [];
-    
-    for (const trait of traits) {
-      const name = trait.name.toLowerCase();
-      const description = (trait.description || '').toLowerCase();
-      
-      let score = 0;
-      let matchedText = '';
-      
-      // Exact name match gets highest score
-      if (name === searchQuery) {
-        score = 1.0;
-        matchedText = trait.name;
-      }
-      // Name starts with query gets high score
-      else if (name.startsWith(searchQuery)) {
-        score = 0.8;
-        matchedText = trait.name.substring(0, searchQuery.length);
-      }
-      // Name contains query gets medium score
-      else if (name.includes(searchQuery)) {
-        score = 0.6;
-        const index = name.indexOf(searchQuery);
-        matchedText = trait.name.substring(index, index + searchQuery.length);
-      }
-      // Description contains query gets lower score
-      else if (description.includes(searchQuery)) {
-        score = 0.3;
-        const index = description.indexOf(searchQuery);
-        matchedText = description.substring(index, index + searchQuery.length);
-      }
-      
-      // Add suggestion if it has a score
-      if (score > 0) {
-        suggestions.push({
-          id: trait.id,
-          name: trait.name,
-          color: trait.color,
-          icon: trait.icon,
-          score,
-          matchedText
-        });
-      }
-    }
-    
-    // Sort by score (highest first) and limit results
-    return suggestions
-      .sort((a, b) => b.score - a.score)
-      .slice(0, maxSuggestions);
-    
-  } catch (error) {
-    console.error('Error generating trait suggestions:', error);
-    return [];
-  }
+  console.warn('generateTraitSuggestions is deprecated. Use drag-and-drop from compendium instead.');
+  console.warn('Original implementation available in: deprecated/trait-input-system/logic/trait-utils.ts');
+  return [];
 }
 
 /**
@@ -455,49 +392,49 @@ export function validateTraitList(
     if (!Array.isArray(traitIds)) {
       return { valid: [], invalid: [], warnings: ['Trait IDs must be an array'], allValid: false };
     }
-    
+
     if (!Array.isArray(availableTraits)) {
       return { valid: [], invalid: traitIds, warnings: ['No available traits provided'], allValid: false };
     }
-    
+
     const valid: string[] = [];
     const invalid: string[] = [];
     const warnings: string[] = [];
-    
+
     // Create a map for faster lookup
     const traitMap = new Map(availableTraits.map(trait => [trait.id, trait]));
-    
+
     for (const traitId of traitIds) {
       if (!traitId || typeof traitId !== 'string') {
         invalid.push(String(traitId));
         warnings.push(`Invalid trait ID: ${traitId}`);
         continue;
       }
-      
+
       const trait = traitMap.get(traitId);
       if (!trait) {
         invalid.push(traitId);
         warnings.push(`Trait not found: ${traitId}`);
         continue;
       }
-      
+
       // Check if trait applies to items
       if (!trait.item.system.traitMetadata?.appliesToItems) {
         invalid.push(traitId);
         warnings.push(`Trait '${trait.name}' does not apply to items`);
         continue;
       }
-      
+
       valid.push(traitId);
     }
-    
+
     return {
       valid,
       invalid,
       warnings,
       allValid: invalid.length === 0 && warnings.length === 0
     };
-    
+
   } catch (error) {
     console.error('Error validating trait list:', error);
     return {
@@ -527,10 +464,10 @@ export function getTraitsFromIds(traitIds: string[], availableTraits: Trait[]): 
     if (!Array.isArray(traitIds) || !Array.isArray(availableTraits)) {
       return [];
     }
-    
+
     // Create a map for efficient lookup
     const traitMap = new Map(availableTraits.map(trait => [trait.id, trait]));
-    
+
     // Get trait objects, filtering out missing ones
     const traits: Trait[] = [];
     for (const traitId of traitIds) {
@@ -539,9 +476,9 @@ export function getTraitsFromIds(traitIds: string[], availableTraits: Trait[]): 
         traits.push(trait);
       }
     }
-    
+
     return traits;
-    
+
   } catch (error) {
     console.error('Error getting traits from IDs:', error);
     return [];
@@ -557,19 +494,19 @@ export function getTraitsFromIds(traitIds: string[], availableTraits: Trait[]): 
  * @returns Sorted array of traits
  */
 export function sortTraits(
-  traits: Trait[], 
-  sortBy: 'name' | 'color' | 'source' = 'name', 
+  traits: Trait[],
+  sortBy: 'name' | 'color' | 'source' = 'name',
   ascending: boolean = true
 ): Trait[] {
   try {
     if (!Array.isArray(traits)) {
       return [];
     }
-    
+
     const sorted = [...traits].sort((a, b) => {
       let aValue: string;
       let bValue: string;
-      
+
       switch (sortBy) {
         case 'color':
           aValue = a.color;
@@ -585,13 +522,13 @@ export function sortTraits(
           bValue = b.name;
           break;
       }
-      
+
       const comparison = aValue.localeCompare(bValue);
       return ascending ? comparison : -comparison;
     });
-    
+
     return sorted;
-    
+
   } catch (error) {
     console.error('Error sorting traits:', error);
     return [...traits]; // Return original order on error
@@ -637,12 +574,12 @@ export function virtualizeList<T>(
   // Clamp indices to valid range
   const safeStart = Math.max(0, Math.min(startIndex, items.length - 1));
   const safeEnd = Math.max(safeStart, Math.min(endIndex, items.length));
-  
+
   // Calculate virtual positioning
   const spacerTop = safeStart * itemHeight;
   const visibleHeight = (safeEnd - safeStart) * itemHeight;
   const spacerBottom = Math.max(0, (items.length - safeEnd) * itemHeight);
-  
+
   return {
     visibleItems: items.slice(safeStart, safeEnd),
     startIndex: safeStart,
@@ -702,7 +639,7 @@ export function calculateDropdownPosition(
     // Try right-aligning with input
     left = inputRect.right - dropdownWidth - offset.x;
     placement = 'bottom-right';
-    
+
     // If still overflowing, clamp to viewport edge
     if (left < 0) {
       left = Math.max(8, viewportWidth - dropdownWidth - 8); // 8px margin
@@ -715,7 +652,7 @@ export function calculateDropdownPosition(
     // Try positioning above input
     top = inputRect.top - dropdownHeight - offset.y;
     placement = placement.replace('bottom', 'top') as DropdownPlacement;
-    
+
     // If still overflowing, position within viewport
     if (top < 0) {
       top = Math.max(8, viewportHeight - dropdownHeight - 8); // 8px margin
@@ -727,10 +664,10 @@ export function calculateDropdownPosition(
   left = Math.max(8, Math.min(left, viewportWidth - dropdownWidth - 8));
   top = Math.max(8, Math.min(top, viewportHeight - dropdownHeight - 8));
 
-  const withinViewport = 
-    left >= 0 && 
-    top >= 0 && 
-    left + dropdownWidth <= viewportWidth && 
+  const withinViewport =
+    left >= 0 &&
+    top >= 0 &&
+    left + dropdownWidth <= viewportWidth &&
     top + dropdownHeight <= viewportHeight;
 
   return {
@@ -875,7 +812,7 @@ export function enhanceForTouch(element: HTMLElement, minSize: number = 44): HTM
 
   // Add touch-friendly cursor
   element.style.cursor = 'pointer';
-  
+
   // Prevent text selection on touch
   element.style.userSelect = 'none';
   (element.style as any).webkitUserSelect = 'none';
@@ -923,7 +860,7 @@ export interface DropdownPosition {
 /**
  * Dropdown placement options
  */
-export type DropdownPlacement = 
+export type DropdownPlacement =
   | 'bottom-left' | 'bottom-right' | 'bottom-center'
   | 'top-left' | 'top-right' | 'top-center'
   | 'middle-left' | 'middle-right' | 'middle-center';
