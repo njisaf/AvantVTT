@@ -41,6 +41,22 @@ import { prepareTemplateData, extractItemFormData, prepareItemHeaderMetaFields, 
 import { logger } from '../utils/logger.js';
 import { initializeApSelector } from './ap-selector-handler';
 
+// Import new modular functions
+import { 
+    extractFormData, 
+    shouldBlockSubmission, 
+    validateCriticalFields, 
+    DEFAULT_FORM_CONFIG,
+    type FormExtractionConfig 
+} from '../logic/item-form.js';
+
+import { 
+    extractDragData, 
+    validateTraitDrop, 
+    processTraitDrop,
+    DEFAULT_DRAG_EXTRACTION_CONFIG 
+} from '../logic/drag-drop/item-trait.js';
+
 // Import trait utilities
 // DEPRECATION NOTICE: Trait input imports moved to deprecated folder
 // These imports are stubbed to maintain build compatibility
@@ -1359,31 +1375,19 @@ export function createAvantItemSheet() {
             dropZone.classList.add('drag-active');
 
             try {
-                // Get the dropped data using FoundryVTT v13+ standard method
-                let data;
-                try {
-                    // Try modern v13+ approach first
-                    const dragDataText = event.dataTransfer?.getData('text/plain');
-                    if (dragDataText) {
-                        data = JSON.parse(dragDataText);
-                    } else {
-                        // If dragDataText is empty or falsy, we need to use legacy method
-                        throw new Error('No v13 drag data available');
-                    }
-                } catch (parseError) {
-                    // Fallback to legacy method if modern approach fails
-                    const TextEditor = (globalThis as any).TextEditor;
-                    if (TextEditor?.getDragEventData) {
-                        data = TextEditor.getDragEventData(event);
-                    } else {
-                        throw new Error('Unable to extract drag data - no compatible method available');
-                    }
+                // Use the new modular drag-drop system
+                const dragDataResult = extractDragData(event, DEFAULT_DRAG_EXTRACTION_CONFIG);
+                
+                if (!dragDataResult.success) {
+                    this._showDropError(dropZone, 'Failed to extract drag data');
+                    return;
                 }
 
-                logger.debug('AvantItemSheet | Drop data received:', data);
+                const dragData = dragDataResult.value;
+                logger.debug('AvantItemSheet | Drop data received:', dragData);
 
-                if (data.type === 'Item' && data.uuid) {
-                    await this._handleTraitDrop(data, dropZone);
+                if (dragData.type === 'Item' && dragData.uuid) {
+                    await this._handleTraitDropModular(dragData, dropZone);
                 } else {
                     this._showDropError(dropZone, 'Only trait items can be dropped here');
                 }
@@ -1446,6 +1450,61 @@ export function createAvantItemSheet() {
                 }
             } catch (error) {
                 logger.error('AvantItemSheet | Error in trait drop handling:', error);
+                this._showDropError(dropZone, 'Unexpected error occurred');
+            }
+        }
+
+        /**
+         * Handle trait drop using the new modular system
+         * @param dragData - The drag data containing the item UUID
+         * @param dropZone - The drop zone element for visual feedback
+         * @private
+         */
+        private async _handleTraitDropModular(dragData: any, dropZone: HTMLElement): Promise<void> {
+            try {
+                // Get current traits from the document
+                const existingTraits = this.document.system?.traits || [];
+                
+                // Validate the trait drop using the new modular system
+                const validation = await validateTraitDrop(dragData, this.document, existingTraits);
+                
+                if (!validation.isValid) {
+                    this._showDropError(dropZone, validation.error || 'Invalid trait drop');
+                    
+                    const ui = (globalThis as any).ui;
+                    ui?.notifications?.warn(validation.error || 'Invalid trait drop');
+                    return;
+                }
+                
+                // Process the trait drop using the new modular system
+                const result = await processTraitDrop(validation, this.document, existingTraits);
+                
+                if (result.success && result.traits) {
+                    // Update the document with the new traits
+                    await this.document.update({ 'system.traits': result.traits });
+                    
+                    // Show success feedback
+                    this._showDropSuccess(dropZone, result.message);
+                    
+                    // Show notification
+                    const ui = (globalThis as any).ui;
+                    ui?.notifications?.info(result.message);
+                    
+                    logger.info('AvantItemSheet | Trait drop successful (modular):', {
+                        targetItem: this.document.name,
+                        addedTrait: result.metadata?.addedTraitName,
+                        totalTraits: result.traits.length,
+                        processingTime: result.metadata?.processingTimeMs
+                    });
+                } else {
+                    // Show error feedback
+                    this._showDropError(dropZone, result.error || 'Failed to add trait');
+                    
+                    const ui = (globalThis as any).ui;
+                    ui?.notifications?.warn(result.error || 'Failed to add trait');
+                }
+            } catch (error) {
+                logger.error('AvantItemSheet | Error in modular trait drop handling:', error);
                 this._showDropError(dropZone, 'Unexpected error occurred');
             }
         }
@@ -1544,13 +1603,12 @@ export function createAvantItemSheet() {
          * @returns Processed form data or null to block submission
          */
         _prepareSubmitData(event: any, form: any, formData: any, updateData: any): any {
-            // Block automatic form submission during trait operations
-            if (this._blockAutoSubmit) {
-                logger.debug('AvantItemSheet | Blocking automatic form submission during trait operation');
+            // Use the new modular form handling
+            if (shouldBlockSubmission(this._blockAutoSubmit, 'trait operation')) {
                 return null; // Returning null prevents the submission
             }
 
-            // Continue with normal form processing
+            // Continue with normal form processing using the new module
             return this._originalPrepareSubmitData(event, form, formData, updateData);
         }
 
@@ -1564,156 +1622,28 @@ export function createAvantItemSheet() {
          */
         _originalPrepareSubmitData(event: any, form: any, formData: any, updateData: any): any {
             try {
-                logger.debug('AvantItemSheet | _prepareSubmitData called', {
-                    eventType: event?.type || 'unknown',
-                    formElementType: form?.tagName || 'unknown',
-                    formDataType: typeof formData,
-                    formDataConstructor: formData?.constructor?.name,
-                    hasObjectProperty: !!(formData?.object),
-                    updateDataType: typeof updateData,
-                    itemId: this.document?.id,
-                    itemType: this.document?.type
-                });
-
-                // ================================================================================
-                // STEP 1: DETECT NESTED FORM ISSUE
-                // ================================================================================
-                // 
-                // ApplicationV2 creates nested forms. We need to detect if we're dealing with
-                // the outer frame form (header controls only) or the inner content form (inputs).
-                // 
-                // DETECTION STRATEGY:
-                // - Check if form elements are all header control buttons without 'name' attributes
-                // - Look for header-control CSS class
-                // - If detected, search for the actual content form
-                // 
-                let actualForm = form;
-
-                // Check if this form only has header control buttons (outer frame form)
-                const formElements = Array.from(form.elements) as HTMLFormElement[];
-                const hasOnlyHeaderButtons = formElements.length > 0 && formElements.every((el: any) =>
-                    el.tagName === 'BUTTON' &&
-                    el.className &&
-                    el.className.includes('header-control') &&
-                    !el.name
-                );
-
-                if (hasOnlyHeaderButtons) {
-                    logger.debug('AvantItemSheet | Detected outer frame form, searching for content form');
-
-                    // Find the actual content form with input fields
-                    const contentForm = this.element.querySelector('div[data-application-part="form"]') as HTMLElement;
-                    if (contentForm) {
-                        actualForm = contentForm;
-                        logger.debug('AvantItemSheet | Found content form', {
-                            hasInputs: contentForm.querySelectorAll('input, select, textarea').length,
-                            className: contentForm.className
-                        });
-                    } else {
-                        logger.warn('AvantItemSheet | Could not find content form, using original form');
-                    }
-                }
-
-                // ================================================================================
-                // STEP 2: EXTRACT FORM DATA FROM MULTIPLE SOURCES
-                // ================================================================================
-                // 
-                // ApplicationV2 can provide form data in several formats:
-                // 1. FormDataExtended with .object property
-                // 2. Native FormData requiring conversion
-                // 3. Plain object (already converted)
-                // 4. Empty/undefined (need to extract manually)
-                // 
-                // We handle all these cases to ensure compatibility.
-                // 
-                let rawFormData: any;
-
-                if (formData && typeof formData.object === 'object') {
-                    // Standard FormDataExtended pattern with .object property
-                    rawFormData = formData.object;
-                    logger.debug('AvantItemSheet | Using FormDataExtended.object pattern');
-                } else if (formData && typeof formData === 'object' && formData.constructor?.name === 'FormData') {
-                    // Native FormData - need to convert to object
-                    rawFormData = {};
-                    for (const [key, value] of formData.entries()) {
-                        rawFormData[key] = value;
-                    }
-                    logger.debug('AvantItemSheet | Converted FormData to object', {
-                        fieldCount: Object.keys(rawFormData).length
-                    });
-                } else if (formData && typeof formData === 'object') {
-                    // Plain object - use directly
-                    rawFormData = formData;
-                    logger.debug('AvantItemSheet | Using plain object form data');
-                } else {
-                    // Fallback for unexpected structure
-                    logger.warn('AvantItemSheet | Unexpected form data structure, using fallback');
-                    rawFormData = formData || {};
-                }
-
-                // ================================================================================
-                // STEP 3: MANUAL FORM DATA EXTRACTION (CRITICAL FALLBACK)
-                // ================================================================================
-                // 
-                // If we still have no form data after trying all standard methods,
-                // we manually extract from the actual DOM form elements.
-                // 
-                // This is the key fix that resolved our persistent form data issues.
-                // 
-                if ((!rawFormData || Object.keys(rawFormData).length === 0) && actualForm) {
-                    logger.debug('AvantItemSheet | Extracting form data from content form');
-
-                    // Find all form inputs in the content form
-                    const inputs = actualForm.querySelectorAll('input, select, textarea') as NodeListOf<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>;
-                    const extractedData: any = {};
-
-                    inputs.forEach((input: any) => {
-                        if (input.name && !input.disabled) {
-                            extractedData[input.name] = input.value;
+                // Use the new modular form handling system
+                const extractionResult = extractFormData(event, form, formData, this.element, DEFAULT_FORM_CONFIG);
+                
+                if (extractionResult.success && extractionResult.value.success) {
+                    const processedData = extractionResult.value.data;
+                    
+                    // Validate critical fields using the new validation system
+                    if (processedData && (this.document?.type === 'talent' || this.document?.type === 'augment')) {
+                        const validationResult = validateCriticalFields(processedData, this.document.type);
+                        if (!validationResult.isValid) {
+                            logger.warn('AvantItemSheet | Form validation failed:', validationResult.errors);
+                            // Continue processing but log the issues
                         }
-                    });
-
-                    logger.debug('AvantItemSheet | Content form extraction result:', {
-                        inputCount: inputs.length,
-                        extractedKeys: Object.keys(extractedData),
-                        extractedData
-                    });
-
-                    if (Object.keys(extractedData).length > 0) {
-                        rawFormData = extractedData;
-                        logger.debug('AvantItemSheet | Using extracted content form data');
                     }
+                    
+                    return processedData || {};
+                } else {
+                    const errorMessage = extractionResult.success ? 'Form extraction returned failure' : extractionResult.error;
+                    logger.error('AvantItemSheet | Form extraction failed:', errorMessage);
+                    // Return safe fallback to prevent complete failure
+                    return formData?.object || formData || {};
                 }
-
-                // ================================================================================
-                // STEP 4: PROCESS FORM DATA FOR FOUNDRYVTT
-                // ================================================================================
-                // 
-                // Convert flat form data (e.g., "system.description") to nested objects
-                // (e.g., {system: {description: "value"}}) that FoundryVTT expects.
-                // 
-                const processedData = extractItemFormData(rawFormData);
-
-                logger.debug('AvantItemSheet | Form data processed', {
-                    rawDataKeys: Object.keys(rawFormData),
-                    processedDataKeys: Object.keys(processedData),
-                    hasSystemData: !!(processedData as any).system,
-                    systemKeys: (processedData as any).system ? Object.keys((processedData as any).system) : []
-                });
-
-                // ================================================================================
-                // STEP 5: VALIDATE CRITICAL FIELDS
-                // ================================================================================
-                // 
-                // Perform validation on processed data to catch issues early.
-                // Add validation for new fields as needed.
-                // 
-                if (this.document?.type === 'talent' || this.document?.type === 'augment') {
-                    this._validateCriticalFields(processedData as any, this.document.type);
-                }
-
-                return processedData;
-
             } catch (error) {
                 logger.error('AvantItemSheet | Error in _prepareSubmitData:', error);
                 // Return safe fallback to prevent complete failure
