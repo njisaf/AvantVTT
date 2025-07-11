@@ -61,7 +61,7 @@ import {
 // DEPRECATION NOTICE: Trait input imports moved to deprecated folder
 // These imports are stubbed to maintain build compatibility
 // See: deprecated/trait-input-system/ for original implementations
-import { addTraitToList, removeTraitFromList, generateTraitSuggestions, validateTraitList } from '../logic/trait-utils.ts';
+import { addTraitToList, removeTraitFromList, validateTraitList } from '../logic/trait-utils.ts';
 import { renderTraitSuggestion } from '../logic/chat/trait-renderer.ts';
 
 // Import trait integration utilities for chat messages
@@ -69,6 +69,35 @@ import { createTraitHtmlForChat, itemHasTraits } from '../logic/chat/trait-resol
 
 // Import local foundry UI adapter for safe notifications
 import { FoundryUI } from '../types/adapters/foundry-ui.ts';
+
+// Import new Phase 4 context preparation modules
+import { 
+    prepareCompleteContext, 
+    type ItemDataForContext, 
+    type ContextPreparationConfig,
+    DEFAULT_CONTEXT_CONFIG 
+} from '../logic/context-preparation.js';
+
+import { 
+    prepareTraitDisplayData, 
+    type ItemContextForTraits, 
+    type TraitDataPreparationConfig,
+    DEFAULT_TRAIT_DATA_CONFIG 
+} from '../logic/trait-data-preparation.js';
+
+import { 
+    generateTraitSuggestions as generateTraitSuggestionsModular, 
+    type ItemContextForSuggestions, 
+    type TraitSuggestionConfig,
+    DEFAULT_TRAIT_SUGGESTION_CONFIG 
+} from '../logic/trait-suggestions.js';
+
+import { 
+    logRenderDebugInfo, 
+    logPostRenderDebugInfo, 
+    createPerformanceTimer,
+    DEFAULT_DEBUG_CONFIG 
+} from '../utils/debug-utilities.js';
 
 /**
  * Get FoundryVTT v13 ApplicationV2 classes safely
@@ -475,6 +504,14 @@ export function createAvantItemSheet() {
          * @returns The context data for template rendering
          * @override
          */
+        /**
+         * PHASE 4 THIN WRAPPER
+         * 
+         * Prepare context for template rendering using modular pure functions
+         * 
+         * This method is now a thin wrapper that orchestrates pure functions
+         * for context preparation, making it more testable and maintainable.
+         */
         async _prepareContext(options: any): Promise<ItemSheetContext> {
             logger.debug('AvantItemSheet | _prepareContext called', {
                 itemId: this.document?.id,
@@ -482,295 +519,115 @@ export function createAvantItemSheet() {
                 itemName: this.document?.name
             });
 
-            // Get base ApplicationV2 context
-            const context = await super._prepareContext(options) as any;
-            const itemData = this.document.toObject(false);
-
-            logger.debug('AvantItemSheet | Super context prepared:', {
-                contextKeys: Object.keys(context),
-                hasForm: !!context.form,
-                hasTemplate: !!context.template
-            });
-
-            // Use pure function to prepare template data
-            const templateData = prepareTemplateData(itemData);
-
-            // Prepare augment-specific option data for Phase 3 component library
-            if (itemData.type === 'augment') {
-                context.rarityOptions = this._prepareRarityOptions();
-                context.augmentTypeOptions = this._prepareAugmentTypeOptions();
-            }
-            if (templateData) {
-                // Merge with existing context
-                Object.assign(context, templateData);
-                logger.debug('AvantItemSheet | Template data merged successfully');
-            } else {
-                // Fallback to basic data structure
-                context.system = itemData.system || {};
-                context.flags = itemData.flags || {};
-                logger.debug('AvantItemSheet | Using fallback basic data structure');
-            }
-
-            // Prepare metaFields for consistent header layout
             try {
-                context.metaFields = prepareItemHeaderMetaFields(itemData, context.system);
-                logger.debug('AvantItemSheet | MetaFields prepared:', {
-                    itemType: itemData.type,
-                    fieldCount: context.metaFields.length
-                });
+                // Get base ApplicationV2 context
+                const baseContext = await super._prepareContext(options) as any;
+                const itemData = this.document.toObject(false);
 
-                // Prepare bodyFields for consistent body layout (Stage 2 Universal Architecture)
-                context.bodyFields = prepareItemBodyFields(itemData, context.system);
-                logger.debug('AvantItemSheet | BodyFields prepared:', {
-                    itemType: itemData.type,
-                    fieldCount: context.bodyFields.length,
-                    fieldTypes: context.bodyFields.map((field: any) => field.type)
-                });
-            } catch (error) {
-                logger.warn('AvantItemSheet | Failed to prepare fields:', error);
-                context.metaFields = [];
-                context.bodyFields = [];
-            }
+                // Prepare item data for context preparation
+                const itemDataForContext: ItemDataForContext = {
+                    id: this.document.id,
+                    type: this.document.type,
+                    name: this.document.name,
+                    system: itemData.system || {},
+                    flags: itemData.flags || {},
+                    isEditable: this.isEditable,
+                    isOwner: this.document.isOwner
+                };
 
-            // Ensure traits array exists
-            if (!context.system.traits) {
-                context.system.traits = [];
-            }
+                // Prepare trait display data using modular functions
+                const traitContext: ItemContextForTraits = {
+                    id: this.document.id,
+                    name: this.document.name,
+                    type: this.document.type,
+                    traitIds: itemData.system?.traits || []
+                };
 
-            // For trait items, convert tags array to string for template
-            if (this.document.type === 'trait' && context.system.tags) {
-                context.system.tagsString = Array.isArray(context.system.tags)
-                    ? context.system.tags.join(',')
-                    : (context.system.tags || '');
-            } else if (this.document.type === 'trait') {
-                context.system.tagsString = '';
-            }
+                const traitDataResult = await prepareTraitDisplayData(traitContext, DEFAULT_TRAIT_DATA_CONFIG);
+                const displayTraits = traitDataResult.success ? traitDataResult.traits : [];
 
-            // Add ApplicationV2 required fields
-            context.editable = this.isEditable;
-            context.owner = this.document.isOwner;
+                // Use pure function to prepare complete context
+                const contextResult = await prepareCompleteContext(
+                    itemDataForContext,
+                    baseContext,
+                    displayTraits,
+                    DEFAULT_CONTEXT_CONFIG
+                );
 
-            // Pre-enrich description content for the editor helper (FoundryVTT v13 requirement)
-            if (context.system.description) {
-                try {
-                    // Use the new namespaced TextEditor for v13 compatibility
-                    const foundry = (globalThis as any).foundry;
-                    const TextEditor = foundry?.applications?.ux?.TextEditor?.implementation || (globalThis as any).TextEditor;
-
-                    if (TextEditor && TextEditor.enrichHTML) {
-                        context.enrichedDescription = await TextEditor.enrichHTML(context.system.description, { async: true });
-                    } else {
-                        context.enrichedDescription = context.system.description;
+                if (contextResult.success) {
+                    // Add type-specific options if needed
+                    const context = contextResult.context!;
+                    if (itemData.type === 'augment') {
+                        context.rarityOptions = this._prepareRarityOptions();
+                        context.augmentTypeOptions = this._prepareAugmentTypeOptions();
                     }
-                } catch (error) {
-                    console.warn('Failed to enrich description content:', error);
-                    context.enrichedDescription = context.system.description;
-                }
-            } else {
-                context.enrichedDescription = '';
-            }
 
-            // CRITICAL: Prepare trait display data for template with robust error handling
-            try {
-                context.displayTraits = await this._prepareTraitDisplayData();
-                logger.debug('AvantItemSheet | Trait display data prepared successfully:', {
-                    traitsCount: context.displayTraits?.length || 0,
-                    traitNames: context.displayTraits?.map((t: any) => t.name) || []
-                });
-
-                // WORKAROUND: Since Handlebars context passing fails, override system.traits with enhanced data
-                // This allows the template to use the enhanced trait data directly through the 'value' parameter
-                if (context.displayTraits && context.displayTraits.length > 0) {
-                    // Store original trait IDs for form submission
-                    context.system.originalTraits = context.system.traits;
-                    // Replace system.traits with enhanced trait objects for display
-                    context.system.traits = context.displayTraits;
-                    
-                    console.log('🔧 WORKAROUND | Enhanced trait data passed through system.traits:', {
-                        originalTraits: context.system.originalTraits,
-                        enhancedTraits: context.system.traits.map((t: any) => ({
-                            id: t.id,
-                            name: t.name,
-                            color: t.color,
-                            icon: t.icon
-                        }))
+                    logger.debug('AvantItemSheet | Context preparation complete:', {
+                        finalContextKeys: Object.keys(context),
+                        systemKeys: Object.keys(context.system || {}),
+                        traitsCount: context.displayTraits?.length || 0,
+                        hasTraits: !!(context.displayTraits && context.displayTraits.length > 0),
+                        processingTimeMs: contextResult.metadata.processingTimeMs
                     });
+
+                    return context;
+                } else {
+                    logger.error('AvantItemSheet | Context preparation failed:', contextResult.error);
+                    // Return minimal fallback context
+                    return this._createFallbackContext(baseContext, itemData);
                 }
 
-                // DEEP DEBUGGING: Log the exact structure of displayTraits for template
-                console.log('🔧 CONTEXT DEEP DEBUG | displayTraits structure:', {
-                    isArray: Array.isArray(context.displayTraits),
-                    length: context.displayTraits?.length || 0,
-                    firstTraitStructure: context.displayTraits?.[0] ? {
-                        id: context.displayTraits[0].id,
-                        name: context.displayTraits[0].name,
-                        color: context.displayTraits[0].color,
-                        textColor: context.displayTraits[0].textColor,
-                        icon: context.displayTraits[0].icon,
-                        source: context.displayTraits[0].source,
-                        allKeys: Object.keys(context.displayTraits[0])
-                    } : null,
-                    fullData: context.displayTraits
-                });
             } catch (error) {
-                logger.error('AvantItemSheet | Failed to prepare trait display data:', error);
-                // Fallback to empty array to prevent template errors
-                context.displayTraits = [];
+                logger.error('AvantItemSheet | Error in _prepareContext:', error);
+                // Return minimal fallback context
+                const itemData = this.document.toObject(false);
+                const baseContext = { item: itemData };
+                return this._createFallbackContext(baseContext, itemData);
             }
-
-            logger.debug('AvantItemSheet | Context preparation complete:', {
-                finalContextKeys: Object.keys(context),
-                systemKeys: Object.keys(context.system || {}),
-                traitsCount: context.displayTraits?.length || 0,
-                hasTraits: !!(context.displayTraits && context.displayTraits.length > 0)
-            });
-
-            return context;
         }
 
         /**
-         * Prepare trait display data for template rendering
-         * @private
+         * PHASE 4 UTILITY METHOD
+         * 
+         * Create fallback context when preparation fails
+         * 
+         * @param baseContext - Base context from ApplicationV2
+         * @param itemData - Item data object
+         * @returns Minimal fallback context
+         */
+        private _createFallbackContext(baseContext: any, itemData: any): ItemSheetContext {
+            return {
+                ...baseContext,
+                item: itemData,
+                system: itemData.system || {},
+                flags: itemData.flags || {},
+                editable: this.isEditable,
+                owner: this.document.isOwner,
+                enrichedDescription: itemData.system?.description || '',
+                displayTraits: [],
+                metaFields: [],
+                bodyFields: []
+            };
+        }
+
+        /**
+         * PHASE 4 THIN WRAPPER
+         * 
+         * Prepare trait display data for template rendering using modular pure functions
+         * 
+         * This method is now a thin wrapper that delegates to the modular trait data
+         * preparation system, making it more testable and maintainable.
          */
         private async _prepareTraitDisplayData(): Promise<any[]> {
-            const traitIds = this.document?.system?.traits || [];
-            logger.debug('AvantItemSheet | Preparing trait display data', {
-                itemName: this.document?.name || 'Unknown',
-                itemType: this.document?.type || 'Unknown',
-                traitIds,
-                traitCount: traitIds.length,
-                traitIdTypes: traitIds.map((id: string) => ({ id, type: typeof id, length: id?.length || 0 }))
-            });
+            const traitContext: ItemContextForTraits = {
+                id: this.document.id,
+                name: this.document.name,
+                type: this.document.type,
+                traitIds: this.document?.system?.traits || []
+            };
 
-            // CRITICAL: Always return displayable data, never empty
-            if (traitIds.length === 0) {
-                logger.debug('AvantItemSheet | No traits to display');
-                return [];
-            }
-
-            // STEP 1: Create immediate fallback display data (never fails)
-            const fallbackTraits = traitIds.map((traitId: string) => {
-                const traitName = this._generateFallbackTraitName(traitId);
-                const fallbackColor = this._generateFallbackTraitColor(traitId, traitName);
-
-                return {
-                    id: traitId,
-                    name: traitName,
-                    displayId: traitId,
-                    color: fallbackColor.background,
-                    textColor: fallbackColor.text,
-                    icon: fallbackColor.icon,
-                    description: `Trait: ${traitName}`,
-                    source: 'fallback'
-                };
-            });
-
-            // STEP 2: Progressive enhancement with service data (if available)
-            try {
-                const game = (globalThis as any).game;
-                const initManager = game?.avant?.initializationManager;
-
-                if (initManager) {
-                    logger.debug('AvantItemSheet | Attempting to get TraitProvider service...');
-
-                    // CRITICAL FIX: Use waitForService with timeout instead of getService
-                    // This ensures we wait for the service to be ready rather than getting null
-                    try {
-                        const traitProvider = await initManager.waitForService('traitProvider', 2000);
-
-                        if (traitProvider) {
-                            logger.debug('AvantItemSheet | TraitProvider available, enhancing display data');
-                            const result = await traitProvider.getAll();
-
-                            if (result.success && result.data) {
-                                // CRITICAL FIX: Use findByReference instead of exact ID matching
-                                // This allows flexible trait lookup (Fire, avant-trait-fire, etc.)
-                                const enhancedTraits = await Promise.all(traitIds.map(async (traitId: string) => {
-                                    try {
-                                        // Use the enhanced findByReference method for flexible trait lookup
-                                        const traitResult = await traitProvider.findByReference(traitId);
-
-                                        if (traitResult.success && traitResult.data) {
-                                            const trait = traitResult.data;
-                                            const matchType = traitResult.metadata?.matchType || 'unknown';
-
-                                            return {
-                                                id: trait.id,
-                                                name: trait.name,
-                                                color: trait.color || '#00E0DC', // Fallback to primary accent
-                                                textColor: trait.textColor || '#000000', // Explicit text color
-                                                icon: trait.icon || 'fas fa-tag',
-                                                description: trait.description,
-                                                displayId: traitId,
-                                                matchType: matchType,
-                                                source: 'service'
-                                            };
-                                        } else {
-                                            // Only log warning for legitimate trait IDs, not corrupted data
-                                            if (traitId && typeof traitId === 'string' && !traitId.startsWith('[') && !traitId.startsWith('{')) {
-                                                logger.warn('AvantItemSheet | Trait not found in provider:', traitId);
-                                            } else {
-                                                logger.debug('AvantItemSheet | Skipping corrupted trait data:', traitId);
-                                            }
-
-                                            // Keep fallback for missing traits
-                                            return fallbackTraits.find((f: any) => f.id === traitId) || {
-                                                id: traitId,
-                                                name: this._generateFallbackTraitName(traitId),
-                                                displayId: traitId,
-                                                color: '#6C757D',
-                                                textColor: '#FFFFFF',
-                                                icon: 'fas fa-tag',
-                                                description: `Unknown trait: ${traitId}`,
-                                                source: 'fallback'
-                                            };
-                                        }
-                                    } catch (error) {
-                                        logger.warn('AvantItemSheet | Error looking up trait:', traitId, error);
-                                        // Return fallback on error
-                                        return fallbackTraits.find((f: any) => f.id === traitId) || {
-                                            id: traitId,
-                                            name: this._generateFallbackTraitName(traitId),
-                                            displayId: traitId,
-                                            color: '#6C757D',
-                                            textColor: '#FFFFFF',
-                                            icon: 'fas fa-tag',
-                                            description: `Unknown trait: ${traitId}`,
-                                            source: 'fallback'
-                                        };
-                                    }
-                                }));
-
-                                logger.debug('AvantItemSheet | Enhanced trait display data:', {
-                                    enhancedCount: enhancedTraits.filter((t: any) => t.source === 'service').length,
-                                    fallbackCount: enhancedTraits.filter((t: any) => t.source === 'fallback').length,
-                                    totalCount: enhancedTraits.length,
-                                    traitDetails: enhancedTraits.map((t: any) => ({
-                                        id: t.id,
-                                        name: t.name,
-                                        source: t.source,
-                                        matchType: t.matchType,
-                                        color: t.color
-                                    }))
-                                });
-
-                                return enhancedTraits;
-                            }
-                        }
-                    } catch (serviceError) {
-                        logger.warn('AvantItemSheet | TraitProvider service not ready or failed:', serviceError);
-                        // Fall through to fallback logic
-                    }
-                } else {
-                    logger.warn('AvantItemSheet | InitializationManager not available');
-                }
-            } catch (error) {
-                logger.warn('AvantItemSheet | Error enhancing trait display data:', error);
-            }
-
-            // STEP 3: Always return at least fallback data
-            logger.debug('AvantItemSheet | Using fallback trait display data');
-            return fallbackTraits;
+            const result = await prepareTraitDisplayData(traitContext, DEFAULT_TRAIT_DATA_CONFIG);
+            return result.success ? result.traits : [];
         }
 
         /**
@@ -923,94 +780,33 @@ export function createAvantItemSheet() {
         }
 
         /**
-         * Render the inner HTML content
-         * @param context - Template context
-         * @param options - Render options
-         * @returns Rendered HTML content
+         * PHASE 4 THIN WRAPPER
+         * 
+         * Render HTML content with modular debugging utilities
+         * 
+         * This method is now a thin wrapper that uses modular debugging utilities
+         * for comprehensive template and context investigation.
          */
         async _renderHTML(context: any, options: any): Promise<string> {
-            // DEBUGGING: Comprehensive template path investigation
-            const partsConfig = this.parts;
-            const templateFromParts = partsConfig?.form?.template;
-            const templateFromOptions = this.options.template;
-            const templateFromContext = context?.template;
-
-            logger.debug('AvantItemSheet | _renderHTML called - TEMPLATE PATH INVESTIGATION', {
-                itemType: this.document?.type,
-                contextKeys: Object.keys(context),
-                templateFromParts: this.options.parts?.form?.template,
-                templateFromOptions: this.options.template,
-                templateFromContext: context.template,
-                partsConfig: this.options.parts || {},
-                partsKeys: Object.keys(this.options.parts || {}),
-                optionsKeys: Object.keys(this.options),
-                optionsTemplate: this.options.template,
-                documentExists: !!this.document,
-                documentType: this.document?.type,
-                documentId: this.document?.id,
-                documentName: this.document?.name,
-                hasDisplayTraits: !!context.displayTraits,
-                displayTraitsType: typeof context.displayTraits,
-                displayTraitsLength: context.displayTraits?.length || 0,
-                displayTraitsFirst: context.displayTraits?.[0],
-                actualTemplate: this.options.parts?.form?.template || this.options.template
-            });
+            // Create performance timer for render operation
+            const renderTimer = createPerformanceTimer('_renderHTML', DEFAULT_DEBUG_CONFIG);
+            renderTimer.start();
 
             try {
-                // DEBUGGING: Check what partials are available in Handlebars before rendering
-                const handlebars = (globalThis as any).Handlebars;
-                if (handlebars && handlebars.partials) {
-                    console.log('🔧 RENDER DEBUG | Available Handlebars partials:', Object.keys(handlebars.partials));
+                // Use modular debug utilities for comprehensive investigation
+                logRenderDebugInfo(this, context, options, DEFAULT_DEBUG_CONFIG);
 
-                    // Check specifically for image-upload partial
-                    const imageUploadKeys = Object.keys(handlebars.partials).filter(key =>
-                        key.includes('image-upload')
-                    );
-                    console.log('🔧 RENDER DEBUG | Image-upload partials found:', imageUploadKeys);
+                // Call parent's _renderHTML
+                const html = await super._renderHTML(context, options);
 
-                    // Check exactly what we're looking for
-                    const expectedKey = 'systems/avant/templates/shared/partials/image-upload';
-                    console.log('🔧 RENDER DEBUG | Looking for partial:', expectedKey);
-                    console.log('🔧 RENDER DEBUG | Partial exists?', !!handlebars.partials[expectedKey]);
+                // Log post-render debug information
+                const processingTime = renderTimer.stop();
+                logPostRenderDebugInfo(this, context, html, processingTime, DEFAULT_DEBUG_CONFIG);
 
-                    if (handlebars.partials[expectedKey]) {
-                        console.log('🔧 RENDER DEBUG | Partial content type:', typeof handlebars.partials[expectedKey]);
-                    } else {
-                        console.log('🔧 RENDER DEBUG | Checking alternative patterns...');
-                        const alternatives = Object.keys(handlebars.partials).filter(key =>
-                            key.endsWith('image-upload') || key.includes('image-upload')
-                        );
-                        console.log('🔧 RENDER DEBUG | Alternative matches:', alternatives);
-                    }
-                } else {
-                    console.warn('🔧 RENDER DEBUG | Handlebars partials registry not accessible');
-                }
-
-                // CRITICAL DIAGNOSTIC: Log the exact context being passed to template
-                console.log('🔧 TEMPLATE CONTEXT DEBUG | Full context being passed to template:', {
-                    hasDisplayTraits: !!context.displayTraits,
-                    displayTraitsType: typeof context.displayTraits,
-                    displayTraitsValue: context.displayTraits,
-                    displayTraitsLength: context.displayTraits?.length || 0,
-                    contextKeys: Object.keys(context),
-                    systemTraits: context.system?.traits,
-                    systemTraitsLength: context.system?.traits?.length || 0
-                });
-
-                // Call the parent _renderHTML method to perform the actual template rendering
-                const result = await super._renderHTML(context, options);
-
-                // CRITICAL DIAGNOSTIC: Log what happened after template rendering
-                console.log('🔧 TEMPLATE RENDER DEBUG | After template render:', {
-                    resultType: typeof result,
-                    resultKeys: Object.keys(result || {}),
-                    resultLength: result?.length || 0,
-                    resultPreview: typeof result === 'string' ? result.substring(0, 200) + '...' : 'Not a string'
-                });
-
-                return result;
+                return html;
             } catch (error) {
-                logger.error('AvantItemSheet | _renderHTML failed:', error);
+                renderTimer.stop();
+                logger.error('AvantItemSheet | Error in _renderHTML:', error);
                 throw error;
             }
         }
@@ -2097,64 +1893,49 @@ export function createAvantItemSheet() {
          * @param query - The search string entered by the user
          * @private
          */
+        /**
+         * PHASE 4 THIN WRAPPER
+         * 
+         * Show trait suggestions using modular pure functions
+         * 
+         * This method is now a thin wrapper that delegates to the modular trait
+         * suggestions system, making it more testable and maintainable.
+         */
         private async _showTraitSuggestions(query: string): Promise<void> {
             try {
-                // Access TraitProvider service through the initialization manager
-                // This pattern ensures proper service availability in ApplicationV2
-                const game = (globalThis as any).game;
-                const initManager = game?.avant?.initializationManager;
+                // Prepare context for suggestions
+                const itemContext: ItemContextForSuggestions = {
+                    id: this.document.id,
+                    name: this.document.name,
+                    type: this.document.type,
+                    existingTraitIds: this.document.system.traits || []
+                };
 
-                if (!initManager) {
-                    logger.warn('AvantItemSheet | InitializationManager not available for trait suggestions');
-                    this._showNoTraitSuggestions('Service not available');
-                    return;
+                // Generate suggestions using modular functions
+                const result = await generateTraitSuggestionsModular(query, itemContext, DEFAULT_TRAIT_SUGGESTION_CONFIG);
+
+                if (result.success && result.suggestions.length > 0) {
+                    // Filter for available traits only
+                    const availableTraits = result.suggestions.filter(s => s.isAvailable);
+                    
+                    if (availableTraits.length > 0) {
+                        // Convert suggestions back to legacy format for display
+                        const legacyTraits = availableTraits.map(s => ({
+                            id: s.id,
+                            name: s.name,
+                            description: s.description,
+                            color: s.color,
+                            textColor: s.textColor,
+                            icon: s.icon
+                        }));
+
+                        await this._displayTraitSuggestions(legacyTraits);
+                    } else {
+                        this._showNoTraitSuggestions();
+                    }
+                } else {
+                    this._showNoTraitSuggestions(result.error || 'No matching traits found');
                 }
-
-                // CRITICAL FIX: Use waitForService with timeout instead of getService
-                // This ensures we wait for the service to be ready rather than getting null
-                let traitProvider;
-                try {
-                    traitProvider = await initManager.waitForService('traitProvider', 2000);
-                } catch (serviceError) {
-                    logger.warn('AvantItemSheet | TraitProvider service not ready or failed:', serviceError);
-                    this._showNoTraitSuggestions('Trait service unavailable');
-                    return;
-                }
-
-                // CRITICAL FIX: Properly await the getAll() call and handle the result structure
-                // TraitProvider.getAll() returns Promise<TraitProviderResult<Trait[]>>, not a direct array
-                const allTraitsResult = await traitProvider.getAll();
-                if (!allTraitsResult.success || !allTraitsResult.data) {
-                    logger.warn('AvantItemSheet | Failed to load traits from provider:', allTraitsResult.error);
-                    this._showNoTraitSuggestions('Failed to load traits');
-                    return;
-                }
-
-                // Extract the actual traits array from the result
-                const allTraits = allTraitsResult.data;
-
-                // Filter traits based on user's search query
-                // Case-insensitive matching on trait names
-                const matchingTraits = allTraits.filter((trait: any) => {
-                    if (!trait?.name) return false;
-                    return trait.name.toLowerCase().includes(query.toLowerCase());
-                });
-
-                // Get traits already assigned to this item to prevent duplicates
-                const existingTraitIds = this.document.system.traits || [];
-
-                // Filter out traits already on the item
-                const availableTraits = matchingTraits.filter((trait: any) => {
-                    return !existingTraitIds.includes(trait.id);
-                });
-
-                if (availableTraits.length === 0) {
-                    this._showNoTraitSuggestions();
-                    return;
-                }
-
-                // Generate and display trait suggestions using the renderer service
-                await this._displayTraitSuggestions(availableTraits);
 
             } catch (error) {
                 logger.error('AvantItemSheet | Error showing trait suggestions:', error);
