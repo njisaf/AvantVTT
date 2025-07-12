@@ -6,9 +6,10 @@
  * - CSS Grid-first layout for responsive design
  * - CSS custom properties for theming integration
  * - Accessibility-first approach with proper focus states
+ * - ApplicationV2 compatibility merged from _applicationv2-item-sheets.scss
  * 
  * @author Avant VTT Team
- * @version 1.0.0 - Phase 1 Skeleton
+ * @version 1.0.0 - Phase 1 Skeleton + ApplicationV2 Integration
  * @since Phase 1 - Item Sheet Unification
  */
 
@@ -46,6 +47,62 @@
     &:focus-within {
         outline: 2px solid var(--color-focus, #00E0DC);
         outline-offset: 2px;
+    }
+}
+
+// ============================================================================
+// APPLICATIONV2 INTEGRATION - Complete Integration with Base Styles
+// ============================================================================
+// 
+// These styles ensure ApplicationV2 compatibility while maintaining the base
+// item sheet layout structure. All redundant styles have been merged and
+// deduplicated for optimal performance.
+
+// ApplicationV2 Item Sheets - Base Layout with ApplicationV2 Specificity
+.application.sheet.avant.item {
+    // Clean window styling
+    background: var(--theme-bg-primary, #2a2a2a) !important;
+    border: 1px solid var(--theme-border-primary, #555) !important;
+    min-height: 400px !important;
+
+    // Window content container
+    .window-content {
+        background: var(--theme-bg-primary, #2a2a2a) !important;
+        border: none !important;
+        min-height: 350px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100% !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+
+        // Main item sheet container
+        .item-sheet {
+            background: var(--theme-bg-primary, #2a2a2a) !important;
+            border: none !important;
+            min-height: 300px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            height: 100% !important;
+            padding: 0 !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+    }
+
+    // Default active state - Ensure first tab is visible by default
+    &:not(.has-active-tab) {
+        .sheet-body .tab:first-child {
+            display: block !important;
+        }
+
+        .sheet-tabs .item:first-child {
+            background: var(--theme-bg-primary, #2a2a2a) !important;
+            color: var(--theme-text-primary, #ffffff) !important;
+            border-bottom-color: var(--theme-accent-primary, #00e0dc) !important;
+        }
     }
 }
 
@@ -103,232 +160,136 @@
     }
 }
 
-// Additional specificity for nested structure override
-.avant.item-sheet .sheet-header,
-.item-sheet.avant .sheet-header {
-    display: flex !important;
-    flex-direction: column !important;
-}
-
 // CRITICAL FIX: Override ApplicationV2 and main avant.scss flex row behavior
 // These selectors have maximum specificity to override conflicting styles
 .application.sheet.avant.item .sheet-header,
 .avant.application.sheet.item .sheet-header,
-.item-sheet.avant.application.sheet .sheet-header {
+.item-sheet.avant.application.sheet .sheet-header,
+.avant.item-sheet .sheet-header,
+.item-sheet.avant .sheet-header {
     display: flex !important;
     flex-direction: column !important;
     align-items: stretch !important;
     justify-content: flex-start !important;
     gap: var(--space-sm, 8px) !important;
     padding: var(--space-md, 12px) !important;
+    background: var(--theme-bg-secondary, #333) !important;
+    border-bottom: 1px solid var(--theme-border-primary, #555) !important;
+    flex-shrink: 0 !important;
 
     // Remove any conflicting height constraints that might force horizontal layout
     height: auto !important;
     min-height: auto !important;
     max-height: none !important;
-}
 
-// ============================================================================
-// APPLICATIONV2 INTEGRATION - High Specificity Overrides
-// ============================================================================
-// 
-// These styles ensure the base item sheet layout takes precedence over the
-// ApplicationV2 specific styles. Using maximum specificity to override any
-// remaining conflicts from the ApplicationV2 file.
-
-// ApplicationV2 Item Sheets - Base Layout Override
-.application.sheet.avant.item {
-
-    // Window content container
-    .window-content {
+    // Row container for image + name (20-80 layout)
+    .row-container {
         display: flex !important;
-        flex-direction: column !important;
-        height: 100% !important;
-        padding: 0 !important;
-        overflow: hidden !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: var(--space-md, 12px) !important;
+        width: 100% !important;
 
-        // Main item sheet container
-        .item-sheet {
+        // Image upload section (20% width)
+        .form-group--image-upload {
+            flex: 0 0 20% !important;
             display: flex !important;
-            flex-direction: column !important;
-            height: 100% !important;
-            padding: 0 !important;
-            background: var(--theme-bg-primary, #2a2a2a) !important;
-            color: var(--theme-text-primary, #ffffff) !important;
+            justify-content: center !important;
+            align-items: center !important;
 
-            // HEADER LAYOUT - Force column layout with row containers
-            .sheet-header {
-                display: flex !important;
-                flex-direction: column !important;
-                align-items: stretch !important;
-                gap: var(--space-sm, 8px) !important;
-                padding: var(--space-md, 12px) !important;
-                background: var(--theme-bg-secondary, #333) !important;
-                border-bottom: 1px solid var(--theme-border-primary, #555) !important;
-                flex-shrink: 0 !important;
-                height: auto !important;
-                min-height: auto !important;
-                max-height: none !important;
+            .image-upload {
+                position: relative !important;
 
-                // Row container for image + name (20-80 layout)
-                .row-container {
-                    display: flex !important;
-                    flex-direction: row !important;
-                    align-items: center !important;
-                    gap: var(--space-md, 12px) !important;
-                    width: 100% !important;
-
-                    // Image upload section (20% width)
-                    .form-group--image-upload {
-                        flex: 0 0 20% !important;
-                        display: flex !important;
-                        justify-content: center !important;
-                        align-items: center !important;
-
-                        .image-upload {
-                            position: relative !important;
-
-                            .image-upload__img {
-                                width: 64px !important;
-                                height: 64px !important;
-                                border: 2px solid var(--theme-accent-primary, #00e0dc) !important;
-                                cursor: pointer !important;
-                                border-radius: 4px !important;
-                                object-fit: cover !important;
-                                transition: all 0.3s ease !important;
-
-                                &:hover {
-                                    border-color: var(--theme-accent-secondary, #4ce2e1) !important;
-                                    box-shadow: 0 0 8px rgba(0, 224, 220, 0.3) !important;
-                                }
-                            }
-
-                            .image-upload__overlay {
-                                position: absolute !important;
-                                top: 0 !important;
-                                left: 0 !important;
-                                right: 0 !important;
-                                bottom: 0 !important;
-                                background: rgba(0, 0, 0, 0.7) !important;
-                                display: flex !important;
-                                align-items: center !important;
-                                justify-content: center !important;
-                                opacity: 0 !important;
-                                transition: opacity 0.3s ease !important;
-                                border-radius: 4px !important;
-
-                                i {
-                                    color: var(--theme-accent-primary, #00e0dc) !important;
-                                    font-size: 16px !important;
-                                }
-                            }
-
-                            &:hover .image-upload__overlay {
-                                opacity: 1 !important;
-                            }
-                        }
-                    }
-
-                    // Name field section (80% width)
-                    .form-group--text-field {
-                        flex: 1 !important;
-                        display: flex !important;
-                        flex-direction: column !important;
-                        gap: var(--space-xs, 4px) !important;
-
-                        .form-label {
-                            font-family: var(--theme-font-display, "Orbitron", monospace) !important;
-                            font-size: 10px !important;
-                            font-weight: 600 !important;
-                            color: var(--theme-text-secondary, #aaa) !important;
-                            text-transform: uppercase !important;
-                            letter-spacing: 0.5px !important;
-                            margin: 0 !important;
-                        }
-
-                        .form-input {
-                            background: var(--theme-bg-tertiary, #444) !important;
-                            border: 1px solid var(--theme-border-primary, #555) !important;
-                            color: var(--theme-text-primary, #ffffff) !important;
-                            font-size: 16px !important;
-                            font-weight: bold !important;
-                            padding: 8px !important;
-                            width: 100% !important;
-                            border-radius: 4px !important;
-                            transition: all 0.3s ease !important;
-
-                            &:focus {
-                                border-color: var(--theme-accent-primary, #00e0dc) !important;
-                                outline: none !important;
-                                box-shadow: 0 0 8px rgba(0, 224, 220, 0.3) !important;
-                            }
-
-                            &::placeholder {
-                                color: var(--theme-text-secondary, #aaa) !important;
-                                opacity: 0.7 !important;
-                            }
-                        }
-                    }
-                }
-
-                // AP Selector row (full width)
-                .ap-selector-row {
-                    display: flex !important;
-                    justify-content: center !important;
-                    align-items: center !important;
-                    width: 100% !important;
-                    padding-top: var(--space-sm, 8px) !important;
-                }
-            }
-
-            // Tab and body styles remain the same
-            .sheet-tabs {
-                background: var(--theme-bg-secondary, #333) !important;
-                border-bottom: 1px solid var(--theme-border-primary, #555) !important;
-                display: flex !important;
-                flex-shrink: 0 !important;
-
-                .item {
-                    padding: 8px 16px !important;
-                    background: transparent !important;
-                    border: none !important;
-                    color: var(--theme-text-secondary, #aaa) !important;
-                    font-size: 12px !important;
-                    font-weight: 600 !important;
-                    text-transform: uppercase !important;
+                .image-upload__img {
+                    width: 64px !important;
+                    height: 64px !important;
+                    border: 2px solid var(--theme-accent-primary, #00e0dc) !important;
                     cursor: pointer !important;
-                    transition: all 0.2s ease !important;
+                    border-radius: 4px !important;
+                    object-fit: cover !important;
+                    transition: all 0.3s ease !important;
 
                     &:hover {
-                        background: rgba(0, 224, 220, 0.1) !important;
-                        color: var(--theme-accent-primary, #00e0dc) !important;
-                    }
-
-                    &.active {
-                        background: var(--theme-bg-primary, #2a2a2a) !important;
-                        color: var(--theme-text-primary, #ffffff) !important;
-                        border-bottom: 2px solid var(--theme-accent-primary, #00e0dc) !important;
+                        border-color: var(--theme-accent-secondary, #4ce2e1) !important;
+                        box-shadow: 0 0 8px rgba(0, 224, 220, 0.3) !important;
                     }
                 }
-            }
 
-            .sheet-body {
-                flex: 1 !important;
-                display: flex !important;
-                flex-direction: column !important;
-                overflow-y: auto !important;
-                background: var(--theme-bg-primary, #2a2a2a) !important;
+                .image-upload__overlay {
+                    position: absolute !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    right: 0 !important;
+                    bottom: 0 !important;
+                    background: rgba(0, 0, 0, 0.7) !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    opacity: 0 !important;
+                    transition: opacity 0.3s ease !important;
+                    border-radius: 4px !important;
 
-                .tab {
-                    padding: 15px !important;
-                    display: none !important;
-
-                    &.active {
-                        display: block !important;
+                    i {
+                        color: var(--theme-accent-primary, #00e0dc) !important;
+                        font-size: 16px !important;
                     }
+                }
+
+                &:hover .image-upload__overlay {
+                    opacity: 1 !important;
                 }
             }
         }
+
+        // Name field section (80% width)
+        .form-group--text-field {
+            flex: 1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: var(--space-xs, 4px) !important;
+
+            .form-label {
+                font-family: var(--theme-font-display, "Orbitron", monospace) !important;
+                font-size: 10px !important;
+                font-weight: 600 !important;
+                color: var(--theme-text-secondary, #aaa) !important;
+                text-transform: uppercase !important;
+                letter-spacing: 0.5px !important;
+                margin: 0 !important;
+            }
+
+            .form-input {
+                background: var(--theme-bg-tertiary, #444) !important;
+                border: 1px solid var(--theme-border-primary, #555) !important;
+                color: var(--theme-text-primary, #ffffff) !important;
+                font-size: 16px !important;
+                font-weight: bold !important;
+                padding: 8px !important;
+                width: 100% !important;
+                border-radius: 4px !important;
+                transition: all 0.3s ease !important;
+
+                &:focus {
+                    border-color: var(--theme-accent-primary, #00e0dc) !important;
+                    outline: none !important;
+                    box-shadow: 0 0 8px rgba(0, 224, 220, 0.3) !important;
+                }
+
+                &::placeholder {
+                    color: var(--theme-text-secondary, #aaa) !important;
+                    opacity: 0.7 !important;
+                }
+            }
+        }
+    }
+
+    // AP Selector row (full width)
+    .ap-selector-row {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        width: 100% !important;
+        padding-top: var(--space-sm, 8px) !important;
     }
 }
 
@@ -568,8 +529,7 @@
     }
 }
 
-// Legacy header-main styles removed - now using .header-main class
-
+// Legacy profile image styles
 .item-sheet__image {
     flex-shrink: 0;
 
@@ -628,8 +588,6 @@
         }
     }
 }
-
-// Legacy header-costs styles removed - now using .row-container class
 
 // ============================================================================
 // AP SELECTOR WIDGET STYLES
@@ -739,14 +697,21 @@
 }
 
 // ============================================================================
-// TAB NAVIGATION STYLES
+// TAB NAVIGATION STYLES - Merged ApplicationV2 and Base Styles
 // ============================================================================
 
-.item-sheet__tabs {
+.item-sheet__tabs,
+.sheet-tabs {
     grid-area: tabs;
     display: flex;
     border-bottom: 2px solid var(--color-border-primary, #cccccc);
     margin-bottom: var(--space-md, 12px);
+    background: var(--theme-bg-secondary, #333) !important;
+    border-bottom: 1px solid var(--theme-border-primary, #555) !important;
+    min-height: 36px !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
 
     // Hide tabs area when not needed
     &:empty {
@@ -754,19 +719,24 @@
     }
 }
 
-.item-sheet__tab {
-    background: transparent;
-    border: none;
-    padding: var(--space-sm, 8px) var(--space-md, 12px);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: var(--space-xs, 4px);
-    font-family: var(--font-primary, 'Exo 2', sans-serif);
-    font-size: var(--font-size-sm, 12px);
-    color: var(--color-text-secondary, #555555);
-    border-bottom: 3px solid transparent;
-    transition: all 0.2s ease;
+.item-sheet__tab,
+.sheet-tabs .item {
+    background: transparent !important;
+    border: none !important;
+    padding: 8px 16px !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: var(--space-xs, 4px) !important;
+    font-family: var(--font-primary, 'Exo 2', sans-serif) !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    color: var(--theme-text-secondary, #aaa) !important;
+    border-bottom: 2px solid transparent !important;
+    transition: all 0.2s ease !important;
+    text-decoration: none !important;
+    height: 36px !important;
 
     // Icon styling
     i {
@@ -775,8 +745,8 @@
 
     // Hover state
     &:hover {
-        color: var(--color-text-primary, #000000);
-        background: var(--color-background-secondary, #f9f9f9);
+        background: rgba(0, 224, 220, 0.1) !important;
+        color: var(--theme-accent-primary, #00e0dc) !important;
     }
 
     // Focus state
@@ -786,9 +756,11 @@
     }
 
     // Active state
-    &--active {
-        color: var(--color-primary, #00E0DC);
-        border-bottom-color: var(--color-primary, #00E0DC);
+    &--active,
+    &.active {
+        background: var(--theme-bg-primary, #2a2a2a) !important;
+        color: var(--theme-text-primary, #ffffff) !important;
+        border-bottom-color: var(--theme-accent-primary, #00e0dc) !important;
         font-weight: 600;
 
         i {
@@ -798,17 +770,40 @@
 }
 
 // ============================================================================
-// BODY CONTENT STYLES
+// BODY CONTENT STYLES - Merged ApplicationV2 and Base Styles
 // ============================================================================
 
-.item-sheet__body {
+.item-sheet__body,
+.sheet-body {
     grid-area: body;
     overflow-y: auto;
     min-height: 0; // Allow grid shrinking
+    background: var(--theme-bg-primary, #2a2a2a) !important;
+    border: none !important;
+    min-height: 200px !important;
+    display: block !important;
+    flex: 1 !important;
+    padding: 0 !important;
+    overflow-y: auto !important;
+
+    // Individual tab panels - Critical for ApplicationV2 tab functionality
+    .tab {
+        background: var(--theme-bg-primary, #2a2a2a) !important;
+        border: none !important;
+        min-height: 150px !important;
+        display: none !important; // Hide all tabs by default
+        padding: 15px !important;
+        margin: 0 !important;
+
+        // Only show the active tab
+        &.active {
+            display: block !important;
+        }
+    }
 }
 
 // ============================================================================
-// UNIVERSAL SHEET BODY STYLES - Stage 2 Refactor
+// UNIVERSAL SHEET BODY STYLES - Stage 2 Refactor with ApplicationV2 Integration
 // ============================================================================
 
 .sheet-body {
@@ -873,40 +868,56 @@
         }
     }
 
-    // Form groups within sheet body
+    // Form groups within sheet body - Merged ApplicationV2 and Base Styles
     .form-group {
         display: flex;
         flex-direction: column;
         gap: var(--space-xs, 4px);
+        background: transparent !important;
+        border: none !important;
+        min-height: auto !important;
+        display: block !important;
+        margin-bottom: 15px !important;
+        padding: 0 !important;
 
         // Ensure proper label styling
-        .form-label {
-            font-family: var(--font-display, 'Orbitron', monospace);
-            font-size: var(--font-size-xs, 10px);
-            font-weight: 600;
-            color: var(--color-text-secondary, #666666);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: var(--space-xs, 4px);
+        .form-label,
+        label {
+            font-family: var(--theme-font-display, 'Orbitron', monospace) !important;
+            font-size: 10px !important;
+            font-weight: 600 !important;
+            color: var(--theme-text-secondary, #aaa) !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            display: block !important;
+            margin-bottom: 4px !important;
+            padding: 0 !important;
+            border: none !important;
         }
 
-        // Input styling consistency
+        // Input styling consistency - Merged ApplicationV2 and Base Styles
         .form-input,
         .form-textarea,
-        .form-select {
-            background: var(--color-background-primary, #ffffff);
-            border: 1px solid var(--color-border-primary, #cccccc);
-            color: var(--color-text-primary, #000000);
-            font-family: var(--font-primary, 'Exo 2', sans-serif);
-            font-size: var(--font-size-sm, 12px);
-            padding: var(--space-sm, 8px);
+        .form-select,
+        input,
+        textarea,
+        select {
+            background: var(--theme-bg-tertiary, #444) !important;
+            border: 1px solid var(--theme-border-primary, #555) !important;
+            color: var(--theme-text-primary, #ffffff) !important;
+            font-size: 12px !important;
+            display: block !important;
+            width: 100% !important;
+            padding: 8px !important;
+            min-height: auto !important;
             border-radius: var(--border-radius-sm, 4px);
+            font-family: var(--font-primary, 'Exo 2', sans-serif);
             transition: border-color 0.2s ease;
 
             &:focus {
-                outline: none;
-                border-color: var(--color-primary, #00E0DC);
-                box-shadow: 0 0 0 2px var(--color-primary-alpha, rgba(0, 224, 220, 0.2));
+                border-color: var(--theme-accent-primary, #00e0dc) !important;
+                outline: none !important;
+                box-shadow: 0 0 8px rgba(0, 224, 220, 0.3) !important;
             }
 
             &:invalid {
@@ -915,9 +926,10 @@
         }
 
         // Textarea specific styling
-        .form-textarea {
-            resize: vertical;
-            min-height: 80px;
+        .form-textarea,
+        textarea {
+            min-height: 80px !important;
+            resize: vertical !important;
             line-height: 1.4;
         }
 
@@ -937,14 +949,10 @@
 }
 
 // ============================================================================
-// FIELD TYPE SPECIFIC STYLES
+// TRAIT CHIP SYSTEM STYLES - Merged and Deduplicated
 // ============================================================================
 
-// ============================================================================
-// TRAIT CHIP SYSTEM STYLES
-// ============================================================================
-
-// Trait chip input system styling - integrated from V2 file
+// Trait chip input system styling - Merged from both files with deduplication
 .trait-chip-input {
     background: var(--theme-bg-tertiary, #444) !important;
     border: 1px solid var(--theme-border-primary, #555) !important;
@@ -1087,6 +1095,10 @@
         }
     }
 }
+
+// ============================================================================
+// FIELD TYPE SPECIFIC STYLES
+// ============================================================================
 
 // Unknown field type fallback styling
 .unknown-field-type {

@@ -74,7 +74,7 @@ export interface TraitDataPreparationConfig {
 export const DEFAULT_TRAIT_DATA_CONFIG: TraitDataPreparationConfig = {
     enableServiceEnhancement: true,
     waitForService: true,
-    serviceTimeout: 2000,
+    serviceTimeout: 5000, // Increased from 2000ms to 5000ms for better service availability
     maxTraits: 50,
     enableDebugLogging: true,
     defaultFallbackColor: '#6C757D',
@@ -250,53 +250,86 @@ export async function enhanceTraitDataWithService(
 /**
  * PHASE 4 PURE FUNCTION
  * 
- * Get trait provider service
+ * Get trait provider service with retry logic
  * 
- * Safely retrieves the trait provider service with error handling and timeouts.
+ * Safely retrieves the trait provider service with error handling, timeouts, and retry logic.
  * 
  * @param config - Configuration for trait data preparation
+ * @param maxRetries - Maximum number of retry attempts
  * @returns Promise resolving to trait provider service or null
  */
 export async function getTraitProviderService(
-    config: TraitDataPreparationConfig = DEFAULT_TRAIT_DATA_CONFIG
+    config: TraitDataPreparationConfig = DEFAULT_TRAIT_DATA_CONFIG,
+    maxRetries = 3
 ): Promise<any | null> {
-    try {
-        const game = (globalThis as any).game;
-        const initManager = game?.avant?.initializationManager;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            const game = (globalThis as any).game;
+            const initManager = game?.avant?.initializationManager;
 
-        if (!initManager) {
-            if (config.enableDebugLogging) {
-                logger.warn('TraitDataPreparation | InitializationManager not available');
+            if (!initManager) {
+                if (config.enableDebugLogging) {
+                    logger.warn(`TraitDataPreparation | InitializationManager not available (attempt ${attempt}/${maxRetries})`);
+                }
+                
+                // If InitializationManager is not available, wait and retry
+                if (attempt < maxRetries) {
+                    await new Promise(resolve => setTimeout(resolve, attempt * 500));
+                    continue;
+                }
+                return null;
             }
-            return null;
-        }
 
-        if (config.enableDebugLogging) {
-            logger.debug('TraitDataPreparation | Attempting to get TraitProvider service...');
-        }
+            if (config.enableDebugLogging) {
+                logger.debug(`TraitDataPreparation | Attempting to get TraitProvider service (attempt ${attempt}/${maxRetries})...`);
+            }
 
-        if (config.waitForService) {
-            // Wait for service to be ready with timeout
-            const traitProvider = await Promise.race([
-                initManager.waitForService('traitProvider', config.serviceTimeout),
-                new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error('Service wait timeout')), config.serviceTimeout)
-                )
-            ]);
+            if (config.waitForService) {
+                // Wait for service to be ready with timeout
+                const traitProvider = await Promise.race([
+                    initManager.waitForService('traitProvider', config.serviceTimeout),
+                    new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('Service wait timeout')), config.serviceTimeout)
+                    )
+                ]);
 
-            return traitProvider;
-        } else {
-            // Try to get service immediately
-            const traitProvider = initManager.getService('traitProvider');
-            return traitProvider;
-        }
+                if (traitProvider) {
+                    if (config.enableDebugLogging) {
+                        logger.debug(`TraitDataPreparation | TraitProvider service obtained successfully on attempt ${attempt}`);
+                    }
+                    return traitProvider;
+                }
+            } else {
+                // Try to get service immediately
+                const traitProvider = initManager.getService('traitProvider');
+                if (traitProvider) {
+                    if (config.enableDebugLogging) {
+                        logger.debug(`TraitDataPreparation | TraitProvider service obtained immediately on attempt ${attempt}`);
+                    }
+                    return traitProvider;
+                }
+            }
 
-    } catch (error) {
-        if (config.enableDebugLogging) {
-            logger.warn('TraitDataPreparation | TraitProvider service not ready or failed:', error);
+        } catch (error) {
+            if (config.enableDebugLogging) {
+                logger.warn(`TraitDataPreparation | TraitProvider service attempt ${attempt}/${maxRetries} failed:`, error);
+            }
         }
-        return null;
+        
+        // Wait before retry (exponential backoff)
+        if (attempt < maxRetries) {
+            const backoffMs = attempt * 1000; // 1s, 2s, 3s delays
+            if (config.enableDebugLogging) {
+                logger.debug(`TraitDataPreparation | Waiting ${backoffMs}ms before retry...`);
+            }
+            await new Promise(resolve => setTimeout(resolve, backoffMs));
+        }
     }
+
+    if (config.enableDebugLogging) {
+        logger.warn(`TraitDataPreparation | TraitProvider service unavailable after ${maxRetries} attempts`);
+    }
+    return null;
 }
 
 /**
