@@ -22,8 +22,9 @@ Validation Keywords (for CI script):
 --}}
 
 <div class="item-sheet talent-sheet flexcol" autocomplete="off" data-application-part="form">
-{{!-- DEBUGGING: Use Handlebars helper (inline JS disabled in FoundryVTT v13+) --}}
-{{debugContext "TALENT-TEMPLATE displayTraits" displayTraits}}
+    <!-- TALENT_BEACON_42 -->
+    {{!-- DEBUGGING: Use Handlebars helper (inline JS disabled in FoundryVTT v13+) --}}
+    {{debugContext "TALENT-TEMPLATE displayTraits" displayTraits}}
     {{!-- Header Section - Using Consistent Layout --}}
     {{> "systems/avant/templates/shared/partials/item-header"}}
 
@@ -70,7 +71,7 @@ Validation Keywords (for CI script):
     {{> "systems/avant/templates/shared/partials/traits-field"
     name="system.traits"
     displayTraits=displayTraits
-    value=system.traits
+    value=displayTraits
     label="Traits"
     hint="Add traits to categorize and enhance this talent"
     editable=editable

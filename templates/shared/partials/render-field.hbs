@@ -112,23 +112,23 @@ class=field.class}}
 {{else if (eq field.type "traits")}}
 {{!-- Traits field --}}
 <script>
-console.log('🔧 RENDER-FIELD DEBUG | Traits field context:', {
-  fieldType: field.type,
-  fieldName: field.name,
-  fieldValue: field.value,
-  fieldValueType: typeof field.value,
-  fieldValueLength: field.value ? field.value.length : 0,
-  hasDisplayTraits: !!displayTraits,
-  displayTraitsType: typeof displayTraits,
-  displayTraitsLength: displayTraits ? displayTraits.length : 0,
-  displayTraitsData: displayTraits,
-  editable: editable
-});
+  console.log('🔧 RENDER-FIELD DEBUG | Traits field context:', {
+    fieldType: field.type,
+    fieldName: field.name,
+    fieldValue: field.value,
+    fieldValueType: typeof field.value,
+    fieldValueLength: field.value ? field.value.length : 0,
+    hasDisplayTraits: !!displayTraits,
+    displayTraitsType: typeof displayTraits,
+    displayTraitsLength: displayTraits ? displayTraits.length : 0,
+    displayTraitsData: displayTraits,
+    editable: editable
+  });
 </script>
 {{> "systems/avant/templates/shared/partials/traits-field"
 name=field.name
-displayTraits=displayTraits
-value=field.value
+displayTraits=@root.displayTraits
+value=@root.displayTraits
 label=field.label
 hint=field.hint
 editable=editable
@@ -137,9 +137,9 @@ class=field.class}}
 {{else}}
 {{!-- Fallback for unknown field types --}}
 <div class="unknown-field-type" data-field-type="{{field.type}}">
-    <label class="form-label">{{field.label}}</label>
-    <div class="unknown-field-message">
-        Unsupported field type: {{field.type}}
-    </div>
+  <label class="form-label">{{field.label}}</label>
+  <div class="unknown-field-message">
+    Unsupported field type: {{field.type}}
+  </div>
 </div>
 {{/if}}

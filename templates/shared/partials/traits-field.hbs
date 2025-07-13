@@ -35,7 +35,9 @@ Optional: hint, class, editable (defaults to true), displayTraits
             {{#each value as |traitItem|}}
             {{#if traitItem.name}}
             {{!-- Enhanced trait object with name, color, icon --}}
-            <div class="trait-chip" style="background-color: {{traitItem.color}}; color: {{traitItem.textColor}};" data-trait-id="{{traitItem.id}}" data-trait-type="{{traitItem.type}}" data-trait-source="{{traitItem.source}}">
+            <div class="trait-chip" style="background-color: {{traitItem.color}}; color: {{traitItem.textColor}};"
+                data-trait-id="{{traitItem.id}}" data-trait-type="{{traitItem.type}}"
+                data-trait-source="{{traitItem.source}}">
                 {{#if traitItem.icon}}<i class="{{traitItem.icon}}" aria-hidden="true"></i>{{/if}}
                 <span class="trait-name">{{traitItem.name}}</span>
                 <button type="button" class="trait-remove" data-action="removeTrait" data-trait-id="{{traitItem.id}}"
@@ -46,7 +48,8 @@ Optional: hint, class, editable (defaults to true), displayTraits
             {{else}}
             {{!-- Raw trait ID - use fallback helpers --}}
             <div class="trait-chip" style="{{traitChipStyleFromId traitItem}}" data-trait-id="{{traitItem}}">
-                {{#if (traitIconFromId traitItem)}}<i class="{{traitIconFromId traitItem}}" aria-hidden="true"></i>{{/if}}
+                {{#if (traitIconFromId traitItem)}}<i class="{{traitIconFromId traitItem}}"
+                    aria-hidden="true"></i>{{/if}}
                 <span class="trait-name">{{traitNameFromId traitItem}}</span>
                 <button type="button" class="trait-remove" data-action="removeTrait" data-trait-id="{{traitItem}}"
                     aria-label="Remove {{traitNameFromId traitItem}}">
@@ -80,7 +83,10 @@ Optional: hint, class, editable (defaults to true), displayTraits
         {{#each value as |traitItem|}}
         {{#if traitItem.name}}
         {{!-- Enhanced trait object with name, color, icon --}}
-        <div class="trait-chip trait-chip-readonly" style="background-color: {{traitItem.color}}; color: {{traitItem.textColor}};" data-trait-id="{{traitItem.id}}" data-trait-type="{{traitItem.type}}" data-trait-source="{{traitItem.source}}">
+        <div class="trait-chip trait-chip-readonly"
+            style="background-color: {{traitItem.color}}; color: {{traitItem.textColor}};"
+            data-trait-id="{{traitItem.id}}" data-trait-type="{{traitItem.type}}"
+            data-trait-source="{{traitItem.source}}">
             {{#if traitItem.icon}}<i class="{{traitItem.icon}}" aria-hidden="true"></i>{{/if}}
             <span class="trait-name">{{traitItem.name}}</span>
         </div>

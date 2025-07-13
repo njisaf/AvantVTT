@@ -42,19 +42,19 @@ import { logger } from '../utils/logger.js';
 import { initializeApSelector } from './ap-selector-handler';
 
 // Import new modular functions
-import { 
-    extractFormData, 
-    shouldBlockSubmission, 
-    validateCriticalFields, 
+import {
+    extractFormData,
+    shouldBlockSubmission,
+    validateCriticalFields,
     DEFAULT_FORM_CONFIG,
-    type FormExtractionConfig 
+    type FormExtractionConfig
 } from '../logic/item-form.js';
 
-import { 
-    extractDragData, 
-    validateTraitDrop, 
+import {
+    extractDragData,
+    validateTraitDrop,
     processTraitDrop,
-    DEFAULT_DRAG_EXTRACTION_CONFIG 
+    DEFAULT_DRAG_EXTRACTION_CONFIG
 } from '../logic/drag-drop/item-trait.js';
 
 // Import trait utilities
@@ -71,32 +71,32 @@ import { createTraitHtmlForChat, itemHasTraits } from '../logic/chat/trait-resol
 import { FoundryUI } from '../types/adapters/foundry-ui.ts';
 
 // Import new Phase 4 context preparation modules
-import { 
-    prepareCompleteContext, 
-    type ItemDataForContext, 
+import {
+    prepareCompleteContext,
+    type ItemDataForContext,
     type ContextPreparationConfig,
-    DEFAULT_CONTEXT_CONFIG 
+    DEFAULT_CONTEXT_CONFIG
 } from '../logic/context-preparation.js';
 
-import { 
-    prepareTraitDisplayData, 
-    type ItemContextForTraits, 
+import {
+    prepareTraitDisplayData,
+    type ItemContextForTraits,
     type TraitDataPreparationConfig,
-    DEFAULT_TRAIT_DATA_CONFIG 
+    DEFAULT_TRAIT_DATA_CONFIG
 } from '../logic/trait-data-preparation.js';
 
-import { 
-    generateTraitSuggestions as generateTraitSuggestionsModular, 
-    type ItemContextForSuggestions, 
+import {
+    generateTraitSuggestions as generateTraitSuggestionsModular,
+    type ItemContextForSuggestions,
     type TraitSuggestionConfig,
-    DEFAULT_TRAIT_SUGGESTION_CONFIG 
+    DEFAULT_TRAIT_SUGGESTION_CONFIG
 } from '../logic/trait-suggestions.js';
 
-import { 
-    logRenderDebugInfo, 
-    logPostRenderDebugInfo, 
+import {
+    logRenderDebugInfo,
+    logPostRenderDebugInfo,
     createPerformanceTimer,
-    DEFAULT_DEBUG_CONFIG 
+    DEFAULT_DEBUG_CONFIG
 } from '../utils/debug-utilities.js';
 
 /**
@@ -545,7 +545,7 @@ export function createAvantItemSheet() {
 
                 const traitDataResult = await prepareTraitDisplayData(traitContext, DEFAULT_TRAIT_DATA_CONFIG);
                 const displayTraits = traitDataResult.success ? traitDataResult.traits : [];
-
+                console.log('NASSIR displayTraits', displayTraits);
                 // Use pure function to prepare complete context
                 const contextResult = await prepareCompleteContext(
                     itemDataForContext,
@@ -1173,7 +1173,7 @@ export function createAvantItemSheet() {
             try {
                 // Use the new modular drag-drop system
                 const dragDataResult = extractDragData(event, DEFAULT_DRAG_EXTRACTION_CONFIG);
-                
+
                 if (!dragDataResult.success) {
                     this._showDropError(dropZone, 'Failed to extract drag data');
                     return;
@@ -1260,32 +1260,32 @@ export function createAvantItemSheet() {
             try {
                 // Get current traits from the document
                 const existingTraits = this.document.system?.traits || [];
-                
+
                 // Validate the trait drop using the new modular system
                 const validation = await validateTraitDrop(dragData, this.document, existingTraits);
-                
+
                 if (!validation.isValid) {
                     this._showDropError(dropZone, validation.error || 'Invalid trait drop');
-                    
+
                     const ui = (globalThis as any).ui;
                     ui?.notifications?.warn(validation.error || 'Invalid trait drop');
                     return;
                 }
-                
+
                 // Process the trait drop using the new modular system
                 const result = await processTraitDrop(validation, this.document, existingTraits);
-                
+
                 if (result.success && result.traits) {
                     // Update the document with the new traits
                     await this.document.update({ 'system.traits': result.traits });
-                    
+
                     // Show success feedback
                     this._showDropSuccess(dropZone, result.message);
-                    
+
                     // Show notification
                     const ui = (globalThis as any).ui;
                     ui?.notifications?.info(result.message);
-                    
+
                     logger.info('AvantItemSheet | Trait drop successful (modular):', {
                         targetItem: this.document.name,
                         addedTrait: result.metadata?.addedTraitName,
@@ -1295,7 +1295,7 @@ export function createAvantItemSheet() {
                 } else {
                     // Show error feedback
                     this._showDropError(dropZone, result.error || 'Failed to add trait');
-                    
+
                     const ui = (globalThis as any).ui;
                     ui?.notifications?.warn(result.error || 'Failed to add trait');
                 }
@@ -1420,10 +1420,10 @@ export function createAvantItemSheet() {
             try {
                 // Use the new modular form handling system
                 const extractionResult = extractFormData(event, form, formData, this.element, DEFAULT_FORM_CONFIG);
-                
+
                 if (extractionResult.success && extractionResult.value.success) {
                     const processedData = extractionResult.value.data;
-                    
+
                     // Validate critical fields using the new validation system
                     if (processedData && (this.document?.type === 'talent' || this.document?.type === 'augment')) {
                         const validationResult = validateCriticalFields(processedData, this.document.type);
@@ -1432,7 +1432,7 @@ export function createAvantItemSheet() {
                             // Continue processing but log the issues
                         }
                     }
-                    
+
                     return processedData || {};
                 } else {
                     const errorMessage = extractionResult.success ? 'Form extraction returned failure' : extractionResult.error;
@@ -1917,7 +1917,7 @@ export function createAvantItemSheet() {
                 if (result.success && result.suggestions.length > 0) {
                     // Filter for available traits only
                     const availableTraits = result.suggestions.filter(s => s.isAvailable);
-                    
+
                     if (availableTraits.length > 0) {
                         // Convert suggestions back to legacy format for display
                         const legacyTraits = availableTraits.map(s => ({

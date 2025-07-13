@@ -194,11 +194,18 @@ export async function enhanceTraitDataWithService(
                 // Use the enhanced findByReference method for flexible trait lookup
                 const traitResult = await Promise.race([
                     traitProvider.findByReference(traitId),
-                    new Promise((_, reject) => 
+                    new Promise((_, reject) =>
                         setTimeout(() => reject(new Error('Service timeout')), config.serviceTimeout)
                     )
                 ]);
-
+                console.log('NASSIR traitResult', traitResult);
+                const otherTraitResult = await Promise.race([
+                    traitProvider.getTraitById(traitId),
+                    new Promise((_, reject) =>
+                        setTimeout(() => reject(new Error('Service timeout')), config.serviceTimeout)
+                    )
+                ]);
+                console.log('NASSIR otherTraitResult', otherTraitResult);
                 if (traitResult.success && traitResult.data) {
                     const trait = traitResult.data;
                     const matchType = traitResult.metadata?.matchType || 'unknown';
@@ -271,7 +278,7 @@ export async function getTraitProviderService(
                 if (config.enableDebugLogging) {
                     logger.warn(`TraitDataPreparation | InitializationManager not available (attempt ${attempt}/${maxRetries})`);
                 }
-                
+
                 // If InitializationManager is not available, wait and retry
                 if (attempt < maxRetries) {
                     await new Promise(resolve => setTimeout(resolve, attempt * 500));
@@ -288,7 +295,7 @@ export async function getTraitProviderService(
                 // Wait for service to be ready with timeout
                 const traitProvider = await Promise.race([
                     initManager.waitForService('traitProvider', config.serviceTimeout),
-                    new Promise((_, reject) => 
+                    new Promise((_, reject) =>
                         setTimeout(() => reject(new Error('Service wait timeout')), config.serviceTimeout)
                     )
                 ]);
@@ -315,7 +322,7 @@ export async function getTraitProviderService(
                 logger.warn(`TraitDataPreparation | TraitProvider service attempt ${attempt}/${maxRetries} failed:`, error);
             }
         }
-        
+
         // Wait before retry (exponential backoff)
         if (attempt < maxRetries) {
             const backoffMs = attempt * 1000; // 1s, 2s, 3s delays
@@ -382,7 +389,7 @@ export function generateFallbackTraitColor(
     try {
         // Use the trait display utility for consistent color generation
         const colorScheme = generateFallbackColorScheme(traitId, traitName);
-        
+
         return {
             background: colorScheme.background,
             text: colorScheme.text,
@@ -474,7 +481,7 @@ export async function prepareTraitDisplayData(
 ): Promise<TraitDataPreparationResult> {
     const startTime = Date.now();
     const fallbacksUsed: string[] = [];
-
+    console.log('NASSIR itemContext', itemContext);
     try {
         const traitIds = itemContext.traitIds || [];
 

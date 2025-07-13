@@ -309,8 +309,8 @@ export function prepareContextFields(
             enhancedContext.bodyFields = [];
         }
 
-        return { 
-            success: true, 
+        return {
+            success: true,
             value: enhancedContext
         };
 
@@ -382,14 +382,14 @@ export function prepareTraitDisplayContext(
         const enhancedContext = { ...context };
 
         enhancedContext.displayTraits = displayTraits;
-
+        console.log('NASSIR prepareTraitDisplayContext displayTraits', displayTraits);
         // WORKAROUND: Since Handlebars context passing fails, override system.traits with enhanced data
         if (displayTraits && displayTraits.length > 0) {
             // Store original trait IDs for form submission
             enhancedContext.originalTraits = enhancedContext.system.traits;
             // Replace system.traits with enhanced trait objects for display
             enhancedContext.system.traits = displayTraits;
-            
+
             if (config.enableDebugLogging) {
                 logger.debug('ContextPreparation | Enhanced trait data applied via workaround:', {
                     originalTraits: enhancedContext.originalTraits,
@@ -492,7 +492,7 @@ export async function prepareCompleteContext(
 ): Promise<ContextPreparationResult> {
     const startTime = Date.now();
     const fallbacksUsed: string[] = [];
-    
+
     try {
         // Step 1: Prepare base context
         const baseResult = prepareBaseContext(itemData, baseContext, config);
@@ -570,7 +570,7 @@ export async function prepareCompleteContext(
     } catch (error) {
         const processingTime = Date.now() - startTime;
         const errorMessage = `Complete context preparation failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
-        
+
         logger.error('ContextPreparation | Error in complete context preparation:', error);
 
         return {

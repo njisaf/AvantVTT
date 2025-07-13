@@ -323,6 +323,34 @@ export class TraitProvider {
   }
 
   /**
+   * Synchronous lookup of a trait by ID using the in-memory cache.
+   *
+   * Handlebars helpers run synchronously, so they cannot await the asynchronous
+   * {@link get} method.  This convenience wrapper allows template-level helpers
+   * (`traitNameFromId`, `traitIconFromId`, etc.) to resolve traits instantly
+   * once the provider has already been initialized and its cache populated.
+   *
+   * IMPORTANT:  If the cache has not been populated yet this will return `null`.
+   * Callers that require a guaranteed result should fall back to the async
+   * {@link get} method.
+   *
+   * @param id  The trait document ID to resolve.
+   * @returns   The matching {@link Trait} or `null` if not found / not cached.
+   */
+  public getTraitById(id: string): Trait | null {
+    if (!id) return null;
+
+    // If cache exists, attempt direct lookup.
+    if (this.cache && Array.isArray(this.cache.traits)) {
+      const trait = this.cache.traits.find(t => t.id === id) || null;
+      return trait;
+    }
+
+    // No cache available – return null (template helper will fall back).
+    return null;
+  }
+
+  /**
    * Find a trait by flexible reference lookup
    * 
    * CRITICAL FEATURE: This method was added to solve the trait display issue where
@@ -364,6 +392,7 @@ export class TraitProvider {
           metadata: { searchedReference: reference, reason: 'empty_reference' }
         };
       }
+      console.log('NASSIR findByReference reference', reference);
 
       const allTraitsResult = await this.getAll(options);
 
@@ -380,6 +409,7 @@ export class TraitProvider {
 
       // Strategy 1: Exact document ID match
       trait = allTraitsResult.data.find(t => t.id === cleanReference) || null;
+      console.log('NASSIR findByReference allTraitsResult.data', allTraitsResult.data);
       if (trait) {
         matchType = 'document_id';
       }
