@@ -34,7 +34,7 @@
   "packs": [
     {
       "name": "avant-traits",
-      "label": "Avant Traits",
+      "label": "Traits",
       "path": "./packs/avant-traits",
       "type": "Item",
       "system": "avant",
@@ -47,7 +47,7 @@
     },
     {
       "name": "avant-macros",
-      "label": "Avant Macros",
+      "label": "Macros",
       "path": "./packs/avant-macros",
       "type": "Macro",
       "banner": "systems/avant/assets/compendium-banner/orange.webp",
@@ -59,7 +59,7 @@
     },
     {
       "name": "avant-talents",
-      "label": "Avant Talents",
+      "label": "Talents",
       "path": "./packs/avant-talents",
       "type": "Item",
       "system": "avant",
@@ -72,7 +72,7 @@
     },
     {
       "name": "avant-augments",
-      "label": "Avant Augments",
+      "label": "Augments",
       "path": "./packs/avant-augments",
       "type": "Item",
       "system": "avant",

@@ -2,7 +2,7 @@
   {
     "_id": "AZUuqJpQsRqwSI1A",
     "name": "Buff",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "conditional-traits",
@@ -17,7 +17,7 @@
   {
     "_id": "YfqADB6clKL1hvmE",
     "name": "Debuff",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "conditional-traits",
@@ -32,7 +32,7 @@
   {
     "_id": "ICXYTj9zbuvPGpbs",
     "name": "Death",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "conditional-traits",
@@ -47,7 +47,7 @@
   {
     "_id": "bPPUImvJG64M0pJz",
     "name": "Morale",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "conditional-traits",
@@ -62,7 +62,7 @@
   {
     "_id": "dnJGBhHJdNqvNLVM",
     "name": "Physical",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "conditional-traits",
@@ -77,7 +77,7 @@
   {
     "_id": "S8ERpKXzAVEncX1e",
     "name": "Position",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "conditional-traits",
@@ -92,7 +92,7 @@
   {
     "_id": "4uNy8ImDeUESqdl2",
     "name": "Sense",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "conditional-traits",

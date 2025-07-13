@@ -2,7 +2,7 @@
   {
     "_id": "30qrmNpTBNWm5wst",
     "name": "AOE",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "mechanics-traits",
@@ -17,7 +17,7 @@
   {
     "_id": "YdqiKiYr4vmB2gq6",
     "name": "Attack",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "mechanics-traits",
@@ -32,7 +32,7 @@
   {
     "_id": "mqoVv39hLn563LQi",
     "name": "Aura",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "mechanics-traits",
@@ -47,7 +47,7 @@
   {
     "_id": "veUQtdUy79vzG7NC",
     "name": "Encounter",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "mechanics-traits",
@@ -62,7 +62,7 @@
   {
     "_id": "fICQVqrYDb8uqKOa",
     "name": "Disarm",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "mechanics-traits",
@@ -77,7 +77,7 @@
   {
     "_id": "feYBw0Ei6juv2gvj",
     "name": "Grapple",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "mechanics-traits",
@@ -92,7 +92,7 @@
   {
     "_id": "SqokF8dfGejXJ6Ts",
     "name": "Hostile",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "mechanics-traits",
@@ -107,7 +107,7 @@
   {
     "_id": "qoSW56DEtH0XIwhR",
     "name": "Intermediate",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "mechanics-traits",
@@ -122,7 +122,7 @@
   {
     "_id": "nAXL8SGcwwuyriP8",
     "name": "Lethal",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "mechanics-traits",
@@ -137,7 +137,7 @@
   {
     "_id": "bFFjt3u2F8H4YmkS",
     "name": "Long-Term",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "mechanics-traits",
@@ -152,7 +152,7 @@
   {
     "_id": "HOnIOYjU2sPDuZcV",
     "name": "Manipulate",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "mechanics-traits",
@@ -167,7 +167,7 @@
   {
     "_id": "KMU7tOygteoEHsZ8",
     "name": "Melee",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "mechanics-traits",
@@ -182,7 +182,7 @@
   {
     "_id": "FM4EKus1RkAcJACa",
     "name": "Movement",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "mechanics-traits",
@@ -197,7 +197,7 @@
   {
     "_id": "HZwava6HbHCafomT",
     "name": "Pacifying",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "mechanics-traits",
@@ -212,7 +212,7 @@
   {
     "_id": "vJFiWzagkov0IsQg",
     "name": "Passive",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "mechanics-traits",
@@ -227,7 +227,7 @@
   {
     "_id": "D9b4WSbdSqLTVqug",
     "name": "Reach",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "mechanics-traits",
@@ -242,7 +242,7 @@
   {
     "_id": "TmLxVzSlkplxrY0V",
     "name": "Ranged",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "mechanics-traits",
@@ -257,7 +257,7 @@
   {
     "_id": "ODTQd2fk1pnD0N4N",
     "name": "Splash",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "mechanics-traits",
@@ -272,7 +272,7 @@
   {
     "_id": "UfGsMqA7xYMt4EDm",
     "name": "Subtle",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "mechanics-traits",
@@ -287,7 +287,7 @@
   {
     "_id": "rkSxsdVbAMU7lwt0",
     "name": "Trip",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "mechanics-traits",
@@ -302,7 +302,7 @@
   {
     "_id": "3NTMdhOpoc0Vtd6v",
     "name": "Vocal",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "mechanics-traits",

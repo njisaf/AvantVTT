@@ -2,7 +2,7 @@
   {
     "_id": "GMglhh7Nf2hHqQZo",
     "name": "Alsharic",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "culture-traits",
@@ -17,7 +17,7 @@
   {
     "_id": "Gow2CO2vKe4SUA8t",
     "name": "Banrizan",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "culture-traits",
@@ -32,7 +32,7 @@
   {
     "_id": "AN4qupSkpu4woyCz",
     "name": "Bhendesan",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "culture-traits",
@@ -47,7 +47,7 @@
   {
     "_id": "ReqosuTh6G6ldC2D",
     "name": "Cosmopolitan",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "culture-traits",
@@ -62,7 +62,7 @@
   {
     "_id": "gTeCzdxWjLgWWRhS",
     "name": "Counterculture",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "culture-traits",
@@ -77,7 +77,7 @@
   {
     "_id": "Pe9rwK68GUYVk14a",
     "name": "Doheedian",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "culture-traits",
@@ -92,7 +92,7 @@
   {
     "_id": "gG09OBlgpUXXYIIQ",
     "name": "Gökish",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "culture-traits",
@@ -107,7 +107,7 @@
   {
     "_id": "Tr5DgUZvEwq0K0mK",
     "name": "Govriyan",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "culture-traits",
@@ -122,7 +122,7 @@
   {
     "_id": "1is5SOrQxi9VqPOv",
     "name": "Inculture",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "culture-traits",
@@ -137,7 +137,7 @@
   {
     "_id": "RBNsvPpLUYOTWCwN",
     "name": "Inillan",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "culture-traits",
@@ -152,7 +152,7 @@
   {
     "_id": "mdwJMpcvfyWcqbkF",
     "name": "Kiningan",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "culture-traits",
@@ -167,7 +167,7 @@
   {
     "_id": "g5CnPjycCbeTqF6Y",
     "name": "Mafawaiin",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "culture-traits",
@@ -182,7 +182,7 @@
   {
     "_id": "oRj251tJCz7gfRB9",
     "name": "Nodayanian",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "culture-traits",
@@ -197,7 +197,7 @@
   {
     "_id": "SO6yxij8Ti5ABE4q",
     "name": "Nordivic",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "culture-traits",
@@ -212,7 +212,7 @@
   {
     "_id": "5LRp7vQ0iCC5stKS",
     "name": "Pamungan",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "culture-traits",
@@ -227,7 +227,7 @@
   {
     "_id": "5EBGDNwpzAAexxtq",
     "name": "Sozilean",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "culture-traits",
@@ -242,7 +242,7 @@
   {
     "_id": "h4J0gVaGiOdF7Wya",
     "name": "Sanese",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "culture-traits",
@@ -257,7 +257,7 @@
   {
     "_id": "KVcOsII7ETSBn5uU",
     "name": "Morlian",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "culture-traits",
@@ -272,7 +272,7 @@
   {
     "_id": "I0fplBckBa6TnJLC",
     "name": "Thallinic",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "culture-traits",
@@ -287,7 +287,7 @@
   {
     "_id": "1WC4TOVLO46m0Mv1",
     "name": "Tlalpan",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "culture-traits",
@@ -302,7 +302,7 @@
   {
     "_id": "RxWnr2XA0dsdVon3",
     "name": "Ungtukhan",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "culture-traits",
@@ -317,7 +317,7 @@
   {
     "_id": "3OhjfxgyNrK4Cej3",
     "name": "Visatari",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "culture-traits",
@@ -332,7 +332,7 @@
   {
     "_id": "gUzROFP57L0JLxgr",
     "name": "Wistaran",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "culture-traits",
@@ -347,7 +347,7 @@
   {
     "_id": "yBFGgAjQWDPPebb7",
     "name": "Yahlimic",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "culture-traits",
@@ -362,7 +362,7 @@
   {
     "_id": "Q98HVszcEWD8LiNE",
     "name": "Zinbakan",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "culture-traits",

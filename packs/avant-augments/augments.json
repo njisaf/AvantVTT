@@ -2,7 +2,7 @@
   {
     "_id": "aB1cD2eF3gH4iJ5K",
     "name": "Neural Interface",
-    "type": "avant-augment",
+    "type": "augment",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Direct neural connection to computer systems",
@@ -20,7 +20,7 @@
   {
     "_id": "lM6nO7pQ8rS9tU0V",
     "name": "Cyber Eyes",
-    "type": "avant-augment",
+    "type": "augment",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Enhanced vision with zoom and night vision",
@@ -38,7 +38,7 @@
   {
     "_id": "wX1yZ2aB3cD4eF5G",
     "name": "Subdermal Armor",
-    "type": "avant-augment",
+    "type": "augment",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Protective plating beneath the skin",
@@ -56,7 +56,7 @@
   {
     "_id": "hI6jK7lM8nO9pQ0R",
     "name": "Reflex Boosters",
-    "type": "avant-augment",
+    "type": "augment",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Enhanced reaction time and speed",
@@ -74,7 +74,7 @@
   {
     "_id": "sT2uV3wX4yZ5aB6C",
     "name": "Data Jack",
-    "type": "avant-augment",
+    "type": "augment",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Direct data connection port",
@@ -92,7 +92,7 @@
   {
     "_id": "dE7fG8hI9jK0lM1N",
     "name": "Enhanced Muscles",
-    "type": "avant-augment",
+    "type": "augment",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Genetically enhanced muscle fibers",
@@ -110,7 +110,7 @@
   {
     "_id": "oP4qR5sT6uV7wX8Y",
     "name": "Toxin Filters",
-    "type": "avant-augment",
+    "type": "augment",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Biological filters for poison resistance",
@@ -128,7 +128,7 @@
   {
     "_id": "zA9bC0dE1fG2hI3J",
     "name": "Regenerative Cells",
-    "type": "avant-augment",
+    "type": "augment",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Enhanced healing and recovery",
@@ -146,7 +146,7 @@
   {
     "_id": "kL4mN5oP6qR7sT8U",
     "name": "Adaptive Skin",
-    "type": "avant-augment",
+    "type": "augment",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Skin that adapts to environmental conditions",
@@ -164,7 +164,7 @@
   {
     "_id": "vW9xY0zA1bC2dE3F",
     "name": "Pheromone Glands",
-    "type": "avant-augment",
+    "type": "augment",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Biological pheromone production for influence",
@@ -182,7 +182,7 @@
   {
     "_id": "gH6iJ7kL8mN9oP0Q",
     "name": "Quantum Processor",
-    "type": "avant-augment",
+    "type": "augment",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Advanced quantum computing implant",
@@ -200,7 +200,7 @@
   {
     "_id": "rS1tU2vW3xY4zA5B",
     "name": "Plasma Conduits",
-    "type": "avant-augment",
+    "type": "augment",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Internal energy distribution system",
@@ -218,7 +218,7 @@
   {
     "_id": "cD8eF9gH0iJ1kL2M",
     "name": "Metamorphic Tissue",
-    "type": "avant-augment",
+    "type": "augment",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Tissue that can change form and function",
@@ -236,7 +236,7 @@
   {
     "_id": "nO3pQ4rS5tU6vW7X",
     "name": "Dimensional Anchor",
-    "type": "avant-augment",
+    "type": "augment",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Prevents dimensional displacement",
@@ -254,7 +254,7 @@
   {
     "_id": "yZ4aB5cD6eF7gH8I",
     "name": "Temporal Stabilizer",
-    "type": "avant-augment",
+    "type": "augment",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Protects against temporal effects",

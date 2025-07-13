@@ -2,7 +2,7 @@
   {
     "_id": "wEF8HFrplLzdLBBm",
     "name": "Auditory",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "sense-traits",
@@ -17,7 +17,7 @@
   {
     "_id": "rMqLVNpsMs5C2odg",
     "name": "Gustatory",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "sense-traits",
@@ -32,7 +32,7 @@
   {
     "_id": "gWX0xtIAzZfCvy8A",
     "name": "Olfactory",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "sense-traits",
@@ -47,7 +47,7 @@
   {
     "_id": "X3sleANXtZEhj4nn",
     "name": "Tactile",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "sense-traits",
@@ -62,7 +62,7 @@
   {
     "_id": "FctnGpi9IHfPv4kE",
     "name": "Visual",
-    "type": "avant-trait",
+    "type": "trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "sense-traits",
