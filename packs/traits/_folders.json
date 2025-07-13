@@ -2,7 +2,7 @@
   {
     "_id": "DINlARhfvdKa8Ekp",
     "name": "Ancestry Traits",
-    "type": "Folder",
+    "type": "Item",
     "description": "Traits that define character ancestry and heritage",
     "color": "#8B4513",
     "folder": null,
@@ -17,7 +17,7 @@
   {
     "_id": "ewUKFlr9RL7Wzt0U",
     "name": "Conditional Traits",
-    "type": "Folder",
+    "type": "Item",
     "description": "Traits that apply under specific conditions",
     "color": "#FFC107",
     "folder": null,
@@ -32,7 +32,7 @@
   {
     "_id": "pMHGr9PUTs755Lx5",
     "name": "Creature Traits",
-    "type": "Folder",
+    "type": "Item",
     "description": "Traits that define creature types and characteristics",
     "color": "#6F42C1",
     "folder": null,
@@ -47,7 +47,7 @@
   {
     "_id": "dEGTOkKorHOcE93S",
     "name": "Culture Traits",
-    "type": "Folder",
+    "type": "Item",
     "description": "Traits that represent cultural backgrounds and traditions",
     "color": "#17A2B8",
     "folder": null,
@@ -62,7 +62,7 @@
   {
     "_id": "eh1FHUVEieJjGzmD",
     "name": "Elemental & Energy",
-    "type": "Folder",
+    "type": "Item",
     "description": "Traits related to elemental forces and energy types",
     "color": "#FF6B6B",
     "folder": null,
@@ -77,7 +77,7 @@
   {
     "_id": "2ai6CmtoUn1KtGXO",
     "name": "Gear Traits",
-    "type": "Folder",
+    "type": "Item",
     "description": "Traits that apply to equipment and gear",
     "color": "#6C757D",
     "folder": null,
@@ -92,7 +92,7 @@
   {
     "_id": "uEn7XVIMfv77Sd9x",
     "name": "Hazard Traits",
-    "type": "Folder",
+    "type": "Item",
     "description": "Traits that define environmental hazards and dangers",
     "color": "#DC3545",
     "folder": null,
@@ -107,7 +107,7 @@
   {
     "_id": "fmRygluovFW0OZX2",
     "name": "Magic Traits",
-    "type": "Folder",
+    "type": "Item",
     "description": "Traits related to magical effects and spellcasting",
     "color": "#8B5CF6",
     "folder": null,
@@ -122,7 +122,7 @@
   {
     "_id": "ZuMoxONEA3iORtKN",
     "name": "Mechanics Traits",
-    "type": "Folder",
+    "type": "Item",
     "description": "Traits that define game mechanics and rules interactions",
     "color": "#007BFF",
     "folder": null,
@@ -137,7 +137,7 @@
   {
     "_id": "2yy2chwKBpT2o6Pq",
     "name": "Poison Traits",
-    "type": "Folder",
+    "type": "Item",
     "description": "Traits related to poisons and toxic effects",
     "color": "#28A745",
     "folder": null,
@@ -152,7 +152,7 @@
   {
     "_id": "lH4iqTPOfgbhGP6L",
     "name": "Sense Traits",
-    "type": "Folder",
+    "type": "Item",
     "description": "Traits that enhance or modify sensory capabilities",
     "color": "#FD7E14",
     "folder": null,
@@ -167,7 +167,7 @@
   {
     "_id": "qAmjybtpATGylZfg",
     "name": "Vocation Traits",
-    "type": "Folder",
+    "type": "Item",
     "description": "Traits that represent professional skills and occupations",
     "color": "#20C997",
     "folder": null,
