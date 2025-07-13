@@ -1,0 +1,332 @@
+[
+  {
+    "_id": "uBPp69FqxrGrYLKJ",
+    "name": "Antherum",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "folder": "DINlARhfvdKa8Ekp",
+    "system": {
+      "category": "ancestry-traits",
+      "color": "#FF6B9D",
+      "icon": "fas fa-users",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Antherum"
+    },
+    "sort": 100
+  },
+  {
+    "_id": "KdY9D2Lpx9tgV3Bm",
+    "name": "Cambion",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "ancestry-traits",
+      "color": "#FF6B9D",
+      "icon": "fas fa-users",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Cambion"
+    },
+    "sort": 200,
+    "folder": "DINlARhfvdKa8Ekp"
+  },
+  {
+    "_id": "SLVZl106hluMx1br",
+    "name": "Draycid",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "ancestry-traits",
+      "color": "#FF6B9D",
+      "icon": "fas fa-users",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Draycid"
+    },
+    "sort": 300,
+    "folder": "DINlARhfvdKa8Ekp"
+  },
+  {
+    "_id": "2hH93iR1MLWNAcCt",
+    "name": "Dworg",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "ancestry-traits",
+      "color": "#FF6B9D",
+      "icon": "fas fa-users",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Dworg"
+    },
+    "sort": 400,
+    "folder": "DINlARhfvdKa8Ekp"
+  },
+  {
+    "_id": "C14JPLsUQ8C7mPxJ",
+    "name": "Elf",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "ancestry-traits",
+      "color": "#FF6B9D",
+      "icon": "fas fa-users",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Elf"
+    },
+    "sort": 500,
+    "folder": "DINlARhfvdKa8Ekp"
+  },
+  {
+    "_id": "GaOGF9eTL7FedLtI",
+    "name": "Exive",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "ancestry-traits",
+      "color": "#FF6B9D",
+      "icon": "fas fa-users",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Exive"
+    },
+    "sort": 600,
+    "folder": "DINlARhfvdKa8Ekp"
+  },
+  {
+    "_id": "ohN59UEfmXTlFIgy",
+    "name": "Fairy",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "ancestry-traits",
+      "color": "#FF6B9D",
+      "icon": "fas fa-users",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Fairy"
+    },
+    "sort": 700,
+    "folder": "DINlARhfvdKa8Ekp"
+  },
+  {
+    "_id": "fP2YeOzEEbFA4bAr",
+    "name": "Fignette",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "ancestry-traits",
+      "color": "#FF6B9D",
+      "icon": "fas fa-users",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Fignette"
+    },
+    "sort": 800,
+    "folder": "DINlARhfvdKa8Ekp"
+  },
+  {
+    "_id": "Gt9BiqFMZztYI20d",
+    "name": "Goblin",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "ancestry-traits",
+      "color": "#FF6B9D",
+      "icon": "fas fa-users",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Goblin"
+    },
+    "sort": 900,
+    "folder": "DINlARhfvdKa8Ekp"
+  },
+  {
+    "_id": "i0dfGAVI6tny8xmT",
+    "name": "Human",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "ancestry-traits",
+      "color": "#FF6B9D",
+      "icon": "fas fa-users",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Human"
+    },
+    "sort": 1000,
+    "folder": "DINlARhfvdKa8Ekp"
+  },
+  {
+    "_id": "2Vf9gqi7yaTMJYdP",
+    "name": "Hybrid",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "ancestry-traits",
+      "color": "#FF6B9D",
+      "icon": "fas fa-users",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Hybrid"
+    },
+    "sort": 1100,
+    "folder": "DINlARhfvdKa8Ekp"
+  },
+  {
+    "_id": "q3Q2jp3zJOn9ghDR",
+    "name": "Kryon",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "ancestry-traits",
+      "color": "#FF6B9D",
+      "icon": "fas fa-users",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Kryon"
+    },
+    "sort": 1200,
+    "folder": "DINlARhfvdKa8Ekp"
+  },
+  {
+    "_id": "wYwQBMJaMCGmLTT7",
+    "name": "Lux",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "ancestry-traits",
+      "color": "#FF6B9D",
+      "icon": "fas fa-users",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Lux"
+    },
+    "sort": 1300,
+    "folder": "DINlARhfvdKa8Ekp"
+  },
+  {
+    "_id": "O1iJpdIMwyRCE72y",
+    "name": "Mocro",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "ancestry-traits",
+      "color": "#FF6B9D",
+      "icon": "fas fa-users",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Mocro"
+    },
+    "sort": 1400,
+    "folder": "DINlARhfvdKa8Ekp"
+  },
+  {
+    "_id": "CSvFyqXHqxbFDLez",
+    "name": "Nephilim",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "ancestry-traits",
+      "color": "#FF6B9D",
+      "icon": "fas fa-users",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Nephilim"
+    },
+    "sort": 1500,
+    "folder": "DINlARhfvdKa8Ekp"
+  },
+  {
+    "_id": "tTTxed12PG8JAQnq",
+    "name": "Oaf",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "ancestry-traits",
+      "color": "#FF6B9D",
+      "icon": "fas fa-users",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Oaf"
+    },
+    "sort": 1600,
+    "folder": "DINlARhfvdKa8Ekp"
+  },
+  {
+    "_id": "coDkimppVMXQB27O",
+    "name": "Orc",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "ancestry-traits",
+      "color": "#FF6B9D",
+      "icon": "fas fa-users",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Orc"
+    },
+    "sort": 1700,
+    "folder": "DINlARhfvdKa8Ekp"
+  },
+  {
+    "_id": "XOGZszaZZvzvsDW9",
+    "name": "Shari",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "ancestry-traits",
+      "color": "#FF6B9D",
+      "icon": "fas fa-users",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Shari"
+    },
+    "sort": 1800,
+    "folder": "DINlARhfvdKa8Ekp"
+  },
+  {
+    "_id": "yFSHSQkjSYMpWrr1",
+    "name": "Stoich",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "ancestry-traits",
+      "color": "#FF6B9D",
+      "icon": "fas fa-users",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Stoich"
+    },
+    "sort": 1900,
+    "folder": "DINlARhfvdKa8Ekp"
+  },
+  {
+    "_id": "HIRIhAWt9MxeQz3q",
+    "name": "Vivan",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "ancestry-traits",
+      "color": "#FF6B9D",
+      "icon": "fas fa-users",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Vivan"
+    },
+    "sort": 2000,
+    "folder": "DINlARhfvdKa8Ekp"
+  },
+  {
+    "_id": "s2RWLw90l6wwJepo",
+    "name": "Wyrd",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "ancestry-traits",
+      "color": "#FF6B9D",
+      "icon": "fas fa-users",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Wyrd"
+    },
+    "sort": 2100,
+    "folder": "DINlARhfvdKa8Ekp"
+  },
+  {
+    "_id": "E6AjxLm5MCNLCgvs",
+    "name": "Yotun",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "ancestry-traits",
+      "color": "#FF6B9D",
+      "icon": "fas fa-users",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Yotun"
+    },
+    "sort": 2200,
+    "folder": "DINlARhfvdKa8Ekp"
+  }
+]

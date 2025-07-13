@@ -1,0 +1,272 @@
+[
+  {
+    "_id": "aB1cD2eF3gH4iJ5K",
+    "name": "Neural Interface",
+    "type": "augment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Direct neural connection to computer systems",
+      "cost": 5000,
+      "installation": "Requires surgery",
+      "traits": [
+        "LGgzEItGDbSJiH55",
+        "xFmSV2ZXlTnNhnPS",
+        "tzd1cp95Ky6B29T0"
+      ]
+    },
+    "sort": 100,
+    "folder": "IeDD6QgMPsyEwWZq"
+  },
+  {
+    "_id": "lM6nO7pQ8rS9tU0V",
+    "name": "Cyber Eyes",
+    "type": "augment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Enhanced vision with zoom and night vision",
+      "cost": 3000,
+      "installation": "Requires optical surgery",
+      "traits": [
+        "LGgzEItGDbSJiH55",
+        "xFmSV2ZXlTnNhnPS",
+        "0VuoqlxYRKVkkZFO"
+      ]
+    },
+    "sort": 200,
+    "folder": "IeDD6QgMPsyEwWZq"
+  },
+  {
+    "_id": "wX1yZ2aB3cD4eF5G",
+    "name": "Subdermal Armor",
+    "type": "augment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Protective plating beneath the skin",
+      "cost": 8000,
+      "installation": "Requires extensive surgery",
+      "traits": [
+        "LGgzEItGDbSJiH55",
+        "xFmSV2ZXlTnNhnPS",
+        "3TkL6wKzNhMpRtS3"
+      ]
+    },
+    "sort": 300,
+    "folder": "IeDD6QgMPsyEwWZq"
+  },
+  {
+    "_id": "hI6jK7lM8nO9pQ0R",
+    "name": "Reflex Boosters",
+    "type": "augment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Enhanced reaction time and speed",
+      "cost": 6000,
+      "installation": "Requires nervous system modification",
+      "traits": [
+        "LGgzEItGDbSJiH55",
+        "xFmSV2ZXlTnNhnPS",
+        "22N0YjYYbXJ7tuHj"
+      ]
+    },
+    "sort": 400,
+    "folder": "IeDD6QgMPsyEwWZq"
+  },
+  {
+    "_id": "sT2uV3wX4yZ5aB6C",
+    "name": "Data Jack",
+    "type": "augment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Direct data connection port",
+      "cost": 2000,
+      "installation": "Minor surgical procedure",
+      "traits": [
+        "LGgzEItGDbSJiH55",
+        "xFmSV2ZXlTnNhnPS",
+        "tzd1cp95Ky6B29T0"
+      ]
+    },
+    "sort": 500,
+    "folder": "IeDD6QgMPsyEwWZq"
+  },
+  {
+    "_id": "dE7fG8hI9jK0lM1N",
+    "name": "Enhanced Muscles",
+    "type": "augment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Genetically enhanced muscle fibers",
+      "cost": 4000,
+      "installation": "Requires genetic therapy",
+      "traits": [
+        "LGgzEItGDbSJiH55",
+        "xFmSV2ZXlTnNhnPS",
+        "3TkL6wKzNhMpRtS3"
+      ]
+    },
+    "sort": 100,
+    "folder": "9YcpYWhnEAS7TdaP"
+  },
+  {
+    "_id": "oP4qR5sT6uV7wX8Y",
+    "name": "Toxin Filters",
+    "type": "augment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Biological filters for poison resistance",
+      "cost": 3500,
+      "installation": "Requires organ modification",
+      "traits": [
+        "LGgzEItGDbSJiH55",
+        "xFmSV2ZXlTnNhnPS",
+        "lOIFXcPpEzc6ZJxU"
+      ]
+    },
+    "sort": 200,
+    "folder": "9YcpYWhnEAS7TdaP"
+  },
+  {
+    "_id": "zA9bC0dE1fG2hI3J",
+    "name": "Regenerative Cells",
+    "type": "augment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Enhanced healing and recovery",
+      "cost": 7000,
+      "installation": "Requires cellular modification",
+      "traits": [
+        "LGgzEItGDbSJiH55",
+        "xFmSV2ZXlTnNhnPS",
+        "0VuoqlxYRKVkkZFO"
+      ]
+    },
+    "sort": 300,
+    "folder": "9YcpYWhnEAS7TdaP"
+  },
+  {
+    "_id": "kL4mN5oP6qR7sT8U",
+    "name": "Adaptive Skin",
+    "type": "augment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Skin that adapts to environmental conditions",
+      "cost": 5500,
+      "installation": "Requires dermal modification",
+      "traits": [
+        "LGgzEItGDbSJiH55",
+        "xFmSV2ZXlTnNhnPS",
+        "ewUKFlr9RL7Wzt0U"
+      ]
+    },
+    "sort": 400,
+    "folder": "9YcpYWhnEAS7TdaP"
+  },
+  {
+    "_id": "vW9xY0zA1bC2dE3F",
+    "name": "Pheromone Glands",
+    "type": "augment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Biological pheromone production for influence",
+      "cost": 4500,
+      "installation": "Requires glandular modification",
+      "traits": [
+        "LGgzEItGDbSJiH55",
+        "xFmSV2ZXlTnNhnPS",
+        "lOIFXcPpEzc6ZJxU"
+      ]
+    },
+    "sort": 500,
+    "folder": "9YcpYWhnEAS7TdaP"
+  },
+  {
+    "_id": "gH6iJ7kL8mN9oP0Q",
+    "name": "Quantum Processor",
+    "type": "augment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Advanced quantum computing implant",
+      "cost": 12000,
+      "installation": "Requires specialized facility",
+      "traits": [
+        "LGgzEItGDbSJiH55",
+        "xFmSV2ZXlTnNhnPS",
+        "tzd1cp95Ky6B29T0"
+      ]
+    },
+    "sort": 100,
+    "folder": "Wbw6bxHqyGdJkN4P"
+  },
+  {
+    "_id": "rS1tU2vW3xY4zA5B",
+    "name": "Plasma Conduits",
+    "type": "augment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Internal energy distribution system",
+      "cost": 9000,
+      "installation": "Requires energy system integration",
+      "traits": [
+        "LGgzEItGDbSJiH55",
+        "xFmSV2ZXlTnNhnPS",
+        "eoBL454MnKXSQFjY"
+      ]
+    },
+    "sort": 200,
+    "folder": "Wbw6bxHqyGdJkN4P"
+  },
+  {
+    "_id": "cD8eF9gH0iJ1kL2M",
+    "name": "Metamorphic Tissue",
+    "type": "augment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Tissue that can change form and function",
+      "cost": 15000,
+      "installation": "Requires advanced bioengineering",
+      "traits": [
+        "LGgzEItGDbSJiH55",
+        "xFmSV2ZXlTnNhnPS",
+        "0VuoqlxYRKVkkZFO"
+      ]
+    },
+    "sort": 300,
+    "folder": "Wbw6bxHqyGdJkN4P"
+  },
+  {
+    "_id": "nO3pQ4rS5tU6vW7X",
+    "name": "Dimensional Anchor",
+    "type": "augment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Prevents dimensional displacement",
+      "cost": 11000,
+      "installation": "Requires dimensional technology",
+      "traits": [
+        "LGgzEItGDbSJiH55",
+        "xFmSV2ZXlTnNhnPS",
+        "tzd1cp95Ky6B29T0"
+      ]
+    },
+    "sort": 400,
+    "folder": "Wbw6bxHqyGdJkN4P"
+  },
+  {
+    "_id": "yZ4aB5cD6eF7gH8I",
+    "name": "Temporal Stabilizer",
+    "type": "augment",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Protects against temporal effects",
+      "cost": 13000,
+      "installation": "Requires temporal shielding",
+      "traits": [
+        "LGgzEItGDbSJiH55",
+        "xFmSV2ZXlTnNhnPS",
+        "tzd1cp95Ky6B29T0"
+      ]
+    },
+    "sort": 500,
+    "folder": "Wbw6bxHqyGdJkN4P"
+  }
+]

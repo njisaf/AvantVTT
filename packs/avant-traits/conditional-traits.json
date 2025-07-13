@@ -1,0 +1,107 @@
+[
+  {
+    "_id": "AZUuqJpQsRqwSI1A",
+    "name": "Buff",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "conditional-traits",
+      "color": "#4ECDC4",
+      "icon": "fas fa-exchange-alt",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Buff"
+    },
+    "sort": 100,
+    "folder": "ewUKFlr9RL7Wzt0U"
+  },
+  {
+    "_id": "YfqADB6clKL1hvmE",
+    "name": "Debuff",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "conditional-traits",
+      "color": "#4ECDC4",
+      "icon": "fas fa-exchange-alt",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Debuff"
+    },
+    "sort": 200,
+    "folder": "ewUKFlr9RL7Wzt0U"
+  },
+  {
+    "_id": "ICXYTj9zbuvPGpbs",
+    "name": "Death",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "conditional-traits",
+      "color": "#4ECDC4",
+      "icon": "fas fa-exchange-alt",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Death"
+    },
+    "sort": 300,
+    "folder": "ewUKFlr9RL7Wzt0U"
+  },
+  {
+    "_id": "bPPUImvJG64M0pJz",
+    "name": "Morale",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "conditional-traits",
+      "color": "#4ECDC4",
+      "icon": "fas fa-exchange-alt",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Morale"
+    },
+    "sort": 400,
+    "folder": "ewUKFlr9RL7Wzt0U"
+  },
+  {
+    "_id": "dnJGBhHJdNqvNLVM",
+    "name": "Physical",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "conditional-traits",
+      "color": "#4ECDC4",
+      "icon": "fas fa-exchange-alt",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Physical"
+    },
+    "sort": 500,
+    "folder": "ewUKFlr9RL7Wzt0U"
+  },
+  {
+    "_id": "S8ERpKXzAVEncX1e",
+    "name": "Position",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "conditional-traits",
+      "color": "#4ECDC4",
+      "icon": "fas fa-exchange-alt",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Position"
+    },
+    "sort": 600,
+    "folder": "ewUKFlr9RL7Wzt0U"
+  },
+  {
+    "_id": "4uNy8ImDeUESqdl2",
+    "name": "Sense",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "conditional-traits",
+      "color": "#4ECDC4",
+      "icon": "fas fa-exchange-alt",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Sense"
+    },
+    "sort": 700,
+    "folder": "ewUKFlr9RL7Wzt0U"
+  }
+]

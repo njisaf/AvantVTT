@@ -1,0 +1,11 @@
+{
+  "name": "Export Custom Traits",
+  "type": "script",
+  "command": "/**\n * Export Custom Traits Macro\n * Exports only custom/world traits (excludes system built-ins)\n */\n\nconsole.log('🔄 Starting custom trait export...');\n\n// Get TraitProvider\nlet traitProvider = game?.avant?.initializationManager?.getService('traitProvider');\n\nif (!traitProvider) {\n  ui.notifications.error('TraitProvider not found. Please ensure the system is loaded.');\n  return;\n}\n\ntry {\n  // Get all traits and filter for custom ones\n  const allTraits = await traitProvider.getAllTraits();\n  const customTraits = allTraits.filter(trait => \n    trait.source !== 'system' && \n    !trait.localKey?.startsWith('AVANT.Trait.')\n  );\n  \n  if (customTraits.length === 0) {\n    ui.notifications.warn('No custom traits found to export.');\n    return;\n  }\n  \n  // Create export data\n  const exportData = {\n    version: '1.0.0',\n    system: 'avant',\n    type: 'traits',\n    timestamp: new Date().toISOString(),\n    traits: customTraits\n  };\n  \n  // Download as JSON\n  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });\n  const url = URL.createObjectURL(blob);\n  const a = document.createElement('a');\n  a.href = url;\n  a.download = `custom-traits-${new Date().toISOString().split('T')[0]}.json`;\n  a.click();\n  URL.revokeObjectURL(url);\n  \n  console.log(`✅ Export complete: ${customTraits.length} custom traits`);\n  ui.notifications.info(`Successfully exported ${customTraits.length} custom traits!`);\n  \n} catch (error) {\n  console.error('❌ Export failed:', error);\n  ui.notifications.error(`Export failed: ${error.message}`);\n}",
+  "img": "icons/svg/download.svg",
+  "folder": "07NQ1aYKh4kiti9l",
+  "sort": 100,
+  "flags": {},
+  "_id": "WtgSxN2tuGMQBDVJ",
+  "category": "utility"
+}

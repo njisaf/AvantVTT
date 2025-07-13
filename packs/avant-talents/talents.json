@@ -1,0 +1,288 @@
+[
+  {
+    "_id": "FZr4H1i9jLuGCJP6",
+    "name": "Fireball",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Launch a devastating fireball at your enemies",
+      "cost": 3,
+      "range": "60 feet",
+      "damage": "3d6",
+      "traits": [
+        "lOIFXcPpEzc6ZJxU",
+        "eoBL454MnKXSQFjY",
+        "tzd1cp95Ky6B29T0",
+        "RcBG8LQNhJXNfPzl"
+      ]
+    },
+    "sort": 100,
+    "folder": "w5IIR14XUz1m2lXz"
+  },
+  {
+    "_id": "dH8pQ2mNvKwYxE7A",
+    "name": "Lightning Bolt",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Strike enemies with a bolt of lightning",
+      "cost": 2,
+      "range": "100 feet",
+      "damage": "2d8",
+      "traits": [
+        "BVQw1xKzNhMpRtS3",
+        "tzd1cp95Ky6B29T0",
+        "RcBG8LQNhJXNfPzl"
+      ]
+    },
+    "sort": 200,
+    "folder": "w5IIR14XUz1m2lXz"
+  },
+  {
+    "_id": "kL9tR3nBvCwZxF2D",
+    "name": "Acid Splash",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Spray acid at nearby enemies",
+      "cost": 1,
+      "range": "30 feet",
+      "damage": "1d4",
+      "traits": [
+        "lOIFXcPpEzc6ZJxU",
+        "tzd1cp95Ky6B29T0",
+        "RcBG8LQNhJXNfPzl"
+      ]
+    },
+    "sort": 300,
+    "folder": "w5IIR14XUz1m2lXz"
+  },
+  {
+    "_id": "mP4sT7nEwDxZyG5H",
+    "name": "Ice Shield",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Create a protective shield of ice",
+      "cost": 2,
+      "range": "Self",
+      "damage": "0",
+      "traits": [
+        "T6jQ8wKzNhMpRtS3",
+        "tzd1cp95Ky6B29T0",
+        "LGgzEItGDbSJiH55"
+      ]
+    },
+    "sort": 100,
+    "folder": "kAFP51DgdgSxtQ1I"
+  },
+  {
+    "_id": "nQ5uU8oFxEyAzH6I",
+    "name": "Stone Skin",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Harden your skin like stone for protection",
+      "cost": 3,
+      "range": "Self",
+      "damage": "0",
+      "traits": [
+        "3TkL6wKzNhMpRtS3",
+        "tzd1cp95Ky6B29T0",
+        "LGgzEItGDbSJiH55"
+      ]
+    },
+    "sort": 200,
+    "folder": "kAFP51DgdgSxtQ1I"
+  },
+  {
+    "_id": "oR6vV9pGyFzBaI7J",
+    "name": "Healing Light",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Channel healing energy to restore health",
+      "cost": 2,
+      "range": "Touch",
+      "damage": "2d4+2",
+      "traits": [
+        "tzd1cp95Ky6B29T0",
+        "LGgzEItGDbSJiH55",
+        "0VuoqlxYRKVkkZFO"
+      ]
+    },
+    "sort": 300,
+    "folder": "kAFP51DgdgSxtQ1I"
+  },
+  {
+    "_id": "pS7wW0qHzGaDbJ8K",
+    "name": "Teleport",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Instantly transport yourself to another location",
+      "cost": 4,
+      "range": "500 feet",
+      "damage": "0",
+      "traits": [
+        "tzd1cp95Ky6B29T0",
+        "RcBG8LQNhJXNfPzl",
+        "xFmSV2ZXlTnNhnPS"
+      ]
+    },
+    "sort": 100,
+    "folder": "JUxm0qrSAGcEiL9N"
+  },
+  {
+    "_id": "qT8xX1rIaHbEcK9L",
+    "name": "Invisibility",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Become invisible to enemies",
+      "cost": 3,
+      "range": "Self",
+      "damage": "0",
+      "traits": [
+        "tzd1cp95Ky6B29T0",
+        "0VuoqlxYRKVkkZFO",
+        "xFmSV2ZXlTnNhnPS"
+      ]
+    },
+    "sort": 200,
+    "folder": "JUxm0qrSAGcEiL9N"
+  },
+  {
+    "_id": "rU9yY2sJbIcFdL0M",
+    "name": "Detect Magic",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Sense magical auras and enchantments",
+      "cost": 1,
+      "range": "60 feet",
+      "damage": "0",
+      "traits": [
+        "tzd1cp95Ky6B29T0",
+        "0VuoqlxYRKVkkZFO",
+        "xFmSV2ZXlTnNhnPS"
+      ]
+    },
+    "sort": 300,
+    "folder": "JUxm0qrSAGcEiL9N"
+  },
+  {
+    "_id": "sV0zZ3tKcJdGeM1N",
+    "name": "Flight",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Gain the ability to fly through the air",
+      "cost": 5,
+      "range": "Self",
+      "damage": "0",
+      "traits": [
+        "22N0YjYYbXJ7tuHj",
+        "tzd1cp95Ky6B29T0",
+        "xFmSV2ZXlTnNhnPS"
+      ]
+    },
+    "sort": 400,
+    "folder": "JUxm0qrSAGcEiL9N"
+  },
+  {
+    "_id": "tW1aA4uLdKeHfN2O",
+    "name": "Mind Control",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Dominate the mind of your target",
+      "cost": 6,
+      "range": "30 feet",
+      "damage": "0",
+      "traits": [
+        "tzd1cp95Ky6B29T0",
+        "0VuoqlxYRKVkkZFO",
+        "xFmSV2ZXlTnNhnPS"
+      ]
+    },
+    "sort": 500,
+    "folder": "JUxm0qrSAGcEiL9N"
+  },
+  {
+    "_id": "uX2bB5vMeKfIgO3P",
+    "name": "Energy Drain",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Drain energy from your target to restore your own",
+      "cost": 4,
+      "range": "Touch",
+      "damage": "2d6",
+      "traits": [
+        "tzd1cp95Ky6B29T0",
+        "0VuoqlxYRKVkkZFO",
+        "xFmSV2ZXlTnNhnPS"
+      ]
+    },
+    "sort": 600,
+    "folder": "JUxm0qrSAGcEiL9N"
+  },
+  {
+    "_id": "vY3cC6wNfLgJhP4Q",
+    "name": "Shockwave",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Create a devastating shockwave that knocks down enemies",
+      "cost": 5,
+      "range": "30 feet radius",
+      "damage": "4d6",
+      "traits": [
+        "3TkL6wKzNhMpRtS3",
+        "tzd1cp95Ky6B29T0",
+        "RcBG8LQNhJXNfPzl"
+      ]
+    },
+    "sort": 400,
+    "folder": "w5IIR14XUz1m2lXz"
+  },
+  {
+    "_id": "wZ4dD7xOgMhKiQ5R",
+    "name": "Barrier",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Create a protective barrier to block attacks",
+      "cost": 3,
+      "range": "10 feet",
+      "damage": "0",
+      "traits": [
+        "tzd1cp95Ky6B29T0",
+        "LGgzEItGDbSJiH55",
+        "xFmSV2ZXlTnNhnPS"
+      ]
+    },
+    "sort": 400,
+    "folder": "kAFP51DgdgSxtQ1I"
+  },
+  {
+    "_id": "xA5eE8yPhNiLjR6S",
+    "name": "Time Stop",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "description": "Briefly stop time to act freely",
+      "cost": 8,
+      "range": "Self",
+      "damage": "0",
+      "traits": [
+        "tzd1cp95Ky6B29T0",
+        "0VuoqlxYRKVkkZFO",
+        "xFmSV2ZXlTnNhnPS"
+      ]
+    },
+    "sort": 700,
+    "folder": "JUxm0qrSAGcEiL9N"
+  }
+]

@@ -1,0 +1,50 @@
+[
+  {
+    "_id": "w5IIR14XUz1m2lXz",
+    "name": "Offensive",
+    "type": "Item",
+    "description": "Offensive talents for dealing damage and controlling enemies",
+    "color": "#FF5733",
+    "folder": null,
+    "sort": 100,
+    "sorting": "a",
+    "flags": {
+      "avant": {
+        "category": "offensive",
+        "version": "1.0.0"
+      }
+    }
+  },
+  {
+    "_id": "kAFP51DgdgSxtQ1I",
+    "name": "Defensive",
+    "type": "Item",
+    "description": "Defensive talents for protection and damage mitigation",
+    "color": "#33C3FF",
+    "folder": null,
+    "sort": 200,
+    "sorting": "a",
+    "flags": {
+      "avant": {
+        "category": "defensive",
+        "version": "1.0.0"
+      }
+    }
+  },
+  {
+    "_id": "3gH7iJ8kL9mN0pQ2",
+    "name": "Support",
+    "type": "Item",
+    "description": "Support talents for helping allies and providing utility",
+    "color": "#28A745",
+    "folder": null,
+    "sort": 300,
+    "sorting": "a",
+    "flags": {
+      "avant": {
+        "category": "support",
+        "version": "1.0.0"
+      }
+    }
+  }
+]

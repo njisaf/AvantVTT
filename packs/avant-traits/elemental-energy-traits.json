@@ -1,0 +1,212 @@
+[
+  {
+    "_id": "lOIFXcPpEzc6ZJxU",
+    "name": "Acid",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "elemental-energy-traits",
+      "color": "#F39C12",
+      "icon": "fas fa-burn",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Acid"
+    },
+    "sort": 100,
+    "folder": "eh1FHUVEieJjGzmD"
+  },
+  {
+    "_id": "22N0YjYYbXJ7tuHj",
+    "name": "Air",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "elemental-energy-traits",
+      "color": "#F39C12",
+      "icon": "fas fa-wind",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Air"
+    },
+    "sort": 200,
+    "folder": "eh1FHUVEieJjGzmD"
+  },
+  {
+    "_id": "nTcuzHTxYGlr76HK",
+    "name": "Cold",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "elemental-energy-traits",
+      "color": "#F39C12",
+      "icon": "fas fa-snowflake",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Cold"
+    },
+    "sort": 300,
+    "folder": "eh1FHUVEieJjGzmD"
+  },
+  {
+    "_id": "1WqJk29EiMwNtFWr",
+    "name": "Doom",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "elemental-energy-traits",
+      "color": "#F39C12",
+      "icon": "fas fa-bolt",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Doom"
+    },
+    "sort": 400,
+    "folder": "eh1FHUVEieJjGzmD"
+  },
+  {
+    "_id": "Zj7fQtiSkKwt35ZT",
+    "name": "Disease",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "elemental-energy-traits",
+      "color": "#F39C12",
+      "icon": "fas fa-virus",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Disease"
+    },
+    "sort": 500,
+    "folder": "eh1FHUVEieJjGzmD"
+  },
+  {
+    "_id": "6wsOxqq80BEXtCuy",
+    "name": "Earth",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "elemental-energy-traits",
+      "color": "#F39C12",
+      "icon": "fas fa-mountain",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Earth"
+    },
+    "sort": 600,
+    "folder": "eh1FHUVEieJjGzmD"
+  },
+  {
+    "_id": "Q50h8SgD7YeLBwD7",
+    "name": "Fire",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "elemental-energy-traits",
+      "color": "#F39C12",
+      "icon": "fas fa-fire",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Fire"
+    },
+    "sort": 700,
+    "folder": "eh1FHUVEieJjGzmD"
+  },
+  {
+    "_id": "n1Yq9PqBqzNv9RtQ",
+    "name": "Lightning",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "elemental-energy-traits",
+      "color": "#F39C12",
+      "icon": "fas fa-bolt",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Lightning"
+    },
+    "sort": 800,
+    "folder": "eh1FHUVEieJjGzmD"
+  },
+  {
+    "_id": "yZZSt8JnYSeZDftS",
+    "name": "Metal",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "elemental-energy-traits",
+      "color": "#F39C12",
+      "icon": "fas fa-bolt",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Metal"
+    },
+    "sort": 900,
+    "folder": "eh1FHUVEieJjGzmD"
+  },
+  {
+    "_id": "FTDVGDVuNQOT4uVR",
+    "name": "Poison",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "elemental-energy-traits",
+      "color": "#F39C12",
+      "icon": "fas fa-flask",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Poison"
+    },
+    "sort": 1000,
+    "folder": "eh1FHUVEieJjGzmD"
+  },
+  {
+    "_id": "tdEonp3Kk8hfeDSf",
+    "name": "Radiant",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "elemental-energy-traits",
+      "color": "#F39C12",
+      "icon": "fas fa-sun",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Radiant"
+    },
+    "sort": 1100,
+    "folder": "eh1FHUVEieJjGzmD"
+  },
+  {
+    "_id": "kMQJO0ENUjJidIK1",
+    "name": "Thunder",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "elemental-energy-traits",
+      "color": "#F39C12",
+      "icon": "fas fa-bolt",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Thunder"
+    },
+    "sort": 1200,
+    "folder": "eh1FHUVEieJjGzmD"
+  },
+  {
+    "_id": "nSb1JZQt2gOjc420",
+    "name": "Water",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "elemental-energy-traits",
+      "color": "#F39C12",
+      "icon": "fas fa-tint",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Water"
+    },
+    "sort": 1300,
+    "folder": "eh1FHUVEieJjGzmD"
+  },
+  {
+    "_id": "0fcOU0Ff4nTKr3yU",
+    "name": "Wood",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "elemental-energy-traits",
+      "color": "#F39C12",
+      "icon": "fas fa-tree",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Wood"
+    },
+    "sort": 1400,
+    "folder": "eh1FHUVEieJjGzmD"
+  }
+]

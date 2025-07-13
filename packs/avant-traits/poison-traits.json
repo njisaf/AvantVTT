@@ -1,0 +1,62 @@
+[
+  {
+    "_id": "nF7b16rpNv8uv3Lq",
+    "name": "Contact",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "poison-traits",
+      "color": "#27AE60",
+      "icon": "fas fa-flask",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Contact"
+    },
+    "sort": 100,
+    "folder": "2yy2chwKBpT2o6Pq"
+  },
+  {
+    "_id": "3C2wSTp2tBnIjv6B",
+    "name": "Ingested",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "poison-traits",
+      "color": "#27AE60",
+      "icon": "fas fa-flask",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Ingested"
+    },
+    "sort": 200,
+    "folder": "2yy2chwKBpT2o6Pq"
+  },
+  {
+    "_id": "xrBs8yLddloFlr7Q",
+    "name": "Inhaled",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "poison-traits",
+      "color": "#27AE60",
+      "icon": "fas fa-flask",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Inhaled"
+    },
+    "sort": 300,
+    "folder": "2yy2chwKBpT2o6Pq"
+  },
+  {
+    "_id": "YaMsvf2PjWnxzv5C",
+    "name": "Injury",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "poison-traits",
+      "color": "#27AE60",
+      "icon": "fas fa-flask",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Injury"
+    },
+    "sort": 400,
+    "folder": "2yy2chwKBpT2o6Pq"
+  }
+]

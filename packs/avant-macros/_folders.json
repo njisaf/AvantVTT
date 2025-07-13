@@ -1,0 +1,50 @@
+[
+  {
+    "_id": "wfyqaQLIpnIKBXdH",
+    "name": "Combat",
+    "type": "Macro",
+    "description": "Combat-related macros for battle management",
+    "color": "#E74C3C",
+    "folder": null,
+    "sort": 100,
+    "sorting": "a",
+    "flags": {
+      "avant": {
+        "category": "combat",
+        "version": "1.0.0"
+      }
+    }
+  },
+  {
+    "_id": "I2DxQGZe1f2TAtJc",
+    "name": "Utility",
+    "type": "Macro",
+    "description": "Utility macros for general game management",
+    "color": "#3498DB",
+    "folder": null,
+    "sort": 200,
+    "sorting": "a",
+    "flags": {
+      "avant": {
+        "category": "utility",
+        "version": "1.0.0"
+      }
+    }
+  },
+  {
+    "_id": "07NQ1aYKh4kiti9l",
+    "name": "Trait Management",
+    "type": "Macro",
+    "description": "Macros for managing and working with traits",
+    "color": "#F39C12",
+    "folder": null,
+    "sort": 300,
+    "sorting": "a",
+    "flags": {
+      "avant": {
+        "category": "trait-management",
+        "version": "1.0.0"
+      }
+    }
+  }
+]

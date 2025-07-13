@@ -1,0 +1,212 @@
+[
+  {
+    "_id": "LGgzEItGDbSJiH55",
+    "name": "Adept",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "gear-traits",
+      "color": "#8E44AD",
+      "icon": "fas fa-cog",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Adept"
+    },
+    "sort": 100,
+    "folder": "2ai6CmtoUn1KtGXO"
+  },
+  {
+    "_id": "xFmSV2ZXlTnNhnPS",
+    "name": "Alchemical",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "gear-traits",
+      "color": "#8E44AD",
+      "icon": "fas fa-flask",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Alchemical"
+    },
+    "sort": 200,
+    "folder": "2ai6CmtoUn1KtGXO"
+  },
+  {
+    "_id": "8VO3ilYkymQauCHO",
+    "name": "Bomb",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "gear-traits",
+      "color": "#8E44AD",
+      "icon": "fas fa-bomb",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Bomb"
+    },
+    "sort": 300,
+    "folder": "2ai6CmtoUn1KtGXO"
+  },
+  {
+    "_id": "tIX2JDq6fcUerFXx",
+    "name": "Bonded",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "gear-traits",
+      "color": "#8E44AD",
+      "icon": "fas fa-cog",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Bonded"
+    },
+    "sort": 400,
+    "folder": "2ai6CmtoUn1KtGXO"
+  },
+  {
+    "_id": "z9duCK4QCSJO09Wb",
+    "name": "Common",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "gear-traits",
+      "color": "#8E44AD",
+      "icon": "fas fa-cog",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Common"
+    },
+    "sort": 500,
+    "folder": "2ai6CmtoUn1KtGXO"
+  },
+  {
+    "_id": "6UvNKWT4gD3iUVWa",
+    "name": "Consumable",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "gear-traits",
+      "color": "#8E44AD",
+      "icon": "fas fa-apple-alt",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Consumable"
+    },
+    "sort": 600,
+    "folder": "2ai6CmtoUn1KtGXO"
+  },
+  {
+    "_id": "QC3kvf0mvP2kYzpR",
+    "name": "Epic",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "gear-traits",
+      "color": "#8E44AD",
+      "icon": "fas fa-crown",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Epic"
+    },
+    "sort": 700,
+    "folder": "2ai6CmtoUn1KtGXO"
+  },
+  {
+    "_id": "slcTvqxp8CzjH3JN",
+    "name": "Heavy",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "gear-traits",
+      "color": "#8E44AD",
+      "icon": "fas fa-weight-hanging",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Heavy"
+    },
+    "sort": 800,
+    "folder": "2ai6CmtoUn1KtGXO"
+  },
+  {
+    "_id": "lWK0rgnqSQud0hDU",
+    "name": "Mythic",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "gear-traits",
+      "color": "#8E44AD",
+      "icon": "fas fa-star",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Mythic"
+    },
+    "sort": 900,
+    "folder": "2ai6CmtoUn1KtGXO"
+  },
+  {
+    "_id": "czLGDGfDsA322TVh",
+    "name": "Nimble",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "gear-traits",
+      "color": "#8E44AD",
+      "icon": "fas fa-feather",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Nimble"
+    },
+    "sort": 1000,
+    "folder": "2ai6CmtoUn1KtGXO"
+  },
+  {
+    "_id": "ouAkGkwADgxd7gME",
+    "name": "Rare",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "gear-traits",
+      "color": "#8E44AD",
+      "icon": "fas fa-gem",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Rare"
+    },
+    "sort": 1100,
+    "folder": "2ai6CmtoUn1KtGXO"
+  },
+  {
+    "_id": "eS4szHZQpA3Grvus",
+    "name": "Reload",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "gear-traits",
+      "color": "#8E44AD",
+      "icon": "fas fa-redo",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Reload"
+    },
+    "sort": 1200,
+    "folder": "2ai6CmtoUn1KtGXO"
+  },
+  {
+    "_id": "IMZOusqnlcHfKROp",
+    "name": "Sentient",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "gear-traits",
+      "color": "#8E44AD",
+      "icon": "fas fa-brain",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Sentient"
+    },
+    "sort": 1300,
+    "folder": "2ai6CmtoUn1KtGXO"
+  },
+  {
+    "_id": "eFZLUf0X92YMyfcP",
+    "name": "Spiritual",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "gear-traits",
+      "color": "#8E44AD",
+      "icon": "fas fa-praying-hands",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Spiritual"
+    },
+    "sort": 1400,
+    "folder": "2ai6CmtoUn1KtGXO"
+  }
+]
