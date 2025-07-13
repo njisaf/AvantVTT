@@ -1,0 +1,182 @@
+[
+  {
+    "_id": "DINlARhfvdKa8Ekp",
+    "name": "Ancestry Traits",
+    "type": "Folder",
+    "description": "Traits that define character ancestry and heritage",
+    "color": "#8B4513",
+    "folder": null,
+    "sort": 100,
+    "sorting": "a",
+    "flags": {
+      "avant": {
+        "icon": "fas fa-users"
+      }
+    }
+  },
+  {
+    "_id": "ewUKFlr9RL7Wzt0U",
+    "name": "Conditional Traits",
+    "type": "Folder",
+    "description": "Traits that apply under specific conditions",
+    "color": "#FFC107",
+    "folder": null,
+    "sort": 200,
+    "sorting": "a",
+    "flags": {
+      "avant": {
+        "icon": "fas fa-exclamation-triangle"
+      }
+    }
+  },
+  {
+    "_id": "pMHGr9PUTs755Lx5",
+    "name": "Creature Traits",
+    "type": "Folder",
+    "description": "Traits that define creature types and characteristics",
+    "color": "#6F42C1",
+    "folder": null,
+    "sort": 300,
+    "sorting": "a",
+    "flags": {
+      "avant": {
+        "icon": "fas fa-dragon"
+      }
+    }
+  },
+  {
+    "_id": "dEGTOkKorHOcE93S",
+    "name": "Culture Traits",
+    "type": "Folder",
+    "description": "Traits that represent cultural backgrounds and traditions",
+    "color": "#17A2B8",
+    "folder": null,
+    "sort": 400,
+    "sorting": "a",
+    "flags": {
+      "avant": {
+        "icon": "fas fa-globe"
+      }
+    }
+  },
+  {
+    "_id": "eh1FHUVEieJjGzmD",
+    "name": "Elemental & Energy",
+    "type": "Folder",
+    "description": "Traits related to elemental forces and energy types",
+    "color": "#FF6B6B",
+    "folder": null,
+    "sort": 500,
+    "sorting": "a",
+    "flags": {
+      "avant": {
+        "icon": "fas fa-fire"
+      }
+    }
+  },
+  {
+    "_id": "2ai6CmtoUn1KtGXO",
+    "name": "Gear Traits",
+    "type": "Folder",
+    "description": "Traits that apply to equipment and gear",
+    "color": "#6C757D",
+    "folder": null,
+    "sort": 600,
+    "sorting": "a",
+    "flags": {
+      "avant": {
+        "icon": "fas fa-cog"
+      }
+    }
+  },
+  {
+    "_id": "uEn7XVIMfv77Sd9x",
+    "name": "Hazard Traits",
+    "type": "Folder",
+    "description": "Traits that define environmental hazards and dangers",
+    "color": "#DC3545",
+    "folder": null,
+    "sort": 700,
+    "sorting": "a",
+    "flags": {
+      "avant": {
+        "icon": "fas fa-skull-crossbones"
+      }
+    }
+  },
+  {
+    "_id": "fmRygluovFW0OZX2",
+    "name": "Magic Traits",
+    "type": "Folder",
+    "description": "Traits related to magical effects and spellcasting",
+    "color": "#8B5CF6",
+    "folder": null,
+    "sort": 800,
+    "sorting": "a",
+    "flags": {
+      "avant": {
+        "icon": "fas fa-magic"
+      }
+    }
+  },
+  {
+    "_id": "ZuMoxONEA3iORtKN",
+    "name": "Mechanics Traits",
+    "type": "Folder",
+    "description": "Traits that define game mechanics and rules interactions",
+    "color": "#007BFF",
+    "folder": null,
+    "sort": 900,
+    "sorting": "a",
+    "flags": {
+      "avant": {
+        "icon": "fas fa-dice-d20"
+      }
+    }
+  },
+  {
+    "_id": "2yy2chwKBpT2o6Pq",
+    "name": "Poison Traits",
+    "type": "Folder",
+    "description": "Traits related to poisons and toxic effects",
+    "color": "#28A745",
+    "folder": null,
+    "sort": 1000,
+    "sorting": "a",
+    "flags": {
+      "avant": {
+        "icon": "fas fa-flask"
+      }
+    }
+  },
+  {
+    "_id": "lH4iqTPOfgbhGP6L",
+    "name": "Sense Traits",
+    "type": "Folder",
+    "description": "Traits that enhance or modify sensory capabilities",
+    "color": "#FD7E14",
+    "folder": null,
+    "sort": 1100,
+    "sorting": "a",
+    "flags": {
+      "avant": {
+        "icon": "fas fa-eye"
+      }
+    }
+  },
+  {
+    "_id": "qAmjybtpATGylZfg",
+    "name": "Vocation Traits",
+    "type": "Folder",
+    "description": "Traits that represent professional skills and occupations",
+    "color": "#20C997",
+    "folder": null,
+    "sort": 1200,
+    "sorting": "a",
+    "flags": {
+      "avant": {
+        "icon": "fas fa-briefcase"
+      }
+    }
+  }
+]
