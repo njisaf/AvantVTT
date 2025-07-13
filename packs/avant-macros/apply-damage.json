@@ -1,6 +1,6 @@
 {
   "name": "Apply Damage",
-  "type": "script",
+  "type": "avant-macro",
   "scope": "global",
   "command": "/**\n * Apply Damage Macro\n * Apply damage to selected tokens\n */\n\nconst tokens = canvas.tokens.controlled;\n\nif (tokens.length === 0) {\n  ui.notifications.warn('Please select at least one token to damage.');\n  return;\n}\n\n// Prompt for damage amount\nconst damage = await new Promise((resolve) => {\n  new Dialog({\n    title: 'Apply Damage',\n    content: `\n      <div style=\"padding: 10px;\">\n        <p>Enter the amount of damage to apply:</p>\n        <input type=\"number\" id=\"damage-amount\" min=\"1\" max=\"100\" value=\"5\" style=\"width: 100%; margin: 10px 0;\">\n        <p><label><input type=\"checkbox\" id=\"ignore-armor\"> Ignore Armor</label></p>\n      </div>\n    `,\n    buttons: {\n      damage: {\n        label: 'Apply Damage',\n        callback: (html) => {\n          const amount = parseInt(html.find('#damage-amount').val()) || 5;\n          const ignoreArmor = html.find('#ignore-armor').is(':checked');\n          resolve({ amount, ignoreArmor });\n        }\n      },\n      cancel: {\n        label: 'Cancel',\n        callback: () => resolve(null)\n      }\n    },\n    default: 'damage'\n  }).render(true);\n});\n\nif (damage === null) return;\n\nconsole.log(`⚔️ Applying ${damage.amount} damage to ${tokens.length} token(s)...`);\n\nfor (const token of tokens) {\n  if (token.actor) {\n    try {\n      const currentHP = token.actor.system.health?.value || 0;\n      const armor = damage.ignoreArmor ? 0 : (token.actor.system.armor?.value || 0);\n      const actualDamage = Math.max(1, damage.amount - armor);\n      const newHP = Math.max(0, currentHP - actualDamage);\n      \n      await token.actor.update({\n        'system.health.value': newHP\n      });\n      \n      console.log(`✅ Damaged ${token.actor.name}: ${currentHP} → ${newHP} (${actualDamage} damage)`);\n      \n      // Visual feedback\n      canvas.interface.createScrollingText(token.center, `-${actualDamage}`, {\n        anchor: CONST.TEXT_ANCHOR_POINTS.CENTER,\n        direction: CONST.TEXT_ANCHOR_POINTS.TOP,\n        distance: 2 * token.h,\n        fontSize: 32,\n        fill: '#FF0000',\n        stroke: '#000000',\n        strokeThickness: 4,\n        jitter: 0.25\n      });\n      \n    } catch (error) {\n      console.error(`❌ Failed to damage ${token.actor.name}:`, error);\n    }\n  }\n}\n\nui.notifications.info(`Applied damage to ${tokens.length} token(s)!`);",
   "img": "icons/svg/sword.svg",
@@ -14,5 +14,10 @@
     }
   },
   "_id": "lrGXpQVHOTirksAc",
-  "category": "utility"
+  "category": "utility",
+  "system": {
+    "description": "Apply damage to selected tokens with armor calculation",
+    "version": "1.0.0",
+    "category": "combat"
+  }
 }

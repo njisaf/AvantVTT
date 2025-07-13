@@ -2,7 +2,7 @@
   {
     "_id": "Y36sHlZzOwYOn3si",
     "name": "Antebaler",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -17,7 +17,7 @@
   {
     "_id": "PtfdBMWEZ5NQXIKB",
     "name": "Accountant",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -32,7 +32,7 @@
   {
     "_id": "TmcYy5XC0a2zcBvv",
     "name": "Activist",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -47,7 +47,7 @@
   {
     "_id": "ajj84MROLBDnpZLA",
     "name": "Actor",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -62,7 +62,7 @@
   {
     "_id": "Uf8qr9LKe8nDGYxu",
     "name": "Analyst",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -77,7 +77,7 @@
   {
     "_id": "bUXB6D2t0Pjh18HO",
     "name": "Artist",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -92,7 +92,7 @@
   {
     "_id": "NSbPHGJQohYbdfeP",
     "name": "Chef",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -107,7 +107,7 @@
   {
     "_id": "Zx82S8L9IXsiw4w0",
     "name": "Clerk",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -122,7 +122,7 @@
   {
     "_id": "O3yOL45vuLDhI9WR",
     "name": "Dancer",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -137,7 +137,7 @@
   {
     "_id": "7YIVXiA42PFx8urd",
     "name": "Director",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -152,7 +152,7 @@
   {
     "_id": "wbVPKGCRkxzwuH4k",
     "name": "Driver",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -167,7 +167,7 @@
   {
     "_id": "h5ENP51tzP8nhOJj",
     "name": "Handyperson",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -182,7 +182,7 @@
   {
     "_id": "Q3yU9M56KvXsIsOB",
     "name": "Housekeeper",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -197,7 +197,7 @@
   {
     "_id": "8EZYi2cEKJPZypsn",
     "name": "HR Specialist",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -212,7 +212,7 @@
   {
     "_id": "TMPJFjLeKtOB1cVE",
     "name": "Labourer",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -227,7 +227,7 @@
   {
     "_id": "70vb21jRZNjcccAS",
     "name": "Landscaper",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -242,7 +242,7 @@
   {
     "_id": "FSNyzwW9Ty0Hf8xX",
     "name": "Lawyer",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -257,7 +257,7 @@
   {
     "_id": "kM8xh5OhGYNMTk4b",
     "name": "Magitek Administrator",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -272,7 +272,7 @@
   {
     "_id": "eVUfjzMpi0UqCCGv",
     "name": "Manager",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -287,7 +287,7 @@
   {
     "_id": "PbuncxRwtKYIs8ig",
     "name": "Medic",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -302,7 +302,7 @@
   {
     "_id": "ru5SUR1fR5LhOjfj",
     "name": "Musician",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -317,7 +317,7 @@
   {
     "_id": "kxULXhzHq6hwZRNr",
     "name": "Police Officer",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -332,7 +332,7 @@
   {
     "_id": "spYvQ56hUTocf3Jr",
     "name": "PR Specialist",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -347,7 +347,7 @@
   {
     "_id": "wuEOZOWm4YkgtQpC",
     "name": "Producer",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -362,7 +362,7 @@
   {
     "_id": "0NAdQu1RsytSYNyr",
     "name": "Receptionist",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -377,7 +377,7 @@
   {
     "_id": "rDNm6FNSQjBxytW2",
     "name": "Retailer",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -392,7 +392,7 @@
   {
     "_id": "798Ck5PJMOCSphaX",
     "name": "Salesperson",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -407,7 +407,7 @@
   {
     "_id": "8pT4uf4N97xwl7U0",
     "name": "Security Guard",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -422,7 +422,7 @@
   {
     "_id": "hOH46wbu8ZRtsmlk",
     "name": "Server",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -437,7 +437,7 @@
   {
     "_id": "vhJtOHyLg34wTb2D",
     "name": "Stocker",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -452,7 +452,7 @@
   {
     "_id": "lvzFlm85QiZRc93W",
     "name": "Support Servicer",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -467,7 +467,7 @@
   {
     "_id": "gtcUet0KatrU9hey",
     "name": "Teacher",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",
@@ -482,7 +482,7 @@
   {
     "_id": "yRC1kkYy7VObA9MK",
     "name": "Tradesperson",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "vocation-traits",

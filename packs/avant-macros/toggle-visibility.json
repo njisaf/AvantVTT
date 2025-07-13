@@ -1,6 +1,6 @@
 {
   "name": "Toggle Visibility",
-  "type": "script",
+  "type": "avant-macro",
   "scope": "global",
   "command": "/**\n * Toggle Visibility Macro\n * Toggle visibility of selected tokens\n */\n\nconst tokens = canvas.tokens.controlled;\n\nif (tokens.length === 0) {\n  ui.notifications.warn('Please select at least one token.');\n  return;\n}\n\nconsole.log(`👁️ Toggling visibility for ${tokens.length} token(s)...`);\n\nfor (const token of tokens) {\n  try {\n    const isHidden = token.document.hidden;\n    await token.document.update({ hidden: !isHidden });\n    \n    console.log(`✅ ${token.name}: ${isHidden ? 'visible' : 'hidden'}`);\n  } catch (error) {\n    console.error(`❌ Failed to toggle visibility for ${token.name}:`, error);\n  }\n}\n\nui.notifications.info(`Toggled visibility for ${tokens.length} token(s)!`);",
   "img": "icons/svg/eye.svg",
@@ -14,5 +14,10 @@
     }
   },
   "_id": "MkzxqimBKZ8Rzk7t",
-  "category": "utility"
+  "category": "utility",
+  "system": {
+    "description": "Toggle visibility of selected tokens",
+    "version": "1.0.0",
+    "category": "utility"
+  }
 }

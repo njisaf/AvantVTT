@@ -2,7 +2,7 @@
   {
     "_id": "FZr4H1i9jLuGCJP6",
     "name": "Fireball",
-    "type": "talent",
+    "type": "avant-talent",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Launch a devastating fireball at your enemies",
@@ -22,7 +22,7 @@
   {
     "_id": "dH8pQ2mNvKwYxE7A",
     "name": "Lightning Bolt",
-    "type": "talent",
+    "type": "avant-talent",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Strike enemies with a bolt of lightning",
@@ -41,7 +41,7 @@
   {
     "_id": "kL9tR3nBvCwZxF2D",
     "name": "Acid Splash",
-    "type": "talent",
+    "type": "avant-talent",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Spray acid at nearby enemies",
@@ -60,7 +60,7 @@
   {
     "_id": "mP4sT7nEwDxZyG5H",
     "name": "Ice Shield",
-    "type": "talent",
+    "type": "avant-talent",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Create a protective shield of ice",
@@ -79,7 +79,7 @@
   {
     "_id": "nQ5uU8oFxEyAzH6I",
     "name": "Stone Skin",
-    "type": "talent",
+    "type": "avant-talent",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Harden your skin like stone for protection",
@@ -98,7 +98,7 @@
   {
     "_id": "oR6vV9pGyFzBaI7J",
     "name": "Healing Light",
-    "type": "talent",
+    "type": "avant-talent",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Channel healing energy to restore health",
@@ -117,7 +117,7 @@
   {
     "_id": "pS7wW0qHzGaDbJ8K",
     "name": "Teleport",
-    "type": "talent",
+    "type": "avant-talent",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Instantly transport yourself to another location",
@@ -136,7 +136,7 @@
   {
     "_id": "qT8xX1rIaHbEcK9L",
     "name": "Invisibility",
-    "type": "talent",
+    "type": "avant-talent",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Become invisible to enemies",
@@ -155,7 +155,7 @@
   {
     "_id": "rU9yY2sJbIcFdL0M",
     "name": "Detect Magic",
-    "type": "talent",
+    "type": "avant-talent",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Sense magical auras and enchantments",
@@ -174,7 +174,7 @@
   {
     "_id": "sV0zZ3tKcJdGeM1N",
     "name": "Flight",
-    "type": "talent",
+    "type": "avant-talent",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Gain the ability to fly through the air",
@@ -193,7 +193,7 @@
   {
     "_id": "tW1aA4uLdKeHfN2O",
     "name": "Mind Control",
-    "type": "talent",
+    "type": "avant-talent",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Dominate the mind of your target",
@@ -212,7 +212,7 @@
   {
     "_id": "uX2bB5vMeKfIgO3P",
     "name": "Energy Drain",
-    "type": "talent",
+    "type": "avant-talent",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Drain energy from your target to restore your own",
@@ -231,7 +231,7 @@
   {
     "_id": "vY3cC6wNfLgJhP4Q",
     "name": "Shockwave",
-    "type": "talent",
+    "type": "avant-talent",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Create a devastating shockwave that knocks down enemies",
@@ -250,7 +250,7 @@
   {
     "_id": "wZ4dD7xOgMhKiQ5R",
     "name": "Barrier",
-    "type": "talent",
+    "type": "avant-talent",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Create a protective barrier to block attacks",
@@ -269,7 +269,7 @@
   {
     "_id": "xA5eE8yPhNiLjR6S",
     "name": "Time Stop",
-    "type": "talent",
+    "type": "avant-talent",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "description": "Briefly stop time to act freely",

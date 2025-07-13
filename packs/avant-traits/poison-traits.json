@@ -2,7 +2,7 @@
   {
     "_id": "nF7b16rpNv8uv3Lq",
     "name": "Contact",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "poison-traits",
@@ -17,7 +17,7 @@
   {
     "_id": "3C2wSTp2tBnIjv6B",
     "name": "Ingested",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "poison-traits",
@@ -32,7 +32,7 @@
   {
     "_id": "xrBs8yLddloFlr7Q",
     "name": "Inhaled",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "poison-traits",
@@ -47,7 +47,7 @@
   {
     "_id": "YaMsvf2PjWnxzv5C",
     "name": "Injury",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "poison-traits",

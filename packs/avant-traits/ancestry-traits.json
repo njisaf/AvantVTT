@@ -2,7 +2,7 @@
   {
     "_id": "uBPp69FqxrGrYLKJ",
     "name": "Antherum",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "folder": "DINlARhfvdKa8Ekp",
     "system": {
@@ -17,7 +17,7 @@
   {
     "_id": "KdY9D2Lpx9tgV3Bm",
     "name": "Cambion",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "ancestry-traits",
@@ -32,7 +32,7 @@
   {
     "_id": "SLVZl106hluMx1br",
     "name": "Draycid",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "ancestry-traits",
@@ -47,7 +47,7 @@
   {
     "_id": "2hH93iR1MLWNAcCt",
     "name": "Dworg",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "ancestry-traits",
@@ -62,7 +62,7 @@
   {
     "_id": "C14JPLsUQ8C7mPxJ",
     "name": "Elf",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "ancestry-traits",
@@ -77,7 +77,7 @@
   {
     "_id": "GaOGF9eTL7FedLtI",
     "name": "Exive",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "ancestry-traits",
@@ -92,7 +92,7 @@
   {
     "_id": "ohN59UEfmXTlFIgy",
     "name": "Fairy",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "ancestry-traits",
@@ -107,7 +107,7 @@
   {
     "_id": "fP2YeOzEEbFA4bAr",
     "name": "Fignette",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "ancestry-traits",
@@ -122,7 +122,7 @@
   {
     "_id": "Gt9BiqFMZztYI20d",
     "name": "Goblin",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "ancestry-traits",
@@ -137,7 +137,7 @@
   {
     "_id": "i0dfGAVI6tny8xmT",
     "name": "Human",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "ancestry-traits",
@@ -152,7 +152,7 @@
   {
     "_id": "2Vf9gqi7yaTMJYdP",
     "name": "Hybrid",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "ancestry-traits",
@@ -167,7 +167,7 @@
   {
     "_id": "q3Q2jp3zJOn9ghDR",
     "name": "Kryon",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "ancestry-traits",
@@ -182,7 +182,7 @@
   {
     "_id": "wYwQBMJaMCGmLTT7",
     "name": "Lux",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "ancestry-traits",
@@ -197,7 +197,7 @@
   {
     "_id": "O1iJpdIMwyRCE72y",
     "name": "Mocro",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "ancestry-traits",
@@ -212,7 +212,7 @@
   {
     "_id": "CSvFyqXHqxbFDLez",
     "name": "Nephilim",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "ancestry-traits",
@@ -227,7 +227,7 @@
   {
     "_id": "tTTxed12PG8JAQnq",
     "name": "Oaf",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "ancestry-traits",
@@ -242,7 +242,7 @@
   {
     "_id": "coDkimppVMXQB27O",
     "name": "Orc",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "ancestry-traits",
@@ -257,7 +257,7 @@
   {
     "_id": "XOGZszaZZvzvsDW9",
     "name": "Shari",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "ancestry-traits",
@@ -272,7 +272,7 @@
   {
     "_id": "yFSHSQkjSYMpWrr1",
     "name": "Stoich",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "ancestry-traits",
@@ -287,7 +287,7 @@
   {
     "_id": "HIRIhAWt9MxeQz3q",
     "name": "Vivan",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "ancestry-traits",
@@ -302,7 +302,7 @@
   {
     "_id": "s2RWLw90l6wwJepo",
     "name": "Wyrd",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "ancestry-traits",
@@ -317,7 +317,7 @@
   {
     "_id": "E6AjxLm5MCNLCgvs",
     "name": "Yotun",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "ancestry-traits",

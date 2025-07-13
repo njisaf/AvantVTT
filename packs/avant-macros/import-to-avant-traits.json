@@ -1,6 +1,6 @@
 {
   "name": "Import to Avant Traits",
-  "type": "script",
+  "type": "avant-macro",
   "scope": "global",
   "command": "/**\n * Import Traits Macro\n * Imports traits from JSON file with file dialog interface\n */\n\nconsole.log('🏷️ Starting trait import dialog...');\n\n// Create file input dialog\nnew Dialog({\n  title: 'Import Traits from JSON',\n  content: `\n    <div style=\"padding: 10px;\">\n      <p>Select a JSON file containing trait data to import:</p>\n      <input type=\"file\" id=\"trait-import-file\" accept=\".json\" style=\"width: 100%; margin: 10px 0;\">\n      <p><small>The file should contain an array of trait objects or an export from the Export Custom Traits macro.</small></p>\n    </div>\n  `,\n  buttons: {\n    import: {\n      label: 'Import',\n      callback: async (html) => {\n        const fileInput = html.find('#trait-import-file')[0];\n        const file = fileInput.files[0];\n        \n        if (!file) {\n          ui.notifications.warn('Please select a file to import.');\n          return;\n        }\n        \n        try {\n          const text = await file.text();\n          const data = JSON.parse(text);\n          \n          // Handle different import formats\n          let traitsToImport = [];\n          if (Array.isArray(data)) {\n            traitsToImport = data;\n          } else if (data.traits && Array.isArray(data.traits)) {\n            traitsToImport = data.traits;\n          } else {\n            throw new Error('Invalid file format. Expected array of traits or object with traits property.');\n          }\n          \n          // Ensure custom traits compendium exists\n          let customTraitsPack = game.packs.get('world.custom-traits');\n          if (!customTraitsPack) {\n            customTraitsPack = await CompendiumCollection.createCompendium({\n              type: 'Item',\n              label: 'Custom Traits',\n              name: 'custom-traits',\n              package: 'world',\n              private: false\n            });\n          }\n          \n          // Import traits\n          const imported = [];\n          for (const traitData of traitsToImport) {\n            try {\n              const newTrait = await Item.create(traitData, { pack: customTraitsPack.collection });\n              imported.push(newTrait.name);\n            } catch (error) {\n              console.warn(`Failed to import trait ${traitData.name}:`, error);\n            }\n          }\n          \n          // Clear trait provider cache\n          if (game?.avant?.initializationManager) {\n            const traitProvider = game.avant.initializationManager.getService('traitProvider');\n            if (traitProvider && typeof traitProvider.clearCache === 'function') {\n              traitProvider.clearCache();\n            }\n          }\n          \n          console.log(`✅ Import complete: ${imported.length} traits imported`);\n          ui.notifications.info(`Successfully imported ${imported.length} traits!`);\n          \n        } catch (error) {\n          console.error('❌ Import failed:', error);\n          ui.notifications.error(`Import failed: ${error.message}`);\n        }\n      }\n    },\n    cancel: {\n      label: 'Cancel'\n    }\n  },\n  default: 'import',\n  render: (html) => {\n    console.log('🏷️ Import dialog rendered');\n  }\n}).render(true);",
   "img": "icons/svg/upload.svg",
@@ -14,5 +14,10 @@
     }
   },
   "_id": "CrC04JVwHFVaxumg",
-  "category": "utility"
+  "category": "utility",
+  "system": {
+    "description": "Imports traits from JSON file into the world compendium with file dialog interface",
+    "version": "1.0.0",
+    "category": "trait-management"
+  }
 }

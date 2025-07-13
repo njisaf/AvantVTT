@@ -1,6 +1,6 @@
 {
   "name": "Create Custom Trait",
-  "type": "script",
+  "type": "avant-macro",
   "scope": "global",
   "command": "/**\n * Create Custom Trait Macro\n * Opens trait creation sheet and ensures custom trait compendium exists\n */\n\nconsole.log('🎨 Starting custom trait creation...');\n\n// Ensure custom traits compendium exists\nlet customTraitsPack = game.packs.get('world.custom-traits');\n\nif (!customTraitsPack) {\n  console.log('📦 Creating custom traits compendium...');\n  \n  try {\n    // Create the custom traits compendium\n    customTraitsPack = await CompendiumCollection.createCompendium({\n      type: 'Item',\n      label: 'Custom Traits',\n      name: 'custom-traits',\n      package: 'world',\n      private: false\n    });\n    \n    console.log('✅ Created Custom Traits compendium!');\n    ui.notifications.info('Created Custom Traits compendium!');\n  } catch (error) {\n    console.error('❌ Failed to create compendium:', error);\n    ui.notifications.error('Failed to create Custom Traits compendium!');\n    return;\n  }\n}\n\n// Create new trait in the custom compendium\nconsole.log('🎨 Creating new trait in custom compendium...');\n\nconst traitData = {\n  name: 'New Custom Trait',\n  type: 'trait',\n  img: 'icons/svg/item-bag.svg',\n  system: {\n    description: '',\n    color: '#00E0DC',\n    icon: 'fas fa-tag',\n    localKey: '',\n    tags: [],\n    rarity: 'common',\n    effects: '',\n    textColor: '#000000'\n  }\n};\n\ntry {\n  // Create the trait in the compendium\n  const newTrait = await Item.create(traitData, { pack: customTraitsPack.collection });\n  console.log('✅ Created custom trait:', newTrait.name);\n  ui.notifications.info(`Created trait '${newTrait.name}' in Custom Traits compendium!`);\n  \n  // Open the trait sheet for immediate editing\n  newTrait.sheet.render(true);\n  \n  console.log('🎨 Trait creation complete! Edit the trait and save your changes.');\n  \n  // Clear trait provider cache so new trait appears in autocomplete\n  if (game?.avant?.initializationManager) {\n    const traitProvider = game.avant.initializationManager.getService('traitProvider');\n    if (traitProvider && typeof traitProvider.clearCache === 'function') {\n      traitProvider.clearCache();\n      console.log('🔄 Cleared trait provider cache - new trait will appear in autocomplete');\n    }\n  }\n  \n} catch (error) {\n  console.error('❌ Failed to create trait:', error);\n  ui.notifications.error(`Failed to create trait: ${error.message}`);\n}",
   "img": "icons/svg/item-bag.svg",
@@ -14,5 +14,10 @@
     }
   },
   "_id": "vcgDQ1u72TmUpIfX",
-  "category": "utility"
+  "category": "utility",
+  "system": {
+    "description": "Create a new custom trait in the Custom Traits compendium with trait sheet interface",
+    "version": "1.0.0",
+    "category": "trait-management"
+  }
 }

@@ -2,7 +2,7 @@
   {
     "_id": "zqNRvjngZ3dzq1mZ",
     "name": "Complex",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "hazard-traits",
@@ -17,7 +17,7 @@
   {
     "_id": "tx2QijpaEMRqrEES",
     "name": "Environmental",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "hazard-traits",
@@ -32,7 +32,7 @@
   {
     "_id": "UXj3Ndlk5Ofccb3m",
     "name": "Haunt",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "hazard-traits",
@@ -47,7 +47,7 @@
   {
     "_id": "LIHMnppoY9ONX8T6",
     "name": "Trap",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "hazard-traits",

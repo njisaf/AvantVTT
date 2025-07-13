@@ -2,7 +2,7 @@
   {
     "_id": "Sc7OfV2DJRXCPJvS",
     "name": "Alien",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "creature-traits",
@@ -17,7 +17,7 @@
   {
     "_id": "OpWQRg7szR7E1zHy",
     "name": "Angel",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "creature-traits",
@@ -32,7 +32,7 @@
   {
     "_id": "X1QRwA1tAko21mHx",
     "name": "Beast",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "creature-traits",
@@ -47,7 +47,7 @@
   {
     "_id": "Hr04t8py40r5K7N0",
     "name": "Dragon",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "creature-traits",
@@ -62,7 +62,7 @@
   {
     "_id": "VvqZ49bu9GOyKzpi",
     "name": "Elemental",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "creature-traits",
@@ -77,7 +77,7 @@
   {
     "_id": "2kmWniYfLtMI5Kp0",
     "name": "Fey",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "creature-traits",
@@ -92,7 +92,7 @@
   {
     "_id": "iznIb9Y8hmduEZ7m",
     "name": "Giant",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "creature-traits",
@@ -107,7 +107,7 @@
   {
     "_id": "18lo6eUOEMgpIv2k",
     "name": "Golem",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "creature-traits",
@@ -122,7 +122,7 @@
   {
     "_id": "oWmnNob25S2LSoRQ",
     "name": "Mortal",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "creature-traits",
@@ -137,7 +137,7 @@
   {
     "_id": "0ZIq1aWppK6GAU0r",
     "name": "Nightmare",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "creature-traits",
@@ -152,7 +152,7 @@
   {
     "_id": "rc2HfS1EW0iIs9Iy",
     "name": "Ooze",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "creature-traits",
@@ -167,7 +167,7 @@
   {
     "_id": "Eeit566aL2CP4J7Z",
     "name": "Plant",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "creature-traits",
@@ -182,7 +182,7 @@
   {
     "_id": "z8fmLfnllVnWBO3x",
     "name": "Undead",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "creature-traits",

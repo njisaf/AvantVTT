@@ -2,7 +2,7 @@
   {
     "_id": "LGgzEItGDbSJiH55",
     "name": "Adept",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "gear-traits",
@@ -17,7 +17,7 @@
   {
     "_id": "xFmSV2ZXlTnNhnPS",
     "name": "Alchemical",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "gear-traits",
@@ -32,7 +32,7 @@
   {
     "_id": "8VO3ilYkymQauCHO",
     "name": "Bomb",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "gear-traits",
@@ -47,7 +47,7 @@
   {
     "_id": "tIX2JDq6fcUerFXx",
     "name": "Bonded",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "gear-traits",
@@ -62,7 +62,7 @@
   {
     "_id": "z9duCK4QCSJO09Wb",
     "name": "Common",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "gear-traits",
@@ -77,7 +77,7 @@
   {
     "_id": "6UvNKWT4gD3iUVWa",
     "name": "Consumable",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "gear-traits",
@@ -92,7 +92,7 @@
   {
     "_id": "QC3kvf0mvP2kYzpR",
     "name": "Epic",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "gear-traits",
@@ -107,7 +107,7 @@
   {
     "_id": "slcTvqxp8CzjH3JN",
     "name": "Heavy",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "gear-traits",
@@ -122,7 +122,7 @@
   {
     "_id": "lWK0rgnqSQud0hDU",
     "name": "Mythic",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "gear-traits",
@@ -137,7 +137,7 @@
   {
     "_id": "czLGDGfDsA322TVh",
     "name": "Nimble",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "gear-traits",
@@ -152,7 +152,7 @@
   {
     "_id": "ouAkGkwADgxd7gME",
     "name": "Rare",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "gear-traits",
@@ -167,7 +167,7 @@
   {
     "_id": "eS4szHZQpA3Grvus",
     "name": "Reload",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "gear-traits",
@@ -182,7 +182,7 @@
   {
     "_id": "IMZOusqnlcHfKROp",
     "name": "Sentient",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "gear-traits",
@@ -197,7 +197,7 @@
   {
     "_id": "eFZLUf0X92YMyfcP",
     "name": "Spiritual",
-    "type": "trait",
+    "type": "avant-trait",
     "img": "icons/svg/item-bag.svg",
     "system": {
       "category": "gear-traits",

@@ -1,6 +1,6 @@
 {
   "name": "Roll Initiative",
-  "type": "script",
+  "type": "avant-macro",
   "scope": "global",
   "command": "/**\n * Roll Initiative Macro\n * Quickly roll initiative for selected tokens\n */\n\nconst tokens = canvas.tokens.controlled;\n\nif (tokens.length === 0) {\n  ui.notifications.warn('Please select at least one token.');\n  return;\n}\n\nconsole.log(`🎲 Rolling initiative for ${tokens.length} token(s)...`);\n\nfor (const token of tokens) {\n  if (token.actor) {\n    try {\n      // Roll initiative for the actor\n      await token.actor.rollInitiative();\n      console.log(`✅ Initiative rolled for ${token.actor.name}`);\n    } catch (error) {\n      console.error(`❌ Failed to roll initiative for ${token.actor.name}:`, error);\n      ui.notifications.error(`Failed to roll initiative for ${token.actor.name}`);\n    }\n  }\n}\n\nui.notifications.info(`Initiative rolled for ${tokens.length} token(s)!`);",
   "img": "icons/svg/d20-grey.svg",
@@ -14,5 +14,10 @@
     }
   },
   "_id": "pq0vFtYt7KJARpgn",
-  "category": "utility"
+  "category": "utility",
+  "system": {
+    "description": "Roll initiative for all selected tokens",
+    "version": "1.0.0",
+    "category": "combat"
+  }
 }
