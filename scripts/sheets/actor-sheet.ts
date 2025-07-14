@@ -1327,6 +1327,12 @@ export function createAvantActorSheet() {
             try {
                 console.log('🎯 Avant | Posting talent feature card for:', item.name);
 
+                // 🎵 PLAY TALENT SOUND - Provides audio feedback for talent usage
+                // This plays a distinctive sound when talent cards are posted to chat
+                // Import the audio utility dynamically to avoid circular dependencies
+                const { playSound, UISound } = await import('../utils/audio-utils.js');
+                playSound(UISound.TALENT_CHAT); // Don't await - let sound play asynchronously
+
                 // 🎨 DYNAMIC IMPORT PATTERN - Ensures modules are loaded when needed
                 // This prevents circular dependencies and ensures proper initialization order
                 const { postFeatureCard } = await import('../logic/chat/feature-card-builder.js');
@@ -1441,6 +1447,12 @@ export function createAvantActorSheet() {
             try {
                 console.log('🎯 Avant | Posting augment feature card for:', item.name);
 
+                // 🎵 PLAY AUGMENT SOUND - Provides audio feedback for augment usage
+                // This plays a distinctive sound when augment cards are posted to chat
+                // Import the audio utility dynamically to avoid circular dependencies
+                const { playSound, UISound } = await import('../utils/audio-utils.js');
+                playSound(UISound.AUGMENT_CHAT); // Don't await - let sound play asynchronously
+
                 // 🔧 DYNAMIC IMPORT PATTERN - Consistent with talent handler
                 // Same module loading strategy for maintainability
                 const { postFeatureCard } = await import('../logic/chat/feature-card-builder.js');
@@ -1539,6 +1551,12 @@ export function createAvantActorSheet() {
 
             try {
                 console.log('🔋 Avant | Processing PP spend for:', item.name, 'Cost:', ppCost);
+
+                // 🎵 PLAY SPEND SOUND - Provides audio feedback for PP spending
+                // This plays a distinctive sound when power points are spent
+                // Import the audio utility dynamically to avoid circular dependencies
+                const { playSound, UISound } = await import('../utils/audio-utils.js');
+                playSound(UISound.SPEND_PP); // Don't await - let sound play asynchronously
 
                 // Import required modules
                 const { handlePowerPointSpend } = await import('../logic/chat/power-point-handler.js');

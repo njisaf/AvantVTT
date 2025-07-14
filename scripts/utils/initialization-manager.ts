@@ -451,6 +451,38 @@ export class FoundryInitializationHelper {
                 }
             });
 
+            // Register the universal item sheet template feature flag
+            game.settings.register('avant', 'useUniversalItemSheet', {
+                name: 'Use Universal Item Sheet Template',
+                hint: 'Use the single universal template for all item types. ⚠️ Phase 3: Per-type templates are DEPRECATED and will be REMOVED in Phase 4. Disabling this setting is not recommended.',
+                scope: 'world',
+                config: true,
+                type: Boolean,
+                default: true, // Phase 2: Changed from false to true for broader testing
+                onChange: (value: boolean) => {
+                    console.log(`📋 Avant | Universal item sheet template ${value ? 'enabled' : 'disabled'}`);
+                    
+                    if (ui?.notifications) {
+                        if (value) {
+                            // User enabled universal template
+                            ui.notifications.info(`✅ Universal item sheet template enabled. Refresh item sheets to see changes.`);
+                        } else {
+                            // Phase 3: Strong warning when user disables universal template
+                            ui.notifications.warn(
+                                `⚠️ DEPRECATION WARNING: Per-item templates are deprecated and will be REMOVED in Phase 4. ` +
+                                `Consider keeping universal template enabled for better performance and future compatibility. ` +
+                                `Refresh item sheets to see changes.`,
+                                { permanent: true }
+                            );
+                            console.warn('🚨 AVANT DEPRECATION WARNING 🚨');
+                            console.warn('📋 Per-item templates will be REMOVED in Phase 4');
+                            console.warn('🔄 Consider re-enabling "Use Universal Item Sheet Template"');
+                            console.warn('⚡ Universal template provides better performance and consistency');
+                        }
+                    }
+                }
+            });
+
             console.log('✅ InitializationManager | System settings registered');
             return { success: true };
         }, [], { phase: 'init', critical: true });
@@ -615,18 +647,8 @@ export class FoundryInitializationHelper {
                 "systems/avant/templates/item-sheet.html",
                 "systems/avant/templates/reroll-dialog.html",
 
-                // Legacy templates removed - replaced by component-based architecture
-                // See templates/item/*-new.html for current implementations
-
-                // Phase 3-5 Component Library Templates - NEW unified architecture
-                "systems/avant/templates/item/item-talent-new.html",         // Phase 3 talent sheet
-                "systems/avant/templates/item/item-augment-new.html",        // Phase 3 augment sheet
-                "systems/avant/templates/item/item-weapon-new.html",         // Phase 4 weapon sheet
-                "systems/avant/templates/item/item-armor-new.html",          // Phase 4 armor sheet
-                "systems/avant/templates/item/item-action-new.html",         // Phase 5 action sheet
-                "systems/avant/templates/item/item-gear-new.html",           // Phase 5 gear sheet
-                "systems/avant/templates/item/item-feature-new.html",        // Phase 5 feature sheet
-                "systems/avant/templates/item/item-trait-new.html",          // Phase 5 trait sheet
+                // Phase 4: Per-item templates removed - universal template consolidation complete
+                // All item types now use the single universal template: item-sheet.html
 
                 // PARTIAL TEMPLATES - reusable components included in main templates
                 // NOTE: These are *.hbs files that get included via {{> "path"}} syntax

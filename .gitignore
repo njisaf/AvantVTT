@@ -59,7 +59,6 @@ ehthumbs.db
 Thumbs.db
 
 # FoundryVTT specific
-packs/
 *.db 
 
 # release artifacts

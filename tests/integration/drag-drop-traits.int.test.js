@@ -207,14 +207,14 @@ describe('Drag-and-Drop Trait Integration Tests', () => {
             });
             dropEvent.dataTransfer.setData('text/plain', JSON.stringify({
                 type: 'Item',
-                uuid: 'Compendium.avant.traits.trait-ice'
+                uuid: 'Compendium.avant.avant-traits.trait-ice'
             }));
             dropEvent.preventDefault = jest.fn();
 
             // Mock successful drag data extraction
             mockFoundryAPI.TextEditor.getDragEventData.mockReturnValue({
                 type: 'Item',
-                uuid: 'Compendium.avant.traits.trait-ice'
+                uuid: 'Compendium.avant.avant-traits.trait-ice'
             });
 
             // ACT: Trigger drop
@@ -237,7 +237,7 @@ describe('Drag-and-Drop Trait Integration Tests', () => {
             // Mock drag data for existing trait
             mockFoundryAPI.TextEditor.getDragEventData.mockReturnValue({
                 type: 'Item',
-                uuid: 'Compendium.avant.traits.trait-fire'
+                uuid: 'Compendium.avant.avant-traits.trait-fire'
             });
 
             // Mock trait resolution to return existing trait
@@ -308,7 +308,7 @@ describe('Drag-and-Drop Trait Integration Tests', () => {
 
             mockFoundryAPI.TextEditor.getDragEventData.mockReturnValue({
                 type: 'Item',
-                uuid: 'Compendium.avant.traits.trait-new'
+                uuid: 'Compendium.avant.avant-traits.trait-new'
             });
 
             mockFoundryAPI.fromUuid.mockResolvedValue({
@@ -340,7 +340,7 @@ describe('Drag-and-Drop Trait Integration Tests', () => {
 
             mockFoundryAPI.TextEditor.getDragEventData.mockReturnValue({
                 type: 'Item',
-                uuid: 'Compendium.avant.traits.trait-tech'
+                uuid: 'Compendium.avant.avant-traits.trait-tech'
             });
 
             mockFoundryAPI.fromUuid.mockResolvedValue({
@@ -369,7 +369,7 @@ describe('Drag-and-Drop Trait Integration Tests', () => {
 
             mockFoundryAPI.TextEditor.getDragEventData.mockReturnValue({
                 type: 'Item',
-                uuid: 'Compendium.avant.traits.trait-fire' // Duplicate
+                uuid: 'Compendium.avant.avant-traits.trait-fire' // Duplicate
             });
 
             mockFoundryAPI.fromUuid.mockResolvedValue({
@@ -417,7 +417,7 @@ describe('Drag-and-Drop Trait Integration Tests', () => {
 
                 mockFoundryAPI.TextEditor.getDragEventData.mockReturnValue({
                     type: 'Item',
-                    uuid: 'Compendium.avant.traits.trait-ice'
+                    uuid: 'Compendium.avant.avant-traits.trait-ice'
                 });
 
                 mockFoundryAPI.fromUuid.mockResolvedValue({
@@ -492,7 +492,7 @@ describe('Drag-and-Drop Trait Integration Tests', () => {
 
             mockFoundryAPI.TextEditor.getDragEventData.mockReturnValue({
                 type: 'Item',
-                uuid: 'Compendium.avant.traits.trait-ice'
+                uuid: 'Compendium.avant.avant-traits.trait-ice'
             });
 
             mockFoundryAPI.fromUuid.mockResolvedValue({
@@ -527,7 +527,7 @@ describe('Drag-and-Drop Trait Integration Tests', () => {
 
                 mockFoundryAPI.TextEditor.getDragEventData.mockReturnValue({
                     type: 'Item',
-                    uuid: `Compendium.avant.traits.trait-${i}`
+                    uuid: `Compendium.avant.avant-traits.trait-${i}`
                 });
 
                 mockFoundryAPI.fromUuid.mockResolvedValue({

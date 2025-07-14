@@ -1,11 +1,14 @@
 name: CI - AvantVTT with Deprecation Guards
 
-# === TEMPORARY DISABLE ===
-# The Phase-4 Deprecation Guard workflow is noisy right now.
-# Convert it to manual-only until we revisit it.
 on:
-  workflow_dispatch:
-# === END TEMPORARY DISABLE ===
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run weekly monitoring every Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch: # Allow manual trigger
 
 env:
   NODE_VERSION: "18"
@@ -31,7 +34,6 @@ jobs:
         run: npm ci
 
       - name: Phase 4 Guard - Check deprecated folder modifications
-        if: false  # Disabled per team decision
         run: |
           echo "🔍 Phase 4: Checking for deprecated folder modifications..."
           
@@ -47,12 +49,13 @@ jobs:
           echo "$CHANGED_FILES"
           
           # Check for deprecated folder edits
-          DEPRECATED_CHANGES=$(echo "$CHANGED_FILES" | grep "^deprecated/remote-trait-service/" || true)
+          REMOTE_CHANGES=$(echo "$CHANGED_FILES" | grep "^deprecated/remote-trait-service/" || true)
+          ACCESSIBILITY_CHANGES=$(echo "$CHANGED_FILES" | grep "^deprecated/accessibility/" || true)
           
-          if [ -n "$DEPRECATED_CHANGES" ]; then
-            echo "❌ PHASE 4 GUARD VIOLATION: Detected changes to deprecated folder"
+          if [ -n "$REMOTE_CHANGES" ]; then
+            echo "❌ PHASE 4 GUARD VIOLATION: Detected changes to deprecated remote-trait-service folder"
             echo "Modified deprecated files:"
-            echo "$DEPRECATED_CHANGES"
+            echo "$REMOTE_CHANGES"
             echo ""
             echo "🔧 To edit deprecated files intentionally, include 'restore-remote-trait-service' in your commit message"
             echo "📖 See deprecated/remote-trait-service/README.md for restoration procedures"
@@ -70,29 +73,43 @@ jobs:
               echo "❌ No restoration keyword found - blocking edit"
               exit 1
             fi
-          else
+          fi
+          
+          if [ -n "$ACCESSIBILITY_CHANGES" ]; then
+            echo "❌ PHASE 4 GUARD VIOLATION: Detected changes to deprecated accessibility folder"
+            echo "Modified deprecated files:"
+            echo "$ACCESSIBILITY_CHANGES"
+            echo ""
+            echo "🔧 To edit deprecated files intentionally, include 'restore-accessibility-module' in your commit message"
+            echo "📖 See deprecated/accessibility/README.md for restoration procedures"
+            
+            # Check commit messages for restoration keyword
+            if [ "${{ github.event_name }}" = "pull_request" ]; then
+              COMMIT_MESSAGES=$(git log --pretty=format:"%s" origin/${{ github.base_ref }}...HEAD)
+            else
+              COMMIT_MESSAGES=$(git log --pretty=format:"%s" HEAD~1...HEAD)
+            fi
+            
+            if echo "$COMMIT_MESSAGES" | grep -q "restore-accessibility-module"; then
+              echo "✅ Found restoration keyword in commit message - allowing edit"
+            else
+              echo "❌ No restoration keyword found - blocking edit"
+              exit 1
+            fi
+          fi
+          
+          if [ -z "$REMOTE_CHANGES" ] && [ -z "$ACCESSIBILITY_CHANGES" ]; then
             echo "✅ No deprecated folder modifications detected"
           fi
 
-      - name: Phase 4 Guard - Check for RemoteTraitService imports
-        if: false  # Disabled per team decision
+      - name: Phase 4 Guard - Check for deprecated imports
         run: |
-          echo "🔍 Phase 4: Scanning for RemoteTraitService imports in active code..."
+          echo "🔍 Phase 4: Scanning for deprecated imports in active code..."
           
-          # Scan all TypeScript and JavaScript files outside deprecated folder
-          IMPORT_VIOLATIONS=$(find scripts/ -name "*.ts" -o -name "*.js" | xargs grep -l "RemoteTraitService" || true)
+          # Use the enhanced guard script that checks both RemoteTraitService and accessibility
+          npm run guard:deprecated
           
-          if [ -n "$IMPORT_VIOLATIONS" ]; then
-            echo "❌ PHASE 4 GUARD VIOLATION: Found RemoteTraitService imports in active code"
-            echo "Files with violations:"
-            echo "$IMPORT_VIOLATIONS"
-            echo ""
-            echo "🔧 RemoteTraitService is deprecated. See deprecated/remote-trait-service/README.md"
-            echo "📖 Use alternative trait management approaches or restore service intentionally"
-            exit 1
-          else
-            echo "✅ No RemoteTraitService imports found in active code"
-          fi
+          echo "✅ No deprecated imports found in active code"
 
       - name: Run dead-code scan
         run: |
@@ -174,33 +191,41 @@ jobs:
             exit 1
           fi
           
-          # Check for RemoteTraitService references in dist/
-          DIST_VIOLATIONS=$(find dist/ -name "*.js" | xargs grep -l "RemoteTraitService" || true)
+          # Check for deprecated service references in dist/
+          REMOTE_VIOLATIONS=$(find dist/ -name "*.js" | xargs grep -l "RemoteTraitService" || true)
+          ACCESSIBILITY_VIOLATIONS=$(find dist/ -name "*.js" | xargs grep -l "from.*accessibility\|import.*accessibility" || true)
           
-          if [ -n "$DIST_VIOLATIONS" ]; then
+          if [ -n "$REMOTE_VIOLATIONS" ]; then
             echo "❌ PHASE 4 VIOLATION: Found RemoteTraitService references in dist/"
             echo "Files with violations:"
-            echo "$DIST_VIOLATIONS"
+            echo "$REMOTE_VIOLATIONS"
             exit 1
-          else
-            echo "✅ No RemoteTraitService references in dist/ package"
           fi
+          
+          if [ -n "$ACCESSIBILITY_VIOLATIONS" ]; then
+            echo "❌ PHASE 4 VIOLATION: Found accessibility module references in dist/"
+            echo "Files with violations:"
+            echo "$ACCESSIBILITY_VIOLATIONS"
+            exit 1
+          fi
+          
+          echo "✅ No deprecated references in dist/ package"
           
           echo "✅ Distribution package validation passed"
 
       - name: Phase 4 completion check
-        if: false  # Disabled since guards are off
         run: |
           echo "🎯 Phase 4: Deprecation guards successfully enforced"
           echo ""
           echo "✅ Phase 4 Achievements:"
           echo "  🔒 CI guards prevent deprecated folder edits without keyword"
-          echo "  🔍 Automated scanning prevents RemoteTraitService re-imports"
+          echo "  🔍 Automated scanning prevents deprecated module re-imports"
           echo "  🧹 Dead-code detection integrated into pipeline"
           echo "  📦 Distribution package verified clean of deprecated references"
           echo "  🚀 Build and test pipeline successful"
+          echo "  ♿ Accessibility module fully deprecated and monitored"
           echo ""
-          echo "📋 Next: Phase 5 - Long-term monitoring and policy enforcement"
+          echo "📋 Long-term safeguards: Weekly monitoring and policy enforcement active"
 
   weekly-guard-monitor:
     # This job runs weekly to monitor guard integrity
@@ -233,6 +258,10 @@ jobs:
             echo "⚠️ Pre-commit hook missing"
           fi
           
+          # Run deprecated import guard
+          echo "🔍 Running weekly deprecated import guard..."
+          npm run guard:deprecated
+          
           # Run dead-code scan
           echo "🔍 Running weekly dead-code scan..."
           npm run lint:deadcode
@@ -244,5 +273,22 @@ jobs:
           # Count files in deprecated folder
           DEPRECATED_FILES=$(find deprecated/ -type f | wc -l)
           echo "📄 Deprecated files count: $DEPRECATED_FILES"
+          
+          # Specific check for accessibility module archive integrity
+          if [ -d "deprecated/accessibility" ]; then
+            ACCESSIBILITY_FILES=$(find deprecated/accessibility -type f | wc -l)
+            echo "📄 Accessibility archive files: $ACCESSIBILITY_FILES"
+          else
+            echo "⚠️ Accessibility archive directory missing"
+          fi
+          
+          # Check that accessibility module is not in active codebase
+          ACCESSIBILITY_IMPORTS=$(find scripts tests -name "*.ts" -o -name "*.js" 2>/dev/null | xargs grep -l "import.*accessibility\|from.*accessibility" 2>/dev/null | grep -v deprecated || true)
+          if [ -n "$ACCESSIBILITY_IMPORTS" ]; then
+            echo "❌ Found accessibility imports in active code:"
+            echo "$ACCESSIBILITY_IMPORTS"
+          else
+            echo "✅ No accessibility imports in active code"
+          fi
           
           echo "✅ Weekly monitoring completed" 

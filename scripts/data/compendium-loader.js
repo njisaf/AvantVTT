@@ -301,7 +301,12 @@ export class CompendiumLoader {
       'traits': 'trait',
       'talents': 'talent',
       'augments': 'augment',
-      'macros': 'script'
+      'macros': 'script',
+      // Handle avant- prefixed directories
+      'avant-traits': 'trait',
+      'avant-talents': 'talent',
+      'avant-augments': 'augment',
+      'avant-macros': 'script'
     };
     return typeMap[dirName] || dirName.slice(0, -1); // Remove 's' as fallback
   }

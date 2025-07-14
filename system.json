@@ -33,9 +33,9 @@
   ],
   "packs": [
     {
-      "name": "traits",
-      "label": "Traits",
-      "path": "./packs/traits",
+      "name": "avant-traits",
+      "label": "Avant Traits",
+      "path": "./packs/avant-traits",
       "type": "Item",
       "system": "avant",
       "banner": "systems/avant/assets/compendium-banner/blue.webp",
@@ -46,9 +46,9 @@
       "flags": {}
     },
     {
-      "name": "macros",
-      "label": "Macros",
-      "path": "./packs/macros",
+      "name": "avant-macros",
+      "label": "Avant Macros",
+      "path": "./packs/avant-macros",
       "type": "Macro",
       "banner": "systems/avant/assets/compendium-banner/orange.webp",
       "ownership": {
@@ -58,9 +58,9 @@
       "flags": {}
     },
     {
-      "name": "talents",
-      "label": "Talents",
-      "path": "./packs/talents",
+      "name": "avant-talents",
+      "label": "Avant Talents",
+      "path": "./packs/avant-talents",
       "type": "Item",
       "system": "avant",
       "banner": "systems/avant/assets/compendium-banner/green.webp",
@@ -71,9 +71,9 @@
       "flags": {}
     },
     {
-      "name": "augments",
-      "label": "Augments",
-      "path": "./packs/augments",
+      "name": "avant-augments",
+      "label": "Avant Augments",
+      "path": "./packs/avant-augments",
       "type": "Item",
       "system": "avant",
       "banner": "systems/avant/assets/compendium-banner/purple.webp",
@@ -90,9 +90,9 @@
       "sorting": "m",
       "color": "#343c33",
       "packs": [
-        "traits",
-        "talents",
-        "augments"
+        "avant-traits",
+        "avant-talents",
+        "avant-augments"
       ]
     },
     {
@@ -100,7 +100,7 @@
       "sorting": "m",
       "color": "#181818",
       "packs": [
-        "macros"
+        "avant-macros"
       ]
     }
   ],

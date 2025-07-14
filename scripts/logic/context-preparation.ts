@@ -382,7 +382,6 @@ export function prepareTraitDisplayContext(
         const enhancedContext = { ...context };
 
         enhancedContext.displayTraits = displayTraits;
-        console.log('NASSIR prepareTraitDisplayContext displayTraits', displayTraits);
         // WORKAROUND: Since Handlebars context passing fails, override system.traits with enhanced data
         if (displayTraits && displayTraits.length > 0) {
             // Store original trait IDs for form submission

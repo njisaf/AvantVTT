@@ -25,7 +25,7 @@ export async function assertTraitCompendiumReady(): Promise<void> {
         throw new Error('FoundryVTT compendium packs not available');
     }
 
-    // Look for the avant-traits compendium
+    // Look for the traits compendium
     const traitPack = game.packs.get('avant.avant-traits');
     if (!traitPack) {
         throw new Error('Avant Traits compendium (avant.avant-traits) not found - check system.json configuration');

@@ -48,17 +48,10 @@ export interface TraitRenderResult {
 }
 
 /**
- * @deprecated Use accessibility module instead: import { isLightColor } from '../accessibility'
- * 
- * MIGRATION NOTICE: This function has been moved to the centralized accessibility module 
- * for better organization and enhanced WCAG compliance. The accessibility module provides 
- * more comprehensive color analysis features including proper gamma correction and 
- * accessible text color generation.
- * 
- * @see scripts/accessibility/color-contrast.ts for the new implementation
- * @see docs/ACCESSIBILITY_MODULE_INTEGRATION_PLAN.md for migration guidance
+ * MIGRATION COMPLETE: The isLightColor function has been removed as part of accessibility
+ * module deprecation. This functionality was disabled and no longer in use (see line 158).
+ * If color contrast is needed in the future, implement locally or use a dedicated library.
  */
-export { isLightColor } from '../../accessibility';
 
 /**
  * Escape HTML special characters to prevent injection.

@@ -1,0 +1,210 @@
+name: Compendium Pipeline Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'packs/**'
+      - 'scripts/compendium/**'
+      - 'scripts/build-packs.js'
+      - 'scripts/data/compendium-*.js'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'packs/**'
+      - 'scripts/compendium/**'
+      - 'scripts/build-packs.js'
+      - 'scripts/data/compendium-*.js'
+
+jobs:
+  validate-pipeline:
+    name: Validate Complete Compendium Pipeline
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Phase A - ID & Category Guard
+      run: |
+        echo "🔄 Phase A: ID & Category Guard Validation"
+        npm run compendium:check
+        
+    - name: Phase B - File Granularity Support
+      run: |
+        echo "🔄 Phase B: File Granularity Support (Build System)"
+        # Phase B is validated through successful build
+        
+    - name: Phase C - Folder Support
+      run: |
+        echo "🔄 Phase C: Folder Support Validation"
+        npm run compendium:folders
+        
+    - name: Phase D - Link Rewriting
+      run: |
+        echo "🔄 Phase D: Link Rewriting Validation"
+        npm run compendium:links
+        
+    - name: Build Compendium Packs
+      run: |
+        echo "🔄 Building compendium packs..."
+        npm run build:packs
+        
+    - name: Phase E - Round-trip Validation
+      run: |
+        echo "🔄 Phase E: Round-trip Validation"
+        npm run compendium:roundtrip
+        
+    - name: Complete Pipeline Validation
+      run: |
+        echo "🔄 Complete Pipeline Validation"
+        npm run compendium:pipeline
+        
+    - name: Archive build artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: compendium-packs
+        path: |
+          dist/packs/
+          coverage/
+        retention-days: 30
+        
+    - name: Archive extraction data
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: extraction-data
+        path: |
+          extraction-output/
+        retention-days: 7
+
+  validate-hash-consistency:
+    name: Validate Hash Consistency
+    runs-on: ubuntu-latest
+    needs: validate-pipeline
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: First build
+      run: |
+        echo "🔄 Building packs (first time)..."
+        npm run build:packs
+        
+    - name: Calculate first build hashes
+      run: |
+        echo "🔄 Calculating first build hashes..."
+        cd dist/packs
+        sha256sum *.db > ../first-build-hashes.txt
+        cat ../first-build-hashes.txt
+        
+    - name: Second build
+      run: |
+        echo "🔄 Building packs (second time)..."
+        npm run build:packs
+        
+    - name: Calculate second build hashes
+      run: |
+        echo "🔄 Calculating second build hashes..."
+        cd dist/packs
+        sha256sum *.db > ../second-build-hashes.txt
+        cat ../second-build-hashes.txt
+        
+    - name: Compare build hashes
+      run: |
+        echo "🔄 Comparing build hashes..."
+        if diff dist/first-build-hashes.txt dist/second-build-hashes.txt; then
+          echo "✅ Build hashes are consistent (deterministic builds)"
+        else
+          echo "❌ Build hashes differ (non-deterministic builds)"
+          exit 1
+        fi
+
+  validate-structure:
+    name: Validate Pack Structure
+    runs-on: ubuntu-latest
+    needs: validate-pipeline
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build packs
+      run: npm run build:packs
+      
+    - name: Validate pack structure
+      run: |
+        echo "🔄 Validating pack structure..."
+        
+        # Check that all expected packs exist
+        for pack in avant-traits avant-talents avant-augments avant-macros; do
+          if [ ! -f "dist/packs/${pack}.db" ]; then
+            echo "❌ Missing pack: ${pack}.db"
+            exit 1
+          fi
+          echo "✅ Found pack: ${pack}.db"
+        done
+        
+        # Check pack file sizes (should not be empty)
+        for pack in avant-traits avant-talents avant-augments avant-macros; do
+          size=$(stat -c%s "dist/packs/${pack}.db")
+          if [ $size -eq 0 ]; then
+            echo "❌ Empty pack: ${pack}.db"
+            exit 1
+          fi
+          echo "✅ Pack size OK: ${pack}.db (${size} bytes)"
+        done
+        
+        # Check pack content format (should be valid JSON lines)
+        for pack in avant-traits avant-talents avant-augments avant-macros; do
+          if ! head -1 "dist/packs/${pack}.db" | jq . > /dev/null 2>&1; then
+            echo "❌ Invalid JSON in pack: ${pack}.db"
+            exit 1
+          fi
+          echo "✅ Pack format OK: ${pack}.db"
+        done
+        
+        echo "✅ All pack structure validations passed"
+        
+    - name: Extract and validate content
+      run: |
+        echo "🔄 Extracting and validating pack content..."
+        npm run compendium:extract -- --output=extraction-output
+        
+        # Check extraction output
+        if [ -d "extraction-output" ]; then
+          echo "✅ Extraction output directory created"
+          ls -la extraction-output/
+        else
+          echo "❌ Extraction output directory not found"
+          exit 1
+        fi

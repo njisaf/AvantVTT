@@ -721,8 +721,6 @@ export function prepareItemHeaderMetaFields(item: any, system: any): any[] {
  * @returns Array of field objects for body content
  */
 export function prepareItemBodyFields(item: any, system: any): any[] {
-    console.log('NASSIR prepareItemBodyFields item', item);
-    console.log('NASSIR prepareItemBodyFields system', system);
     const bodyFields: any[] = [];
 
     // Add meta fields that were moved from header to body (Stage 2 Universal Architecture)

@@ -392,7 +392,6 @@ export class TraitProvider {
           metadata: { searchedReference: reference, reason: 'empty_reference' }
         };
       }
-      console.log('NASSIR findByReference reference', reference);
 
       const allTraitsResult = await this.getAll(options);
 
@@ -409,7 +408,6 @@ export class TraitProvider {
 
       // Strategy 1: Exact document ID match
       trait = allTraitsResult.data.find(t => t.id === cleanReference) || null;
-      console.log('NASSIR findByReference allTraitsResult.data', allTraitsResult.data);
       if (trait) {
         matchType = 'document_id';
       }

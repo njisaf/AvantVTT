@@ -198,14 +198,12 @@ export async function enhanceTraitDataWithService(
                         setTimeout(() => reject(new Error('Service timeout')), config.serviceTimeout)
                     )
                 ]);
-                console.log('NASSIR traitResult', traitResult);
                 const otherTraitResult = await Promise.race([
                     traitProvider.getTraitById(traitId),
                     new Promise((_, reject) =>
                         setTimeout(() => reject(new Error('Service timeout')), config.serviceTimeout)
                     )
                 ]);
-                console.log('NASSIR otherTraitResult', otherTraitResult);
                 if (traitResult.success && traitResult.data) {
                     const trait = traitResult.data;
                     const matchType = traitResult.metadata?.matchType || 'unknown';
@@ -481,7 +479,6 @@ export async function prepareTraitDisplayData(
 ): Promise<TraitDataPreparationResult> {
     const startTime = Date.now();
     const fallbacksUsed: string[] = [];
-    console.log('NASSIR itemContext', itemContext);
     try {
         const traitIds = itemContext.traitIds || [];
 

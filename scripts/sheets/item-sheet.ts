@@ -384,49 +384,13 @@ export function createAvantItemSheet() {
          * @override
          */
         get parts() {
-            const itemType = this.document?.type || 'unknown';
-
-            // DEBUGGING: Log everything about the parts getter call
-            logger.debug('AvantItemSheet | parts getter called - FULL DEBUG', {
-                documentExists: !!this.document,
-                documentType: this.document?.type,
-                documentId: this.document?.id,
-                documentName: this.document?.name,
-                thisExists: !!this,
-                constructorName: this.constructor.name,
-                itemType
-            });
-
-            // Map item types to specific templates that we know work
-            const specificTemplates: Record<string, string> = {
-                'talent': 'systems/avant/templates/item/item-talent-new.html',
-                'augment': 'systems/avant/templates/item/item-augment-new.html',
-                'weapon': 'systems/avant/templates/item/item-weapon-new.html',
-                'armor': 'systems/avant/templates/item/item-armor-new.html',
-                'action': 'systems/avant/templates/item/item-action-new.html',
-                'gear': 'systems/avant/templates/item/item-gear-new.html',
-                'feature': 'systems/avant/templates/item/item-feature-new.html',
-                'trait': 'systems/avant/templates/item/item-trait-new.html'
-            };
-
-            // Use specific template if available, otherwise fall back to universal
-            const templatePath = specificTemplates[itemType] || "systems/avant/templates/item/universal-item-sheet.html";
-
-            const partsConfig = {
+            // Phase 4: Hard Switch - Universal template only
+            // All per-item templates have been removed, only universal template remains
+            return {
                 form: {
-                    template: templatePath
+                    template: "systems/avant/templates/item-sheet.html"
                 }
             };
-
-            logger.debug('AvantItemSheet | parts getter returning configuration', {
-                itemType,
-                templatePath,
-                partsConfig,
-                specificTemplateExists: !!specificTemplates[itemType],
-                availableTemplates: Object.keys(specificTemplates)
-            });
-
-            return partsConfig;
         }
 
         /**
@@ -545,7 +509,6 @@ export function createAvantItemSheet() {
 
                 const traitDataResult = await prepareTraitDisplayData(traitContext, DEFAULT_TRAIT_DATA_CONFIG);
                 const displayTraits = traitDataResult.success ? traitDataResult.traits : [];
-                console.log('NASSIR displayTraits', displayTraits);
                 // Use pure function to prepare complete context
                 const contextResult = await prepareCompleteContext(
                     itemDataForContext,
