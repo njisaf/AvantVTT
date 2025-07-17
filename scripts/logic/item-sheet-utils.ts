@@ -536,171 +536,33 @@ export async function applyTraitDrop(
  * This function organizes all header fields (except icon and name) into a standardized
  * array that can be chunked into rows for consistent header layouts across all item types.
  *
+ * REFACTORED: Now uses the new declarative layout system for supported item types,
+ * with fallback to legacy switch-based logic for unsupported types.
+ *
  * @param item - The item data
  * @param system - The item's system data
  * @returns Array of field objects for header display
  */
+// Import the layout system statically
+import { getHeaderLayout, isItemTypeSupported } from '../layout/item-sheet';
+
 export function prepareItemHeaderMetaFields(item: any, system: any): any[] {
+    // Try to use the new layout system first
+    try {
+        if (isItemTypeSupported(item.type)) {
+            const itemData = { ...item, system };
+            return getHeaderLayout(itemData);
+        }
+    } catch (error) {
+        console.warn('Layout system not available, falling back to legacy logic:', error);
+    }
+
+    // Legacy fallback for unsupported types
     const metaFields: any[] = [];
 
-    // Map different item types to their specific header fields
+    // All known item types are now handled by the layout system
+    // This switch statement is kept for future unsupported types
     switch (item.type) {
-        case 'action':
-            // Actions typically only have icon and name, no meta fields
-            break;
-
-        case 'talent':
-            if (system.apCost !== undefined) {
-                metaFields.push({
-                    type: 'ap-selector',
-                    name: 'system.apCost',
-                    value: system.apCost,
-                    label: 'AP',
-                    hint: 'Action Point cost to use this talent',
-                    max: 3
-                });
-            }
-            break;
-
-        case 'augment':
-            if (system.apCost !== undefined) {
-                metaFields.push({
-                    type: 'ap-selector',
-                    name: 'system.apCost',
-                    value: system.apCost,
-                    label: 'AP',
-                    hint: 'Action Point cost to activate this augment',
-                    max: 3
-                });
-            }
-            if (system.ppCost !== undefined) {
-                metaFields.push({
-                    type: 'number',
-                    name: 'system.ppCost',
-                    value: system.ppCost,
-                    label: 'PP',
-                    min: 0,
-                    max: 20,
-                    placeholder: '0',
-                    hint: 'Power Point cost to use this augment'
-                });
-            }
-            break;
-
-        case 'weapon':
-            if (system.damage !== undefined) {
-                metaFields.push({
-                    type: 'text',
-                    name: 'system.damage',
-                    value: system.damage,
-                    label: 'Damage',
-                    placeholder: '1d8',
-                    hint: 'Weapon damage dice (e.g., 1d8, 2d6)'
-                });
-            }
-            if (system.modifier !== undefined) {
-                metaFields.push({
-                    type: 'number',
-                    name: 'system.modifier',
-                    value: system.modifier,
-                    label: 'Modifier',
-                    min: -10,
-                    max: 20,
-                    placeholder: '0',
-                    hint: 'Attack modifier bonus/penalty'
-                });
-            }
-            break;
-
-        case 'armor':
-            if (system.armorClass !== undefined) {
-                metaFields.push({
-                    type: 'number',
-                    name: 'system.armorClass',
-                    value: system.armorClass,
-                    label: 'AC',
-                    min: 10,
-                    max: 25,
-                    placeholder: '10',
-                    hint: 'Armor Class defense value'
-                });
-            }
-            if (system.threshold !== undefined) {
-                metaFields.push({
-                    type: 'number',
-                    name: 'system.threshold',
-                    value: system.threshold,
-                    label: 'Threshold',
-                    min: 0,
-                    max: 20,
-                    placeholder: '0',
-                    hint: 'Damage threshold before penetration'
-                });
-            }
-            break;
-
-        case 'gear':
-            if (system.weight !== undefined) {
-                metaFields.push({
-                    type: 'number',
-                    name: 'system.weight',
-                    value: system.weight,
-                    label: 'Weight',
-                    min: 0,
-                    step: 0.1,
-                    placeholder: '0',
-                    hint: 'Weight in pounds'
-                });
-            }
-            if (system.cost !== undefined) {
-                metaFields.push({
-                    type: 'number',
-                    name: 'system.cost',
-                    value: system.cost,
-                    label: 'Cost',
-                    min: 0,
-                    placeholder: '0',
-                    hint: 'Cost in credits'
-                });
-            }
-            break;
-
-        case 'feature':
-            if (system.powerPointCost !== undefined) {
-                metaFields.push({
-                    type: 'number',
-                    name: 'system.powerPointCost',
-                    value: system.powerPointCost,
-                    label: 'PP Cost',
-                    min: 0,
-                    max: 20,
-                    placeholder: '0',
-                    hint: 'Power Point cost to use this feature'
-                });
-            }
-            if (system.isActive !== undefined) {
-                metaFields.push({
-                    type: 'checkbox',
-                    name: 'system.isActive',
-                    checked: system.isActive,
-                    label: 'Active',
-                    hint: 'Is this an active feature?'
-                });
-            }
-            break;
-
-        case 'trait':
-            // Trait preview (if color and name exist)
-            if (system.color && item.name) {
-                metaFields.push({
-                    type: 'trait-preview',
-                    trait: system,
-                    itemName: item.name,
-                    label: 'Preview'
-                });
-            }
-            break;
-
         default:
             // No meta fields for unknown types
             break;
@@ -716,509 +578,61 @@ export function prepareItemHeaderMetaFields(item: any, system: any): any[] {
  * a structured array that can be rendered consistently across all item types.
  * Fields are grouped logically and can be chunked into rows for layout.
  *
+ * REFACTORED: Now uses the new declarative layout system for supported item types,
+ * with fallback to legacy switch-based logic for unsupported types.
+ *
  * @param item - The item data
  * @param system - The item's system data
  * @returns Array of field objects for body content
  */
+// Import the layout system statically
+import { getBodyLayout } from '../layout/item-sheet';
+
 export function prepareItemBodyFields(item: any, system: any): any[] {
+    // Try to use the new layout system first
+    try {
+        if (isItemTypeSupported(item.type)) {
+            const itemData = { ...item, system };
+            return getBodyLayout(itemData);
+        }
+    } catch (error) {
+        console.warn('Layout system not available, falling back to legacy logic:', error);
+    }
+
+    // Legacy fallback for unsupported types
     const bodyFields: any[] = [];
 
-    // Add meta fields that were moved from header to body (Stage 2 Universal Architecture)
-    // These appear first in the body, right after header
+    // All known item types are now handled by the layout system
+    // This includes description and traits fields which are handled by commonFields
+    // This switch statement is kept for future unsupported types
     switch (item.type) {
-        case 'talent':
-            if (system.apCost !== undefined) {
+        default:
+            // Always include description field for unknown types
+            bodyFields.push({
+                type: 'description',
+                name: 'system.description',
+                value: system.description || '',
+                label: 'Description',
+                placeholder: `Describe this ${item.type}...`,
+                rows: 6,
+                hint: `Detailed description of the ${item.type}'s appearance and function`,
+                class: `${item.type}-description`,
+                fullWidth: true  // Description spans full width
+            });
+
+            // Always include traits field at the end for unknown types (except trait items themselves)
+            if (item.type !== 'trait') {
                 bodyFields.push({
-                    type: 'ap-selector',
-                    name: 'system.apCost',
-                    value: system.apCost,
-                    label: 'AP',
-                    hint: 'Action Point cost to use this talent',
-                    max: 3,
-                    class: 'talent-ap-cost'
+                    type: 'traits',
+                    name: 'system.traits',
+                    value: system.traits || [],
+                    label: 'Traits',
+                    hint: 'Add descriptive traits for this item',
+                    class: `${item.type}-traits`,
+                    fullWidth: true  // Traits span full width
                 });
             }
             break;
-
-        case 'augment':
-            if (system.apCost !== undefined) {
-                bodyFields.push({
-                    type: 'ap-selector',
-                    name: 'system.apCost',
-                    value: system.apCost,
-                    label: 'AP',
-                    hint: 'Action Point cost to activate this augment',
-                    max: 3,
-                    class: 'augment-ap-cost'
-                });
-            }
-            if (system.ppCost !== undefined) {
-                bodyFields.push({
-                    type: 'number',
-                    name: 'system.ppCost',
-                    value: system.ppCost,
-                    label: 'PP',
-                    min: 0,
-                    max: 20,
-                    placeholder: '0',
-                    hint: 'Power Point cost to use this augment',
-                    class: 'augment-pp-cost'
-                });
-            }
-            break;
-
-        case 'weapon':
-            if (system.damage !== undefined) {
-                bodyFields.push({
-                    type: 'text',
-                    name: 'system.damage',
-                    value: system.damage,
-                    label: 'Damage',
-                    placeholder: '1d8',
-                    hint: 'Weapon damage dice (e.g., 1d8, 2d6)',
-                    class: 'weapon-damage'
-                });
-            }
-            if (system.modifier !== undefined) {
-                bodyFields.push({
-                    type: 'number',
-                    name: 'system.modifier',
-                    value: system.modifier,
-                    label: 'Modifier',
-                    min: -10,
-                    max: 20,
-                    placeholder: '0',
-                    hint: 'Attack modifier bonus/penalty',
-                    class: 'weapon-modifier'
-                });
-            }
-            break;
-
-        case 'armor':
-            if (system.armorClass !== undefined) {
-                bodyFields.push({
-                    type: 'number',
-                    name: 'system.armorClass',
-                    value: system.armorClass,
-                    label: 'AC',
-                    min: 10,
-                    max: 25,
-                    placeholder: '10',
-                    hint: 'Armor Class defense value',
-                    class: 'armor-ac'
-                });
-            }
-            if (system.threshold !== undefined) {
-                bodyFields.push({
-                    type: 'number',
-                    name: 'system.threshold',
-                    value: system.threshold,
-                    label: 'Threshold',
-                    min: 0,
-                    max: 20,
-                    placeholder: '0',
-                    hint: 'Damage threshold before penetration',
-                    class: 'armor-threshold'
-                });
-            }
-            break;
-
-        case 'gear':
-            if (system.weight !== undefined) {
-                bodyFields.push({
-                    type: 'number',
-                    name: 'system.weight',
-                    value: system.weight,
-                    label: 'Weight',
-                    min: 0,
-                    step: 0.1,
-                    placeholder: '0',
-                    hint: 'Weight in pounds',
-                    class: 'gear-weight'
-                });
-            }
-            if (system.cost !== undefined) {
-                bodyFields.push({
-                    type: 'number',
-                    name: 'system.cost',
-                    value: system.cost,
-                    label: 'Cost',
-                    min: 0,
-                    placeholder: '0',
-                    hint: 'Cost in credits',
-                    class: 'gear-cost'
-                });
-            }
-            break;
-
-        case 'feature':
-            if (system.powerPointCost !== undefined) {
-                bodyFields.push({
-                    type: 'number',
-                    name: 'system.powerPointCost',
-                    value: system.powerPointCost,
-                    label: 'PP Cost',
-                    min: 0,
-                    max: 20,
-                    placeholder: '0',
-                    hint: 'Power Point cost to use this feature',
-                    class: 'feature-pp-cost'
-                });
-            }
-            if (system.isActive !== undefined) {
-                bodyFields.push({
-                    type: 'checkbox',
-                    name: 'system.isActive',
-                    checked: system.isActive,
-                    label: 'Active',
-                    hint: 'Is this an active feature?',
-                    class: 'feature-active'
-                });
-            }
-            break;
-
-        case 'trait':
-            // Trait preview (if color and name exist)
-            if (system.color && item.name) {
-                bodyFields.push({
-                    type: 'trait-preview',
-                    trait: system,
-                    itemName: item.name,
-                    label: 'Preview',
-                    class: 'trait-preview'
-                });
-            }
-            break;
-    }
-
-    // Always include description field after meta fields for all item types
-    bodyFields.push({
-        type: 'description',
-        name: 'system.description',
-        value: system.description || '',
-        label: 'Description',
-        placeholder: `Describe this ${item.type}...`,
-        rows: 6,
-        hint: `Detailed description of the ${item.type}'s appearance and function`,
-        class: `${item.type}-description`,
-        fullWidth: true  // Description spans full width
-    });
-
-    // Continue with existing type-specific fields after meta fields
-    switch (item.type) {
-        case 'talent':
-            // Level requirement
-            if (system.levelRequirement !== undefined) {
-                bodyFields.push({
-                    type: 'number',
-                    name: 'system.levelRequirement',
-                    value: system.levelRequirement || 1,
-                    label: 'Level Required',
-                    min: 1,
-                    max: 20,
-                    placeholder: '1',
-                    hint: 'Minimum character level to acquire this talent',
-                    class: 'talent-level-requirement'
-                });
-            }
-
-            // Requirements text field
-            if (system.requirements !== undefined) {
-                bodyFields.push({
-                    type: 'textarea',
-                    name: 'system.requirements',
-                    value: system.requirements || '',
-                    label: 'Requirements',
-                    placeholder: 'Any prerequisites or requirements...',
-                    rows: 2,
-                    hint: 'List any conditions needed to learn this talent',
-                    class: 'talent-requirements'
-                });
-            }
-            break;
-
-        case 'augment':
-            // Level requirement
-            if (system.levelRequirement !== undefined) {
-                bodyFields.push({
-                    type: 'number',
-                    name: 'system.levelRequirement',
-                    value: system.levelRequirement || 1,
-                    label: 'Level Required',
-                    min: 1,
-                    max: 20,
-                    placeholder: '1',
-                    hint: 'Minimum character level for this augment',
-                    class: 'augment-level'
-                });
-            }
-
-            // Requirements text field
-            if (system.requirements !== undefined) {
-                bodyFields.push({
-                    type: 'textarea',
-                    name: 'system.requirements',
-                    value: system.requirements || '',
-                    label: 'Requirements',
-                    placeholder: 'Enter any prerequisites or requirements...',
-                    rows: 2,
-                    hint: 'List any conditions needed to install or use this augment',
-                    class: 'augment-requirements'
-                });
-            }
-
-            // Active status
-            if (system.isActive !== undefined) {
-                bodyFields.push({
-                    type: 'checkbox',
-                    name: 'system.isActive',
-                    checked: system.isActive || false,
-                    label: 'Active',
-                    hint: 'Whether this augment is currently active',
-                    class: 'augment-active'
-                });
-            }
-
-            // Rarity and augment type
-            if (system.rarity !== undefined) {
-                bodyFields.push({
-                    type: 'select',
-                    name: 'system.rarity',
-                    value: system.rarity || 'common',
-                    label: 'Rarity',
-                    options: [
-                        { value: 'common', label: 'Common' },
-                        { value: 'uncommon', label: 'Uncommon' },
-                        { value: 'rare', label: 'Rare' },
-                        { value: 'legendary', label: 'Legendary' }
-                    ],
-                    hint: 'How rare this augment is',
-                    class: 'augment-rarity'
-                });
-            }
-
-            if (system.augmentType !== undefined) {
-                bodyFields.push({
-                    type: 'select',
-                    name: 'system.augmentType',
-                    value: system.augmentType || 'enhancement',
-                    label: 'Augment Type',
-                    options: [
-                        { value: 'enhancement', label: 'Enhancement' },
-                        { value: 'cybernetic', label: 'Cybernetic' },
-                        { value: 'biological', label: 'Biological' },
-                        { value: 'neural', label: 'Neural' }
-                    ],
-                    hint: 'Type of augmentation technology',
-                    class: 'augment-type'
-                });
-            }
-            break;
-
-        case 'weapon':
-            // Ability selection, weight and cost (already have damage and modifier from meta fields)
-            if (system.ability !== undefined) {
-                bodyFields.push({
-                    type: 'select',
-                    name: 'system.ability',
-                    value: system.ability || 'might',
-                    label: 'Ability',
-                    options: [
-                        { value: 'might', label: 'Might' },
-                        { value: 'grace', label: 'Grace' },
-                        { value: 'intellect', label: 'Intellect' },
-                        { value: 'focus', label: 'Focus' }
-                    ],
-                    hint: 'Primary ability used for attacks',
-                    class: 'weapon-ability'
-                });
-            }
-
-            if (system.weight !== undefined) {
-                bodyFields.push({
-                    type: 'number',
-                    name: 'system.weight',
-                    value: system.weight || 0,
-                    label: 'Weight',
-                    min: 0,
-                    step: 0.1,
-                    placeholder: '0',
-                    hint: 'Weight in pounds',
-                    class: 'weapon-weight'
-                });
-            }
-
-            if (system.cost !== undefined) {
-                bodyFields.push({
-                    type: 'number',
-                    name: 'system.cost',
-                    value: system.cost || 0,
-                    label: 'Cost',
-                    min: 0,
-                    placeholder: '0',
-                    hint: 'Cost in credits',
-                    class: 'weapon-cost'
-                });
-            }
-            break;
-
-        case 'armor':
-            // Ability selection and modifier, weight and cost (already have AC and threshold from meta fields)
-            if (system.ability !== undefined) {
-                bodyFields.push({
-                    type: 'select',
-                    name: 'system.ability',
-                    value: system.ability || 'might',
-                    label: 'Ability',
-                    options: [
-                        { value: 'might', label: 'Might' },
-                        { value: 'grace', label: 'Grace' },
-                        { value: 'intellect', label: 'Intellect' },
-                        { value: 'focus', label: 'Focus' }
-                    ],
-                    hint: 'Primary ability for armor calculations',
-                    class: 'armor-ability'
-                });
-            }
-
-            if (system.modifier !== undefined) {
-                bodyFields.push({
-                    type: 'number',
-                    name: 'system.modifier',
-                    value: system.modifier || 0,
-                    label: 'Modifier',
-                    min: -10,
-                    max: 20,
-                    placeholder: '0',
-                    hint: 'Armor modifier bonus/penalty',
-                    class: 'armor-modifier'
-                });
-            }
-
-            if (system.weight !== undefined) {
-                bodyFields.push({
-                    type: 'number',
-                    name: 'system.weight',
-                    value: system.weight || 0,
-                    label: 'Weight',
-                    min: 0,
-                    step: 0.1,
-                    placeholder: '0',
-                    hint: 'Weight in pounds',
-                    class: 'armor-weight'
-                });
-            }
-
-            if (system.cost !== undefined) {
-                bodyFields.push({
-                    type: 'number',
-                    name: 'system.cost',
-                    value: system.cost || 0,
-                    label: 'Cost',
-                    min: 0,
-                    placeholder: '0',
-                    hint: 'Cost in credits',
-                    class: 'armor-cost'
-                });
-            }
-            break;
-
-        case 'gear':
-            // Gear has no additional fields beyond description
-            break;
-
-        case 'feature':
-            // Category selection
-            if (system.category !== undefined) {
-                bodyFields.push({
-                    type: 'select',
-                    name: 'system.category',
-                    value: system.category || 'general',
-                    label: 'Category',
-                    options: [
-                        { value: 'general', label: 'General' },
-                        { value: 'combat', label: 'Combat' },
-                        { value: 'exploration', label: 'Exploration' },
-                        { value: 'social', label: 'Social' },
-                        { value: 'supernatural', label: 'Supernatural' }
-                    ],
-                    hint: 'Feature category for organization',
-                    class: 'feature-category'
-                });
-            }
-
-            // Uses counter if applicable
-            if (system.uses !== undefined) {
-                bodyFields.push({
-                    type: 'uses-counter',
-                    name: 'system.uses',
-                    current: system.uses.value || 0,
-                    max: system.uses.max || 1,
-                    label: 'Uses',
-                    hint: 'Current uses / Maximum uses',
-                    class: 'feature-uses'
-                });
-            }
-            break;
-
-        case 'trait':
-            // Color and icon row
-            if (system.color !== undefined) {
-                bodyFields.push({
-                    type: 'text',
-                    name: 'system.color',
-                    value: system.color || '#FF5733',
-                    label: 'Color',
-                    placeholder: '#FF5733',
-                    hint: 'Hex color code for the trait chip',
-                    required: true,
-                    class: 'trait-color'
-                });
-            }
-
-            if (system.icon !== undefined) {
-                bodyFields.push({
-                    type: 'text',
-                    name: 'system.icon',
-                    value: system.icon || '',
-                    label: 'Icon',
-                    placeholder: 'fas fa-fire',
-                    hint: 'FontAwesome icon class',
-                    class: 'trait-icon'
-                });
-            }
-
-            // Rarity
-            if (system.rarity !== undefined) {
-                bodyFields.push({
-                    type: 'select',
-                    name: 'system.rarity',
-                    value: system.rarity || 'common',
-                    label: 'Rarity',
-                    options: [
-                        { value: 'common', label: 'Common' },
-                        { value: 'uncommon', label: 'Uncommon' },
-                        { value: 'rare', label: 'Rare' },
-                        { value: 'legendary', label: 'Legendary' }
-                    ],
-                    hint: 'How rare this trait is',
-                    class: 'trait-rarity'
-                });
-            }
-            break;
-    }
-
-    // Always include traits field at the end for all item types (except trait items themselves)
-    if (item.type !== 'trait') {
-        bodyFields.push({
-            type: 'traits',
-            name: 'system.traits',
-            value: system.traits || [],
-            label: 'Traits',
-            hint: 'Add descriptive traits for this item',
-            class: `${item.type}-traits`,
-            fullWidth: true  // Traits span full width
-        });
     }
 
     return bodyFields;

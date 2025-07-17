@@ -10,6 +10,7 @@
 @use 'components/form-components';
 @use 'components/item-rows';
 @use 'components/item-sheets';
+@use 'components/item-cards';
 @use 'themes/base';
 @use 'themes/dark';
 
@@ -718,6 +719,7 @@ form.avant.theme-dark {
     border-radius: 0;
     flex-shrink: 0; // Prevent tabs from shrinking
     z-index: 40;
+    line-height: 1;
 
     .item {
       background: transparent;
@@ -730,6 +732,7 @@ form.avant.theme-dark {
       @include transition-standard;
       cursor: pointer;
       letter-spacing: 1px;
+      max-width: 17%;
 
       &:hover {
         background: rgba(0, 224, 220, 0.1);
@@ -1383,6 +1386,7 @@ form.avant.theme-dark {
   }
 
   .item,
+  .item-card,
   .gear-item,
   .action-item,
   .feature-item,
@@ -1406,6 +1410,7 @@ form.avant.theme-dark {
   }
 
   .item-name,
+  .item-card .card-item-name,
   .gear-item h4,
   .action-item .action-name,
   .feature-item .feature-name,
@@ -1423,6 +1428,7 @@ form.avant.theme-dark {
   }
 
   .item-controls,
+  .item-card .item-card__right,
   .gear-item .item-controls,
   .action-item .action-controls,
   .feature-item .feature-controls,
@@ -2034,7 +2040,7 @@ form.avant.theme-dark {
             input {
               @include orbitron-header(16px, 700);
               @include form-input-base;
-              
+
               & {
                 background: transparent !important;
                 border: 1px solid var(--theme-border-primary, $border-primary) !important;
@@ -2708,6 +2714,49 @@ form.avant.theme-dark {
       font-size: 14px;
       width: 16px;
       text-align: center;
+    }
+  }
+}
+
+/* Gear Tab - Enhanced Item Details for Weapons and Armor */
+.gear-item {
+  .item-details {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--theme-text-secondary, $text-secondary);
+
+    span {
+      padding: 2px 6px;
+      border-radius: 3px;
+      background: rgba(0, 224, 220, 0.1);
+      border: 1px solid rgba(0, 224, 220, 0.3);
+      white-space: nowrap;
+    }
+
+    .item-damage {
+      background: rgba(255, 107, 107, 0.1);
+      border-color: rgba(255, 107, 107, 0.3);
+      color: #ff6b6b;
+    }
+
+    .item-damage-type {
+      background: rgba(255, 195, 0, 0.1);
+      border-color: rgba(255, 195, 0, 0.3);
+      color: #ffc300;
+    }
+
+    .item-ac {
+      background: rgba(74, 144, 226, 0.1);
+      border-color: rgba(74, 144, 226, 0.3);
+      color: #4a90e2;
+    }
+
+    .item-threshold {
+      background: rgba(156, 39, 176, 0.1);
+      border-color: rgba(156, 39, 176, 0.3);
+      color: #9c27b0;
     }
   }
 }

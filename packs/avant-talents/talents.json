@@ -11,9 +11,9 @@
       "damage": "3d6",
       "traits": [
         "lOIFXcPpEzc6ZJxU",
-        "eoBL454MnKXSQFjY",
+        "30qrmNpTBNWm5wst",
         "tzd1cp95Ky6B29T0",
-        "RcBG8LQNhJXNfPzl"
+        "GMglhh7Nf2hHqQZo"
       ]
     },
     "sort": 100,
@@ -30,9 +30,9 @@
       "range": "100 feet",
       "damage": "2d8",
       "traits": [
-        "BVQw1xKzNhMpRtS3",
-        "tzd1cp95Ky6B29T0",
-        "RcBG8LQNhJXNfPzl"
+        "nF7b16rpNv8uv3Lq",
+        "30qrmNpTBNWm5wst",
+        "tzd1cp95Ky6B29T0"
       ]
     },
     "sort": 200,
@@ -50,8 +50,8 @@
       "damage": "1d4",
       "traits": [
         "lOIFXcPpEzc6ZJxU",
-        "tzd1cp95Ky6B29T0",
-        "RcBG8LQNhJXNfPzl"
+        "nF7b16rpNv8uv3Lq",
+        "tzd1cp95Ky6B29T0"
       ]
     },
     "sort": 300,
@@ -68,9 +68,9 @@
       "range": "Self",
       "damage": "0",
       "traits": [
-        "T6jQ8wKzNhMpRtS3",
-        "tzd1cp95Ky6B29T0",
-        "LGgzEItGDbSJiH55"
+        "wEF8HFrplLzdLBBm",
+        "30qrmNpTBNWm5wst",
+        "tzd1cp95Ky6B29T0"
       ]
     },
     "sort": 100,
@@ -87,9 +87,9 @@
       "range": "Self",
       "damage": "0",
       "traits": [
-        "3TkL6wKzNhMpRtS3",
-        "tzd1cp95Ky6B29T0",
-        "LGgzEItGDbSJiH55"
+        "GMglhh7Nf2hHqQZo",
+        "nF7b16rpNv8uv3Lq",
+        "tzd1cp95Ky6B29T0"
       ]
     },
     "sort": 200,
@@ -107,8 +107,8 @@
       "damage": "2d4+2",
       "traits": [
         "tzd1cp95Ky6B29T0",
-        "LGgzEItGDbSJiH55",
-        "0VuoqlxYRKVkkZFO"
+        "lOIFXcPpEzc6ZJxU",
+        "wEF8HFrplLzdLBBm"
       ]
     },
     "sort": 300,
@@ -125,9 +125,9 @@
       "range": "500 feet",
       "damage": "0",
       "traits": [
-        "tzd1cp95Ky6B29T0",
-        "RcBG8LQNhJXNfPzl",
-        "xFmSV2ZXlTnNhnPS"
+        "22N0YjYYbXJ7tuHj",
+        "30qrmNpTBNWm5wst",
+        "tzd1cp95Ky6B29T0"
       ]
     },
     "sort": 100,
@@ -144,9 +144,9 @@
       "range": "Self",
       "damage": "0",
       "traits": [
-        "tzd1cp95Ky6B29T0",
-        "0VuoqlxYRKVkkZFO",
-        "xFmSV2ZXlTnNhnPS"
+        "wEF8HFrplLzdLBBm",
+        "nF7b16rpNv8uv3Lq",
+        "tzd1cp95Ky6B29T0"
       ]
     },
     "sort": 200,
@@ -163,9 +163,9 @@
       "range": "60 feet",
       "damage": "0",
       "traits": [
-        "tzd1cp95Ky6B29T0",
-        "0VuoqlxYRKVkkZFO",
-        "xFmSV2ZXlTnNhnPS"
+        "30qrmNpTBNWm5wst",
+        "GMglhh7Nf2hHqQZo",
+        "tzd1cp95Ky6B29T0"
       ]
     },
     "sort": 300,
@@ -183,8 +183,8 @@
       "damage": "0",
       "traits": [
         "22N0YjYYbXJ7tuHj",
-        "tzd1cp95Ky6B29T0",
-        "xFmSV2ZXlTnNhnPS"
+        "wEF8HFrplLzdLBBm",
+        "tzd1cp95Ky6B29T0"
       ]
     },
     "sort": 400,
@@ -201,9 +201,9 @@
       "range": "30 feet",
       "damage": "0",
       "traits": [
-        "tzd1cp95Ky6B29T0",
-        "0VuoqlxYRKVkkZFO",
-        "xFmSV2ZXlTnNhnPS"
+        "GMglhh7Nf2hHqQZo",
+        "lOIFXcPpEzc6ZJxU",
+        "tzd1cp95Ky6B29T0"
       ]
     },
     "sort": 500,
@@ -220,9 +220,9 @@
       "range": "Touch",
       "damage": "2d6",
       "traits": [
-        "tzd1cp95Ky6B29T0",
-        "0VuoqlxYRKVkkZFO",
-        "xFmSV2ZXlTnNhnPS"
+        "nF7b16rpNv8uv3Lq",
+        "30qrmNpTBNWm5wst",
+        "tzd1cp95Ky6B29T0"
       ]
     },
     "sort": 600,
@@ -239,9 +239,10 @@
       "range": "30 feet radius",
       "damage": "4d6",
       "traits": [
-        "3TkL6wKzNhMpRtS3",
-        "tzd1cp95Ky6B29T0",
-        "RcBG8LQNhJXNfPzl"
+        "lOIFXcPpEzc6ZJxU",
+        "30qrmNpTBNWm5wst",
+        "nF7b16rpNv8uv3Lq",
+        "tzd1cp95Ky6B29T0"
       ]
     },
     "sort": 400,
@@ -258,9 +259,10 @@
       "range": "10 feet",
       "damage": "0",
       "traits": [
-        "tzd1cp95Ky6B29T0",
-        "LGgzEItGDbSJiH55",
-        "xFmSV2ZXlTnNhnPS"
+        "GMglhh7Nf2hHqQZo",
+        "wEF8HFrplLzdLBBm",
+        "30qrmNpTBNWm5wst",
+        "tzd1cp95Ky6B29T0"
       ]
     },
     "sort": 400,
@@ -277,9 +279,9 @@
       "range": "Self",
       "damage": "0",
       "traits": [
-        "tzd1cp95Ky6B29T0",
-        "0VuoqlxYRKVkkZFO",
-        "xFmSV2ZXlTnNhnPS"
+        "22N0YjYYbXJ7tuHj",
+        "GMglhh7Nf2hHqQZo",
+        "tzd1cp95Ky6B29T0"
       ]
     },
     "sort": 700,

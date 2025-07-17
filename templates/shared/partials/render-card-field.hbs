@@ -1,0 +1,44 @@
+{{!--
+  Card Field Renderer - Renders individual fields within card zones
+  
+  Context expects:
+  - this: Field object with type, name, and other properties
+  - item: The parent item data object
+  
+  Handles button fields, icon fields, and standard form fields
+--}}
+
+{{#if (eq this.type "button")}}
+  {{!-- Button field rendering --}}
+  <button type="button" 
+          class="{{this.class}}" 
+          data-action="{{this.action}}"
+          data-item-id="{{item._id}}"
+          title="{{this.tooltip}}">
+    {{#if this.icon}}
+      <i class="{{this.icon}}"></i>
+    {{/if}}
+    {{#unless (eq this.buttonType "drag")}}
+      <span class="btn-label">{{this.label}}</span>
+    {{/unless}}
+  </button>
+  
+{{else if (eq this.type "icon")}}
+  {{!-- Icon field rendering --}}
+  {{#if (eq this.icon "item-img")}}
+    {{!-- Special case: item image --}}
+    <div class="{{this.class}}" title="{{this.tooltip}}">
+      <img src="{{item.img}}" alt="{{item.name}}" class="item-icon-img" />
+    </div>
+  {{else}}
+    {{!-- Regular icon --}}
+    <div class="{{this.class}}" title="{{this.tooltip}}" {{#if this.color}}style="color: {{this.color}}"{{/if}}>
+      <i class="{{this.icon}}"></i>
+    </div>
+  {{/if}}
+  
+{{else}}
+  {{!-- Standard field rendering (delegate to existing render-field) --}}
+  {{> "systems/avant/templates/shared/partials/render-field" field=this editable=true}}
+  
+{{/if}}

@@ -855,23 +855,17 @@ export class TraitProvider {
     try {
       const packName = source === 'system' ? this.config.systemPackName : this.config.worldPackName;
 
-      console.log(`🏷️ TRAIT DEBUG | loadTraitsFromPack called for source '${source}', packName: '${packName}'`);
-      console.log(`🏷️ TRAIT DEBUG | Using CompendiumLocalService for pack loading...`);
-      console.log(`🏷️ TRAIT DEBUG | Current timestamp: ${new Date().toISOString()}`);
 
       // Use CompendiumLocalService to load documents
       let items;
       try {
         items = await this.compendiumService.loadPack(packName);
-        console.log(`🏷️ TRAIT DEBUG | CompendiumLocalService loaded ${items.length} items from pack`);
       } catch (loadError) {
         // If pack doesn't exist or can't be loaded, that's not necessarily an error
         const errorMsg = loadError instanceof Error ? loadError.message : String(loadError);
-        console.log(`🏷️ TRAIT DEBUG | Pack '${packName}' could not be loaded: ${errorMsg}`);
 
         // If it's a "not found" error, return empty result rather than failing
         if (errorMsg.includes('not found')) {
-          console.log(`🏷️ TRAIT DEBUG | Pack '${packName}' not found for source '${source}' - returning empty result`);
           return {
             success: true, // Not finding a pack is not an error
             data: []
@@ -884,13 +878,8 @@ export class TraitProvider {
 
       // If system pack is empty, this means the build process didn't populate it correctly
       if (items.length === 0 && source === 'system') {
-        console.warn(`🏷️ TRAIT DEBUG | System pack is empty - this should be populated during build process`);
-        console.warn(`🏷️ TRAIT DEBUG | Run 'npm run build:packs' to populate system compendium pack`);
-        console.warn(`🏷️ TRAIT DEBUG | Continuing with empty system pack...`);
       }
 
-      console.log(`🏷️ TRAIT DEBUG | Final document count: ${items.length}`);
-      console.log(`🏷️ TRAIT DEBUG | Sample items:`, items.slice(0, 3).map((i: any) => ({ id: i._id, name: i.name, type: i.type })));
 
       const traits: Trait[] = [];
       let processedCount = 0;
@@ -899,13 +888,11 @@ export class TraitProvider {
 
       for (const item of items) {
         processedCount++;
-        console.log(`🏷️ TRAIT DEBUG | Processing item ${processedCount}: ${item.name} (type: ${item.type})`);
 
         // For system pack, only process items of the configured type (feature)
         // For world pack, allow any item type if it has the required trait properties
         if (source === 'system') {
           if (item.type !== this.config.itemType) {
-            console.log(`🏷️ TRAIT DEBUG | Skipping system item '${item.name}' - wrong type (${item.type} !== ${this.config.itemType})`);
             skippedCount++;
             continue;
           }
@@ -919,11 +906,9 @@ export class TraitProvider {
             const missingProps = [];
             if (!system?.color) missingProps.push('color');
             if (!system?.icon) missingProps.push('icon');
-            console.log(`🏷️ TRAIT DEBUG | Skipping world item '${item.name}' (type: ${item.type}) - missing trait properties (${missingProps.join(', ')})`);
             skippedCount++;
             continue;
           } else {
-            console.log(`🏷️ TRAIT DEBUG | World item '${item.name}' (type: ${item.type}) has trait properties, will attempt conversion`);
           }
         }
 
@@ -931,14 +916,11 @@ export class TraitProvider {
         if (trait) {
           traits.push(trait);
           convertedCount++;
-          console.log(`🏷️ TRAIT DEBUG | Converted item '${item.name}' to trait successfully`);
         } else {
           skippedCount++;
-          console.log(`🏷️ TRAIT DEBUG | Failed to convert item '${item.name}' to trait`);
         }
       }
 
-      console.log(`🏷️ TRAIT DEBUG | Final results - processed: ${processedCount}, skipped: ${skippedCount}, converted: ${convertedCount}`);
       console.log(`🏷️ TraitProvider | Loaded ${traits.length} traits from ${source} pack '${packName}' via CompendiumLocalService`);
 
       return {
@@ -962,23 +944,12 @@ export class TraitProvider {
    */
   private convertItemToTrait(item: any, source: TraitSource): Trait | null {
     try {
-      console.log(`🏷️ TRAIT DEBUG | convertItemToTrait called for item '${item.name}'`);
-      console.log(`🏷️ TRAIT DEBUG | Item ID info - _id: ${item._id}, id: ${item.id}, uuid: ${item.uuid}`);
-      console.log(`🏷️ TRAIT DEBUG | Full item object keys:`, Object.keys(item));
 
       const system = item.system as TraitItemSystemData;
-      console.log(`🏷️ TRAIT DEBUG | Item system properties:`, {
-        color: system.color,
-        icon: system.icon,
-        localKey: system.localKey,
-        description: system.description,
-        tags: system.tags
-      });
 
       // For new trait items, validate required properties
       if (item.type === 'trait') {
         if (!system.color || !system.icon) {
-          console.warn(`🏷️ TRAIT DEBUG | Trait item '${item.name}' missing required properties (color, icon), skipping`);
           return null;
         }
       } else {
@@ -989,12 +960,10 @@ export class TraitProvider {
           if (!system.color) missingProps.push('color');
           if (!system.icon) missingProps.push('icon');
           if (source === 'system' && !system.localKey) missingProps.push('localKey');
-          console.warn(`🏷️ TRAIT DEBUG | Item '${item.name}' missing required trait properties (${missingProps.join(', ')}), skipping`);
           return null;
         }
       }
 
-      console.log(`🏷️ TRAIT DEBUG | All required properties present, creating trait object...`);
 
       // Generate ID with fallback strategy if item._id is null
       let traitId = item._id || item.id;
@@ -1002,7 +971,6 @@ export class TraitProvider {
         // Generate a stable, deterministic ID based on name and source (NO timestamp)
         const sanitizedName = item.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
         traitId = `${source}_trait_${sanitizedName}`;
-        console.log(`🏷️ TRAIT DEBUG | Generated deterministic ID: ${traitId}`);
       }
 
       const trait: Trait = {
@@ -1026,8 +994,6 @@ export class TraitProvider {
         }
       };
 
-      console.log(`🏷️ TRAIT DEBUG | Successfully created trait object for '${item.name}' with ID: ${traitId}`);
-      console.log(`🏷️ TRAIT DEBUG | Final trait object ID field: ${trait.id}, tags: ${trait.tags}`);
       return trait;
 
     } catch (error) {
@@ -1045,14 +1011,11 @@ export class TraitProvider {
   private deduplicateTraits(traits: Trait[]): Trait[] {
     const traitMap = new Map<string, Trait>();
 
-    console.log(`🏷️ TRAIT DEBUG | deduplicateTraits called with ${traits.length} traits`);
-    console.log(`🏷️ TRAIT DEBUG | Input trait names:`, traits.map(t => t.name));
 
     // First add all system traits (use trait name as key, not ID)
     for (const trait of traits) {
       if (trait.source === 'system') {
         traitMap.set(trait.name, trait);
-        console.log(`🏷️ TRAIT DEBUG | Added system trait '${trait.name}' with key '${trait.name}'`);
       }
     }
 
@@ -1060,13 +1023,10 @@ export class TraitProvider {
     for (const trait of traits) {
       if (trait.source === 'world') {
         traitMap.set(trait.name, trait);
-        console.log(`🏷️ TRAIT DEBUG | Added/overwrote world trait '${trait.name}' with key '${trait.name}'`);
       }
     }
 
     const result = Array.from(traitMap.values());
-    console.log(`🏷️ TRAIT DEBUG | deduplicateTraits result: ${result.length} unique traits`);
-    console.log(`🏷️ TRAIT DEBUG | Result trait names:`, result.map(t => t.name));
 
     return result;
   }
@@ -1221,9 +1181,6 @@ export class TraitProvider {
         // ✅ NEW: Also emit avantTagsUpdated hook to trigger autocomplete index rebuild
         (globalThis as any).Hooks.call('avantTagsUpdated', []);
       }
-
-      console.log(`🏷️ TraitProvider | Emitted 'avantTraitRegistered' hook for trait '${trait.name}' (${action})`);
-      console.log(`🏷️ TraitProvider | Emitted 'avantTagsUpdated' hook to trigger autocomplete rebuild`);
 
     } catch (error) {
       console.error('🏷️ TraitProvider | Failed to emit trait registered hook:', error);

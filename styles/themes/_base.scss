@@ -4,45 +4,47 @@
  * Compatible with FoundryVTT v12 and v13
  */
 
+@use '../utilities/variables' as *;
+
 // Theme Interface - All themes must define these variables
 @mixin theme-interface {
   // Primary Colors
-  --theme-bg-primary: initial;
-  --theme-bg-secondary: initial;
-  --theme-bg-tertiary: initial;
+  --theme-bg-primary: #{$bg-primary};
+  --theme-bg-secondary: #{$bg-secondary};
+  --theme-bg-tertiary: #{$bg-tertiary};
   
   // Text Colors
-  --theme-text-primary: initial;
-  --theme-text-secondary: initial;
-  --theme-text-muted: initial;
+  --theme-text-primary: #{$text-primary};
+  --theme-text-secondary: #{$text-secondary};
+  --theme-text-muted: #{$text-muted};
   
   // Accent Colors
-  --theme-accent-primary: initial;
-  --theme-accent-secondary: initial;
-  --theme-accent-tertiary: initial;
+  --theme-accent-primary: #{$accent-primary};
+  --theme-accent-secondary: #{$accent-secondary};
+  --theme-accent-tertiary: #{$accent-secondary};
   
   // Border Colors
-  --theme-border-primary: initial;
-  --theme-border-accent: initial;
+  --theme-border-primary: #{$border-primary};
+  --theme-border-accent: #{$border-accent};
   
   // State Colors
-  --theme-success: initial;
-  --theme-warning: initial;
-  --theme-error: initial;
-  --theme-info: initial;
+  --theme-success: #4CAF50;
+  --theme-warning: #FF9800;
+  --theme-error: #F44336;
+  --theme-info: #{$accent-primary};
   
   // Shadows
-  --theme-shadow-primary: initial;
-  --theme-shadow-accent: initial;
-  --theme-shadow-deep: initial;
+  --theme-shadow-primary: #{$shadow-primary};
+  --theme-shadow-accent: #{$shadow-accent};
+  --theme-shadow-deep: #{$shadow-deep};
   
   // Gradients
-  --theme-gradient-primary: initial;
-  --theme-gradient-accent: initial;
+  --theme-gradient-primary: #{$gradient-primary};
+  --theme-gradient-accent: #{$gradient-accent};
   
   // Typography
-  --theme-font-primary: initial;
-  --theme-font-display: initial;
+  --theme-font-primary: #{$font-primary};
+  --theme-font-display: #{$font-display};
   
   // Theme Metadata
   --theme-name: initial;

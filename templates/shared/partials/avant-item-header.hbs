@@ -1,37 +1,67 @@
 {{!--
-Universal Item Header Partial - Stage 2 Refactor
+Item Header Partial - Fully Configurable Header Layout
 
-This partial provides a simplified header layout containing ONLY icon + name.
-All other fields (AP cost, level requirements, etc.) have been moved to the body
-for the universal item sheet architecture.
+This partial provides a standardized header layout for all item sheets.
+It uses the layout system to render all header fields from metaFields array,
+respecting the exact order and configuration from the layout system.
 
 Required context:
 - item: The item data object
+- metaFields: Array of field objects prepared by prepareItemHeaderMetaFields()
 
 Features:
-- Single row: icon + name only
-- Consistent across all item types
-- Meta fields moved to sheet-body for better organization
+- Fully configurable through layout system
+- Support for all field types (image-upload, text, number, ap-selector, etc.)
+- Side-by-side field placement with sideBy helper
+- Full-width field support
+- Responsive design with mobile support
+- Consistent spacing and alignment
 --}}
 
 <header class="sheet-header">
-    {{!-- Row 1: Icon + Name (ONLY content in header) --}}
-    <div class="header-main row-container">
-        {{!-- Image Upload Component --}}
-        {{> "systems/avant/templates/shared/partials/image-upload"
-        src=item.img
-        alt=item.name
-        title=item.name
-        size=48
-        class="item-icon"}}
+  {{#if metaFields}}
+  {{#each metaFields as |field fieldIndex|}}
+  {{#if field.fullWidth}}
+  {{!-- Full-width fields get their own container --}}
+  <div class="row-container full-width">
+    {{> "systems/avant/templates/shared/partials/render-field" field=field editable=editable
+    displayTraits=displayTraits}}
+  </div>
+  {{else if field.sideBy}}
+  {{!-- Side-by-side fields get a shared container --}}
+  <div class="row-container side-by-side" data-field-index="{{fieldIndex}}">
+    {{#each field.fields as |subField|}}
+    {{> "systems/avant/templates/shared/partials/render-field" field=subField editable=editable
+    displayTraits=displayTraits}}
+    {{/each}}
+  </div>
+  {{else}}
+  {{!-- Regular fields get individual containers --}}
+  <div class="row-container field-container" data-field-index="{{fieldIndex}}">
+    {{> "systems/avant/templates/shared/partials/render-field" field=field editable=editable
+    displayTraits=displayTraits}}
+  </div>
+  {{/if}}
+  {{/each}}
+  {{else}}
+  {{!-- Fallback to hardcoded header if metaFields is not available --}}
+  <div class="header-main row-container">
+    {{!-- Image Upload Component --}}
+    {{> "systems/avant/templates/shared/partials/image-upload"
+    src=item.img
+    alt=item.name
+    title=item.name
+    size=48
+    class="item-icon"}}
 
-        {{!-- Name Field --}}
-        {{> "systems/avant/templates/shared/partials/text-field"
-        name="name"
-        value=item.name
-        label="Item Name"
-        placeholder=(concat "Enter " (titleCase item.type) " name...")
-        required=true
-        class="item-name-field"}}
-    </div>
+    {{!-- Name Field --}}
+    {{> "systems/avant/templates/shared/partials/text-field"
+    name="name"
+    value=item.name
+    label="Item Name"
+    placeholder=(concat "Enter " (titleCase item.type) " name...")
+    required=true
+    class="item-name-field"}}
+  </div>
+  {{/if}}
 </header>

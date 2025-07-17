@@ -1,108 +1,47 @@
 {{!--
-Item Header Partial - Consistent Header Layout
+Item Header Partial - Fully Configurable Header Layout
 
 This partial provides a standardized header layout for all item sheets.
-It uses a column-based layout with row containers that automatically
-organize fields into rows of max 2 items each.
+It uses the layout system to render all header fields from metaFields array,
+respecting the exact order and configuration from the layout system.
 
 Required context:
 - item: The item data object
 - metaFields: Array of field objects prepared by prepareItemHeaderMetaFields()
 
 Features:
-- Row 1: Always icon + name (header-main)
-- Subsequent rows: Auto-generated from metaFields (max 2 per row)
+- Fully configurable through layout system
+- Support for all field types (image-upload, text, number, ap-selector, etc.)
+- Side-by-side field placement with sideBy helper
+- Full-width field support
 - Responsive design with mobile support
 - Consistent spacing and alignment
 --}}
 
 <header class="sheet-header">
-    {{!-- Row 1: Icon + Name (Always present) --}}
-    <div class="header-main row-container">
-        {{!-- Image Upload Component --}}
-        {{> "systems/avant/templates/shared/partials/image-upload"
-        src=item.img
-        alt=item.name
-        title=item.name
-        size=48
-        class="item-icon"}}
-
-        {{!-- Name Field --}}
-        {{> "systems/avant/templates/shared/partials/text-field"
-        name="name"
-        value=item.name
-        label="Item Name"
-        placeholder=(concat "Enter " (titleCase item.type) " name...")
-        required=true
-        class="item-name-field"}}
-    </div>
-
-    {{!-- Dynamic Meta Fields Rows (Max 2 fields per row) --}}
-    {{#if metaFields}}
-    {{#each (chunk metaFields 2) as |fieldRow rowIndex|}}
-    <div class="row-container" data-row="{{add rowIndex 2}}">
-        {{#each fieldRow as |field fieldIndex|}}
-        {{#if (eq field.type "ap-selector")}}
-        {{!-- AP Selector Component --}}
-        {{> "systems/avant/templates/shared/partials/ap-selector"
-        name=field.name
-        value=field.value
-        label=field.label
-        hint=field.hint
-        max=field.max
-        class=(concat item.type "-ap-selector")}}
-
-        {{else if (eq field.type "number")}}
-        {{!-- Number Field Component --}}
-        {{> "systems/avant/templates/shared/partials/number-field"
-        name=field.name
-        value=field.value
-        label=field.label
-        min=field.min
-        max=field.max
-        step=field.step
-        placeholder=field.placeholder
-        hint=field.hint
-        class=(concat item.type "-" field.label)}}
-
-        {{else if (eq field.type "text")}}
-        {{!-- Text Field Component --}}
-        {{> "systems/avant/templates/shared/partials/text-field"
-        name=field.name
-        value=field.value
-        label=field.label
-        placeholder=field.placeholder
-        hint=field.hint
-        class=(concat item.type "-" field.label)}}
-
-        {{else if (eq field.type "checkbox")}}
-        {{!-- Checkbox Field Component --}}
-        {{> "systems/avant/templates/shared/partials/checkbox-field"
-        name=field.name
-        checked=field.checked
-        label=field.label
-        hint=field.hint
-        class=(concat item.type "-" field.label)}}
-
-        {{else if (eq field.type "trait-preview")}}
-        {{!-- Trait Preview Component --}}
-        <div class="trait-preview-field">
-            <label class="trait-preview-label">{{field.label}}:</label>
-            <span class="trait-chip trait-chip--preview" style="{{traitChipStyle field.trait}}">
-                {{#if field.trait.icon}}<i class="{{field.trait.icon}}" aria-hidden="true"></i>{{/if}}
-                <span class="trait-chip__text">{{field.itemName}}</span>
-            </span>
-        </div>
-
-        {{else}}
-        {{!-- Fallback for unknown field types --}}
-        <div class="unknown-field-type" data-field-type="{{field.type}}">
-            <span class="unknown-field-label">{{field.label}}</span>
-            <span class="unknown-field-value">{{field.value}}</span>
-        </div>
-        {{/if}}
-        {{/each}}
-    </div>
+  {{#if metaFields}}
+  {{#each metaFields as |field fieldIndex|}}
+  {{#if field.fullWidth}}
+  {{!-- Full-width fields get their own container --}}
+  <div class="row-container full-width">
+    {{> "systems/avant/templates/shared/partials/render-field" field=field editable=editable
+    displayTraits=displayTraits}}
+  </div>
+  {{else if field.sideBy}}
+  {{!-- Side-by-side fields get a shared container --}}
+  <div class="row-container side-by-side" data-field-index="{{fieldIndex}}">
+    {{#each field.fields as |subField|}}
+    {{> "systems/avant/templates/shared/partials/render-field" field=subField editable=editable
+    displayTraits=displayTraits}}
     {{/each}}
-    {{/if}}
+  </div>
+  {{else}}
+  {{!-- Regular fields get individual containers --}}
+  <div class="row-container field-container" data-field-index="{{fieldIndex}}">
+    {{> "systems/avant/templates/shared/partials/render-field" field=field editable=editable
+    displayTraits=displayTraits}}
+  </div>
+  {{/if}}
+  {{/each}}
+  {{/if}}
 </header>

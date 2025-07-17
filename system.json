@@ -34,8 +34,8 @@
   "packs": [
     {
       "name": "avant-traits",
-      "label": "Avant Traits",
-      "path": "./packs/avant-traits",
+      "label": "Traits",
+      "path": "./packs/avant-traits.db",
       "type": "Item",
       "system": "avant",
       "banner": "systems/avant/assets/compendium-banner/blue.webp",
@@ -47,8 +47,8 @@
     },
     {
       "name": "avant-macros",
-      "label": "Avant Macros",
-      "path": "./packs/avant-macros",
+      "label": "Macros",
+      "path": "./packs/avant-macros.db",
       "type": "Macro",
       "banner": "systems/avant/assets/compendium-banner/orange.webp",
       "ownership": {
@@ -59,8 +59,8 @@
     },
     {
       "name": "avant-talents",
-      "label": "Avant Talents",
-      "path": "./packs/avant-talents",
+      "label": "Talents",
+      "path": "./packs/avant-talents.db",
       "type": "Item",
       "system": "avant",
       "banner": "systems/avant/assets/compendium-banner/green.webp",
@@ -72,8 +72,8 @@
     },
     {
       "name": "avant-augments",
-      "label": "Avant Augments",
-      "path": "./packs/avant-augments",
+      "label": "Augments",
+      "path": "./packs/avant-augments.db",
       "type": "Item",
       "system": "avant",
       "banner": "systems/avant/assets/compendium-banner/purple.webp",
@@ -100,7 +100,7 @@
       "sorting": "m",
       "color": "#181818",
       "packs": [
-        "avant-macros"
+        "macros"
       ]
     }
   ],

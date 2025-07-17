@@ -26,8 +26,9 @@ describe('Template Partial Registration', () => {
         const content = fs.readFileSync(partialPath, 'utf8');
         expect(content).toContain('image-upload');
         expect(content).toContain('data-edit="img"');
-        expect(content).toContain('role="button"');
-        expect(content).toContain('aria-label=');
+        expect(content).toContain('fa-pen'); // Updated icon
+        expect(content).toContain('image-upload__overlay');
+        expect(content).toContain('aria-hidden="true"'); // Accessibility feature
     });
 
     test('all component library partials exist', () => {

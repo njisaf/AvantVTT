@@ -10,12 +10,13 @@
     "description": "Description"
   },
   "AVANT": {
-
     "accessibilitySettings": {
       "title": "Avant Accessibility Settings"
     },
+    "ImageUpload": {
+      "clickToChange": "Click to change {alt}"
+    },
     "settings": {
-
       "accessibility": {
         "autoContrast": {
           "name": "Auto-Contrast",
@@ -41,4 +42,4 @@
       }
     }
   }
-} 
+}

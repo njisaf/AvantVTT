@@ -23,6 +23,14 @@ import type {
 // Import template helpers statically to ensure they're bundled
 import { initializeHandlebarsHelpers } from './template-helpers.js';
 
+// Import service dependency configuration for centralized management
+import {
+    SERVICE_DEPENDENCY_CONFIG,
+    validateServiceDependencies,
+    getServiceConfig,
+    getServicesForPhase
+} from './service-dependency-config.js';
+
 /**
  * Service registration and dependency management for FoundryVTT systems
  * Prevents load order issues by ensuring dependencies are met before initialization
@@ -61,6 +69,15 @@ export class InitializationManager {
         this.retryDelay = 100; // ms
 
         console.log('🔧 InitializationManager | Singleton instance created');
+
+        // 🚨 CRITICAL: Validate service dependency configuration to prevent race conditions
+        const configErrors = validateServiceDependencies();
+        if (configErrors.length > 0) {
+            const errorMessage = `🚨 CRITICAL: Service dependency configuration is invalid:\n${configErrors.join('\n')}`;
+            console.error(errorMessage);
+            throw new Error(errorMessage);
+        }
+        console.log('✅ InitializationManager | Service dependency configuration validated');
     }
 
     /**
@@ -88,6 +105,31 @@ export class InitializationManager {
         dependencies: string[] = [],
         options: Partial<ServiceOptions> = {}
     ): InitializationManager {
+        // 🚨 CRITICAL: Validate against centralized configuration
+        const configService = getServiceConfig(serviceName);
+        if (configService) {
+            // Check if dependencies match the centralized configuration
+            const configDeps = configService.dependencies.sort();
+            const providedDeps = dependencies.sort();
+
+            if (JSON.stringify(configDeps) !== JSON.stringify(providedDeps)) {
+                const errorMessage = `🚨 RACE CONDITION RISK: Service '${serviceName}' dependencies don't match configuration.
+                Expected: [${configDeps.join(', ')}]
+                Provided: [${providedDeps.join(', ')}]
+                
+                This mismatch could cause race conditions. Please update the service registration to match the centralized configuration.`;
+                console.error(errorMessage);
+                throw new Error(errorMessage);
+            }
+
+            // Use phase and critical settings from configuration
+            options.phase = configService.phase;
+            options.critical = configService.critical;
+
+            console.log(`✅ InitializationManager | Service '${serviceName}' validated against centralized configuration`);
+        } else {
+            console.warn(`⚠️  InitializationManager | Service '${serviceName}' not found in centralized configuration`);
+        }
         const service: ServiceConfiguration<T> = {
             name: serviceName,
             initFunction,
@@ -109,6 +151,41 @@ export class InitializationManager {
         console.log(`🔧 InitializationManager | Registered service: ${serviceName}`);
 
         return this;
+    }
+
+    /**
+     * 🚨 CRITICAL: Register service using centralized configuration
+     * 
+     * This method automatically uses the correct dependencies from the centralized
+     * configuration to prevent race conditions. This is the PREFERRED way to register
+     * services as it's impossible to get the dependencies wrong.
+     * 
+     * @param serviceName - Name of the service to register
+     * @param initFunction - Function to initialize the service
+     * @returns This instance for chaining
+     */
+    registerServiceFromConfig<T = any>(
+        serviceName: string,
+        initFunction: ServiceInitializer<T>
+    ): InitializationManager {
+        const configService = getServiceConfig(serviceName);
+        if (!configService) {
+            throw new Error(`🚨 Service '${serviceName}' not found in centralized configuration. Add it to SERVICE_DEPENDENCY_CONFIG first.`);
+        }
+
+        console.log(`🔧 InitializationManager | Registering '${serviceName}' from centralized config`);
+        console.log(`🔧 InitializationManager | Dependencies: [${configService.dependencies.join(', ')}]`);
+        console.log(`🔧 InitializationManager | Phase: ${configService.phase}, Critical: ${configService.critical}`);
+
+        return this.registerService(
+            serviceName,
+            initFunction,
+            configService.dependencies,
+            {
+                phase: configService.phase,
+                critical: configService.critical
+            }
+        );
     }
 
     /**
@@ -142,25 +219,36 @@ export class InitializationManager {
      * @returns Promise that resolves with service instance
      */
     async waitForService<T = any>(serviceName: string, timeout: number = 5000): Promise<T> {
+        console.log(`🔍 WAIT SERVICE DEBUG | waitForService called for '${serviceName}' with timeout ${timeout}ms`);
+
         const service = this.services.get(serviceName);
         if (!service) {
+            console.log(`🔍 WAIT SERVICE DEBUG | Service '${serviceName}' not registered`);
             throw new Error(`Service '${serviceName}' not registered`);
         }
 
+        console.log(`🔍 WAIT SERVICE DEBUG | Service '${serviceName}' status: ${service.status}`);
+
         if (service.status === 'ready') {
+            console.log(`🔍 WAIT SERVICE DEBUG | Service '${serviceName}' already ready, returning instance`);
             return service.instance as T;
         }
 
+        console.log(`🔍 WAIT SERVICE DEBUG | Service '${serviceName}' not ready, waiting...`);
         return new Promise<T>((resolve, reject) => {
             const timeoutId = setTimeout(() => {
+                console.log(`🔍 WAIT SERVICE DEBUG | Timeout waiting for service '${serviceName}' after ${timeout}ms`);
                 reject(new Error(`Timeout waiting for service '${serviceName}'`));
             }, timeout);
 
             const checkStatus = (): void => {
+                console.log(`🔍 WAIT SERVICE DEBUG | Checking status for '${serviceName}': ${service.status}`);
                 if (service.status === 'ready') {
+                    console.log(`🔍 WAIT SERVICE DEBUG | Service '${serviceName}' is now ready, resolving`);
                     clearTimeout(timeoutId);
                     resolve(service.instance as T);
                 } else if (service.status === 'failed') {
+                    console.log(`🔍 WAIT SERVICE DEBUG | Service '${serviceName}' failed to initialize`);
                     clearTimeout(timeoutId);
                     reject(new Error(`Service '${serviceName}' failed to initialize`));
                 } else {
@@ -451,37 +539,9 @@ export class FoundryInitializationHelper {
                 }
             });
 
-            // Register the universal item sheet template feature flag
-            game.settings.register('avant', 'useUniversalItemSheet', {
-                name: 'Use Universal Item Sheet Template',
-                hint: 'Use the single universal template for all item types. ⚠️ Phase 3: Per-type templates are DEPRECATED and will be REMOVED in Phase 4. Disabling this setting is not recommended.',
-                scope: 'world',
-                config: true,
-                type: Boolean,
-                default: true, // Phase 2: Changed from false to true for broader testing
-                onChange: (value: boolean) => {
-                    console.log(`📋 Avant | Universal item sheet template ${value ? 'enabled' : 'disabled'}`);
-                    
-                    if (ui?.notifications) {
-                        if (value) {
-                            // User enabled universal template
-                            ui.notifications.info(`✅ Universal item sheet template enabled. Refresh item sheets to see changes.`);
-                        } else {
-                            // Phase 3: Strong warning when user disables universal template
-                            ui.notifications.warn(
-                                `⚠️ DEPRECATION WARNING: Per-item templates are deprecated and will be REMOVED in Phase 4. ` +
-                                `Consider keeping universal template enabled for better performance and future compatibility. ` +
-                                `Refresh item sheets to see changes.`,
-                                { permanent: true }
-                            );
-                            console.warn('🚨 AVANT DEPRECATION WARNING 🚨');
-                            console.warn('📋 Per-item templates will be REMOVED in Phase 4');
-                            console.warn('🔄 Consider re-enabling "Use Universal Item Sheet Template"');
-                            console.warn('⚡ Universal template provides better performance and consistency');
-                        }
-                    }
-                }
-            });
+            // Universal item sheet template is now permanently enabled
+            // The setting has been removed as all item types now use the universal template
+            console.log('✅ Avant | Universal item sheet template permanently enabled');
 
             console.log('✅ InitializationManager | System settings registered');
             return { success: true };
@@ -550,74 +610,7 @@ export class FoundryInitializationHelper {
             return result;
         }, [], { phase: 'init', critical: true });
 
-        // Sheet Registration - depends on data models
-        manager.registerService('sheetRegistration', async () => {
-            console.log('🚨 SHEET REGISTRATION | Starting sheet registration service...');
-
-            const { registerSheets } = await import('../logic/avant-init-utils.js');
-            console.log('🚨 SHEET REGISTRATION | Imported registerSheets function');
-
-            // Create actor sheet class when Foundry is ready
-            console.log('🚨 SHEET REGISTRATION | Importing createAvantActorSheet...');
-            const { createAvantActorSheet } = await import('../sheets/actor-sheet.ts');
-            console.log('🚨 SHEET REGISTRATION | createAvantActorSheet imported successfully');
-
-            console.log('🚨 SHEET REGISTRATION | Creating AvantActorSheet class...');
-            const AvantActorSheet = createAvantActorSheet();
-            console.log('🚨 SHEET REGISTRATION | AvantActorSheet created:', {
-                name: AvantActorSheet.name,
-                hasDefaultOptions: !!AvantActorSheet.DEFAULT_OPTIONS,
-                actionsCount: Object.keys(AvantActorSheet.DEFAULT_OPTIONS?.actions || {}).length
-            });
-
-            // Create item sheet class when Foundry is ready
-            console.log('🚨 SHEET REGISTRATION | Importing createAvantItemSheet...');
-            const { createAvantItemSheet } = await import('../sheets/item-sheet.ts');
-            console.log('🚨 SHEET REGISTRATION | createAvantItemSheet imported successfully');
-
-            console.log('🚨 SHEET REGISTRATION | Creating AvantItemSheet class...');
-            const AvantItemSheet = createAvantItemSheet();
-            console.log('🚨 SHEET REGISTRATION | AvantItemSheet created:', {
-                name: AvantItemSheet.name,
-                hasDefaultOptions: !!AvantItemSheet.DEFAULT_OPTIONS
-            });
-
-            // Get FoundryVTT collections using v13 namespaced access
-            console.log('🚨 SHEET REGISTRATION | Getting FoundryVTT collections...');
-            const actorCollection = (globalThis as any).foundry?.documents?.collections?.Actors || (globalThis as any).Actors;
-            const itemCollection = (globalThis as any).foundry?.documents?.collections?.Items || (globalThis as any).Items;
-
-            console.log('🚨 SHEET REGISTRATION | Collections found:', {
-                actorCollection: !!actorCollection,
-                itemCollection: !!itemCollection,
-                actorCollectionName: actorCollection?.constructor?.name,
-                itemCollectionName: itemCollection?.constructor?.name
-            });
-
-            if (!actorCollection || !itemCollection) {
-                throw new Error('FoundryVTT collections not available for sheet registration');
-            }
-
-            // Execute sheet registration
-            console.log('🚨 SHEET REGISTRATION | Executing registerSheets...');
-            const result = registerSheets(actorCollection, itemCollection, AvantActorSheet, AvantItemSheet) as {
-                success: boolean;
-                error?: string;
-                message: string;
-                registeredSheets: number;
-            };
-
-            console.log('🚨 SHEET REGISTRATION | Registration result:', result);
-
-            if (!result.success) {
-                throw new Error(`Sheet registration failed: ${result.error}`);
-            }
-
-            console.log(`✅ InitializationManager | ${result.message} (ApplicationV2)`);
-            return result;
-        }, ['dataModels'], { phase: 'init', critical: true });
-
-        // Template Loading - depends on sheets being registered first
+        // Template Loading - Load templates BEFORE sheet registration to prevent race condition
         // CRITICAL: All templates must be explicitly registered here to be found by FoundryVTT
         manager.registerService('templates', async () => {
             /**
@@ -667,6 +660,7 @@ export class FoundryInitializationHelper {
                 "systems/avant/templates/shared/partials/textarea-field.hbs",
                 "systems/avant/templates/shared/partials/traits-field.hbs",
                 "systems/avant/templates/shared/partials/item-header.hbs",
+                "systems/avant/templates/shared/partials/item-card.hbs",          // Item card layout for actor sheet display
 
                 // Stage 2 Universal Item Sheet Partials - NEW shared header and body architecture
                 "systems/avant/templates/shared/partials/avant-item-header.hbs",  // Universal header with icon + name + meta fields
@@ -789,14 +783,98 @@ export class FoundryInitializationHelper {
             }
 
             return templatePaths;
-        }, ['sheetRegistration'], { phase: 'init', critical: true });
+        }, [], { phase: 'init', critical: true });
 
-        // Chat Context Menu - ready phase, no dependencies
-        manager.registerService('chatContextMenu', async () => {
+        // Sheet Registration - depends on data models AND templates to prevent race condition
+        manager.registerService('sheetRegistration', async () => {
+            console.log('🚨 SHEET REGISTRATION | Starting sheet registration service...');
+
+            const { registerSheets } = await import('../logic/avant-init-utils.js');
+            console.log('🚨 SHEET REGISTRATION | Imported registerSheets function');
+
+            // Create actor sheet class when Foundry is ready
+            console.log('🚨 SHEET REGISTRATION | Importing createAvantActorSheet...');
+            const { createAvantActorSheet } = await import('../sheets/actor-sheet.ts');
+            console.log('🚨 SHEET REGISTRATION | createAvantActorSheet imported successfully');
+
+            console.log('🚨 SHEET REGISTRATION | Creating AvantActorSheet class...');
+            const AvantActorSheet = createAvantActorSheet();
+            console.log('🚨 SHEET REGISTRATION | AvantActorSheet created:', {
+                name: AvantActorSheet.name,
+                hasDefaultOptions: !!AvantActorSheet.DEFAULT_OPTIONS,
+                actionsCount: Object.keys(AvantActorSheet.DEFAULT_OPTIONS?.actions || {}).length
+            });
+
+            // Create item sheet class when Foundry is ready
+            console.log('🚨 SHEET REGISTRATION | Importing createAvantItemSheet...');
+            const { createAvantItemSheet } = await import('../sheets/item-sheet.ts');
+            console.log('🚨 SHEET REGISTRATION | createAvantItemSheet imported successfully');
+
+            console.log('🚨 SHEET REGISTRATION | Creating AvantItemSheet class...');
+            const AvantItemSheet = createAvantItemSheet();
+            console.log('🚨 SHEET REGISTRATION | AvantItemSheet created:', {
+                name: AvantItemSheet.name,
+                hasDefaultOptions: !!AvantItemSheet.DEFAULT_OPTIONS
+            });
+
+            // Get FoundryVTT collections using v13 namespaced access
+            console.log('🚨 SHEET REGISTRATION | Getting FoundryVTT collections...');
+            const actorCollection = (globalThis as any).foundry?.documents?.collections?.Actors || (globalThis as any).Actors;
+            const itemCollection = (globalThis as any).foundry?.documents?.collections?.Items || (globalThis as any).Items;
+
+            console.log('🚨 SHEET REGISTRATION | Collections found:', {
+                actorCollection: !!actorCollection,
+                itemCollection: !!itemCollection,
+                actorCollectionName: actorCollection?.constructor?.name,
+                itemCollectionName: itemCollection?.constructor?.name
+            });
+
+            if (!actorCollection || !itemCollection) {
+                throw new Error('FoundryVTT collections not available for sheet registration');
+            }
+
+            // Execute sheet registration
+            console.log('🚨 SHEET REGISTRATION | Executing registerSheets...');
+            const result = registerSheets(actorCollection, itemCollection, AvantActorSheet, AvantItemSheet) as {
+                success: boolean;
+                error?: string;
+                message: string;
+                registeredSheets: number;
+            };
+
+            console.log('🚨 SHEET REGISTRATION | Registration result:', result);
+
+            if (!result.success) {
+                throw new Error(`Sheet registration failed: ${result.error}`);
+            }
+
+            console.log(`✅ InitializationManager | ${result.message} (ApplicationV2)`);
+
+            // CRITICAL DEBUG: Verify what sheet class is actually registered
+            const game = (globalThis as any).game;
+
+            // Check v13 ApplicationV2 registration
+
+            // Check direct registration
+            const debugActorCollection = game?.actors;
+
+            // Try to get sheet class for ALL actors
+            if (debugActorCollection && debugActorCollection.size > 0) {
+                debugActorCollection.contents.forEach((actor: any, index: number) => {
+                });
+            }
+
+            // Check CONFIG
+
+            return result;
+        }, ['dataModels', 'templates'], { phase: 'init', critical: true });
+
+        // Chat Context Menu - ready phase, depends on sheetRegistration to prevent race condition
+        manager.registerServiceFromConfig('chatContextMenu', async () => {
             const { AvantChatContextMenu } = await import('../chat/context-menu.ts');
             AvantChatContextMenu.addContextMenuListeners();
             return AvantChatContextMenu;
-        }, [], { phase: 'ready', critical: false });
+        });
 
         // Trait Provider - init phase, handles trait data from compendium packs
         // CRITICAL FIX: Moved from 'ready' to 'init' phase so it's available when item sheets render

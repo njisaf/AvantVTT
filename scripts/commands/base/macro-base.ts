@@ -301,20 +301,41 @@ export class MacroRegistry extends CommandBase {
      * @param macro - Macro to register
      */
     register(macro: MacroCommand): void {
+        // Create a valid command name from the macro name
+        const commandName = this.sanitizeCommandName(macro.name);
+        
+        // Create a copy of the macro with the sanitized command name for validation
+        const macroForValidation = { ...macro, name: commandName };
+        
         // Validate before registering
-        const validation = MacroBase.validateMacro(macro);
+        const validation = MacroBase.validateMacro(macroForValidation);
         if (!validation.valid) {
-            console.error(`🎯 Macros | Invalid macro "${macro.name}":`, validation.errors);
+            console.error(`🎯 Macros | Invalid macro "${macro.name}" (command: "${commandName}"):`, validation.errors);
             return;
         }
         
         // Log warnings
         if (validation.warnings.length > 0) {
-            console.warn(`🎯 Macros | Warnings for macro "${macro.name}":`, validation.warnings);
+            console.warn(`🎯 Macros | Warnings for macro "${macro.name}" (command: "${commandName}"):`, validation.warnings);
         }
         
-        this.macros.set(macro.name.toLowerCase(), macro);
-        console.log(`🎯 Macros | Registered: ${macro.name}`);
+        // Store the original macro but use the sanitized name as the key
+        this.macros.set(commandName.toLowerCase(), macro);
+        console.log(`🎯 Macros | Registered: ${macro.name} (command: ${commandName})`);
+    }
+    
+    /**
+     * Sanitize a macro name to create a valid command name
+     * 
+     * @param name - Original macro name
+     * @returns Sanitized command name
+     */
+    private sanitizeCommandName(name: string): string {
+        return name
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, '-')  // Replace non-alphanumeric with dashes
+            .replace(/-+/g, '-')         // Collapse multiple dashes
+            .replace(/^-+|-+$/g, '');    // Remove leading/trailing dashes
     }
     
     /**

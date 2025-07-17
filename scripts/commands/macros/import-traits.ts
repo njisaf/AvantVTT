@@ -13,10 +13,10 @@ import type { MacroCommand } from '../base/types';
  * with comprehensive validation, conflict resolution, and progress feedback
  */
 export const importTraitsMacro: MacroCommand = {
-    name: 'Import to Avant Traits',
-    type: 'script',
-    scope: 'global',
-    command: `
+  name: 'Import to Avant Traits',
+  type: 'script',
+  scope: 'global',
+  command: `
 /**
  * Import Avant Traits - Direct Access Macro
  * Imports traits from JSON files into the Avant Traits system
@@ -179,15 +179,15 @@ new Dialog({
   default: "import"
 }).render(true);
     `,
-    img: 'icons/svg/upload.svg',
-    sort: 200,
-    flags: {
-        avant: {
-            description: 'Import traits from JSON file into the world compendium with file dialog interface',
-            version: '1.0.0',
-            category: 'trait-management'
-        }
+  img: 'icons/svg/upload.svg',
+  sort: 200,
+  flags: {
+    avant: {
+      description: 'Import traits from JSON file into the world compendium with file dialog interface',
+      version: '1.0.0',
+      category: 'trait-management'
     }
+  }
 };
 
 /**

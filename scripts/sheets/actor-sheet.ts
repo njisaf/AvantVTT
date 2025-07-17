@@ -38,6 +38,7 @@ import {
     type SkillAbilityMap
 } from '../logic/actor-sheet-utils.ts';
 import { itemHasTraits, createTraitHtmlForChat } from '../logic/chat/trait-resolver.ts';
+import { CardLayoutIntegration } from '../layout/item-card/integration-example.ts';
 
 // Import local foundry UI adapter for safe notifications
 import { FoundryUI } from '../types/adapters/foundry-ui.ts';
@@ -214,6 +215,17 @@ export function createAvantActorSheet() {
         };
 
         /**
+         * Override to add debugging for template resolution
+         * @static
+         */
+        static get defaultOptions() {
+            const options = super.defaultOptions;
+            console.log('🔍 ACTOR SHEET DEBUG | defaultOptions called, template path:', 'systems/avant/templates/actor-sheet.html');
+            console.log('🔍 ACTOR SHEET DEBUG | PARTS configuration:', AvantActorSheet.PARTS);
+            return options;
+        }
+
+        /**
          * Tab configuration for the actor sheet
          */
         tabGroups = {
@@ -275,15 +287,29 @@ export function createAvantActorSheet() {
          * @override
          */
         async _prepareContext(options: any): Promise<any> {
+            console.log('🔍 ACTOR SHEET DEBUG | _prepareContext called with options:', options);
+            console.log('🔍 ACTOR SHEET DEBUG | Document exists:', !!this.document);
+            console.log('🔍 ACTOR SHEET DEBUG | Document ID:', this.document?.id);
+            console.log('🔍 ACTOR SHEET DEBUG | Document name:', this.document?.name);
+
             // Get base ApplicationV2 context
+            console.log('🔍 ACTOR SHEET DEBUG | Getting base context from super._prepareContext()...');
             const context = await super._prepareContext(options);
+            console.log('🔍 ACTOR SHEET DEBUG | Base context received:', context);
+            console.log('🔍 ACTOR SHEET DEBUG | Base context keys:', Object.keys(context || {}));
 
             // CRITICAL FIX: Ensure TraitProvider is ready before preparing context
             // This prevents race conditions where traits are rendered before their
             // display data (colors, icons) is available.
             const game = (globalThis as any).game;
+            console.log('🔍 ACTOR SHEET DEBUG | Game exists:', !!game);
+            console.log('🔍 ACTOR SHEET DEBUG | game.avant exists:', !!game?.avant);
+            console.log('🔍 ACTOR SHEET DEBUG | initializationManager exists:', !!game?.avant?.initializationManager);
+
             if (game?.avant?.initializationManager) {
+                console.log('🔍 ACTOR SHEET DEBUG | Waiting for traitProvider service...');
                 await game.avant.initializationManager.waitForService('traitProvider');
+                console.log('🔍 ACTOR SHEET DEBUG | TraitProvider service ready');
             }
 
             // Extract actor data for processing
@@ -339,11 +365,38 @@ export function createAvantActorSheet() {
             const itemsArray = Array.from(this.document.items.values());
             context.items = organizeItemsByType(itemsArray);
 
+            // Prepare card layouts for each item type
+            console.log('🔍 ACTOR SHEET DEBUG | Preparing card layouts for items...');
+            context.cardLayouts = {};
+
+            // Generate card layouts for each item type
+            const itemTypes = ['weapon', 'armor', 'gear', 'action', 'feature', 'talent', 'augment'];
+            for (const itemType of itemTypes) {
+                const itemsOfType = context.items[itemType] || [];
+                if (itemsOfType.length > 0) {
+                    context.cardLayouts[itemType] = await CardLayoutIntegration.prepareItemCards(itemsOfType);
+                } else {
+                    context.cardLayouts[itemType] = [];
+                }
+            }
+            console.log('🔍 ACTOR SHEET DEBUG | Card layouts prepared successfully');
+
             // Add comprehensive display data to items (traits, descriptions, requirements, etc.)
+            console.log('🔍 ACTOR SHEET DEBUG | Adding trait display data to items...');
             await this._addTraitDisplayDataToItems(context.items);
+            console.log('🔍 ACTOR SHEET DEBUG | Trait display data added successfully');
 
             // Add system configuration data
             context.config = (globalThis as any).CONFIG?.AVANT || {};
+            console.log('🔍 ACTOR SHEET DEBUG | Config added:', !!context.config);
+
+            console.log('🔍 ACTOR SHEET DEBUG | Final context keys:', Object.keys(context || {}));
+            console.log('🔍 ACTOR SHEET DEBUG | Final context.actor exists:', !!context.actor);
+            console.log('🔍 ACTOR SHEET DEBUG | Final context.system exists:', !!context.system);
+            console.log('🔍 ACTOR SHEET DEBUG | Final context.items exists:', !!context.items);
+            console.log('🔍 ACTOR SHEET DEBUG | Final context.editable:', context.editable);
+            console.log('🔍 ACTOR SHEET DEBUG | Final context.cssClass:', context.cssClass);
+            console.log('🔍 ACTOR SHEET DEBUG | Returning context from _prepareContext()');
 
             return context;
         }
@@ -361,8 +414,14 @@ export function createAvantActorSheet() {
          * @override
          */
         async _onRender(context: any, options: any): Promise<void> {
+            console.log('🔍 ACTOR SHEET DEBUG | _onRender called with context:', context);
+            console.log('🔍 ACTOR SHEET DEBUG | _onRender options:', options);
+            console.log('🔍 ACTOR SHEET DEBUG | Template elements in DOM:', this.element?.querySelectorAll('*').length || 0);
+
             // Complete base ApplicationV2 rendering first
+            console.log('🔍 ACTOR SHEET DEBUG | Calling super._onRender()...');
             await super._onRender(context, options);
+            console.log('🔍 ACTOR SHEET DEBUG | super._onRender() completed');
 
             // Initialize custom functionality that ApplicationV2 doesn't handle automatically
             this._initializeTabs();    // Manual tab management for Avant sheets
@@ -786,8 +845,11 @@ export function createAvantActorSheet() {
          * 
          * @param {any} options - Configuration options for the sheet
          */
-        constructor(options = {}) {
+        constructor(options: any = {}) {
+            console.log('🔍 ACTOR SHEET DEBUG | Constructor called with options:', options);
+            console.log('🔍 ACTOR SHEET DEBUG | Document in constructor:', options.document?.name || 'undefined');
             super(options);
+            console.log('🔍 ACTOR SHEET DEBUG | Constructor completed, this.document exists:', !!this.document);
         }
 
         /**

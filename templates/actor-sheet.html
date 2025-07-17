@@ -465,6 +465,37 @@
 
                 <!-- Gear Tab -->
                 <div class="tab" data-group="sheet" data-tab="gear">
+                    <!-- Weapons Section -->
+                    <div class="items-header">
+                        <h3>Weapons</h3>
+                        <button type="button" class="item-create" data-action="createItem" data-type="weapon"
+                            title="Create Weapon">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                    <div class="items-list weapon-cards">
+                        {{#each cardLayouts.weapon as |cardData id|}}
+                        {{> "systems/avant/templates/shared/partials/item-card" item=cardData.item
+                        layout=cardData.cardLayout}}
+                        {{/each}}
+                    </div>
+
+                    <!-- Armor Section -->
+                    <div class="items-header">
+                        <h3>Armor</h3>
+                        <button type="button" class="item-create" data-action="createItem" data-type="armor"
+                            title="Create Armor">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                    <div class="items-list armor-cards">
+                        {{#each cardLayouts.armor as |cardData id|}}
+                        {{> "systems/avant/templates/shared/partials/item-card" item=cardData.item
+                        layout=cardData.cardLayout}}
+                        {{/each}}
+                    </div>
+
+                    <!-- Equipment & Gear Section -->
                     <div class="items-header">
                         <h3>Equipment & Gear</h3>
                         <button type="button" class="item-create" data-action="createItem" data-type="gear"
@@ -472,21 +503,10 @@
                             <i class="fas fa-plus"></i> Add
                         </button>
                     </div>
-                    <div class="items-list">
-                        {{#each items.gear as |item id|}}
-                        <div class="item gear-item" data-item-id="{{item._id}}">
-                            <div class="item-image">
-                                <img src="{{item.img}}" title="{{item.name}}" width="24" height="24" />
-                            </div>
-                            <h4 class="item-name">{{item.name}}</h4>
-                            <div class="item-weight">{{item.system.weight}} lbs</div>
-                            <div class="item-controls">
-                                <a class="item-control item-edit" title="Edit Item" data-action="editItem"><i
-                                        class="fas fa-edit"></i></a>
-                                <a class="item-control item-delete" title="Delete Item" data-action="deleteItem"><i
-                                        class="fas fa-trash"></i></a>
-                            </div>
-                        </div>
+                    <div class="items-list gear-cards">
+                        {{#each cardLayouts.gear as |cardData id|}}
+                        {{> "systems/avant/templates/shared/partials/item-card" item=cardData.item
+                        layout=cardData.cardLayout}}
                         {{/each}}
                     </div>
                 </div>
@@ -500,32 +520,10 @@
                             <i class="fas fa-plus"></i> Add
                         </button>
                     </div>
-                    <div class="items-list">
-                        {{#each items.action as |item id|}}
-                        <div class="action-item" data-item-id="{{item._id}}">
-                            <div class="action-header">
-                                <div class="action-name">{{item.name}}</div>
-                                <div class="action-controls">
-                                    <button type="button" class="action-use-btn" data-action="useAction"
-                                        data-item-id="{{item._id}}" title="Use Action">
-                                        <i class="fas fa-play"></i>
-                                        Use
-                                    </button>
-                                    <a class="item-control item-edit" title="Edit Item" data-action="editItem"><i
-                                            class="fas fa-edit"></i></a>
-                                    <a class="item-control item-delete" title="Delete Item" data-action="deleteItem"><i
-                                            class="fas fa-trash"></i></a>
-                                </div>
-                            </div>
-                            <div class="action-details">
-                                {{#if item.system.apCost}}<span class="action-cost">AP:
-                                    {{item.system.apCost}}</span>{{/if}}
-                                {{#if item.system.ppCost}}<span class="action-cost">PP:
-                                    {{item.system.ppCost}}</span>{{/if}}
-                                {{#if item.system.description}}<div class="action-description">
-                                    {{item.system.description}}</div>{{/if}}
-                            </div>
-                        </div>
+                    <div class="items-list action-cards">
+                        {{#each cardLayouts.action as |cardData id|}}
+                        {{> "systems/avant/templates/shared/partials/item-card" item=cardData.item
+                        layout=cardData.cardLayout}}
                         {{/each}}
                     </div>
                 </div>
@@ -539,23 +537,10 @@
                             <i class="fas fa-plus"></i> Add
                         </button>
                     </div>
-                    <div class="items-list">
-                        {{#each items.feature as |item id|}}
-                        <div class="feature-item" data-item-id="{{item._id}}">
-                            <div class="feature-header">
-                                <div class="feature-name">{{item.name}}</div>
-                                <div class="feature-controls">
-                                    <a class="item-control item-edit" title="Edit Item" data-action="editItem"><i
-                                            class="fas fa-edit"></i></a>
-                                    <a class="item-control item-delete" title="Delete Item" data-action="deleteItem"><i
-                                            class="fas fa-trash"></i></a>
-                                </div>
-                            </div>
-                            <div class="feature-details">
-                                {{#if item.system.description}}<div class="feature-description">
-                                    {{item.system.description}}</div>{{/if}}
-                            </div>
-                        </div>
+                    <div class="items-list feature-cards">
+                        {{#each cardLayouts.feature as |cardData id|}}
+                        {{> "systems/avant/templates/shared/partials/item-card" item=cardData.item
+                        layout=cardData.cardLayout}}
                         {{/each}}
                     </div>
                 </div>
@@ -573,9 +558,10 @@
                             <i class="fas fa-plus"></i> Add
                         </button>
                     </div>
-                    <div class="items-list talent-rows">
-                        {{#each items.talent as |item id|}}
-                        {{> "systems/avant/templates/actor/row-talent-augment" item=item}}
+                    <div class="items-list talent-cards">
+                        {{#each cardLayouts.talent as |cardData id|}}
+                        {{> "systems/avant/templates/shared/partials/item-card" item=cardData.item
+                        layout=cardData.cardLayout}}
                         {{/each}}
                     </div>
 
@@ -587,9 +573,10 @@
                             <i class="fas fa-plus"></i> Add
                         </button>
                     </div>
-                    <div class="items-list augment-rows">
-                        {{#each items.augment as |item id|}}
-                        {{> "systems/avant/templates/actor/row-talent-augment" item=item}}
+                    <div class="items-list augment-cards">
+                        {{#each cardLayouts.augment as |cardData id|}}
+                        {{> "systems/avant/templates/shared/partials/item-card" item=cardData.item
+                        layout=cardData.cardLayout}}
                         {{/each}}
                     </div>
                 </div>

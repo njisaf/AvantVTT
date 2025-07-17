@@ -283,18 +283,15 @@ export async function registerAvantHandlebarsHelpers(Handlebars: any): Promise<v
     // Helper to get trait styling from rich trait object (used in displayTraits branch)
     if (!Handlebars.helpers.traitChipStyle) {
         Handlebars.registerHelper('traitChipStyle', function (trait: any) {
-            console.log('🔧 TRAIT HELPER DEBUG | traitChipStyle called with:', trait);
             if (!trait) return '--trait-color: #6C757D; --trait-text-color: #000000;';
 
             if (trait.color) {
                 const textColor = isLightColor(trait.color) ? '#000000' : '#FFFFFF';
                 const result = `--trait-color: ${trait.color}; --trait-text-color: ${textColor};`;
-                console.log('🔧 TRAIT HELPER DEBUG | traitChipStyle returning:', result);
                 return result;
             }
 
             // Fallback styling
-            console.log('🔧 TRAIT HELPER DEBUG | traitChipStyle using fallback styling');
             return '--trait-color: #6C757D; --trait-text-color: #000000;';
         });
     }
@@ -302,7 +299,6 @@ export async function registerAvantHandlebarsHelpers(Handlebars: any): Promise<v
     // Helper to get trait data attributes from rich trait object
     if (!Handlebars.helpers.traitChipData) {
         Handlebars.registerHelper('traitChipData', function (trait: any) {
-            console.log('🔧 TRAIT HELPER DEBUG | traitChipData called with:', trait);
             if (!trait) return 'data-trait-type="unknown" data-trait-source="fallback"';
 
             const traitType = trait.type || trait.category || 'custom';
@@ -310,14 +306,13 @@ export async function registerAvantHandlebarsHelpers(Handlebars: any): Promise<v
 
             // Build base attributes
             let result = `data-trait-id="${trait.id}" data-trait-type="${traitType}" data-trait-source="${traitSource}"`;
-            
+
             // Only add data-color and data-text-color if trait has a color (for CSS selector matching)
             if (trait.color) {
                 const textColor = isLightColor(trait.color) ? '#000000' : '#FFFFFF';
                 result += ` data-color="${trait.color}" data-text-color="${textColor}"`;
             }
-            
-            console.log('🔧 TRAIT HELPER DEBUG | traitChipData returning:', result);
+
             return result;
         });
     }
