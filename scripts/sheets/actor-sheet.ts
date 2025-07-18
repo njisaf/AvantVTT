@@ -38,6 +38,7 @@ import {
     type SkillAbilityMap
 } from '../logic/actor-sheet-utils.ts';
 import { itemHasTraits, createTraitHtmlForChat } from '../logic/chat/trait-resolver.ts';
+import { CardLayoutIntegration } from '../layout/item-card/integration-example.ts';
 
 // Import local foundry UI adapter for safe notifications
 import { FoundryUI } from '../types/adapters/foundry-ui.ts';
@@ -214,6 +215,17 @@ export function createAvantActorSheet() {
         };
 
         /**
+         * Override to add debugging for template resolution
+         * @static
+         */
+        static get defaultOptions() {
+            const options = super.defaultOptions;
+            console.log('🔍 ACTOR SHEET DEBUG | defaultOptions called, template path:', 'systems/avant/templates/actor-sheet.html');
+            console.log('🔍 ACTOR SHEET DEBUG | PARTS configuration:', AvantActorSheet.PARTS);
+            return options;
+        }
+
+        /**
          * Tab configuration for the actor sheet
          */
         tabGroups = {
@@ -275,8 +287,30 @@ export function createAvantActorSheet() {
          * @override
          */
         async _prepareContext(options: any): Promise<any> {
+            console.log('🔍 ACTOR SHEET DEBUG | _prepareContext called with options:', options);
+            console.log('🔍 ACTOR SHEET DEBUG | Document exists:', !!this.document);
+            console.log('🔍 ACTOR SHEET DEBUG | Document ID:', this.document?.id);
+            console.log('🔍 ACTOR SHEET DEBUG | Document name:', this.document?.name);
+
             // Get base ApplicationV2 context
+            console.log('🔍 ACTOR SHEET DEBUG | Getting base context from super._prepareContext()...');
             const context = await super._prepareContext(options);
+            console.log('🔍 ACTOR SHEET DEBUG | Base context received:', context);
+            console.log('🔍 ACTOR SHEET DEBUG | Base context keys:', Object.keys(context || {}));
+
+            // CRITICAL FIX: Ensure TraitProvider is ready before preparing context
+            // This prevents race conditions where traits are rendered before their
+            // display data (colors, icons) is available.
+            const game = (globalThis as any).game;
+            console.log('🔍 ACTOR SHEET DEBUG | Game exists:', !!game);
+            console.log('🔍 ACTOR SHEET DEBUG | game.avant exists:', !!game?.avant);
+            console.log('🔍 ACTOR SHEET DEBUG | initializationManager exists:', !!game?.avant?.initializationManager);
+
+            if (game?.avant?.initializationManager) {
+                console.log('🔍 ACTOR SHEET DEBUG | Waiting for traitProvider service...');
+                await game.avant.initializationManager.waitForService('traitProvider');
+                console.log('🔍 ACTOR SHEET DEBUG | TraitProvider service ready');
+            }
 
             // Extract actor data for processing
             const actorData = this.document.toObject(false);
@@ -331,11 +365,38 @@ export function createAvantActorSheet() {
             const itemsArray = Array.from(this.document.items.values());
             context.items = organizeItemsByType(itemsArray);
 
+            // Prepare card layouts for each item type
+            console.log('🔍 ACTOR SHEET DEBUG | Preparing card layouts for items...');
+            context.cardLayouts = {};
+
+            // Generate card layouts for each item type
+            const itemTypes = ['weapon', 'armor', 'gear', 'action', 'feature', 'talent', 'augment'];
+            for (const itemType of itemTypes) {
+                const itemsOfType = context.items[itemType] || [];
+                if (itemsOfType.length > 0) {
+                    context.cardLayouts[itemType] = await CardLayoutIntegration.prepareItemCards(itemsOfType);
+                } else {
+                    context.cardLayouts[itemType] = [];
+                }
+            }
+            console.log('🔍 ACTOR SHEET DEBUG | Card layouts prepared successfully');
+
             // Add comprehensive display data to items (traits, descriptions, requirements, etc.)
+            console.log('🔍 ACTOR SHEET DEBUG | Adding trait display data to items...');
             await this._addTraitDisplayDataToItems(context.items);
+            console.log('🔍 ACTOR SHEET DEBUG | Trait display data added successfully');
 
             // Add system configuration data
             context.config = (globalThis as any).CONFIG?.AVANT || {};
+            console.log('🔍 ACTOR SHEET DEBUG | Config added:', !!context.config);
+
+            console.log('🔍 ACTOR SHEET DEBUG | Final context keys:', Object.keys(context || {}));
+            console.log('🔍 ACTOR SHEET DEBUG | Final context.actor exists:', !!context.actor);
+            console.log('🔍 ACTOR SHEET DEBUG | Final context.system exists:', !!context.system);
+            console.log('🔍 ACTOR SHEET DEBUG | Final context.items exists:', !!context.items);
+            console.log('🔍 ACTOR SHEET DEBUG | Final context.editable:', context.editable);
+            console.log('🔍 ACTOR SHEET DEBUG | Final context.cssClass:', context.cssClass);
+            console.log('🔍 ACTOR SHEET DEBUG | Returning context from _prepareContext()');
 
             return context;
         }
@@ -353,8 +414,14 @@ export function createAvantActorSheet() {
          * @override
          */
         async _onRender(context: any, options: any): Promise<void> {
+            console.log('🔍 ACTOR SHEET DEBUG | _onRender called with context:', context);
+            console.log('🔍 ACTOR SHEET DEBUG | _onRender options:', options);
+            console.log('🔍 ACTOR SHEET DEBUG | Template elements in DOM:', this.element?.querySelectorAll('*').length || 0);
+
             // Complete base ApplicationV2 rendering first
+            console.log('🔍 ACTOR SHEET DEBUG | Calling super._onRender()...');
             await super._onRender(context, options);
+            console.log('🔍 ACTOR SHEET DEBUG | super._onRender() completed');
 
             // Initialize custom functionality that ApplicationV2 doesn't handle automatically
             this._initializeTabs();    // Manual tab management for Avant sheets
@@ -553,13 +620,16 @@ export function createAvantActorSheet() {
                                     const traitProviderService = game?.avant?.initializationManager?.getService('traitProvider');
                                     if (!traitProviderService) {
                                         console.warn('🔍 TRAIT DEBUG | TraitProvider service not available for enhanced lookup');
+                                        const traitName = self._generateFallbackTraitName(traitId);
+                                        const fallbackColor = self._generateFallbackTraitColor(traitId, traitName);
+
                                         return {
                                             id: traitId,
-                                            name: self._generateFallbackTraitName(traitId),
+                                            name: traitName,
                                             displayId: traitId,
-                                            color: '#6C757D',
-                                            textColor: '#FFFFFF',
-                                            icon: 'fas fa-tag',
+                                            color: fallbackColor.background,
+                                            textColor: fallbackColor.text,
+                                            icon: fallbackColor.icon,
                                             matchType: 'no_service'
                                         };
                                     }
@@ -589,14 +659,17 @@ export function createAvantActorSheet() {
                                             logger.debug('AvantActorSheet | Skipping corrupted trait data:', traitId);
                                         }
 
+                                        const traitName = self._generateFallbackTraitName(traitId);
+                                        const fallbackColor = self._generateFallbackTraitColor(traitId, traitName);
+
                                         return {
                                             id: traitId,
-                                            name: self._generateFallbackTraitName(traitId),
+                                            name: traitName,
                                             displayId: traitId,
-                                            // Provide default styling for missing traits
-                                            color: '#6C757D', // Bootstrap secondary gray
-                                            textColor: '#FFFFFF', // White text for gray background
-                                            icon: 'fas fa-tag',  // Generic tag icon
+                                            // Provide enhanced styling for missing traits
+                                            color: fallbackColor.background,
+                                            textColor: fallbackColor.text,
+                                            icon: fallbackColor.icon,
                                             matchType: 'fallback'
                                         };
                                     }
@@ -617,11 +690,29 @@ export function createAvantActorSheet() {
 
         /**
          * Generate a fallback display name from a trait ID
+         * 
+         * This method handles various trait ID formats and creates user-friendly names:
+         * - "fire" → "Fire"
+         * - "system_trait_fire" → "Fire"
+         * - "avant-trait-fire" → "Fire"
+         * - "fROYGUX93Sy3aqgM" → "Custom Trait"
+         * - "Fire" → "Fire" (already readable)
+         * 
          * @param traitId - The trait ID to generate a name from
          * @private
          */
         private _generateFallbackTraitName(traitId: string): string {
-            // For system traits like "system_trait_fire_1750695472058", extract "fire"
+            // Handle empty or invalid IDs
+            if (!traitId || typeof traitId !== 'string') {
+                return 'Unknown Trait';
+            }
+
+            // Handle already readable names (common case)
+            if (traitId.match(/^[A-Z][a-z]+$/)) {
+                return traitId;
+            }
+
+            // Handle system trait prefixes
             if (traitId.startsWith('system_trait_')) {
                 return traitId
                     .replace(/^system_trait_/, '')
@@ -630,8 +721,120 @@ export function createAvantActorSheet() {
                     .replace(/\b\w/g, l => l.toUpperCase());
             }
 
-            // For other IDs, just return as-is (this will show the raw ID for custom traits)
-            return traitId;
+            // Handle avant trait prefixes
+            if (traitId.startsWith('avant-trait-')) {
+                return traitId
+                    .replace(/^avant-trait-/, '')
+                    .replace(/-\d+$/, '')
+                    .replace(/-/g, ' ')
+                    .replace(/\b\w/g, l => l.toUpperCase());
+            }
+
+            // Handle common single-word trait names
+            if (traitId.match(/^[a-z]+$/)) {
+                return traitId.charAt(0).toUpperCase() + traitId.slice(1);
+            }
+
+            // Handle kebab-case or underscore-case
+            if (traitId.includes('-') || traitId.includes('_')) {
+                return traitId
+                    .replace(/[-_]/g, ' ')
+                    .replace(/\b\w/g, l => l.toUpperCase());
+            }
+
+            // Handle long random IDs (likely UUIDs or generated IDs)
+            if (traitId.length > 10 && traitId.match(/^[a-zA-Z0-9]+$/)) {
+                return 'Custom Trait';
+            }
+
+            // Handle camelCase
+            if (traitId.match(/^[a-z][a-zA-Z]+$/)) {
+                return traitId.replace(/([A-Z])/g, ' $1').replace(/\b\w/g, l => l.toUpperCase());
+            }
+
+            // Fallback: return the original ID with first letter capitalized
+            return traitId.charAt(0).toUpperCase() + traitId.slice(1);
+        }
+
+        /**
+         * Generate fallback colors and icon for a trait based on its ID or name
+         * 
+         * This method provides visually appealing colors instead of generic gray,
+         * making traits more identifiable even when the TraitProvider isn't available.
+         * 
+         * @param traitId - The trait ID
+         * @param traitName - The generated trait name
+         * @returns Object with background color, text color, and icon
+         * @private
+         */
+        private _generateFallbackTraitColor(traitId: string, traitName: string): { background: string, text: string, icon: string } {
+            // Define color palette for fallback traits
+            const colorPalette = [
+                { background: '#FF6B6B', text: '#FFFFFF', icon: 'fas fa-fire' },      // Red/Fire
+                { background: '#4ECDC4', text: '#FFFFFF', icon: 'fas fa-snowflake' }, // Teal/Ice
+                { background: '#45B7D1', text: '#FFFFFF', icon: 'fas fa-bolt' },      // Blue/Lightning
+                { background: '#96CEB4', text: '#FFFFFF', icon: 'fas fa-leaf' },      // Green/Nature
+                { background: '#FECA57', text: '#FFFFFF', icon: 'fas fa-sun' },       // Yellow/Light
+                { background: '#8B7EC8', text: '#FFFFFF', icon: 'fas fa-magic' },     // Purple/Arcane
+                { background: '#F8B500', text: '#FFFFFF', icon: 'fas fa-cog' },       // Orange/Tech
+                { background: '#2C3E50', text: '#FFFFFF', icon: 'fas fa-shield-alt' } // Dark/Defense
+            ];
+
+            // Check for specific trait name patterns to assign themed colors
+            const lowerName = traitName.toLowerCase();
+            const lowerID = traitId.toLowerCase();
+
+            // Fire-themed traits
+            if (lowerName.includes('fire') || lowerID.includes('fire') || lowerName.includes('flame') || lowerName.includes('burn')) {
+                return colorPalette[0]; // Red/Fire
+            }
+
+            // Ice/Cold-themed traits
+            if (lowerName.includes('ice') || lowerID.includes('ice') || lowerName.includes('cold') || lowerName.includes('frost')) {
+                return colorPalette[1]; // Teal/Ice
+            }
+
+            // Lightning/Electric-themed traits
+            if (lowerName.includes('lightning') || lowerID.includes('lightning') || lowerName.includes('electric') || lowerName.includes('shock')) {
+                return colorPalette[2]; // Blue/Lightning
+            }
+
+            // Nature/Earth-themed traits
+            if (lowerName.includes('nature') || lowerID.includes('nature') || lowerName.includes('earth') || lowerName.includes('plant')) {
+                return colorPalette[3]; // Green/Nature
+            }
+
+            // Light/Holy-themed traits
+            if (lowerName.includes('light') || lowerID.includes('light') || lowerName.includes('holy') || lowerName.includes('divine')) {
+                return colorPalette[4]; // Yellow/Light
+            }
+
+            // Magic/Arcane-themed traits
+            if (lowerName.includes('magic') || lowerID.includes('magic') || lowerName.includes('arcane') || lowerName.includes('mystical')) {
+                return colorPalette[5]; // Purple/Arcane
+            }
+
+            // Tech/Mechanical-themed traits
+            if (lowerName.includes('tech') || lowerID.includes('tech') || lowerName.includes('cyber') || lowerName.includes('mech')) {
+                return colorPalette[6]; // Orange/Tech
+            }
+
+            // Defense/Protection-themed traits
+            if (lowerName.includes('defense') || lowerID.includes('defense') || lowerName.includes('protect') || lowerName.includes('shield')) {
+                return colorPalette[7]; // Dark/Defense
+            }
+
+            // For traits that don't match any theme, use a hash-based color selection
+            // This ensures consistent colors for the same trait across different contexts
+            let hash = 0;
+            const str = traitId + traitName;
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) - hash) + str.charCodeAt(i);
+                hash = hash & hash; // Convert to 32-bit integer
+            }
+
+            const colorIndex = Math.abs(hash) % colorPalette.length;
+            return colorPalette[colorIndex];
         }
 
         /**
@@ -642,8 +845,11 @@ export function createAvantActorSheet() {
          * 
          * @param {any} options - Configuration options for the sheet
          */
-        constructor(options = {}) {
+        constructor(options: any = {}) {
+            console.log('🔍 ACTOR SHEET DEBUG | Constructor called with options:', options);
+            console.log('🔍 ACTOR SHEET DEBUG | Document in constructor:', options.document?.name || 'undefined');
             super(options);
+            console.log('🔍 ACTOR SHEET DEBUG | Constructor completed, this.document exists:', !!this.document);
         }
 
         /**
@@ -1183,6 +1389,12 @@ export function createAvantActorSheet() {
             try {
                 console.log('🎯 Avant | Posting talent feature card for:', item.name);
 
+                // 🎵 PLAY TALENT SOUND - Provides audio feedback for talent usage
+                // This plays a distinctive sound when talent cards are posted to chat
+                // Import the audio utility dynamically to avoid circular dependencies
+                const { playSound, UISound } = await import('../utils/audio-utils.js');
+                playSound(UISound.TALENT_CHAT); // Don't await - let sound play asynchronously
+
                 // 🎨 DYNAMIC IMPORT PATTERN - Ensures modules are loaded when needed
                 // This prevents circular dependencies and ensures proper initialization order
                 const { postFeatureCard } = await import('../logic/chat/feature-card-builder.js');
@@ -1297,6 +1509,12 @@ export function createAvantActorSheet() {
             try {
                 console.log('🎯 Avant | Posting augment feature card for:', item.name);
 
+                // 🎵 PLAY AUGMENT SOUND - Provides audio feedback for augment usage
+                // This plays a distinctive sound when augment cards are posted to chat
+                // Import the audio utility dynamically to avoid circular dependencies
+                const { playSound, UISound } = await import('../utils/audio-utils.js');
+                playSound(UISound.AUGMENT_CHAT); // Don't await - let sound play asynchronously
+
                 // 🔧 DYNAMIC IMPORT PATTERN - Consistent with talent handler
                 // Same module loading strategy for maintainability
                 const { postFeatureCard } = await import('../logic/chat/feature-card-builder.js');
@@ -1395,6 +1613,12 @@ export function createAvantActorSheet() {
 
             try {
                 console.log('🔋 Avant | Processing PP spend for:', item.name, 'Cost:', ppCost);
+
+                // 🎵 PLAY SPEND SOUND - Provides audio feedback for PP spending
+                // This plays a distinctive sound when power points are spent
+                // Import the audio utility dynamically to avoid circular dependencies
+                const { playSound, UISound } = await import('../utils/audio-utils.js');
+                playSound(UISound.SPEND_PP); // Don't await - let sound play asynchronously
 
                 // Import required modules
                 const { handlePowerPointSpend } = await import('../logic/chat/power-point-handler.js');

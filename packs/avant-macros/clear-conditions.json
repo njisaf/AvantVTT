@@ -1,0 +1,23 @@
+{
+  "name": "Clear Conditions",
+  "type": "script",
+  "scope": "global",
+  "command": "/**\n * Clear Conditions Macro\n * Remove all status effects/conditions from selected tokens\n */\n\nconst tokens = canvas.tokens.controlled;\n\nif (tokens.length === 0) {\n  ui.notifications.warn('Please select at least one token.');\n  return;\n}\n\nconsole.log(`🧹 Clearing conditions for ${tokens.length} token(s)...`);\n\nlet clearedCount = 0;\n\nfor (const token of tokens) {\n  try {\n    const effects = token.actor?.effects || [];\n    \n    if (effects.size > 0) {\n      // Remove all temporary effects\n      const effectsToRemove = effects.filter(effect => !effect.disabled);\n      \n      if (effectsToRemove.length > 0) {\n        await token.actor.deleteEmbeddedDocuments('ActiveEffect', effectsToRemove.map(e => e.id));\n        console.log(`✅ Cleared ${effectsToRemove.length} condition(s) from ${token.name}`);\n        clearedCount++;\n      } else {\n        console.log(`ℹ️ No active conditions on ${token.name}`);\n      }\n    } else {\n      console.log(`ℹ️ No conditions on ${token.name}`);\n    }\n    \n  } catch (error) {\n    console.error(`❌ Failed to clear conditions for ${token.name}:`, error);\n  }\n}\n\nif (clearedCount > 0) {\n  ui.notifications.info(`Cleared conditions from ${clearedCount} token(s)!`);\n} else {\n  ui.notifications.info('No conditions to clear.');\n}",
+  "img": "icons/svg/aura.svg",
+  "folder": "wfyqaQLIpnIKBXdH",
+  "sort": 800,
+  "flags": {
+    "avant": {
+      "description": "Remove all status effects and conditions from selected tokens",
+      "version": "1.0.0",
+      "category": "utility"
+    }
+  },
+  "_id": "j29ph1sN6G2Ybxj5",
+  "category": "utility",
+  "system": {
+    "description": "Remove all status effects and conditions from selected tokens",
+    "version": "1.0.0",
+    "category": "utility"
+  }
+}

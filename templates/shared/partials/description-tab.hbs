@@ -5,12 +5,12 @@
   It provides the description and traits fields in a standard layout.
   
   Usage:
-    {{> "systems/avant/templates/shared/partials/description-tab.hbs" system=system displayTraits=displayTraits}}
+    {{> "systems/avant/templates/shared/partials/description-tab" system=system displayTraits=displayTraits}}
   
   Optional: class - Additional CSS classes for the tab content
 --}}
 
 <div class="tab-content description-tab {{#if class}}{{class}}{{/if}}" data-tab="description">
-    {{> "systems/avant/templates/shared/partials/textarea-field.hbs" name="system.description" value=system.description label="Description" rows=8}}
-    {{> "systems/avant/templates/shared/partials/traits-field.hbs" name="system.traits" displayTraits=displayTraits label="Traits"}}
+    {{> "systems/avant/templates/shared/partials/textarea-field" name="system.description" value=system.description label="Description" rows=8}}
+    {{> "systems/avant/templates/shared/partials/traits-field" name="system.traits" displayTraits=displayTraits label="Traits"}}
 </div> 

@@ -1,0 +1,466 @@
+/**
+ * @fileoverview Item Card Layout System - Styling
+ * @description SCSS for three-zone item cards in Actor Sheets
+ * @version 0.1.0
+ * @author Avant Development Team
+ */
+
+// Item Card Container
+.avant .item-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas: "left center right";
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid var(--theme-border-secondary, #4a5568);
+  border-radius: 6px;
+  background: var(--theme-bg-secondary, #2d3748);
+  margin-bottom: 0.5rem;
+  transition: all 0.2s ease;
+  min-height: 3rem;
+  align-items: center;
+
+  &:hover {
+    border-color: var(--theme-border-accent, #63b3ed);
+    background: var(--theme-bg-hover, #374151);
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Zone Layout
+.avant .avant .item-card__left {
+  grid-area: left;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: fit-content;
+}
+
+.avant .avant .item-card__center {
+  grid-area: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+  min-width: 0; // Allow shrinking
+}
+
+.avant .item-card__right {
+  grid-area: right;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: fit-content;
+}
+
+// Card Buttons
+.avant .item-card {
+  .card-roll-btn,
+  .card-edit-btn,
+  .card-delete-btn,
+  .card-drag-handle {
+    padding: 0.375rem 0.75rem;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    .btn-label {
+      font-size: 0.75rem;
+    }
+
+    i {
+      font-size: 0.875rem;
+    }
+  }
+
+  // Primary roll button
+  .card-roll-btn {
+    background: var(--theme-primary, #3182ce);
+    color: var(--theme-text-on-primary, #ffffff);
+    border-color: var(--theme-primary-dark, #2c5aa0);
+
+    &:hover {
+      background: var(--theme-primary-dark, #2c5aa0);
+    }
+  }
+
+  // Secondary edit button
+  .card-edit-btn {
+    background: var(--theme-secondary, #718096);
+    color: var(--theme-text-on-secondary, #ffffff);
+    border-color: var(--theme-secondary-dark, #4a5568);
+
+    &:hover {
+      background: var(--theme-secondary-dark, #4a5568);
+    }
+  }
+
+  // Danger delete button
+  .card-delete-btn {
+    background: var(--theme-danger, #e53e3e);
+    color: var(--theme-text-on-danger, #ffffff);
+    border-color: var(--theme-danger-dark, #c53030);
+
+    &:hover {
+      background: var(--theme-danger-dark, #c53030);
+    }
+  }
+
+  // Ghost drag handle
+  .card-drag-handle {
+    background: transparent;
+    color: var(--theme-text-secondary, #a0aec0);
+    border-color: transparent;
+    cursor: grab;
+    padding: 0.375rem;
+
+    &:hover {
+      background: var(--theme-bg-tertiary, #4a5568);
+      color: var(--theme-text-primary, #f7fafc);
+    }
+
+    &:active {
+      cursor: grabbing;
+    }
+
+    .btn-label {
+      display: none; // Only show icon for drag handle
+    }
+  }
+}
+
+// Card Icons
+.avant .item-card {
+  .card-item-icon,
+  .card-custom-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 4px;
+    background: var(--theme-bg-tertiary, #4a5568);
+    border: 1px solid var(--theme-border-secondary, #4a5568);
+
+    .item-icon-img {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 2px;
+      object-fit: cover;
+    }
+
+    i {
+      font-size: 1.25rem;
+      color: var(--theme-text-secondary, #a0aec0);
+    }
+  }
+}
+
+// Card Center Content Styling
+.avant .item-card__center {
+  .field-group {
+    margin-bottom: 0.25rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .field-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--theme-text-secondary, #a0aec0);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.125rem;
+  }
+
+  .field-value {
+    font-size: 0.875rem;
+    color: var(--theme-text-primary, #f7fafc);
+    font-weight: 500;
+  }
+
+  // Display field styling
+  .display-field {
+    margin-bottom: 0.25rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .display-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--theme-text-secondary, #a0aec0);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-right: 0.25rem;
+    }
+
+    .display-value {
+      font-size: 0.875rem;
+      color: var(--theme-text-primary, #f7fafc);
+      font-weight: 500;
+    }
+  }
+
+  // Display text fields
+  .display-text {
+    .display-value {
+      color: var(--theme-text-primary, #f7fafc);
+    }
+
+    &.card-item-name .display-value {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--theme-text-primary, #f7fafc);
+    }
+  }
+
+  // Display AP cost with dots
+  .display-ap-cost {
+    .ap-icons-display {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.125rem;
+      margin-left: 0.25rem;
+
+      .ap-icon {
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: 50%;
+        
+        &.filled i {
+          color: var(--theme-accent, #63b3ed);
+        }
+        
+        &.empty i {
+          color: var(--theme-border-secondary, #4a5568);
+        }
+
+        i {
+          font-size: 0.5rem;
+        }
+      }
+    }
+  }
+
+  // Display uses as fraction
+  .display-uses {
+    .uses-fraction {
+      font-family: var(--theme-font-mono, 'Roboto Mono', monospace);
+      color: var(--theme-text-secondary, #a0aec0);
+    }
+  }
+
+  // Display badge (status indicators)
+  .display-badge {
+    .status-badge {
+      display: inline-block;
+      padding: 0.125rem 0.375rem;
+      background: var(--theme-accent, #63b3ed);
+      color: var(--theme-text-on-accent, #ffffff);
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  }
+
+  // Display traits as chips
+  .display-traits {
+    .trait-chips-display {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+    }
+
+    .trait-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.125rem 0.375rem;
+      background: var(--trait-color, var(--theme-bg-tertiary, #4a5568));
+      color: var(--theme-text-primary, #f7fafc);
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+
+      .trait-chip__text {
+        font-size: 0.75rem;
+      }
+
+      .trait-icon {
+        font-size: 0.625rem;
+      }
+    }
+  }
+
+  // Legacy AP Cost display (for backward compatibility)
+  .ap-cost-display {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+
+    .ap-dot {
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+      background: var(--theme-accent, #63b3ed);
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .avant .item-card {
+    grid-template-columns: auto 1fr;
+    grid-template-areas: 
+      "left center"
+      "right right";
+    gap: 0.375rem;
+
+    .item-card__right {
+      grid-area: right;
+      justify-content: flex-end;
+      padding-top: 0.25rem;
+      border-top: 1px solid var(--theme-border-secondary, #4a5568);
+      margin-top: 0.25rem;
+    }
+  }
+
+  .card-roll-btn,
+  .card-edit-btn,
+  .card-delete-btn {
+    .btn-label {
+      display: none; // Only show icons on mobile
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .avant .item-card {
+    padding: 0.5rem;
+    
+    .item-card__left,
+    .item-card__right {
+      gap: 0.125rem;
+    }
+
+    .card-item-icon,
+    .card-custom-icon {
+      width: 2rem;
+      height: 2rem;
+
+      .item-icon-img {
+        width: 1.5rem;
+        height: 1.5rem;
+      }
+
+      i {
+        font-size: 1rem;
+      }
+    }
+  }
+}
+
+// Card States
+.avant .item-card {
+  // Active/equipped state
+  &.item-equipped {
+    border-color: var(--theme-success, #38a169);
+    background: var(--theme-success-bg, rgba(56, 161, 105, 0.1));
+  }
+
+  // Disabled/unusable state
+  &.item-disabled {
+    opacity: 0.6;
+    
+    .card-roll-btn {
+      opacity: 0.5;
+      cursor: not-allowed;
+      
+      &:hover {
+        transform: none;
+        box-shadow: none;
+      }
+    }
+  }
+
+  // Loading state
+  &.item-loading {
+    .card-roll-btn {
+      position: relative;
+      
+      &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 1rem;
+        height: 1rem;
+        margin: -0.5rem 0 0 -0.5rem;
+        border: 2px solid transparent;
+        border-top-color: currentColor;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      .btn-label,
+      i {
+        opacity: 0;
+      }
+    }
+  }
+}
+
+// Animations
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Card transitions for add/remove
+.avant .avant .item-card-enter {
+  opacity: 0;
+  transform: translateY(-0.5rem);
+}
+
+.avant .avant .item-card-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.avant .avant .item-card-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.avant .item-card-exit-active {
+  opacity: 0;
+  transform: translateY(-0.5rem);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}

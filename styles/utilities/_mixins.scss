@@ -1,0 +1,299 @@
+/**
+ * @fileoverview SCSS Mixins
+ * @description Reusable mixins for common styling patterns
+ * @version 2.0.0
+ * @author Avant Development Team
+ */
+
+@use 'variables' as *;
+
+/* ==================================================
+   LAYOUT MIXINS
+   ================================================== */
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-start {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin flex-column-center {
+  @include flex-column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ==================================================
+   TYPOGRAPHY MIXINS
+   ================================================== */
+
+@mixin text-primary {
+  color: $text-primary;
+  font-family: $font-primary;
+  font-weight: $font-weight-regular;
+  line-height: $line-height-normal;
+}
+
+@mixin text-secondary {
+  color: $text-secondary;
+  font-family: $font-primary;
+  font-weight: $font-weight-regular;
+  line-height: $line-height-normal;
+}
+
+@mixin text-muted {
+  color: $text-muted;
+  font-family: $font-primary;
+  font-weight: $font-weight-regular;
+  line-height: $line-height-normal;
+}
+
+@mixin text-display {
+  font-family: $font-display;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-tight;
+}
+
+@mixin text-mono {
+  font-family: $font-mono;
+  font-weight: $font-weight-regular;
+  line-height: $line-height-normal;
+}
+
+/* ==================================================
+   BUTTON MIXINS
+   ================================================== */
+
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $button-padding;
+  border: none;
+  border-radius: $button-border-radius;
+  min-height: $button-min-height;
+  font-family: $font-primary;
+  font-weight: $font-weight-medium;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all $transition-normal;
+  user-select: none;
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+@mixin button-primary {
+  @include button-base;
+  background: $gradient-accent;
+  color: $color-black-pure;
+  
+  &:hover:not(:disabled) {
+    box-shadow: $shadow-accent;
+    transform: translateY(-1px);
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+@mixin button-secondary {
+  @include button-base;
+  background: $bg-tertiary;
+  color: $text-primary;
+  border: 1px solid $border-primary;
+  
+  &:hover:not(:disabled) {
+    background: lighten($bg-tertiary, 10%);
+    border-color: $border-accent;
+  }
+}
+
+/* ==================================================
+   FORM MIXINS
+   ================================================== */
+
+@mixin form-field-base {
+  display: block;
+  width: 100%;
+  padding: $form-field-padding;
+  background: $bg-tertiary;
+  border: 1px solid $border-primary;
+  border-radius: $form-field-border-radius;
+  color: $text-primary;
+  font-family: $font-primary;
+  font-size: $font-size-base;
+  transition: all $transition-normal;
+  
+  &::placeholder {
+    color: $text-muted;
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: $accent-primary;
+    box-shadow: 0 0 0 3px rgba(0, 224, 220, 0.1);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+@mixin form-label {
+  display: block;
+  margin-bottom: $spacing-xs;
+  color: $text-secondary;
+  font-family: $font-primary;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+}
+
+/* ==================================================
+   CARD MIXINS
+   ================================================== */
+
+@mixin card-base {
+  background: $bg-secondary;
+  border: $card-border-width solid $border-primary;
+  border-radius: $card-border-radius;
+  padding: $card-padding;
+  box-shadow: $shadow-primary;
+}
+
+@mixin card-hover {
+  transition: all $transition-normal;
+  
+  &:hover {
+    border-color: $border-accent;
+    box-shadow: $shadow-accent;
+    transform: translateY(-2px);
+  }
+}
+
+/* ==================================================
+   RESPONSIVE MIXINS
+   ================================================== */
+
+@mixin mobile-only {
+  @media (max-width: #{$breakpoint-sm - 1px}) {
+    @content;
+  }
+}
+
+@mixin tablet-up {
+  @media (min-width: $breakpoint-sm) {
+    @content;
+  }
+}
+
+@mixin desktop-up {
+  @media (min-width: $breakpoint-md) {
+    @content;
+  }
+}
+
+@mixin large-desktop-up {
+  @media (min-width: $breakpoint-lg) {
+    @content;
+  }
+}
+
+/* ==================================================
+   UTILITY MIXINS
+   ================================================== */
+
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@mixin clearfix {
+  &::after {
+    content: '';
+    display: table;
+    clear: both;
+  }
+}
+
+@mixin ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@mixin image-replacement {
+  text-indent: -9999px;
+  overflow: hidden;
+  text-align: left;
+  background-repeat: no-repeat;
+}
+
+/* ==================================================
+   ANIMATION MIXINS
+   ================================================== */
+
+@mixin fade-in($duration: $transition-normal) {
+  opacity: 0;
+  animation: fadeIn $duration $easing-ease-out forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+@mixin slide-up($duration: $transition-normal) {
+  transform: translateY(20px);
+  opacity: 0;
+  animation: slideUp $duration $easing-ease-out forwards;
+}
+
+@keyframes slideUp {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@mixin pulse-glow($color: $accent-primary) {
+  animation: pulseGlow 2s infinite;
+  
+  @keyframes pulseGlow {
+    0%, 100% {
+      box-shadow: 0 0 5px rgba($color, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 20px rgba($color, 0.6);
+    }
+  }
+}

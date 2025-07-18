@@ -9,7 +9,8 @@
 @use 'components/forms';
 @use 'components/form-components';
 @use 'components/item-rows';
-@use 'components/applicationv2-item-sheets';
+@use 'components/item-sheets';
+@use 'components/item-cards';
 @use 'themes/base';
 @use 'themes/dark';
 
@@ -18,17 +19,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&display=swap');
 
 // SCSS Variables - Color Palette
-$bg-primary: #1C1C1C;        // Dark charcoal/graphite background
-$text-primary: #FFFFFF;       // White primary text
-$accent-cyan: #00E0DC;        // Bright cyan for emphasis
-$grey-cool: #BFBFBF;          // Cool grey for structural elements
-$aqua-muted: #4CE2E1;         // Softer cyan variant
-$black-pure: #000000;         // Pure black for contrast
+$bg-primary: #1C1C1C; // Dark charcoal/graphite background
+$text-primary: #FFFFFF; // White primary text
+$accent-cyan: #00E0DC; // Bright cyan for emphasis
+$grey-cool: #BFBFBF; // Cool grey for structural elements
+$aqua-muted: #4CE2E1; // Softer cyan variant
+$black-pure: #000000; // Pure black for contrast
 
 // Derived Colors
-$bg-secondary: #2A2A2A;       // Slightly lighter background
-$bg-tertiary: #333333;        // Card/section backgrounds
-$border-primary: #404040;     // Primary borders
+$bg-secondary: #2A2A2A; // Slightly lighter background
+$bg-tertiary: #333333; // Card/section backgrounds
+$border-primary: #404040; // Primary borders
 $border-accent: $accent-cyan;
 $text-secondary: $grey-cool;
 $text-muted: #808080;
@@ -146,7 +147,7 @@ $spacing-xxl: 30px;
 .application.sheet.avant.item.theme-dark,
 form.avant.theme-dark {
   @include dark.theme-dark;
-  
+
   // Force theme variables on ALL descendant elements
   *,
   *::before,
@@ -155,33 +156,37 @@ form.avant.theme-dark {
     color: inherit;
     background-color: inherit;
   }
-  
+
   // Explicitly apply theme to form elements
-  input, textarea, select, button {
+  input,
+  textarea,
+  select,
+  button {
     background: var(--theme-bg-tertiary, $bg-tertiary) !important;
     border-color: var(--theme-border-primary, $border-primary) !important;
     color: var(--theme-text-primary, $text-primary) !important;
-    
+
     &:focus {
       background: var(--theme-bg-primary, $bg-primary) !important;
       border-color: var(--theme-accent-primary, $accent-cyan) !important;
     }
   }
-  
+
   // Apply theme to window content
   .window-content {
     background: var(--theme-bg-primary, $bg-primary) !important;
     color: var(--theme-text-primary, $text-primary) !important;
   }
-  
+
   // Apply theme to sheet content area
   .sheet-content {
     background: var(--theme-bg-primary, $bg-primary) !important;
     color: var(--theme-text-primary, $text-primary) !important;
   }
-  
+
   // Apply theme to tabs and tab content
-  .tabs, .tab {
+  .tabs,
+  .tab {
     background: var(--theme-bg-secondary, $bg-secondary) !important;
     color: var(--theme-text-primary, $text-primary) !important;
     border-color: var(--theme-border-primary, $border-primary) !important;
@@ -217,7 +222,7 @@ form.avant.theme-dark {
 .avant {
   // Default to dark theme if no theme class specified
   @include dark.theme-dark;
-  
+
   // Removed legacy CSS custom properties - now handled by theme system only
   // This reduces CSS output by ~2KB and eliminates duplicate variable definitions
 
@@ -256,7 +261,7 @@ form.avant.theme-dark {
     position: relative;
     display: flex;
     flex-direction: column;
-    
+
     // For ApplicationV2, allow natural window frame behavior
     // Only apply constraints for specific legacy compatibility cases
     &.legacy-height-constraint {
@@ -282,7 +287,7 @@ form.avant.theme-dark {
     @include orbitron-header(700);
     letter-spacing: 2px;
     flex-shrink: 0; // Prevent header from shrinking
-    
+
     // Ensure ApplicationV2 window controls are visible and functional
     .header-control {
       width: auto !important;
@@ -293,7 +298,7 @@ form.avant.theme-dark {
       color: var(--theme-text-primary, $text-primary) !important;
       cursor: pointer !important;
       @include transition-standard;
-      
+
       // CRITICAL: FontAwesome font-family for window header controls
       font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 5 Free", "FontAwesome" !important;
       font-weight: 900 !important;
@@ -303,19 +308,19 @@ form.avant.theme-dark {
       text-rendering: auto !important;
       -webkit-font-smoothing: antialiased !important;
       -moz-osx-font-smoothing: grayscale !important;
-      
+
       &:hover {
         background: rgba(0, 224, 220, 0.2) !important;
         border-color: var(--theme-accent-primary, $accent-cyan) !important;
       }
     }
-    
+
     // Fallback for any nested controls structure
     .window-controls {
       display: flex !important;
       align-items: center;
       gap: 4px;
-      
+
       .header-button,
       .header-control {
         font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 5 Free", "FontAwesome" !important;
@@ -710,9 +715,11 @@ form.avant.theme-dark {
     padding: 0;
     margin: 0;
     display: flex;
+    gap: 0; // Override FoundryVTT's default nav.tabs gap
     border-radius: 0;
     flex-shrink: 0; // Prevent tabs from shrinking
     z-index: 40;
+    line-height: 1;
 
     .item {
       background: transparent;
@@ -725,6 +732,7 @@ form.avant.theme-dark {
       @include transition-standard;
       cursor: pointer;
       letter-spacing: 1px;
+      max-width: 17%;
 
       &:hover {
         background: rgba(0, 224, 220, 0.1);
@@ -747,6 +755,7 @@ form.avant.theme-dark {
     padding: 0 !important;
     margin: 0 !important;
     display: flex !important;
+    gap: 0 !important; // Override FoundryVTT's default nav.tabs gap
     border-radius: 0 !important;
     flex-shrink: 0 !important; // Prevent tabs from shrinking
     z-index: 40 !important;
@@ -760,20 +769,23 @@ form.avant.theme-dark {
       border: none !important;
       border-bottom: 2px solid transparent !important;
       color: var(--theme-text-secondary, $text-secondary) !important;
-      @include orbitron-header(9px, 600); // Force smaller font for item sheets
-      letter-spacing: 0.5px !important; // Reduced letter spacing
-      padding: 6px 10px !important; // More compact padding
+      @include orbitron-header(8px, 600); // Reduced font size from 9px to 8px for better fit
+      letter-spacing: 0.3px !important; // Further reduced letter spacing
+      padding: 4px 6px !important; // More compact padding (reduced from 6px 10px)
       text-decoration: none !important;
       @include transition-standard;
       cursor: pointer !important;
-      line-height: 1 !important;
+      line-height: 1.1 !important; // Slightly increased line height for readability
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
       height: 32px !important; // Match tab container height
-      min-width: 60px !important; // Minimum width for readability
-      flex: 1 !important; // Equal width distribution
+      min-width: 0 !important; // Allow shrinking below content size
+      flex: 1 1 auto !important; // Flexible sizing that can grow and shrink
       @include box-sizing-border-box;
+      white-space: nowrap !important; // Prevent text wrapping
+      overflow: hidden !important; // Hide overflow
+      text-overflow: ellipsis !important; // Add ellipsis for very long text
 
       &:hover {
         background: rgba(0, 224, 220, 0.1) !important;
@@ -1374,6 +1386,7 @@ form.avant.theme-dark {
   }
 
   .item,
+  .item-card,
   .gear-item,
   .action-item,
   .feature-item,
@@ -1397,6 +1410,7 @@ form.avant.theme-dark {
   }
 
   .item-name,
+  .item-card .card-item-name,
   .gear-item h4,
   .action-item .action-name,
   .feature-item .feature-name,
@@ -1414,6 +1428,7 @@ form.avant.theme-dark {
   }
 
   .item-controls,
+  .item-card .item-card__right,
   .gear-item .item-controls,
   .action-item .action-controls,
   .feature-item .feature-controls,
@@ -1428,6 +1443,7 @@ form.avant.theme-dark {
 
   // Compact icon-only edit/delete buttons
   .item-control {
+
     &.item-edit,
     &.item-delete {
       background: transparent;
@@ -1594,7 +1610,7 @@ form.avant.theme-dark {
     border-radius: 0;
     padding: $spacing-xl;
     margin-bottom: $spacing-xxl;
-    
+
     h3 {
       margin: 0 0 $spacing-lg 0;
       @include orbitron-header(16px, 700);
@@ -1621,7 +1637,7 @@ form.avant.theme-dark {
     text-align: center;
     @include transition-standard;
     min-width: 120px;
-    
+
     &:hover {
       border-color: var(--theme-accent-primary, $accent-cyan);
       box-shadow: var(--theme-shadow-primary, $shadow-primary);
@@ -1822,7 +1838,7 @@ form.avant.theme-dark {
   &.sheet.item,
   &.item.sheet {
     height: 100%;
-    
+
     .window-content {
       display: flex;
       flex-direction: column;
@@ -1830,7 +1846,7 @@ form.avant.theme-dark {
       padding: 0;
       overflow: hidden;
     }
-    
+
     .item-sheet {
       display: flex !important;
       flex-direction: column !important;
@@ -1839,14 +1855,14 @@ form.avant.theme-dark {
       background: var(--theme-bg-primary, $bg-primary);
       color: var(--theme-text-primary, $text-primary);
       overflow-y: auto;
-      
+
       // Flexcol layout support - CRITICAL for ApplicationV2
       &.flexcol {
         display: flex !important;
         flex-direction: column !important;
         height: 100% !important;
       }
-      
+
       // Item type specific styling
       &.talent-sheet,
       &.augment-sheet,
@@ -1858,7 +1874,7 @@ form.avant.theme-dark {
         background: var(--theme-bg-primary, $bg-primary);
         border: none;
       }
-      
+
       // Header styling
       .sheet-header {
         display: flex;
@@ -1868,17 +1884,17 @@ form.avant.theme-dark {
         background: var(--theme-bg-secondary, $bg-secondary);
         border-bottom: 1px solid var(--theme-border-primary, $border-primary);
         flex-shrink: 0;
-        
+
         .profile-img {
           width: 64px;
           height: 64px;
           border: 2px solid var(--theme-accent-primary, $accent-cyan);
           cursor: pointer;
         }
-        
+
         .header-fields {
           flex: 1;
-          
+
           .charname input {
             @include form-input-base;
             @include orbitron-header(16px, 700);
@@ -1887,37 +1903,37 @@ form.avant.theme-dark {
             color: var(--theme-text-primary, $text-primary);
             width: 100%;
             padding: 0;
-            
+
             &:focus {
               outline: 1px solid var(--theme-accent-primary, $accent-cyan);
             }
           }
         }
       }
-      
+
       // Tab content area
       .sheet-body {
         flex: 1;
         display: flex;
         flex-direction: column;
         overflow-y: auto;
-        
+
         .tab {
           padding: $spacing-md;
-          
+
           &.active {
             display: block;
           }
         }
       }
-      
+
       // Tab navigation
       .sheet-tabs {
         background: var(--theme-bg-secondary, $bg-secondary);
         border-bottom: 1px solid var(--theme-border-primary, $border-primary);
         display: flex;
         flex-shrink: 0;
-        
+
         .item {
           padding: $spacing-sm $spacing-md;
           background: transparent;
@@ -1926,12 +1942,12 @@ form.avant.theme-dark {
           @include orbitron-header(10px, 600);
           text-transform: uppercase;
           cursor: pointer;
-          
+
           &:hover {
             background: rgba(0, 224, 220, 0.1);
             color: var(--theme-accent-primary, $accent-cyan);
           }
-          
+
           &.active {
             background: var(--theme-bg-primary, $bg-primary);
             color: var(--theme-text-primary, $text-primary);
@@ -1947,7 +1963,7 @@ form.avant.theme-dark {
   &.item,
   &.application.item {
     height: 100%;
-    
+
     .window-content {
       display: flex !important;
       flex-direction: column !important;
@@ -1955,7 +1971,7 @@ form.avant.theme-dark {
       padding: 0 !important;
       overflow: hidden !important;
     }
-    
+
     .item-sheet {
       display: flex !important;
       flex-direction: column !important;
@@ -1966,7 +1982,7 @@ form.avant.theme-dark {
       background: var(--theme-bg-primary, $bg-primary) !important;
       color: var(--theme-text-primary, $text-primary) !important;
       overflow: visible !important;
-      
+
       // Flexcol layout support - CRITICAL for ApplicationV2
       &.flexcol {
         display: flex !important;
@@ -1974,7 +1990,7 @@ form.avant.theme-dark {
         height: 100% !important;
         min-height: 100% !important;
       }
-      
+
       // Item type specific styling - force visibility
       &.talent-sheet,
       &.augment-sheet,
@@ -1990,7 +2006,7 @@ form.avant.theme-dark {
         height: 100% !important;
         min-height: 100% !important;
       }
-      
+
       // Header styling - ensure visibility
       .sheet-header {
         display: flex !important;
@@ -2003,7 +2019,7 @@ form.avant.theme-dark {
         height: 80px !important;
         min-height: 80px !important;
         max-height: 80px !important;
-        
+
         .profile-img {
           width: 64px !important;
           height: 64px !important;
@@ -2011,25 +2027,28 @@ form.avant.theme-dark {
           cursor: pointer !important;
           flex-shrink: 0 !important;
         }
-        
+
         .header-fields {
           flex: 1 !important;
           display: flex !important;
           flex-direction: column !important;
           gap: $spacing-sm !important;
-          
+
           .charname {
             margin: 0 !important;
-            
+
             input {
-              @include form-input-base;
               @include orbitron-header(16px, 700);
-              background: transparent !important;
-              border: 1px solid var(--theme-border-primary, $border-primary) !important;
-              color: var(--theme-text-primary, $text-primary) !important;
-              width: 100% !important;
-              padding: $spacing-xs $spacing-sm !important;
-              
+              @include form-input-base;
+
+              & {
+                background: transparent !important;
+                border: 1px solid var(--theme-border-primary, $border-primary) !important;
+                color: var(--theme-text-primary, $text-primary) !important;
+                width: 100% !important;
+                padding: $spacing-xs $spacing-sm !important;
+              }
+
               &:focus {
                 outline: none !important;
                 border-color: var(--theme-accent-primary, $accent-cyan) !important;
@@ -2037,25 +2056,26 @@ form.avant.theme-dark {
               }
             }
           }
-          
+
           .resource-row {
             display: flex !important;
             gap: $spacing-md !important;
             align-items: center !important;
-            
+
             .resource {
               display: flex !important;
               flex-direction: column !important;
               gap: 2px !important;
-              
+
               label {
                 @include orbitron-header(9px, 600);
                 color: var(--theme-text-secondary, $text-secondary) !important;
                 text-transform: uppercase !important;
                 letter-spacing: 0.5px !important;
               }
-              
-              input, select {
+
+              input,
+              select {
                 @include form-input-base;
                 padding: 4px 8px !important;
                 width: 80px !important;
@@ -2064,7 +2084,7 @@ form.avant.theme-dark {
           }
         }
       }
-      
+
       // Tab navigation - ensure visibility
       .sheet-tabs {
         background: var(--theme-bg-secondary, $bg-secondary) !important;
@@ -2076,7 +2096,7 @@ form.avant.theme-dark {
         max-height: 36px !important;
         margin: 0 !important;
         padding: 0 !important;
-        
+
         .item {
           padding: $spacing-sm $spacing-md !important;
           background: transparent !important;
@@ -2089,12 +2109,12 @@ form.avant.theme-dark {
           display: flex !important;
           align-items: center !important;
           height: 36px !important;
-          
+
           &:hover {
             background: rgba(0, 224, 220, 0.1) !important;
             color: var(--theme-accent-primary, $accent-cyan) !important;
           }
-          
+
           &.active {
             background: var(--theme-bg-primary, $bg-primary) !important;
             color: var(--theme-text-primary, $text-primary) !important;
@@ -2102,7 +2122,7 @@ form.avant.theme-dark {
           }
         }
       }
-      
+
       // Tab content area - ensure proper layout
       .sheet-body {
         flex: 1 !important;
@@ -2112,45 +2132,47 @@ form.avant.theme-dark {
         overflow-x: hidden !important;
         min-height: 0 !important;
         background: var(--theme-bg-primary, $bg-primary) !important;
-        
+
         .tab {
           padding: $spacing-md !important;
           display: none !important;
           flex-direction: column !important;
           gap: $spacing-md !important;
-          
+
           &.active {
             display: flex !important;
           }
-          
+
           .form-group {
             display: flex !important;
             flex-direction: column !important;
             gap: $spacing-xs !important;
             margin-bottom: $spacing-md !important;
-            
+
             label {
               @include orbitron-header(10px, 600);
               color: var(--theme-text-secondary, $text-secondary) !important;
               text-transform: uppercase !important;
               letter-spacing: 0.5px !important;
             }
-            
-            input, select, textarea {
+
+            input,
+            select,
+            textarea {
               @include form-input-base;
               padding: $spacing-sm !important;
-              
+
               &:focus {
                 border-color: var(--theme-accent-primary, $accent-cyan) !important;
                 box-shadow: 0 0 8px rgba(0, 224, 220, 0.3) !important;
               }
             }
           }
-          
+
           .form-row {
             display: flex !important;
             gap: $spacing-md !important;
-            
+
             .form-group {
               flex: 1 !important;
             }
@@ -2175,7 +2197,7 @@ form.avant.theme-dark {
     gap: 4px;
     margin-bottom: 12px;
     padding: 8px;
-    
+
     label {
       display: block;
       @include orbitron-header(10px, 600);
@@ -2184,8 +2206,10 @@ form.avant.theme-dark {
       letter-spacing: 0.5px;
       margin-bottom: 4px;
     }
-    
-    input, select, textarea {
+
+    input,
+    select,
+    textarea {
       @include form-input-base;
       display: block;
       width: 100%;
@@ -2194,13 +2218,13 @@ form.avant.theme-dark {
       background: var(--theme-bg-tertiary, $bg-tertiary);
       border: 1px solid var(--theme-border-primary, $border-primary);
       color: var(--theme-text-primary, $text-primary);
-      
+
       &:focus {
         border-color: var(--theme-accent-primary, $accent-cyan);
         box-shadow: 0 0 8px rgba(0, 224, 220, 0.3);
       }
     }
-    
+
     textarea {
       min-height: 100px;
       resize: vertical;
@@ -2212,7 +2236,7 @@ form.avant.theme-dark {
     display: flex;
     flex-direction: column;
     min-height: 0; // Prevent flex items from overflowing
-    
+
     &.full-height {
       height: 100%;
     }
@@ -2224,25 +2248,34 @@ form.avant.theme-dark {
     background: var(--theme-bg-secondary, $bg-secondary);
     border-bottom: 1px solid var(--theme-border-primary, $border-primary);
     display: flex;
+    gap: 0; // Override FoundryVTT's default nav.tabs gap
     padding: 0;
     margin: 0;
     flex-shrink: 0;
-    
+
     .item {
-      @include orbitron-header(10px, 600);
+      @include orbitron-header(8px, 600); // Reduced from 10px for consistency
       color: var(--theme-text-secondary, $text-secondary);
-      padding: $spacing-sm $spacing-md;
+      padding: 4px 6px; // More compact padding
       border-right: 1px solid var(--theme-border-primary, $border-primary);
       cursor: pointer;
       @include transition-standard;
       text-decoration: none;
       background: transparent;
-      
+      flex: 1 1 auto; // Flexible sizing
+      min-width: 0; // Allow shrinking
+      white-space: nowrap; // Prevent wrapping
+      overflow: hidden; // Hide overflow
+      text-overflow: ellipsis; // Add ellipsis
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
       &:hover {
         background: var(--theme-bg-tertiary, $bg-tertiary);
         color: var(--theme-text-primary, $text-primary);
       }
-      
+
       &.active {
         background: var(--theme-bg-primary, $bg-primary);
         color: var(--theme-accent-primary, $accent-cyan);
@@ -2259,15 +2292,15 @@ form.avant.theme-dark {
       width: 100%;
       height: 100%;
     }
-    
+
     .stats-sidebar {
       width: 240px;
     }
-    
+
     .main-content {
       margin-left: 240px;
     }
-    
+
     .sheet-tabs .item {
       padding: 10px 16px;
       font-size: 10px;
@@ -2278,7 +2311,7 @@ form.avant.theme-dark {
       grid-template-columns: 1fr;
       gap: 10px; // Reduced from 15px
     }
-    
+
     .skill-tile {
       grid-template-columns: 1fr 40px 40px; // Reduced from 50px
       gap: $spacing-xs; // Reduced from 6px
@@ -2291,15 +2324,15 @@ form.avant.theme-dark {
     .stats-sidebar {
       width: 200px;
     }
-    
+
     .main-content {
       margin-left: 200px;
     }
-    
+
     .sidebar-abilities {
       grid-template-columns: 1fr;
     }
-    
+
     .sheet-tabs {
       flex-wrap: wrap;
 
@@ -2330,21 +2363,21 @@ form.avant.theme-dark {
     background: white;
     color: black;
     box-shadow: none;
-    
+
     .sheet-header {
       background: white;
       color: black;
       border-bottom: 2px solid black;
     }
-    
+
     .sheet-tabs {
       display: none;
     }
-    
+
     .tab {
       display: block;
     }
-    
+
     .item-controls {
       display: none;
     }
@@ -2356,6 +2389,7 @@ form.avant.theme-dark {
  * ============================================================================ */
 
 .avant {
+
   // Tag examples container
   .tag-examples {
     display: flex;
@@ -2479,7 +2513,8 @@ form.avant.theme-dark {
     opacity: 0.5;
 
     &:hover {
-      transform: none; /* Disable hover scale effect */
+      transform: none;
+      /* Disable hover scale effect */
     }
 
     .die-face {
@@ -2683,5 +2718,45 @@ form.avant.theme-dark {
   }
 }
 
+/* Gear Tab - Enhanced Item Details for Weapons and Armor */
+.gear-item {
+  .item-details {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--theme-text-secondary, $text-secondary);
 
+    span {
+      padding: 2px 6px;
+      border-radius: 3px;
+      background: rgba(0, 224, 220, 0.1);
+      border: 1px solid rgba(0, 224, 220, 0.3);
+      white-space: nowrap;
+    }
 
+    .item-damage {
+      background: rgba(255, 107, 107, 0.1);
+      border-color: rgba(255, 107, 107, 0.3);
+      color: #ff6b6b;
+    }
+
+    .item-damage-type {
+      background: rgba(255, 195, 0, 0.1);
+      border-color: rgba(255, 195, 0, 0.3);
+      color: #ffc300;
+    }
+
+    .item-ac {
+      background: rgba(74, 144, 226, 0.1);
+      border-color: rgba(74, 144, 226, 0.3);
+      color: #4a90e2;
+    }
+
+    .item-threshold {
+      background: rgba(156, 39, 176, 0.1);
+      border-color: rgba(156, 39, 176, 0.3);
+      color: #9c27b0;
+    }
+  }
+}

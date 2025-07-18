@@ -1,0 +1,197 @@
+[
+  {
+    "_id": "Sc7OfV2DJRXCPJvS",
+    "name": "Alien",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "creature-traits",
+      "color": "#95A5A6",
+      "icon": "fas fa-dragon",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Alien"
+    },
+    "sort": 100,
+    "folder": "pMHGr9PUTs755Lx5"
+  },
+  {
+    "_id": "OpWQRg7szR7E1zHy",
+    "name": "Angel",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "creature-traits",
+      "color": "#95A5A6",
+      "icon": "fas fa-dragon",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Angel"
+    },
+    "sort": 200,
+    "folder": "pMHGr9PUTs755Lx5"
+  },
+  {
+    "_id": "X1QRwA1tAko21mHx",
+    "name": "Beast",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "creature-traits",
+      "color": "#95A5A6",
+      "icon": "fas fa-dragon",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Beast"
+    },
+    "sort": 300,
+    "folder": "pMHGr9PUTs755Lx5"
+  },
+  {
+    "_id": "Hr04t8py40r5K7N0",
+    "name": "Dragon",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "creature-traits",
+      "color": "#95A5A6",
+      "icon": "fas fa-dragon",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Dragon"
+    },
+    "sort": 400,
+    "folder": "pMHGr9PUTs755Lx5"
+  },
+  {
+    "_id": "VvqZ49bu9GOyKzpi",
+    "name": "Elemental",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "creature-traits",
+      "color": "#95A5A6",
+      "icon": "fas fa-dragon",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Elemental"
+    },
+    "sort": 500,
+    "folder": "pMHGr9PUTs755Lx5"
+  },
+  {
+    "_id": "2kmWniYfLtMI5Kp0",
+    "name": "Fey",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "creature-traits",
+      "color": "#95A5A6",
+      "icon": "fas fa-dragon",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Fey"
+    },
+    "sort": 600,
+    "folder": "pMHGr9PUTs755Lx5"
+  },
+  {
+    "_id": "iznIb9Y8hmduEZ7m",
+    "name": "Giant",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "creature-traits",
+      "color": "#95A5A6",
+      "icon": "fas fa-dragon",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Giant"
+    },
+    "sort": 700,
+    "folder": "pMHGr9PUTs755Lx5"
+  },
+  {
+    "_id": "18lo6eUOEMgpIv2k",
+    "name": "Golem",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "creature-traits",
+      "color": "#95A5A6",
+      "icon": "fas fa-dragon",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Golem"
+    },
+    "sort": 800,
+    "folder": "pMHGr9PUTs755Lx5"
+  },
+  {
+    "_id": "oWmnNob25S2LSoRQ",
+    "name": "Mortal",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "creature-traits",
+      "color": "#95A5A6",
+      "icon": "fas fa-dragon",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Mortal"
+    },
+    "sort": 900,
+    "folder": "pMHGr9PUTs755Lx5"
+  },
+  {
+    "_id": "0ZIq1aWppK6GAU0r",
+    "name": "Nightmare",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "creature-traits",
+      "color": "#95A5A6",
+      "icon": "fas fa-dragon",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Nightmare"
+    },
+    "sort": 1000,
+    "folder": "pMHGr9PUTs755Lx5"
+  },
+  {
+    "_id": "rc2HfS1EW0iIs9Iy",
+    "name": "Ooze",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "creature-traits",
+      "color": "#95A5A6",
+      "icon": "fas fa-dragon",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Ooze"
+    },
+    "sort": 1100,
+    "folder": "pMHGr9PUTs755Lx5"
+  },
+  {
+    "_id": "Eeit566aL2CP4J7Z",
+    "name": "Plant",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "creature-traits",
+      "color": "#95A5A6",
+      "icon": "fas fa-dragon",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Plant"
+    },
+    "sort": 1200,
+    "folder": "pMHGr9PUTs755Lx5"
+  },
+  {
+    "_id": "z8fmLfnllVnWBO3x",
+    "name": "Undead",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "creature-traits",
+      "color": "#95A5A6",
+      "icon": "fas fa-dragon",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Undead"
+    },
+    "sort": 1300,
+    "folder": "pMHGr9PUTs755Lx5"
+  }
+]

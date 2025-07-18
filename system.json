@@ -31,33 +31,77 @@
       "path": "lang/en.json"
     }
   ],
-    "packs": [
+  "packs": [
     {
       "name": "avant-traits",
-      "label": "Avant Traits",
+      "label": "Traits",
       "path": "./packs/avant-traits.db",
       "type": "Item",
-      "system": "avant"
+      "system": "avant",
+      "banner": "systems/avant/assets/compendium-banner/blue.webp",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
     },
     {
       "name": "avant-macros",
-      "label": "Avant Macros",
+      "label": "Macros",
       "path": "./packs/avant-macros.db",
-      "type": "Macro"
+      "type": "Macro",
+      "banner": "systems/avant/assets/compendium-banner/orange.webp",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
     },
     {
       "name": "avant-talents",
-      "label": "Avant Talents",
+      "label": "Talents",
       "path": "./packs/avant-talents.db",
       "type": "Item",
-      "system": "avant"
+      "system": "avant",
+      "banner": "systems/avant/assets/compendium-banner/green.webp",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
     },
     {
       "name": "avant-augments",
-      "label": "Avant Augments",
+      "label": "Augments",
       "path": "./packs/avant-augments.db",
       "type": "Item",
-      "system": "avant"
+      "system": "avant",
+      "banner": "systems/avant/assets/compendium-banner/purple.webp",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "flags": {}
+    }
+  ],
+  "packFolders": [
+    {
+      "name": "Character Building",
+      "sorting": "m",
+      "color": "#343c33",
+      "packs": [
+        "avant-traits",
+        "avant-talents",
+        "avant-augments"
+      ]
+    },
+    {
+      "name": "GM Tools",
+      "sorting": "m",
+      "color": "#181818",
+      "packs": [
+        "macros"
+      ]
     }
   ],
   "documentTypes": {
@@ -86,4 +130,4 @@
   "url": "https://github.com/njisaf/AvantVTT",
   "manifest": "https://github.com/njisaf/AvantVTT/releases/download/v0.3.0/system.json",
   "download": "https://github.com/njisaf/AvantVTT/releases/download/v0.3.0/avant-v0.3.0.zip"
-} 
+}

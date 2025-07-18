@@ -4,25 +4,31 @@
  * @author Avant Development Team
  * @description Chat context menu for Fortune Point rerolls in v13
  * 
- * CRITICAL TIMING ISSUE RESOLVED:
+ * 🚨 CRITICAL TIMING REQUIREMENTS:
  * 
- * ROOT CAUSE: The FoundryVTT `ready` hook was already fired by the time our context menu 
- * service tried to register for it, so our callback never executed. This is a classic 
- * timing race condition where we were registering for an event that had already occurred.
+ * This service MUST run in the "init" phase to prevent race conditions.
  * 
- * SOLUTION: Check `game.ready` state before registering - if already ready, execute 
- * immediately; if not ready, register for hook. This eliminates ALL timing dependencies 
- * and provides 100% first-load success.
+ * FoundryVTT creates the ChatLog context menu during initialization (init phase).
+ * Our method override MUST happen BEFORE the context menu is created, otherwise
+ * our extended options will never appear.
+ * 
+ * RACE CONDITION PREVENTION:
+ * ✅ Service configured in "init" phase via service-dependency-config.ts
+ * ✅ Override _getEntryContextOptions() before FoundryVTT creates ChatLog
+ * ✅ Let FoundryVTT create context menu naturally using our overridden method
+ * ✅ No manual context menu creation/destruction (prevents DOM conflicts)
  * 
  * ARCHITECTURAL APPROACH:
- * 1. Override ui.chat._getEntryContextOptions() to inject our reroll option
- * 2. Recreate the context menu to use our overridden method
- * 3. Use timing-independent initialization pattern
+ * 1. Service runs in "init" phase (configured in service-dependency-config.ts)
+ * 2. Override ui.chat._getEntryContextOptions() to inject our reroll option
+ * 3. FoundryVTT creates context menu during ChatLog initialization
+ * 4. When user right-clicks, FoundryVTT calls our overridden method
+ * 5. Our method returns original options + our reroll option
  * 
  * FOUNDRY API REFERENCES:
  * - ChatLog._getEntryContextOptions(): https://foundryvtt.com/api/classes/client.ChatLog.html
  * - ContextMenu: https://foundryvtt.com/api/classes/client.ContextMenu.html
- * - Hooks.ready: https://foundryvtt.com/api/classes/client.ClientDatabaseBackend.html#ready
+ * - Service Dependencies: ../utils/service-dependency-config.ts
  */
 
 // TypeScript compiler hint to allow any types for now during gradual migration
@@ -40,64 +46,27 @@ import { cleanFlavorForDisplay } from '../logic/dialog-utils.js';
  */
 export class AvantChatContextMenu {
     /**
-     * Initialize context menu listeners for v13 using timing-independent approach
+     * Initialize context menu listeners for v13 using init phase approach
      * 
-     * TIMING SOLUTION: This method implements a timing-independent pattern that works
-     * regardless of when it's called relative to FoundryVTT's ready state:
-     * - If game.ready is true: Execute immediately (hook already fired)
-     * - If game.ready is false: Register for ready hook (normal initialization)
+     * 🚨 CRITICAL: This method runs in the init phase to override the
+     * _getEntryContextOptions method BEFORE FoundryVTT creates the ChatLog context menu.
      * 
-     * This eliminates the race condition that caused intermittent failures.
+     * This timing is essential to prevent race conditions where the context menu
+     * doesn't include our extended options.
      * 
      * @static
      */
     static addContextMenuListeners(): void {
-        logger.log('Avant | Initializing v13 context menu system using timing-independent approach...');
-        
-        // CRITICAL FIX: Check ready state before registering for hook
-        // This prevents the race condition where ready hook already fired
-        const game = (globalThis as any).game;
-        if (game?.ready) {
-            logger.log('Avant | Game already ready, implementing context menu solution immediately...');
-            AvantChatContextMenu._implementContextMenuSolution();
-        } else {
-            logger.log('Avant | Game not ready yet, registering for ready hook...');
-            Hooks.once('ready', () => {
-                logger.log('Avant | Ready hook fired, implementing context menu solution...');
-                AvantChatContextMenu._implementContextMenuSolution();
-            });
-        }
-        
-        logger.log('Avant | ✅ Context menu timing-independent initialization complete');
-    }
-    
-    /**
-     * Implement the context menu solution using method override + recreation
-     * 
-     * ARCHITECTURAL INSIGHT: FoundryVTT creates context menus during initialization
-     * and caches the options function. To inject our custom options, we must:
-     * 1. Override the _getEntryContextOptions method
-     * 2. Recreate the context menu to use our override
-     * 
-     * @static
-     * @private
-     */
-    static _implementContextMenuSolution(): void {
-        const ui = (globalThis as any).ui;
-        if (!ui?.chat) {
-            logger.error('Avant | ERROR: ui.chat not available during context menu implementation');
-            return;
-        }
-        
-        logger.log('Avant | Step 1: Override _getEntryContextOptions method');
+        logger.log('Avant | Initializing chat context menu system...');
+
+        // 🚨 CRITICAL: Override method early so FoundryVTT uses it when creating context menu
         AvantChatContextMenu._overrideGetEntryContextOptions();
-        
-        logger.log('Avant | Step 2: Recreate the context menu to use our override');
-        AvantChatContextMenu._recreateContextMenu();
-        
-        logger.log('Avant | ✅ Context menu solution implemented successfully');
+
+        logger.log('Avant | ✅ Context menu initialization complete');
     }
-    
+
+
+
     /**
      * Override ChatLog._getEntryContextOptions with our extended functionality
      * 
@@ -113,23 +82,20 @@ export class AvantChatContextMenu {
      */
     static _overrideGetEntryContextOptions(): void {
         const ui = (globalThis as any).ui;
-        
+
         // Prevent double-override
         if (ui.chat._getEntryContextOptions._avantExtended) {
-            logger.log('Avant | Method already overridden, skipping...');
             return;
         }
-        
+
         // Store original method for delegation
         const originalGetEntryContextOptions = ui.chat._getEntryContextOptions;
-        
+
         // Override with extended functionality
-        ui.chat._getEntryContextOptions = function() {
-            logger.log('Avant | 🎯 EXTENDED _getEntryContextOptions called - SUCCESS!');
-            
+        ui.chat._getEntryContextOptions = function () {
             // Get original FoundryVTT options
             const options = originalGetEntryContextOptions.call(this);
-            
+
             // Add our reroll option
             options.push({
                 name: "Reroll with Fortune Points",
@@ -141,22 +107,17 @@ export class AvantChatContextMenu {
                         if (!messageId) {
                             return false;
                         }
-                        
+
                         const game = (globalThis as any).game;
                         const message = game.messages?.get(messageId);
                         if (!message) {
                             return false;
                         }
-                        
+
                         // Use pure function for validation (testable, maintainable)
                         const validation = validateMessageForReroll(message);
-                        if (!validation.isValid) {
-                            return false;
-                        }
-                        
-                        logger.log('Avant | ✅ Message validated for reroll option');
-                        return true;
-                        
+                        return validation.isValid;
+
                     } catch (error) {
                         logger.error('Avant | Error in reroll condition:', error);
                         return false;
@@ -164,124 +125,56 @@ export class AvantChatContextMenu {
                 },
                 callback: (li: HTMLElement) => {
                     try {
-                        logger.log('Avant | === CONTEXT MENU CALLBACK TRIGGERED - SUCCESS! ===');
-                        
                         // FoundryVTT v13 DOM compatibility: use dataset and getAttribute fallback
                         const messageId = (li as any).dataset?.messageId || li.getAttribute('data-message-id');
                         if (!messageId) {
-                            logger.error('Avant | No message ID found in callback');
+                            logger.error('Avant | No message ID found in context menu callback');
                             return;
                         }
-                        
+
                         const game = (globalThis as any).game;
                         const message = game.messages?.get(messageId);
                         if (!message) {
-                            logger.error('Avant | Message not found in callback:', messageId);
+                            logger.error('Avant | Message not found in context menu callback:', messageId);
                             return;
                         }
-                        
+
                         // Use pure function to validate and extract data
                         const validation = validateMessageForReroll(message);
                         if (!validation.isValid) {
-                            logger.error('Avant | Message validation failed in callback:', validation.reason);
+                            logger.error('Avant | Message validation failed in context menu callback:', validation.reason);
                             return;
                         }
-                        
+
                         // Extract clean roll name from flavor text (remove HTML)
                         const cleanRollName = cleanFlavorForDisplay(validation.flavor || 'Reroll');
-                        
+
                         // Open the reroll dialog with validated data
                         const dialog = new AvantRerollDialog(
-                            validation.roll, 
-                            validation.actor, 
+                            validation.roll,
+                            validation.actor,
                             cleanRollName
                         );
                         (dialog as any).render(true);
-                        logger.log('Avant | ✅ Reroll dialog opened successfully');
-                        
+                        logger.log('Avant | Reroll dialog opened successfully');
+
                     } catch (error) {
                         logger.error('Avant | Error in reroll callback:', error);
                     }
                 }
             });
-            
-            logger.log('Avant | ✅ Reroll option added to context menu');
+
             return options;
         };
-        
+
         // Mark as extended to prevent double-override
         ui.chat._getEntryContextOptions._avantExtended = true;
-        
+
         logger.log('Avant | ✅ _getEntryContextOptions method overridden successfully');
     }
-    
-    /**
-     * Recreate the ChatLog context menu to use our overridden method
-     * 
-     * FOUNDRY ARCHITECTURE: FoundryVTT caches the context menu options function
-     * during initialization. To inject our custom options, we must recreate
-     * the context menu after overriding the method.
-     * 
-     * FOUNDRY API: ChatLog._createContextMenu() creates a new ContextMenu instance
-     * with the specified options function and DOM selector.
-     * 
-     * ERROR FIX: Added proper error handling for context menu state issues
-     * 
-     * @static
-     * @private
-     */
-    static _recreateContextMenu(): void {
-        const ui = (globalThis as any).ui;
-        
-        try {
-            // Verify chat element is available before proceeding
-            if (!ui.chat.element || !ui.chat.element[0]) {
-                logger.log('Avant | Chat element not ready, skipping context menu recreation');
-                return;
-            }
-            
-            // Step 1: Safely destroy existing context menu if it exists
-            if (ui.chat._contextMenu) {
-                logger.log('Avant | Destroying existing context menu...');
-                
-                try {
-                    // Only try to close if the context menu has proper state
-                    if (ui.chat._contextMenu.close && typeof ui.chat._contextMenu.close === 'function') {
-                        ui.chat._contextMenu.close();
-                    }
-                } catch (closeError: any) {
-                    logger.log('Avant | Context menu close failed (expected):', closeError.message);
-                    // This is often expected - context menu may not be in closeable state
-                }
-                
-                ui.chat._contextMenu = null;
-            }
-            
-            // Step 2: Only recreate if we have the necessary components
-            if (!ui.chat._createContextMenu || typeof ui.chat._createContextMenu !== 'function') {
-                logger.log('Avant | _createContextMenu not available, method override should be sufficient');
-                return;
-            }
-            
-            // Step 3: Recreate context menu with our overridden method
-            logger.log('Avant | Recreating context menu with overridden method...');
-            
-            // Use the same pattern as FoundryVTT's original ChatLog._activateListeners()
-            // This ensures compatibility with FoundryVTT's expected context menu structure
-            ui.chat._contextMenu = ui.chat._createContextMenu(
-                () => ui.chat._getEntryContextOptions(),  // Now uses our overridden method!
-                '.message',
-                { 
-                    hookName: 'getChatMessageContextOptions',
-                    container: ui.chat.element[0] 
-                }
-            );
-            
-            logger.log('Avant | ✅ Context menu recreated successfully');
-            
-        } catch (error: any) {
-            logger.error('Avant | Error during context menu recreation, but method override should still work:', error.message);
-            // Even if recreation fails, the method override should still provide functionality
-        }
-    }
+
+
+
+
+
 } 

@@ -116,13 +116,13 @@ npm exec traits integrity
 
 ### Command Reference
 
-| Command | Description | Options |
-|---------|-------------|---------|
-| `traits:export` | Export traits to JSON | `--world-only`, `--system-only`, `--compact` |
-| `traits:import` | Import traits from JSON | `--dry-run`, `--overwrite` |
-| `traits:sync` | Sync from remote repository | None |
-| `traits:remote` | Get remote information | None |
-| `traits:integrity` | Check data integrity | None |
+| Command            | Description                 | Options                                      |
+| ------------------ | --------------------------- | -------------------------------------------- |
+| `traits:export`    | Export traits to JSON       | `--world-only`, `--system-only`, `--compact` |
+| `traits:import`    | Import traits from JSON     | `--dry-run`, `--overwrite`                   |
+| `traits:sync`      | Sync from remote repository | None                                         |
+| `traits:remote`    | Get remote information      | None                                         |
+| `traits:integrity` | Check data integrity        | None                                         |
 
 ## Developer Tools / Compendium CLI
 
@@ -168,13 +168,13 @@ npm run cli:compendium diff pack1 pack2 --json
 
 ### Advanced Options
 
-| Option | Description | Available Commands |
-|--------|-------------|------------------|
-| `--json` | Output in JSON format | All commands |
-| `--filter <type>` | Filter by document type | `list`, `copy` |
-| `--verbose` | Detailed information | `list`, `validate` |
-| `--dry-run` | Preview without changes | `copy`, `create` |
-| `--force` | Overwrite existing | `create`, `copy` |
+| Option            | Description             | Available Commands |
+| ----------------- | ----------------------- | ------------------ |
+| `--json`          | Output in JSON format   | All commands       |
+| `--filter <type>` | Filter by document type | `list`, `copy`     |
+| `--verbose`       | Detailed information    | `list`, `validate` |
+| `--dry-run`       | Preview without changes | `copy`, `create`   |
+| `--force`         | Overwrite existing      | `create`, `copy`   |
 
 ### Developer Examples
 
@@ -211,20 +211,20 @@ The trait item sheet includes interactive tag buttons that allow quick addition/
 
 The system includes 12 predefined tags:
 
-| Tag | Category | Description |
-|-----|----------|-------------|
-| Weapon | item | Combat weapons and offensive tools |
-| Armor | item | Protective gear and defensive equipment |
-| Gear | item | General equipment and utility items |
-| Talent | character | Character abilities and skills |
-| Feature | character | Character traits and background elements |
-| Augment | character | Cybernetic and technological enhancements |
-| Action | ability | Special actions and maneuvers |
-| Elemental | damage | Fire, ice, lightning, and elemental effects |
-| Physical | damage | Blunt force, piercing, and physical damage |
-| Tech | damage | Digital, electromagnetic, and tech-based effects |
-| Healing | beneficial | Restorative and healing abilities |
-| Defensive | beneficial | Protective and defensive bonuses |
+| Tag       | Category   | Description                                      |
+| --------- | ---------- | ------------------------------------------------ |
+| Weapon    | item       | Combat weapons and offensive tools               |
+| Armor     | item       | Protective gear and defensive equipment          |
+| Gear      | item       | General equipment and utility items              |
+| Talent    | character  | Character abilities and skills                   |
+| Feature   | character  | Character traits and background elements         |
+| Augment   | character  | Cybernetic and technological enhancements        |
+| Action    | ability    | Special actions and maneuvers                    |
+| Elemental | damage     | Fire, ice, lightning, and elemental effects      |
+| Physical  | damage     | Blunt force, piercing, and physical damage       |
+| Tech      | damage     | Digital, electromagnetic, and tech-based effects |
+| Healing   | beneficial | Restorative and healing abilities                |
+| Defensive | beneficial | Protective and defensive bonuses                 |
 
 ### TagRegistryService API
 
@@ -250,6 +250,17 @@ const weaponTag = tagRegistry.getById('weapon');
 ```
 
 **📖 For complete tag system documentation, see [docs/TAGS.md](docs/TAGS.md)**
+
+## Documentation
+
+### User Guides
+- **[Custom Sounds Guide](docs/user-guide-custom-sounds.md)** - How to add and manage custom UI sound effects
+- **[Tags System Documentation](docs/TAGS.md)** - Complete guide to the tag system
+
+### Development Documentation
+- **[Refactoring Guide](REFACTORING_GUIDE.md)** - System architecture and refactoring patterns
+- **[Testing Guide](TESTING_GUIDE.md)** - Comprehensive testing strategy and implementation
+- **[Migration Guide](MIGRATION_GUIDE.md)** - Upgrade and migration procedures
 
 ## Development
 

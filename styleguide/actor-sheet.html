@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Actor Sheet - Avant VTT Style Guide</title>
+  <link rel="stylesheet" href="styles/avant-sandbox.css">
+  <style>
+    body {
+      padding: 20px;
+      background: var(--bg-primary, #1C1C1C);
+      color: var(--text-primary, #FFFFFF);
+      font-family: 'Exo 2', sans-serif;
+    }
+    
+    .styleguide-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(28, 28, 28, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-primary, #404040);
+      padding: 10px 20px;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .styleguide-header a {
+      color: var(--accent-primary, #00E0DC);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    
+    .styleguide-header a:hover {
+      text-decoration: underline;
+    }
+    
+    .styleguide-controls {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .styleguide-controls button {
+      background: var(--accent-primary, #00E0DC);
+      color: var(--color-black-pure, #000000);
+      border: none;
+      padding: 4px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .styleguide-content {
+      margin-top: 60px;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .partial-placeholder {
+      background: rgba(0, 224, 220, 0.1);
+      border: 1px dashed var(--accent-primary, #00E0DC);
+      padding: 20px;
+      text-align: center;
+      color: var(--text-secondary, #BFBFBF);
+      font-style: italic;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="styleguide-header">
+    <div>
+      <a href="index.html">← Back to Style Guide</a>
+      <span style="margin-left: 20px; color: var(--text-secondary, #BFBFBF);">Actor Sheet</span>
+    </div>
+    <div class="styleguide-controls">
+      <button onclick="toggleCSS()">Toggle CSS</button>
+      <button onclick="toggleGrid()">Toggle Grid</button>
+    </div>
+  </div>
+  
+  <div class="styleguide-content">
+    <!-- Avant Native Actor Sheet Template - V2 ApplicationV2 --> <div class="avant sheet actor character flexcol" autocomplete="off"> <!-- Fixed Header with Character Name and Avatar --> <header class="sheet-header"> <img class="profile-img" src="icons/svg/mystery-man.svg" data-edit="img" title="Alex Chen" /> <div class="header-fields"> <h1 class="charname"><input name="name" type="text" value="Alex Chen" placeholder="Character Name" /> </h1> </div> <!-- Character Stats moved to header --> <div class="header-stats"> <div class="header-stat"> <span class="header-stat-label">Level</span> <input type="text" name="system.level" value="" data-dtype="Number" class="header-stat-input" /> </div> <div class="header-stat"> <span class="header-stat-label">Fortune</span> <input type="text" name="system.fortunePoints" value="" data-dtype="Number" min="0" max="5" class="header-stat-input" /> </div> </div> </header> <!-- Main Layout Container --> <div class="sheet-content"> <!-- Left Sidebar for Stats --> <aside class="stats-sidebar"> <!-- Defense Threshold --> <div class="sidebar-section"> <h4>Defense Threshold</h4> <div class="stat-tiles-row"> <div class="stat-tile"> <input type="text" name="system.defenseThreshold" value="" data-dtype="Number" class="stat-tile-input" /> <span class="stat-tile-label">Defense</span> </div> </div> </div> <!-- Hit Points --> <div class="sidebar-section"> <h4>Hit Points</h4> <div class="stat-tiles-row"> <div class="stat-tile"> <input type="text" name="system.health.value" value="" data-dtype="Number" class="stat-tile-input" /> <span class="stat-tile-label">Current</span> </div> <div class="stat-tile"> <input type="text" name="system.health.max" value="" data-dtype="Number" class="stat-tile-input" /> <span class="stat-tile-label">Max</span> </div> <div class="stat-tile"> <input type="text" name="system.health.temp" value="" data-dtype="Number" class="stat-tile-input" /> <span class="stat-tile-label">Temp</span> </div> </div> </div> <!-- Expertise Points --> <div class="sidebar-section"> <h4>Expertise Points</h4> <div class="stat-tiles-row"> <div class="stat-tile"> <input type="text" name="system.expertisePoints.total" value="" data-dtype="Number" class="stat-tile-input" /> <span class="stat-tile-label">Total</span> </div> <div class="stat-tile"> <input type="text" name="system.expertisePoints.spent" value="" data-dtype="Number" class="stat-tile-input" /> <span class="stat-tile-label">Spent</span> </div> <div class="stat-tile"> <input type="text" name="system.expertisePoints.remaining" value="" data-dtype="Number" class="stat-tile-input" /> <span class="stat-tile-label">Remaining</span> </div> </div> </div> <!-- Abilities --> <div class="sidebar-section"> <h4>Abilities</h4> <div class="sidebar-abilities"> <div class="sidebar-ability"> <label>Might</label> <div class="ability-input-row"> <input type="text" name="system.abilities.might.modifier" value="" data-dtype="Number" class="ability-modifier-input" /> <button type="button" class="ability-roll-btn rollable" data-action="rollAbility" data-ability="might" title="Click: Might Check (2d10+Level+Modifier)"> + </button> </div> </div> <div class="sidebar-ability"> <label>Grace</label> <div class="ability-input-row"> <input type="text" name="system.abilities.grace.modifier" value="" data-dtype="Number" class="ability-modifier-input" /> <button type="button" class="ability-roll-btn rollable" data-action="rollAbility" data-ability="grace" title="Click: Grace Check (2d10+Level+Modifier)"> + </button> </div> </div> <div class="sidebar-ability"> <label>Intellect</label> <div class="ability-input-row"> <input type="text" name="system.abilities.intellect.modifier" value="" data-dtype="Number" class="ability-modifier-input" /> <button type="button" class="ability-roll-btn rollable" data-action="rollAbility" data-ability="intellect" title="Click: Intellect Check (2d10+Level+Modifier)"> + </button> </div> </div> <div class="sidebar-ability"> <label>Focus</label> <div class="ability-input-row"> <input type="text" name="system.abilities.focus.modifier" value="" data-dtype="Number" class="ability-modifier-input" /> <button type="button" class="ability-roll-btn rollable" data-action="rollAbility" data-ability="focus" title="Click: Focus Check (2d10+Level+Modifier)"> + </button> </div> </div> </div> </div> </aside> <!-- Main Content Area --> <main class="main-content"> <!-- Navigation Tabs --> <nav class="sheet-tabs tabs" data-group="sheet"> <a class="item" data-tab="core" data-group="sheet">Core</a> <a class="item" data-tab="combat" data-group="sheet">Combat</a> <a class="item" data-tab="gear" data-group="sheet">Gear</a> <a class="item" data-tab="skills" data-group="sheet">Skills</a> <a class="item" data-tab="actions" data-group="sheet">Actions</a> <a class="item" data-tab="features" data-group="sheet">Features</a> <a class="item" data-tab="talents" data-group="sheet">Talents & Powers</a> </nav> <!-- Scrollable Content Area --> <section class="sheet-body"> <!-- Core Tab --> <div class="tab" data-group="sheet" data-tab="core"> <!-- Character Information --> <div class="character-info-section"> <h3>Character Information</h3> <div class="form-row"> <div class="form-group"> <label>Ancestry</label> <select name="system.ancestry"> <option value="">Select Ancestry</option> <option value="Antherum" selected> Antherum</option> <option value="Cambion" selected> Cambion</option> <option value="Dracycid" selected> Dracycid</option> <option value="Dworg" selected>Dworg </option> <option value="Elf" selected>Elf</option> <option value="Fairy" selected>Fairy </option> <option value="Fignette" selected> Fignette</option> <option value="Goblin" selected>Goblin </option> <option value="Human" selected>Human </option> <option value="Hybrid" selected>Hybrid </option> <option value="Kryon" selected>Kryon </option> <option value="Lux" selected>Lux</option> <option value="Mixed" selected>Mixed </option> <option value="Mocro" selected>Mocro </option> <option value="Nephilim" selected> Nephilim</option> <option value="Oaf" selected>Oaf</option> <option value="Orc" selected>Orc</option> <option value="Shari" selected>Shari </option> <option value="Stoich" selected>Stoich </option> <option value="Vivan" selected>Vivan </option> <option value="Wyrd" selected>Wyrd </option> <option value="Yotun" selected>Yotun </option> </select> </div> <div class="form-group"> <label>Lineage</label> <select name="system.lineage"> <option value="">Select Lineage</option> <option value="Absolved" selected> Absolved</option> <option value="Ancestral" selected> Ancestral</option> <option value="Arcane" selected>Arcane </option> <option value="Artisan" selected> Artisan</option> <option value="Blue" selected>Blue </option> <option value="Brownie" selected> Brownie</option> <option value="Clay" selected>Clay </option> <option value="Desert" selected>Desert </option> <option value="Dhampir" selected> Dhampir</option> <option value="Diamond" selected> Diamond</option> <option value="Divine" selected>Divine </option> <option value="Draconic" selected> Draconic</option> <option value="Elemental" selected> Elemental</option> <option value="Fey" selected>Fey</option> <option value="Forest" selected>Forest </option> <option value="Giant" selected>Giant </option> </select> </div> </div> <div class="form-row"> <div class="form-group"> <label>Culture</label> <input type="text" name="system.culture" value="" placeholder="Character Culture" /> </div> <div class="form-group"> <label>Vocation</label> <input type="text" name="system.vocation" value="" placeholder="Character Vocation" /> </div> </div> <div class="form-group"> <label>Languages</label> <input type="text" name="system.languages" value="" placeholder="Known Languages" /> </div> </div> <!-- Biography Section --> <div class="character-info-section"> <h3>Biography</h3> <div class="form-group"> <label>Character Biography</label> <textarea name="system.biography" placeholder="Character's background, personality, and history...">}</textarea> </div> <div class="form-group"> <label>Notes</label> <textarea name="system.notes" placeholder="Additional notes and reminders...">}</textarea> </div> </div> </div> <!-- Combat Tab --> <div class="tab" data-group="sheet" data-tab="combat"> <div class="items-header"> <h3>Weapons</h3> <button type="button" class="item-create" data-action="createItem" data-type="weapon" title="Create Weapon"> <i class="fas fa-plus"></i> Add </button> </div> <div class="items-list"> <div class="combat-item" data-item-id=""> <div class="combat-item-actions"> <button type="button" class="combat-action-btn attack-roll" data-action="rollAttack" data-item-id="" title="Attack Roll"> <i class="fas fa-dice-d20"></i> <span>Attack</span> </button> <button type="button" class="combat-action-btn damage-roll" data-action="rollDamage" data-item-id="" title="Damage Roll"> <i class="fas fa-dice-six"></i> <span>Damage</span> </button> </div> <div class="combat-item-content"> <div class="combat-item-header"> <div class="combat-item-name">Plasma Rifle</div> </div> <div class="combat-stats-layout"> <div class="combat-threshold-tile"> <span class="combat-threshold-value"></span> <span class="combat-threshold-label">Threshold</span> </div> <div class="combat-stats-grid"> <div class="combat-stat-tile"> <span class="combat-stat-value"></span> <span class="combat-stat-label">Damage</span> </div> <div class="combat-stat-tile"> <span class="combat-stat-value"></span> <span class="combat-stat-label">Type</span> </div> <div class="combat-stat-tile"> <span class="combat-stat-value"></span> <span class="combat-stat-label">Range</span> </div> </div> </div> </div> </div> </div> <div class="items-header"> <h3>Armor</h3> <button type="button" class="item-create" data-action="createItem" data-type="armor" title="Create Armor"> <i class="fas fa-plus"></i> Add </button> </div> <div class="items-list"> <div class="combat-item" data-item-id=""> <div class="combat-item-actions"> <button type="button" class="combat-action-btn armor-roll" data-action="rollArmor" data-item-id="" title="Armor Roll"> <i class="fas fa-dice-d20"></i> <span>Roll</span> </button> </div> <div class="combat-item-content"> <div class="combat-item-header"> <div class="combat-item-name">Plasma Rifle</div> </div> <div class="combat-stats-layout"> <div class="combat-threshold-tile"> <span class="combat-threshold-value"></span> <span class="combat-threshold-label">Threshold</span> </div> <div class="combat-stats-grid"> <div class="combat-stat-tile"> <span class="combat-stat-value"></span> <span class="combat-stat-label">AC</span> </div> </div> </div> </div> </div> </div> </div> <!-- Skills Tab --> <div class="tab" data-group="sheet" data-tab="skills"> <div class="skills-section"> <h3>Skills</h3> <!-- 2x2 Grid for Ability Groups --> <div class="skills-abilities-grid"> <!-- Might Skills --> <div class="skills-ability-section"> <h4 class="skills-ability-header">Might</h4> <div class="skills-ability-list"> <div class="skill-tile"> <label></label> <input type="text" name="system.skills." value="" data-dtype="Number" /> <button type="button" class="skill-roll rollable" data-action="rollSkill" data-skill="" title="Roll (2d10+Level+Ability+Skill)"> + </button> </div> </div> </div> <!-- Grace Skills --> <div class="skills-ability-section"> <h4 class="skills-ability-header">Grace</h4> <div class="skills-ability-list"> <div class="skill-tile"> <label></label> <input type="text" name="system.skills." value="" data-dtype="Number" /> <button type="button" class="skill-roll rollable" data-action="rollSkill" data-skill="" title="Roll (2d10+Level+Ability+Skill)"> + </button> </div> </div> </div> <!-- Intellect Skills --> <div class="skills-ability-section"> <h4 class="skills-ability-header">Intellect</h4> <div class="skills-ability-list"> <div class="skill-tile"> <label></label> <input type="text" name="system.skills." value="" data-dtype="Number" /> <button type="button" class="skill-roll rollable" data-action="rollSkill" data-skill="" title="Roll (2d10+Level+Ability+Skill)"> + </button> </div> </div> </div> <!-- Focus Skills --> <div class="skills-ability-section"> <h4 class="skills-ability-header">Focus</h4> <div class="skills-ability-list"> <div class="skill-tile"> <label></label> <input type="text" name="system.skills." value="" data-dtype="Number" /> <button type="button" class="skill-roll rollable" data-action="rollSkill" data-skill="" title="Roll (2d10+Level+Ability+Skill)"> + </button> </div> </div> </div> </div> </div> </div> <!-- Gear Tab --> <div class="tab" data-group="sheet" data-tab="gear"> <!-- Weapons Section --> <div class="items-header"> <h3>Weapons</h3> <button type="button" class="item-create" data-action="createItem" data-type="weapon" title="Create Weapon"> <i class="fas fa-plus"></i> Add </button> </div> <div class="items-list weapon-cards"> <div class="partial-placeholder"><!-- item-card partial --></div> </div> <!-- Armor Section --> <div class="items-header"> <h3>Armor</h3> <button type="button" class="item-create" data-action="createItem" data-type="armor" title="Create Armor"> <i class="fas fa-plus"></i> Add </button> </div> <div class="items-list armor-cards"> <div class="partial-placeholder"><!-- item-card partial --></div> </div> <!-- Equipment & Gear Section --> <div class="items-header"> <h3>Equipment & Gear</h3> <button type="button" class="item-create" data-action="createItem" data-type="gear" title="Create Gear"> <i class="fas fa-plus"></i> Add </button> </div> <div class="items-list gear-cards"> <div class="partial-placeholder"><!-- item-card partial --></div> </div> </div> <!-- Actions Tab --> <div class="tab" data-group="sheet" data-tab="actions"> <div class="items-header"> <h3>Actions</h3> <button type="button" class="item-create" data-action="createItem" data-type="action" title="Create Action"> <i class="fas fa-plus"></i> Add </button> </div> <div class="items-list action-cards"> <div class="partial-placeholder"><!-- item-card partial --></div> </div> </div> <!-- Features Tab --> <div class="tab" data-group="sheet" data-tab="features"> <div class="items-header"> <h3>Features</h3> <button type="button" class="item-create" data-action="createItem" data-type="feature" title="Create Feature"> <i class="fas fa-plus"></i> Add </button> </div> <div class="items-list feature-cards"> <div class="partial-placeholder"><!-- item-card partial --></div> </div> </div> <!-- Talents & Augments Tab --> <div class="tab" data-group="sheet" data-tab="talents"> <!-- Power Points Section --> <div class="partial-placeholder"><!-- power-points-section partial --></div> <!-- Talents Section --> <div class="items-header"> <h3>Talents</h3> <button type="button" class="item-create" data-action="createItem" data-type="talent" title="Create Talent"> <i class="fas fa-plus"></i> Add </button> </div> <div class="items-list talent-cards"> <div class="partial-placeholder"><!-- item-card partial --></div> </div> <!-- Augments Section --> <div class="items-header"> <h3>Augments</h3> <button type="button" class="item-create" data-action="createItem" data-type="augment" title="Create Augment"> <i class="fas fa-plus"></i> Add </button> </div> <div class="items-list augment-cards"> <div class="partial-placeholder"><!-- item-card partial --></div> </div> </div> </section> </main> </div> </div>
+  </div>
+  
+  <script>
+    function toggleCSS() {
+      const link = document.querySelector('link[href*="avant"]');
+      const currentHref = link.getAttribute('href');
+      const newHref = currentHref.includes('avant-sandbox.css') 
+        ? 'styles/avant.css' 
+        : 'styles/avant-sandbox.css';
+      
+      link.setAttribute('href', newHref);
+      
+      const button = event.target;
+      button.textContent = newHref.includes('sandbox') ? 'Use Production CSS' : 'Use Sandbox CSS';
+    }
+    
+    function toggleGrid() {
+      const gridStyle = document.getElementById('debug-grid');
+      if (gridStyle) {
+        gridStyle.remove();
+      } else {
+        const style = document.createElement('style');
+        style.id = 'debug-grid';
+        style.textContent = `
+          * {
+            outline: 1px solid rgba(0, 224, 220, 0.2) !important;
+          }
+          *:hover {
+            outline: 2px solid rgba(0, 224, 220, 0.5) !important;
+          }
+        `;
+        document.head.appendChild(style);
+      }
+    }
+  </script>
+</body>
+</html>

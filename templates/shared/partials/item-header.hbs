@@ -1,0 +1,47 @@
+{{!--
+Item Header Partial - Fully Configurable Header Layout
+
+This partial provides a standardized header layout for all item sheets.
+It uses the layout system to render all header fields from metaFields array,
+respecting the exact order and configuration from the layout system.
+
+Required context:
+- item: The item data object
+- metaFields: Array of field objects prepared by prepareItemHeaderMetaFields()
+
+Features:
+- Fully configurable through layout system
+- Support for all field types (image-upload, text, number, ap-selector, etc.)
+- Side-by-side field placement with sideBy helper
+- Full-width field support
+- Responsive design with mobile support
+- Consistent spacing and alignment
+--}}
+
+<header class="sheet-header">
+  {{#if metaFields}}
+  {{#each metaFields as |field fieldIndex|}}
+  {{#if field.fullWidth}}
+  {{!-- Full-width fields get their own container --}}
+  <div class="row-container full-width">
+    {{> "systems/avant/templates/shared/partials/render-field" field=field editable=editable
+    displayTraits=displayTraits}}
+  </div>
+  {{else if field.sideBy}}
+  {{!-- Side-by-side fields get a shared container --}}
+  <div class="row-container side-by-side" data-field-index="{{fieldIndex}}">
+    {{#each field.fields as |subField|}}
+    {{> "systems/avant/templates/shared/partials/render-field" field=subField editable=editable
+    displayTraits=displayTraits}}
+    {{/each}}
+  </div>
+  {{else}}
+  {{!-- Regular fields get individual containers --}}
+  <div class="row-container field-container" data-field-index="{{fieldIndex}}">
+    {{> "systems/avant/templates/shared/partials/render-field" field=field editable=editable
+    displayTraits=displayTraits}}
+  </div>
+  {{/if}}
+  {{/each}}
+  {{/if}}
+</header>

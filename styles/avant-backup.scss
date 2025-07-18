@@ -1,0 +1,2758 @@
+/* Avant - Futuristic Character Sheet Design */
+/* Neo-Futurist & Minimalist Aesthetic with Cyberpunk Elements */
+/* Now with Dynamic Theming Support for v12/v13 compatibility */
+
+// Import styles using @use (SCSS-first methodology) - must be first
+@use 'components/shared-states';
+@use 'components/chips';
+@use 'components/cards';
+@use 'components/forms';
+@use 'components/form-components';
+@use 'components/item-rows';
+@use 'components/item-sheets';
+@use 'themes/base';
+@use 'themes/dark';
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600;700&display=swap');
+
+// SCSS Variables - Color Palette
+$bg-primary: #1C1C1C; // Dark charcoal/graphite background
+$text-primary: #FFFFFF; // White primary text
+$accent-cyan: #00E0DC; // Bright cyan for emphasis
+$grey-cool: #BFBFBF; // Cool grey for structural elements
+$aqua-muted: #4CE2E1; // Softer cyan variant
+$black-pure: #000000; // Pure black for contrast
+
+// Derived Colors
+$bg-secondary: #2A2A2A; // Slightly lighter background
+$bg-tertiary: #333333; // Card/section backgrounds
+$border-primary: #404040; // Primary borders
+$border-accent: $accent-cyan;
+$text-secondary: $grey-cool;
+$text-muted: #808080;
+
+// Gradients
+$gradient-primary: linear-gradient(135deg, $bg-primary 0%, $bg-secondary 100%);
+$gradient-accent: linear-gradient(135deg, $accent-cyan 0%, $aqua-muted 100%);
+
+// Shadows
+$shadow-primary: 0 4px 20px rgba(0, 224, 220, 0.1);
+$shadow-accent: 0 0 20px rgba(0, 224, 220, 0.3);
+$shadow-deep: 0 8px 32px rgba(0, 0, 0, 0.6);
+
+// Typography
+$font-primary: 'Exo 2', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+$font-display: 'Orbitron', monospace;
+
+// Spacing
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 12px;
+$spacing-lg: 15px;
+$spacing-xl: 20px;
+$spacing-xxl: 30px;
+
+// Mixins
+@mixin box-sizing-border-box {
+  box-sizing: border-box !important; // Force box-sizing for v12 compatibility
+}
+
+@mixin transition-standard {
+  transition: all 0.3s ease;
+}
+
+// Updated mixins to use CSS custom properties (theme-aware)
+@mixin orbitron-header($size: 12px, $weight: 700) {
+  font-family: var(--theme-font-display, $font-display);
+  font-size: $size;
+  font-weight: $weight;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--theme-accent-primary, $accent-cyan);
+}
+
+@mixin exo-body($size: 12px, $weight: 400) {
+  font-family: var(--theme-font-primary, $font-primary);
+  font-size: $size;
+  font-weight: $weight;
+  color: var(--theme-text-primary, $text-primary);
+}
+
+@mixin form-input-base {
+  background: var(--theme-bg-tertiary, $bg-tertiary);
+  border: 1px solid var(--theme-border-primary, $border-primary);
+  color: var(--theme-text-primary, $text-primary);
+  font-family: var(--theme-font-primary, $font-primary);
+  border-radius: 0;
+  @include transition-standard;
+  @include box-sizing-border-box;
+
+  &:focus {
+    background: var(--theme-bg-primary, $bg-primary);
+    border-color: var(--theme-accent-primary, $accent-cyan);
+    outline: none;
+    box-shadow: inset 0 0 10px var(--theme-shadow-primary, rgba(0, 224, 220, 0.2));
+  }
+}
+
+@mixin button-base {
+  background: var(--theme-bg-tertiary, $bg-tertiary);
+  border: 1px solid var(--theme-accent-primary, $accent-cyan);
+  color: var(--theme-accent-primary, $accent-cyan);
+  font-family: var(--theme-font-display, $font-display);
+  font-weight: 600;
+  border-radius: 0;
+  cursor: pointer;
+  @include transition-standard;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &:hover {
+    background: var(--theme-accent-primary, $accent-cyan);
+    color: var(--theme-bg-primary, $bg-primary);
+    box-shadow: var(--theme-shadow-accent, 0 0 15px rgba(0, 224, 220, 0.5));
+  }
+}
+
+@mixin section-base {
+  background: var(--theme-bg-secondary, $bg-secondary);
+  border: 1px solid var(--theme-border-primary, $border-primary);
+  border-left: 4px solid var(--theme-accent-primary, $accent-cyan);
+  border-radius: 0;
+}
+
+// Theme Classes - Apply dark theme with higher specificity
+.avant.theme-dark,
+.avant.theme-dark.themed {
+  @include dark.theme-dark;
+}
+
+// Ensure themed elements get dark theme
+.avant.themed {
+  @include dark.theme-dark;
+}
+
+// ========================================================================
+// CRITICAL FIX: ApplicationV2 and Form Content Theme Application
+// Ensure ALL content within themed .avant elements receives theme styling
+// ========================================================================
+
+// Target all possible ApplicationV2 and form combinations
+.avant.theme-dark,
+.avant.theme-dark.themed,
+.application.sheet.avant.actor.theme-dark,
+.application.sheet.avant.item.theme-dark,
+form.avant.theme-dark {
+  @include dark.theme-dark;
+
+  // Force theme variables on ALL descendant elements
+  *,
+  *::before,
+  *::after {
+    // Ensure all elements can access theme variables
+    color: inherit;
+    background-color: inherit;
+  }
+
+  // Explicitly apply theme to form elements
+  input,
+  textarea,
+  select,
+  button {
+    background: var(--theme-bg-tertiary, $bg-tertiary) !important;
+    border-color: var(--theme-border-primary, $border-primary) !important;
+    color: var(--theme-text-primary, $text-primary) !important;
+
+    &:focus {
+      background: var(--theme-bg-primary, $bg-primary) !important;
+      border-color: var(--theme-accent-primary, $accent-cyan) !important;
+    }
+  }
+
+  // Apply theme to window content
+  .window-content {
+    background: var(--theme-bg-primary, $bg-primary) !important;
+    color: var(--theme-text-primary, $text-primary) !important;
+  }
+
+  // Apply theme to sheet content area
+  .sheet-content {
+    background: var(--theme-bg-primary, $bg-primary) !important;
+    color: var(--theme-text-primary, $text-primary) !important;
+  }
+
+  // Apply theme to tabs and tab content
+  .tabs,
+  .tab {
+    background: var(--theme-bg-secondary, $bg-secondary) !important;
+    color: var(--theme-text-primary, $text-primary) !important;
+    border-color: var(--theme-border-primary, $border-primary) !important;
+  }
+}
+
+
+
+// ========================================================================
+// UNIVERSAL THEME APPLICATION
+// Ensure dark theme works regardless of DOM structure changes
+// ========================================================================
+
+// Apply dark theme to any .avant element, regardless of nesting
+[class*="avant"].theme-dark,
+[class*="avant"].theme-dark.themed {
+  @include dark.theme-dark;
+}
+
+// ========================================================================
+// CUSTOM THEME SUPPORT
+// Ensure custom themes (data-theme attribute) work properly
+// ========================================================================
+
+.avant[data-theme="dark"],
+[class*="avant"][data-theme="dark"] {
+  @include dark.theme-dark;
+}
+
+// Removed custom theme support - single dark theme only
+
+// Main Avant Class with Theme System
+.avant {
+  // Default to dark theme if no theme class specified
+  @include dark.theme-dark;
+
+  // Removed legacy CSS custom properties - now handled by theme system only
+  // This reduces CSS output by ~2KB and eliminates duplicate variable definitions
+
+  // Base Styling using theme variables
+  font-family: var(--theme-font-primary, $font-primary);
+  font-weight: 400;
+  color: var(--theme-text-primary, $text-primary);
+  background: var(--theme-bg-primary, $bg-primary);
+  border-radius: 0;
+  box-shadow: var(--theme-shadow-deep, $shadow-deep);
+  border: 1px solid var(--theme-border-primary, $border-primary);
+
+  // Data attribute support for dark theme only
+  &[data-theme="dark"] {
+    @include dark.theme-dark;
+  }
+
+  // Global Reset and Base Styling
+  * {
+    @include box-sizing-border-box;
+  }
+
+  input,
+  select,
+  textarea {
+    font-family: inherit;
+    @include box-sizing-border-box;
+  }
+
+  // Window Container - ApplicationV2 compatible styling
+  .window-app {
+    background: var(--theme-bg-primary, $bg-primary);
+    border: 2px solid var(--theme-border-primary, $border-primary);
+    border-radius: 0;
+    box-shadow: var(--theme-shadow-deep, $shadow-deep);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+
+    // For ApplicationV2, allow natural window frame behavior
+    // Only apply constraints for specific legacy compatibility cases
+    &.legacy-height-constraint {
+      height: 630px;
+      max-height: 630px;
+      overflow: hidden;
+    }
+  }
+
+  // FoundryVTT Window Content - Account for 8px padding and fit within window height
+  .window-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; // Allow flexbox to shrink
+  }
+
+  // FoundryVTT Window Header - Keep functional for dragging and controls
+  .window-header {
+    background: var(--theme-gradient-primary, $gradient-primary);
+    border-bottom: 2px solid var(--theme-accent-primary, $accent-cyan);
+    color: var(--theme-text-primary, $text-primary);
+    @include orbitron-header(700);
+    letter-spacing: 2px;
+    flex-shrink: 0; // Prevent header from shrinking
+
+    // Ensure ApplicationV2 window controls are visible and functional
+    .header-control {
+      width: auto !important;
+      height: auto !important;
+      padding: 4px 8px !important;
+      background: transparent !important;
+      border: 1px solid transparent !important;
+      color: var(--theme-text-primary, $text-primary) !important;
+      cursor: pointer !important;
+      @include transition-standard;
+
+      // CRITICAL: FontAwesome font-family for window header controls
+      font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 5 Free", "FontAwesome" !important;
+      font-weight: 900 !important;
+      font-style: normal !important;
+      display: inline-block !important;
+      line-height: 1 !important;
+      text-rendering: auto !important;
+      -webkit-font-smoothing: antialiased !important;
+      -moz-osx-font-smoothing: grayscale !important;
+
+      &:hover {
+        background: rgba(0, 224, 220, 0.2) !important;
+        border-color: var(--theme-accent-primary, $accent-cyan) !important;
+      }
+    }
+
+    // Fallback for any nested controls structure
+    .window-controls {
+      display: flex !important;
+      align-items: center;
+      gap: 4px;
+
+      .header-button,
+      .header-control {
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 5 Free", "FontAwesome" !important;
+        font-weight: 900 !important;
+        font-style: normal !important;
+      }
+    }
+  }
+
+  // Custom Sheet Header - Compact and controlled height
+  .sheet-header {
+    background: var(--theme-bg-secondary, $bg-secondary);
+    color: var(--theme-text-primary, $text-primary);
+    padding: 10px $spacing-lg; // Reduced padding
+    border-bottom: 2px solid var(--theme-accent-primary, $accent-cyan);
+    display: flex;
+    align-items: center;
+    gap: $spacing-lg; // Reduced gap
+    position: relative;
+    height: 60px; // Reduced from 80px to 60px
+    max-height: 60px; // Enforce maximum height
+    min-height: 60px; // Enforce minimum height
+    flex-shrink: 0; // Prevent header from shrinking
+    z-index: 10;
+    overflow: hidden; // Prevent content overflow in v12
+    @include box-sizing-border-box;
+  }
+
+  .profile-img {
+    border: 2px solid var(--theme-accent-primary, $accent-cyan);
+    border-radius: 0;
+    cursor: pointer;
+    @include transition-standard;
+    box-shadow: var(--theme-shadow-accent, $shadow-accent);
+    width: 40px; // Reduced from 60px
+    height: 40px; // Reduced from 60px
+    flex-shrink: 0; // Prevent shrinking
+    @include box-sizing-border-box;
+    object-fit: cover; // Ensure image fits properly
+
+    &:hover {
+      box-shadow: 0 0 20px var(--theme-accent-primary, $accent-cyan);
+    }
+  }
+
+  .header-fields {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    min-width: 0; // Allow shrinking
+    overflow: hidden; // Prevent overflow in v12
+    @include box-sizing-border-box;
+  }
+
+  // Header Stats - New styling for stats moved to header
+  .header-stats {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xl;
+    flex-shrink: 0;
+    overflow: hidden; // Prevent overflow in v12
+    @include box-sizing-border-box;
+  }
+
+  .header-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0; // Prevent shrinking in v12
+    @include box-sizing-border-box;
+  }
+
+  .header-stat-label {
+    @include orbitron-header(8px, 600);
+    letter-spacing: 0.5px;
+  }
+
+  .header-stat-input {
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    border: 1px solid var(--theme-border-primary, $border-primary);
+    color: var(--theme-text-primary, $text-primary);
+    @include orbitron-header(12px, 700);
+    text-align: center;
+    padding: $spacing-xs $spacing-sm;
+    border-radius: 0;
+    @include transition-standard;
+    width: 50px;
+    @include box-sizing-border-box;
+    flex-shrink: 0; // Prevent shrinking in v12
+
+    &:focus {
+      background: var(--theme-bg-primary, $bg-primary);
+      border-color: var(--theme-accent-primary, $accent-cyan);
+      outline: none;
+      box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
+    }
+  }
+
+  .header-stat-display {
+    background: var(--theme-bg-primary, $bg-primary);
+    color: var(--theme-accent-primary, $accent-cyan);
+    @include orbitron-header(12px, 700);
+    text-align: center;
+    padding: $spacing-xs $spacing-sm;
+    border: 1px solid var(--theme-accent-primary, $accent-cyan);
+    width: 50px;
+    @include box-sizing-border-box;
+    flex-shrink: 0; // Prevent shrinking in v12
+  }
+
+  // Character Name - More compact
+  .charname {
+    margin: 0;
+    @include orbitron-header(18px, 900); // Reduced from 24px
+    letter-spacing: 1px; // Reduced from 2px
+    text-shadow: 0 0 5px var(--theme-accent-primary, $accent-cyan);
+    flex: 1; // Take available space but allow shrinking
+    min-width: 0; // Allow shrinking in flexbox
+    overflow: hidden; // Prevent overflow in v12
+    @include box-sizing-border-box;
+
+    input {
+      background: rgba(0, 224, 220, 0.1);
+      border: 1px solid var(--theme-accent-primary, $accent-cyan);
+      color: var(--theme-text-primary, $text-primary);
+      @include orbitron-header(18px, 900); // Reduced from 24px
+      letter-spacing: 1px; // Reduced from 2px
+      padding: 6px 10px; // Reduced padding
+      border-radius: 0;
+      @include transition-standard;
+      width: 100%;
+      max-width: 300px; // Limit width
+      @include box-sizing-border-box;
+      min-width: 0; // Allow input to shrink if needed
+
+      &:focus {
+        background: rgba(0, 224, 220, 0.2);
+        border-color: var(--theme-text-primary, $text-primary);
+        outline: none;
+        box-shadow: 0 0 10px rgba(0, 224, 220, 0.3);
+      }
+    }
+  }
+
+  // Main Layout Container - Proper height distribution within window-content
+  .sheet-content {
+    display: flex;
+    flex: 1; // Take remaining space after header within window-content
+    min-height: 0; // Allow flexbox to shrink
+    overflow: hidden; // Prevent content-level scrolling
+  }
+
+  // Left Sidebar for Stats - Fixed width, height constrained
+  .stats-sidebar {
+    width: 240px; // Reduced from 280px
+    background: var(--theme-bg-secondary, $bg-secondary);
+    border-right: 2px solid var(--theme-border-primary, $border-primary);
+    padding: $spacing-lg; // Reduced from 20px
+    overflow-y: visible; // Remove sidebar scroll - let main content scroll
+    overflow-x: hidden; // Prevent horizontal scrolling
+    flex-shrink: 0; // Don't shrink width
+  }
+
+  // Compact Resource Sections
+  .sidebar-section {
+    margin-bottom: $spacing-lg; // Further reduced from 20px to 15px
+
+    h4 {
+      margin: 0 0 $spacing-sm 0; // Further reduced from 12px to 8px
+      @include orbitron-header(11px, 700); // Reduced from 12px
+      letter-spacing: 1px;
+      border-bottom: 1px solid var(--theme-border-primary, $border-primary);
+      padding-bottom: 2px; // Further reduced from 4px to 2px
+    }
+  }
+
+  // New Stat Tiles Row Layout
+  .stat-tiles-row {
+    display: flex;
+    gap: 6px; // Reduced from 8px to 6px
+    margin-bottom: 8px; // Reduced from 10px to 8px
+  }
+
+  .stat-tile {
+    flex: 1;
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    border: 1px solid var(--theme-border-primary, $border-primary);
+    border-bottom: 3px solid var(--theme-accent-primary, $accent-cyan);
+    padding: 6px 6px; // Reduced from 8px to 6px
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 2px; // Reduced from 4px to 2px
+    @include transition-standard;
+
+    &.readonly {
+      border-bottom-color: var(--theme-accent-secondary, $aqua-muted);
+
+      .stat-tile-value {
+        @include exo-body(14px, 700);
+        line-height: 1;
+        background: var(--theme-bg-primary, $bg-primary);
+        border: 1px solid var(--theme-border-primary, $border-primary);
+        padding: 6px $spacing-xs;
+        border-radius: 0;
+        text-align: center;
+      }
+    }
+  }
+
+  .stat-tile-input {
+    background: var(--theme-bg-primary, $bg-primary);
+    border: 1px solid var(--theme-border-primary, $border-primary);
+    color: var(--theme-text-primary, $text-primary);
+    @include exo-body(12px, 600);
+    padding: 3px $spacing-xs;
+    border-radius: 0;
+    width: 100%;
+    text-align: center;
+    @include transition-standard;
+
+    &:focus {
+      border-color: var(--theme-accent-primary, $accent-cyan);
+      outline: none;
+      box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
+    }
+  }
+
+  .stat-tile-label {
+    @include orbitron-header(8px, 600);
+    letter-spacing: 0.5px;
+    color: var(--theme-text-secondary, $text-secondary);
+    line-height: 1;
+  }
+
+  // Legacy stat-row styles (keeping for compatibility)
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px; // Reduced from 12px
+    padding: 6px 10px; // Reduced from 8px 12px
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    border-left: 3px solid var(--theme-accent-primary, $accent-cyan);
+  }
+
+  .stat-label {
+    @include orbitron-header(9px, 600); // Reduced from 10px
+    letter-spacing: 0.5px;
+    color: var(--theme-text-secondary, $text-secondary);
+    flex: 1;
+  }
+
+  .stat-input {
+    background: var(--theme-bg-primary, $bg-primary);
+    border: 1px solid var(--theme-border-primary, $border-primary);
+    color: var(--theme-text-primary, $text-primary);
+    @include exo-body(12px, 600); // Reduced from 14px
+    padding: 3px 6px; // Reduced from 4px 8px
+    border-radius: 0;
+    width: 50px; // Reduced from 60px
+    text-align: center;
+    @include transition-standard;
+
+    &:focus {
+      border-color: var(--theme-accent-primary, $accent-cyan);
+      outline: none;
+      box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
+    }
+  }
+
+  .stat-display {
+    background: var(--theme-bg-primary, $bg-primary);
+    color: var(--theme-text-primary, $text-primary);
+    @include exo-body(12px, 600); // Reduced from 14px
+    padding: 3px 6px; // Reduced from 4px 8px
+    border: 1px solid var(--theme-border-primary, $border-primary);
+    width: 50px; // Reduced from 60px
+    text-align: center;
+  }
+
+  // Abilities in Sidebar - Updated layout
+  .sidebar-abilities {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px; // Further reduced from 8px to 6px
+    margin-bottom: 8px; // Further reduced from 15px to 8px
+  }
+
+  .sidebar-ability {
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    padding: 6px; // Further reduced from 8px to 6px
+    border: 1px solid var(--theme-border-primary, $border-primary);
+    text-align: center;
+    @include transition-standard;
+
+    label {
+      display: block;
+      @include orbitron-header(10px, 600); // Increased from 8px as requested
+      letter-spacing: 0.5px;
+      color: var(--theme-text-secondary, $text-secondary);
+      margin-bottom: 4px; // Reduced back from 6px to 4px
+    }
+
+    input:not(.ability-modifier-input) {
+      background: var(--theme-bg-primary, $bg-primary);
+      border: 1px solid var(--theme-border-primary, $border-primary);
+      color: var(--theme-text-primary, $text-primary);
+      @include exo-body(12px, 600); // Reduced from 14px
+      padding: 3px 6px; // Reduced from 4px 8px
+      border-radius: 0;
+      flex: 1;
+      text-align: center;
+      @include transition-standard;
+
+      &:focus {
+        border-color: var(--theme-accent-primary, $accent-cyan);
+        outline: none;
+        box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
+      }
+    }
+  }
+
+  // New ability input row layout
+  .ability-input-row {
+    display: flex;
+    gap: 2px; // Reduced from 4px to 2px
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .ability-modifier-input {
+    background: var(--theme-bg-primary, $bg-primary);
+    border: 1px solid var(--theme-border-primary, $border-primary);
+    color: var(--theme-text-primary, $text-primary);
+    @include exo-body(14px, 600);
+    padding: 4px 6px;
+    border-radius: 0;
+    text-align: center;
+    width: 40px; // Fixed small width for 1-2 digits
+    flex-shrink: 0;
+    @include transition-standard;
+
+    &:focus {
+      border-color: var(--theme-accent-primary, $accent-cyan);
+      outline: none;
+      box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
+    }
+  }
+
+  .ability-roll-btn {
+    background: transparent !important;
+    color: var(--theme-accent-primary, $accent-cyan);
+    padding: 4px 2px !important;
+    border: none !important;
+    margin: 0;
+    cursor: pointer;
+    @include transition-standard;
+    width: 40px; // Match the input width exactly
+    height: 28px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: none !important;
+    @include orbitron-header(13px, 700); // Increased from 11px for better visibility
+    letter-spacing: 0.5px;
+
+    &:hover {
+      color: var(--theme-bg-primary, $bg-primary);
+      background: var(--theme-accent-primary, $accent-cyan) !important;
+      border: none !important;
+      border-radius: 2px;
+      box-shadow: var(--theme-shadow-accent, 0 0 8px rgba(0, 224, 220, 0.4));
+    }
+  }
+
+  // Main Content Area - Proper flexbox layout for tab structure
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; // Allow flexbox to shrink
+    overflow: hidden; // Prevent main content scrolling
+  }
+
+  // Navigation Tabs - More compact
+  .sheet-tabs {
+    background: var(--theme-bg-secondary, $bg-secondary);
+    border-bottom: 2px solid var(--theme-accent-primary, $accent-cyan);
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 0; // Override FoundryVTT's default nav.tabs gap
+    border-radius: 0;
+    flex-shrink: 0; // Prevent tabs from shrinking
+    z-index: 40;
+    line-height: 1;
+
+    .item {
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--theme-text-secondary, $text-secondary);
+      @include orbitron-header(10px, 600); // Reduced from 11px
+      padding: $spacing-sm $spacing-md; // Reduced from 12px 20px
+      text-decoration: none;
+      @include transition-standard;
+      cursor: pointer;
+      letter-spacing: 1px;
+      max-width: 17%;
+
+      &:hover {
+        background: rgba(0, 224, 220, 0.1);
+        color: var(--theme-accent-primary, $accent-cyan);
+      }
+
+      &.active {
+        background: var(--theme-bg-primary, $bg-primary);
+        border-bottom-color: var(--theme-accent-primary, $accent-cyan);
+        color: var(--theme-text-primary, $text-primary);
+        box-shadow: 0 -3px 10px rgba(0, 224, 220, 0.2);
+      }
+    }
+  }
+
+  // ITEM SHEET SPECIFIC TAB STYLING - More compact for smaller windows
+  &.sheet.item .sheet-tabs {
+    background: var(--theme-bg-secondary, $bg-secondary) !important;
+    border-bottom: 2px solid var(--theme-accent-primary, $accent-cyan) !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    gap: 0 !important; // Override FoundryVTT's default nav.tabs gap
+    border-radius: 0 !important;
+    flex-shrink: 0 !important; // Prevent tabs from shrinking
+    z-index: 40 !important;
+    height: 32px !important; // Force compact height
+    max-height: 32px !important;
+    min-height: 32px !important;
+    overflow: hidden !important;
+
+    .item {
+      background: transparent !important;
+      border: none !important;
+      border-bottom: 2px solid transparent !important;
+      color: var(--theme-text-secondary, $text-secondary) !important;
+      @include orbitron-header(8px, 600); // Reduced font size from 9px to 8px for better fit
+      letter-spacing: 0.3px !important; // Further reduced letter spacing
+      padding: 4px 6px !important; // More compact padding (reduced from 6px 10px)
+      text-decoration: none !important;
+      @include transition-standard;
+      cursor: pointer !important;
+      line-height: 1.1 !important; // Slightly increased line height for readability
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      height: 32px !important; // Match tab container height
+      min-width: 0 !important; // Allow shrinking below content size
+      flex: 1 1 auto !important; // Flexible sizing that can grow and shrink
+      @include box-sizing-border-box;
+      white-space: nowrap !important; // Prevent text wrapping
+      overflow: hidden !important; // Hide overflow
+      text-overflow: ellipsis !important; // Add ellipsis for very long text
+
+      &:hover {
+        background: rgba(0, 224, 220, 0.1) !important;
+        color: var(--theme-accent-primary, $accent-cyan) !important;
+      }
+
+      &.active {
+        background: var(--theme-bg-primary, $bg-primary) !important;
+        border-bottom-color: var(--theme-accent-primary, $accent-cyan) !important;
+        color: var(--theme-text-primary, $text-primary) !important;
+        box-shadow: 0 -2px 8px rgba(0, 224, 220, 0.2) !important; // Smaller shadow for item sheets
+      }
+    }
+  }
+
+  // ITEM SHEET BODY - Adjust for compact tabs
+  &.sheet.item .sheet-body {
+    background: var(--theme-bg-primary, $bg-primary);
+    padding: $spacing-lg; // Reduced padding for item sheets
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+  }
+
+  // ITEM SHEET TAB CONTENT - Ensure proper visibility
+  &.sheet.item .tab {
+    display: none;
+
+    &.active {
+      display: block;
+    }
+  }
+
+  // ITEM SHEET FORM ELEMENTS - More compact for smaller space
+  &.sheet.item .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs; // Reduced gap for item sheets
+    margin-bottom: $spacing-md; // Reduced margin
+
+    label {
+      @include orbitron-header(9px, 600); // Smaller labels for item sheets
+      letter-spacing: 0.5px;
+    }
+
+    input,
+    select,
+    textarea {
+      @include form-input-base;
+      @include exo-body(11px); // Smaller text for item sheets
+      padding: 6px 10px; // Reduced padding
+    }
+  }
+
+  // ITEM SHEET WINDOW - Ensure proper sizing
+  &.sheet.item .window-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  // ITEM SHEET HEADER - More compact for smaller windows
+  &.sheet.item .sheet-header {
+    background: var(--theme-bg-secondary, $bg-secondary);
+    color: var(--theme-text-primary, $text-primary);
+    padding: $spacing-sm $spacing-md; // More compact padding
+    border-bottom: 1px solid var(--theme-accent-primary, $accent-cyan); // Thinner border
+    display: flex;
+    align-items: center;
+    gap: 10px; // Reduced gap
+    position: relative;
+    height: 50px; // Reduced height for item sheets
+    max-height: 50px;
+    min-height: 50px;
+    flex-shrink: 0;
+    z-index: 10;
+  }
+
+  &.sheet.item .profile-img {
+    border: 1px solid var(--theme-accent-primary, $accent-cyan); // Thinner border
+    border-radius: 0;
+    cursor: pointer;
+    @include transition-standard;
+    box-shadow: var(--theme-shadow-accent, $shadow-accent);
+    width: 32px; // Smaller for item sheets
+    height: 32px;
+    flex-shrink: 0;
+  }
+
+  &.sheet.item .charname {
+    margin: 0;
+    @include orbitron-header(14px, 900); // Smaller for item sheets
+    letter-spacing: 0.5px;
+    text-shadow: 0 0 5px var(--theme-accent-primary, $accent-cyan);
+
+    input {
+      background: rgba(0, 224, 220, 0.1);
+      border: 1px solid var(--theme-accent-primary, $accent-cyan);
+      color: var(--theme-text-primary, $text-primary);
+      @include orbitron-header(14px, 900);
+      letter-spacing: 0.5px;
+      padding: $spacing-xs $spacing-sm; // Reduced padding
+      border-radius: 0;
+      @include transition-standard;
+      width: 100%;
+      max-width: 250px; // Smaller max width for item sheets
+
+      &:focus {
+        background: rgba(0, 224, 220, 0.2);
+        border-color: var(--theme-text-primary, $text-primary);
+        outline: none;
+        box-shadow: 0 0 8px rgba(0, 224, 220, 0.3);
+      }
+    }
+  }
+
+  // Scrollable Content Area - ONLY this element should scroll
+  .sheet-body {
+    background: var(--theme-bg-primary, $bg-primary);
+    padding: $spacing-xl; // Reduced from 30px
+    flex: 1;
+    overflow-y: auto; // ONLY the tab content should scroll
+    overflow-x: hidden; // Prevent horizontal scrolling
+    min-height: 0; // Allow flexbox to shrink
+    max-height: calc(100vh - 200px); // Ensure proper height constraints
+  }
+
+  .tab {
+    display: none;
+
+    &.active {
+      display: block;
+    }
+  }
+
+  // Character Information Section - More compact
+  .character-info-section {
+    @include section-base;
+    padding: $spacing-lg; // Reduced from 25px
+    margin-bottom: $spacing-xl; // Reduced from 30px
+
+    h3 {
+      margin: 0 0 $spacing-lg 0; // Reduced from 25px
+      @include orbitron-header(14px, 700); // Reduced from 16px
+      letter-spacing: 2px;
+      position: relative;
+      padding-bottom: $spacing-sm; // Reduced from 10px
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px; // Reduced from 60px
+        height: 2px;
+        background: var(--theme-gradient-accent, $gradient-accent);
+      }
+    }
+  }
+
+  // Form Elements - More compact
+  .form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); // Reduced from 250px
+    gap: $spacing-lg; // Reduced from 20px
+    margin-bottom: $spacing-lg; // Reduced from 20px
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px; // Reduced from 8px
+
+    label {
+      @include orbitron-header(10px, 600); // Reduced from 11px
+      letter-spacing: 1px;
+    }
+
+    input,
+    select,
+    textarea {
+      @include form-input-base;
+      @include exo-body(12px); // Reduced from 14px
+      padding: $spacing-sm $spacing-md; // Reduced from 12px 16px
+    }
+  }
+
+  // Trait Configuration Section Styling
+  .trait-configuration {
+    border: 2px solid var(--theme-accent-primary, $accent-cyan);
+    background: var(--theme-bg-secondary, $bg-secondary);
+    padding: $spacing-lg;
+    margin: $spacing-xl 0;
+    border-radius: 0;
+    position: relative;
+
+    legend {
+      @include orbitron-header(12px, 700);
+      color: var(--theme-accent-primary, $accent-cyan);
+      padding: 0 $spacing-md;
+      background: var(--theme-bg-primary, $bg-primary);
+      border: 1px solid var(--theme-accent-primary, $accent-cyan);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .hint {
+      @include exo-body(11px, 400);
+      color: var(--theme-text-secondary, $text-secondary);
+      margin: 0 0 $spacing-lg 0;
+      padding: $spacing-sm;
+      background: var(--theme-bg-tertiary, $bg-tertiary);
+      border-left: 3px solid var(--theme-accent-secondary, $aqua-muted);
+      font-style: italic;
+    }
+
+    .form-group {
+      margin-bottom: $spacing-md;
+
+      label {
+        @include orbitron-header(10px, 600);
+        color: var(--theme-text-primary, $text-primary);
+        margin-bottom: $spacing-xs;
+      }
+
+      input {
+        background: var(--theme-bg-tertiary, $bg-tertiary);
+        border: 1px solid var(--theme-border-primary, $border-primary);
+        color: var(--theme-text-primary, $text-primary);
+        @include exo-body(12px, 400);
+        padding: $spacing-sm;
+        border-radius: 0;
+        @include transition-standard;
+
+        &:focus {
+          border-color: var(--theme-accent-primary, $accent-cyan);
+          background: var(--theme-bg-primary, $bg-primary);
+          box-shadow: inset 0 0 8px rgba(0, 224, 220, 0.2);
+          outline: none;
+        }
+
+        &::placeholder {
+          color: var(--theme-text-muted, $text-muted);
+          font-style: italic;
+        }
+      }
+    }
+
+    .trait-preview {
+      margin-top: $spacing-lg;
+      padding: $spacing-md;
+      background: var(--theme-bg-primary, $bg-primary);
+      border: 1px solid var(--theme-border-primary, $border-primary);
+      border-left: 3px solid var(--theme-accent-primary, $accent-cyan);
+
+      label {
+        @include orbitron-header(10px, 600);
+        color: var(--theme-text-secondary, $text-secondary);
+        margin-bottom: $spacing-sm;
+        display: block;
+      }
+
+      .trait-chip--preview {
+        display: inline-flex;
+        align-items: center;
+        gap: $spacing-xs;
+        padding: $spacing-xs $spacing-sm;
+        border-radius: 4px;
+        color: var(--theme-bg-primary, $bg-primary);
+        font-weight: 600;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+
+        i {
+          font-size: 10px;
+        }
+      }
+    }
+  }
+
+  // Skills Section - 2x2 Grid Layout (like Attributes)
+  .skills-abilities-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-md; // Reduced from 20px
+    margin-top: $spacing-md; // Reduced from 20px
+  }
+
+  .skills-ability-section {
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    border: 1px solid var(--theme-border-primary, $border-primary);
+    border-left: 4px solid var(--theme-accent-primary, $accent-cyan);
+    padding: $spacing-sm; // Reduced from 15px
+    border-radius: 0;
+  }
+
+  .skills-ability-header {
+    @include orbitron-header(12px, 700); // Reduced from 14px
+    letter-spacing: 1px;
+    margin: 0 0 $spacing-sm 0; // Reduced from 15px
+    padding-bottom: $spacing-xs; // Reduced from 8px
+    border-bottom: 1px solid var(--theme-border-primary, $border-primary);
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 30px; // Reduced from 40px
+      height: 2px;
+      background: var(--theme-gradient-accent, $gradient-accent);
+    }
+  }
+
+  .skills-ability-list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs; // Reduced from 8px
+  }
+
+  .skill-tile {
+    background: var(--theme-bg-primary, $bg-primary);
+    border: 1px solid var(--theme-border-primary, $border-primary);
+    padding: 6px; // Reduced from 10px
+    display: grid;
+    grid-template-columns: 1fr 45px 45px; // Reduced from 60px
+    align-items: center;
+    gap: 6px; // Reduced from 8px
+    @include transition-standard;
+    position: relative;
+    min-height: 32px; // Reduced for compactness
+
+    &:hover {
+      background: var(--theme-bg-secondary, $bg-secondary);
+      border-color: var(--theme-accent-primary, $accent-cyan);
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 3px;
+      background: var(--theme-gradient-accent, $gradient-accent);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+      transform-origin: left;
+    }
+
+    &:hover::before {
+      transform: scaleX(1);
+    }
+
+    label {
+      @include orbitron-header(9px, 600); // Reduced from 11px
+      letter-spacing: 0.5px; // Reduced from 1px
+      color: var(--theme-text-secondary, $text-secondary);
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    input {
+      background: var(--theme-bg-tertiary, $bg-tertiary);
+      border: 1px solid var(--theme-border-primary, $border-primary);
+      color: var(--theme-text-primary, $text-primary);
+      @include exo-body(12px, 600); // Reduced from 14px
+      padding: 3px $spacing-xs; // Reduced from 6px 8px
+      border-radius: 0;
+      width: 100%;
+      text-align: center;
+      @include transition-standard;
+
+      &:focus {
+        border-color: var(--theme-accent-primary, $accent-cyan);
+        outline: none;
+        box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
+      }
+    }
+
+    .skill-roll {
+      background: transparent !important;
+      border: none !important;
+      color: var(--theme-accent-primary, $accent-cyan);
+      @include orbitron-header(11px, 700); // Increased from 9px for better visibility
+      padding: 3px 6px !important;
+      border-radius: 0;
+      cursor: pointer;
+      @include transition-standard;
+      white-space: nowrap;
+      width: 100%;
+      text-transform: none !important;
+      letter-spacing: 0.5px;
+
+      &:hover {
+        background: var(--theme-accent-primary, $accent-cyan) !important;
+        color: var(--theme-bg-primary, $bg-primary);
+        box-shadow: 0 0 8px rgba(0, 224, 220, 0.4);
+        border-radius: 2px;
+      }
+    }
+  }
+
+  // Skills Section - More compact
+  .skills-section {
+    @include section-base;
+    padding: 10px; // Reduced from 15px
+    margin-bottom: $spacing-lg; // Reduced from 20px
+
+    h3 {
+      margin: 0 0 10px 0; // Reduced from 15px
+      @include orbitron-header(12px, 700); // Reduced from 14px
+      letter-spacing: 2px;
+      position: relative;
+      padding-bottom: 6px; // Reduced from 8px
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 40px; // Reduced from 50px
+        height: 2px;
+        background: var(--theme-gradient-accent, $gradient-accent);
+      }
+    }
+  }
+
+  // Skill Groups
+  .skill-group {
+    margin-bottom: 25px;
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    border: 1px solid var(--theme-border-primary, $border-primary);
+    border-radius: 0;
+    overflow: hidden;
+  }
+
+  .skill-group-header {
+    background: var(--theme-bg-primary, $bg-primary);
+    color: var(--theme-accent-primary, $accent-cyan);
+    @include orbitron-header(12px, 700);
+    letter-spacing: 1px;
+    margin: 0;
+    padding: 10px $spacing-lg;
+    border-bottom: 1px solid var(--theme-border-primary, $border-primary);
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--theme-gradient-accent, $gradient-accent);
+    }
+  }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0;
+    padding: 0;
+  }
+
+  .skill {
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    padding: $spacing-md $spacing-lg;
+    border-bottom: 1px solid var(--theme-border-primary, $border-primary);
+    border-right: 1px solid var(--theme-border-primary, $border-primary);
+    display: grid;
+    grid-template-columns: 1fr 60px 60px;
+    align-items: center;
+    gap: 10px;
+    @include transition-standard;
+    position: relative;
+    min-height: 50px;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--theme-gradient-accent, $gradient-accent);
+      transform: scaleY(0);
+      transition: transform 0.3s ease;
+      transform-origin: bottom;
+    }
+
+    &:hover {
+      background: var(--theme-bg-primary, $bg-primary);
+
+      &::before {
+        transform: scaleY(1);
+      }
+    }
+
+    label {
+      @include orbitron-header(11px, 600);
+      letter-spacing: 1px;
+      color: var(--theme-text-secondary, $text-secondary);
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    input {
+      background: var(--theme-bg-primary, $bg-primary);
+      border: 1px solid var(--theme-border-primary, $border-primary);
+      color: var(--theme-text-primary, $text-primary);
+      @include exo-body(14px, 600);
+      padding: 6px $spacing-sm;
+      border-radius: 0;
+      width: 100%;
+      text-align: center;
+      @include transition-standard;
+
+      &:focus {
+        border-color: var(--theme-accent-primary, $accent-cyan);
+        outline: none;
+        box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
+      }
+    }
+  }
+
+  .skill-roll {
+    background: transparent !important;
+    border: none !important;
+    color: var(--theme-accent-primary, $accent-cyan);
+    @include orbitron-header(12px, 700); // Increased from 10px for better visibility
+    padding: 4px 8px !important;
+    border-radius: 0;
+    cursor: pointer;
+    @include transition-standard;
+    white-space: nowrap;
+    width: 100%;
+    text-transform: none !important;
+    letter-spacing: 0.5px;
+    min-width: 40px;
+
+    &:hover {
+      background: var(--theme-accent-primary, $accent-cyan) !important;
+      color: var(--theme-bg-primary, $bg-primary);
+      box-shadow: 0 0 8px rgba(0, 224, 220, 0.4);
+      border-radius: 2px;
+    }
+  }
+
+  // Items and Lists - Compact styling
+  .items-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-md; // Reduced from 20px
+    padding-bottom: $spacing-sm; // Reduced from 15px
+    border-bottom: 1px solid var(--theme-border-primary, $border-primary); // Thinner border
+
+    h3 {
+      margin: 0;
+      @include orbitron-header(13px, 700); // Reduced from 16px
+      letter-spacing: 1px; // Reduced from 2px
+    }
+  }
+
+  .item-create {
+    @include button-base;
+    @include orbitron-header(9px, 600); // Reduced from 10px
+    padding: 3px 6px; // Reduced from 4px 8px
+    letter-spacing: 0.5px;
+    width: auto;
+    min-width: 60px; // Reduced from 100px
+    max-width: 80px; // Reduced from 140px
+    text-align: center;
+
+    &:hover {
+      box-shadow: 0 0 10px rgba(0, 224, 220, 0.3); // Reduced glow
+    }
+  }
+
+  .items-list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs; // Reduced from 10px
+  }
+
+  .item,
+  .gear-item,
+  .action-item,
+  .feature-item,
+  .talent-item,
+  .augment-item,
+  .combat-item {
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    border: 1px solid var(--theme-border-primary, $border-primary);
+    border-left: 2px solid var(--theme-accent-primary, $accent-cyan); // Thinner accent border
+    padding: $spacing-sm $spacing-md; // Reduced from 15px
+    display: flex;
+    align-items: center;
+    gap: $spacing-md; // Reduced from 15px
+    @include transition-standard;
+    min-height: 36px; // Reduced from default
+
+    &:hover {
+      background: var(--theme-bg-secondary, $bg-secondary);
+      box-shadow: var(--theme-shadow-primary, $shadow-primary);
+    }
+  }
+
+  .item-name,
+  .gear-item h4,
+  .action-item .action-name,
+  .feature-item .feature-name,
+  .talent-item .talent-name,
+  .augment-item .augment-name,
+  .combat-item .combat-item-name {
+    flex: 1;
+    @include exo-body(13px, 600); // Reduced from 14px
+    cursor: pointer;
+    @include transition-standard;
+
+    &:hover {
+      color: var(--theme-accent-primary, $accent-cyan);
+    }
+  }
+
+  .item-controls,
+  .gear-item .item-controls,
+  .action-item .action-controls,
+  .feature-item .feature-controls,
+  .talent-item .talent-controls,
+  .augment-item .augment-controls,
+  .combat-item .combat-item-actions {
+    display: flex;
+    gap: $spacing-xs; // Reduced from 8px
+    align-items: center;
+    flex-direction: column; // Stack vertically as requested
+  }
+
+  // Compact icon-only edit/delete buttons
+  .item-control {
+
+    &.item-edit,
+    &.item-delete {
+      background: transparent;
+      border: none;
+      color: var(--theme-text-secondary, $text-secondary);
+      font-size: 12px; // Small icon size
+      padding: 2px; // Minimal padding
+      border-radius: 0;
+      cursor: pointer;
+      @include transition-standard;
+      width: 16px; // Fixed small width
+      height: 16px; // Fixed small height
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &.item-edit:hover {
+      color: var(--theme-accent-secondary, $aqua-muted);
+      background: rgba(76, 226, 225, 0.1); // Subtle background highlight
+    }
+
+    &.item-delete:hover {
+      color: #ff4757;
+      background: rgba(255, 71, 87, 0.1); // Subtle background highlight
+    }
+
+    // Keep other item controls (attack, damage, etc.) as buttons
+    &:not(.item-edit):not(.item-delete) {
+      background: var(--theme-bg-primary, $bg-primary);
+      border: 1px solid var(--theme-border-primary, $border-primary);
+      color: var(--theme-text-secondary, $text-secondary);
+      font-size: 10px; // Reduced from 12px
+      padding: $spacing-xs 6px; // Reduced from 6px 10px
+      border-radius: 0;
+      cursor: pointer;
+      @include transition-standard;
+    }
+  }
+
+  .attack-roll,
+  .damage-roll {
+    &:hover {
+      border-color: var(--theme-accent-primary, $accent-cyan);
+      color: var(--theme-accent-primary, $accent-cyan);
+    }
+  }
+
+  // Item details - more compact
+  .item-details {
+    display: flex;
+    gap: $spacing-sm; // Reduced from 15px
+    margin: $spacing-xs 0; // Reduced from 8px 0
+    font-size: 10px; // Reduced from 11px
+    color: var(--theme-text-secondary, $text-secondary);
+  }
+
+  .item-threshold,
+  .item-damage,
+  .item-armor-class,
+  .item-property {
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    border: 1px solid var(--theme-accent-primary, $accent-cyan);
+    color: var(--theme-accent-primary, $accent-cyan);
+    padding: 2px $spacing-xs; // Reduced from 4px 8px
+    border-radius: 0;
+    @include orbitron-header(8px, 600); // Reduced font size
+    letter-spacing: 0.5px;
+
+    &:hover {
+      background: var(--theme-bg-primary, $bg-primary);
+      box-shadow: 0 0 5px rgba(0, 224, 220, 0.2); // Reduced glow
+    }
+  }
+
+  .item-damage,
+  .item-armor-class {
+    border-color: var(--theme-accent-secondary, $aqua-muted);
+    color: var(--theme-accent-secondary, $aqua-muted);
+  }
+
+  // Buttons and Interactive Elements
+  button,
+  .rollable {
+    @include button-base;
+    font-size: 10px;
+    padding: 6px $spacing-md;
+    letter-spacing: 0.5px;
+  }
+
+  .power-point-use {
+    background: var(--theme-bg-primary, $bg-primary);
+    border: 1px solid var(--theme-accent-secondary, $aqua-muted);
+    color: var(--theme-accent-secondary, $aqua-muted);
+    @include orbitron-header(9px, 600);
+    padding: $spacing-xs $spacing-sm;
+    border-radius: 0;
+    cursor: pointer;
+    @include transition-standard;
+
+    &:hover {
+      background: var(--theme-accent-secondary, $aqua-muted);
+      color: var(--theme-bg-primary, $bg-primary);
+      box-shadow: 0 0 10px rgba(76, 226, 225, 0.5);
+    }
+  }
+
+  // Focus States
+  *:focus {
+    outline: 2px solid var(--theme-accent-primary, $accent-cyan);
+    outline-offset: 2px;
+  }
+
+  // Additional Sections - More compact
+  .features-container,
+  .talents-container,
+  .gear-section {
+    @include section-base;
+    padding: $spacing-lg; // Reduced from 25px
+    margin-bottom: $spacing-xl; // Reduced from 30px
+  }
+
+  // Gear Subsection Spacing
+  .gear-subsection {
+    margin-bottom: $spacing-xxl; // Add spacing between subsections
+    padding: $spacing-lg;
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    border: 1px solid var(--theme-border-primary, $border-primary);
+    border-radius: 0;
+
+    &:last-child {
+      margin-bottom: 0; // Remove margin from last subsection
+    }
+  }
+
+  .expertise-section {
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    padding: $spacing-lg; // Reduced from 20px
+    border: 1px solid var(--theme-border-primary, $border-primary);
+    border-top: 3px solid var(--theme-accent-secondary, $aqua-muted);
+    margin-bottom: $spacing-lg; // Reduced from 20px
+
+    h3 {
+      margin: 0 0 $spacing-lg 0; // Reduced from 20px
+      @include orbitron-header(13px, 700); // Reduced from 14px
+      letter-spacing: 2px;
+      color: var(--theme-accent-secondary, $aqua-muted);
+    }
+  }
+
+  // Biography and Notes
+  .form-group textarea {
+    @include form-input-base;
+    @include exo-body(14px);
+    padding: 16px;
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  // Power Points Section in Talents Tab
+  .power-points-section {
+    background: var(--theme-bg-secondary, $bg-secondary);
+    border: 2px solid var(--theme-accent-primary, $accent-cyan);
+    border-radius: 0;
+    padding: $spacing-xl;
+    margin-bottom: $spacing-xxl;
+
+    h3 {
+      margin: 0 0 $spacing-lg 0;
+      @include orbitron-header(16px, 700);
+      color: var(--theme-accent-primary, $accent-cyan);
+      letter-spacing: 2px;
+      text-align: center;
+      border-bottom: 1px solid var(--theme-accent-primary, $accent-cyan);
+      padding-bottom: $spacing-sm;
+    }
+  }
+
+  .power-points-tiles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: $spacing-lg;
+    justify-items: center;
+  }
+
+  .power-point-tile {
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    border: 2px solid var(--theme-border-primary, $border-primary);
+    border-bottom: 4px solid var(--theme-accent-primary, $accent-cyan);
+    padding: $spacing-lg;
+    text-align: center;
+    @include transition-standard;
+    min-width: 120px;
+
+    &:hover {
+      border-color: var(--theme-accent-primary, $accent-cyan);
+      box-shadow: var(--theme-shadow-primary, $shadow-primary);
+    }
+
+    label {
+      display: block;
+      @include orbitron-header(12px, 600);
+      color: var(--theme-text-secondary, $text-secondary);
+      margin-bottom: $spacing-sm;
+      letter-spacing: 1px;
+    }
+  }
+
+  .power-point-input {
+    background: var(--theme-bg-primary, $bg-primary);
+    border: 2px solid var(--theme-border-primary, $border-primary);
+    color: var(--theme-text-primary, $text-primary);
+    @include exo-body(18px, 700);
+    padding: $spacing-sm;
+    border-radius: 0;
+    width: 100%;
+    text-align: center;
+    @include transition-standard;
+
+    &:focus {
+      border-color: var(--theme-accent-primary, $accent-cyan);
+      outline: none;
+      box-shadow: inset 0 0 10px rgba(0, 224, 220, 0.3);
+    }
+  }
+
+  // Hide original resource sections that are now in sidebar or moved
+  .resource-row,
+  .defense-hp-section,
+  .abilities-section {
+    display: none;
+  }
+
+  // Combat Section Redesign
+  .combat-item {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-md;
+    padding: $spacing-md;
+    margin-bottom: $spacing-sm;
+    background: var(--theme-bg-primary, $bg-primary);
+    border: 1px solid var(--theme-border-primary, $border-primary);
+    @include transition-standard;
+    min-height: 60px;
+
+    &:hover {
+      background: var(--theme-bg-secondary, $bg-secondary);
+      box-shadow: var(--theme-shadow-primary, $shadow-primary);
+    }
+  }
+
+  // Combat Action Buttons - Text and icon only, no boxes
+  .combat-item-actions {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    min-width: 80px;
+  }
+
+  .combat-action-btn {
+    background: transparent;
+    border: none;
+    color: var(--theme-accent-primary, $accent-cyan);
+    @include orbitron-header(12px, 700);
+    padding: $spacing-sm 24px $spacing-sm $spacing-xs; // Added 20px padding-right
+    border-radius: 0;
+    cursor: pointer;
+    @include transition-standard;
+    letter-spacing: 0.5px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    min-height: 36px;
+    width: 100px; // Increased from 80px to accommodate padding
+    justify-content: flex-start;
+
+    i {
+      font-size: 14px;
+    }
+
+    &:hover {
+      color: var(--theme-text-primary, $text-primary);
+      text-shadow: 0 0 8px var(--theme-accent-primary, $accent-cyan);
+    }
+
+    &.armor-roll {
+      color: var(--theme-accent-secondary, $aqua-muted);
+
+      &:hover {
+        color: var(--theme-text-primary, $text-primary);
+        text-shadow: 0 0 8px var(--theme-accent-secondary, $aqua-muted);
+      }
+    }
+  }
+
+  // Combat Item Content - Full width for proper layout
+  .combat-item-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  // Combat Item Header - Name in top left
+  .combat-item-header {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: $spacing-xs;
+  }
+
+  .combat-item-name {
+    @include exo-body(16px, 700);
+    text-align: left;
+  }
+
+  // Combat Stats Layout - Threshold left, grid right
+  .combat-stats-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-md;
+  }
+
+  // Special Threshold Tile - Larger and prominent, no hover
+  .combat-threshold-tile {
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    border: 2px solid var(--theme-accent-primary, $accent-cyan);
+    padding: $spacing-md 16px;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-height: 60px;
+    justify-content: center;
+    min-width: 80px;
+    flex-shrink: 0;
+  }
+
+  .combat-threshold-value {
+    @include orbitron-header(18px, 900);
+    color: var(--theme-accent-primary, $accent-cyan);
+    letter-spacing: 0.5px;
+    line-height: 1;
+  }
+
+  .combat-threshold-label {
+    @include exo-body(9px, 600);
+    color: var(--theme-text-secondary, $text-secondary);
+    letter-spacing: 0.3px;
+    margin-top: $spacing-xs;
+  }
+
+  // Combat Stats Grid - Fixed width tiles for consistency, no hover
+  .combat-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 80px);
+    gap: 6px;
+    flex: 1;
+  }
+
+  .combat-stat-tile {
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    border: 1px solid var(--theme-accent-primary, $accent-cyan);
+    padding: $spacing-sm 6px;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-height: 40px;
+    justify-content: center;
+    width: 80px;
+  }
+
+  .combat-stat-value {
+    @include orbitron-header(11px, 700);
+    color: var(--theme-accent-primary, $accent-cyan);
+    letter-spacing: 0.5px;
+    line-height: 1.2;
+  }
+
+  .combat-stat-label {
+    @include exo-body(8px, 500);
+    color: var(--theme-text-secondary, $text-secondary);
+    letter-spacing: 0.3px;
+    margin-top: 2px;
+  }
+
+  // ITEM SHEET STYLES - ApplicationV2 Compatible
+  // Item sheet styling - match actual DOM structure
+  &.sheet.item,
+  &.item.sheet {
+    height: 100%;
+
+    .window-content {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .item-sheet {
+      display: flex !important;
+      flex-direction: column !important;
+      height: 100% !important;
+      padding: $spacing-md;
+      background: var(--theme-bg-primary, $bg-primary);
+      color: var(--theme-text-primary, $text-primary);
+      overflow-y: auto;
+
+      // Flexcol layout support - CRITICAL for ApplicationV2
+      &.flexcol {
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100% !important;
+      }
+
+      // Item type specific styling
+      &.talent-sheet,
+      &.augment-sheet,
+      &.action-sheet,
+      &.feature-sheet,
+      &.gear-sheet,
+      &.weapon-sheet,
+      &.armor-sheet {
+        background: var(--theme-bg-primary, $bg-primary);
+        border: none;
+      }
+
+      // Header styling
+      .sheet-header {
+        display: flex;
+        align-items: center;
+        gap: $spacing-md;
+        padding: $spacing-md;
+        background: var(--theme-bg-secondary, $bg-secondary);
+        border-bottom: 1px solid var(--theme-border-primary, $border-primary);
+        flex-shrink: 0;
+
+        .profile-img {
+          width: 64px;
+          height: 64px;
+          border: 2px solid var(--theme-accent-primary, $accent-cyan);
+          cursor: pointer;
+        }
+
+        .header-fields {
+          flex: 1;
+
+          .charname input {
+            @include form-input-base;
+            @include orbitron-header(16px, 700);
+            background: transparent;
+            border: none;
+            color: var(--theme-text-primary, $text-primary);
+            width: 100%;
+            padding: 0;
+
+            &:focus {
+              outline: 1px solid var(--theme-accent-primary, $accent-cyan);
+            }
+          }
+        }
+      }
+
+      // Tab content area
+      .sheet-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+
+        .tab {
+          padding: $spacing-md;
+
+          &.active {
+            display: block;
+          }
+        }
+      }
+
+      // Tab navigation
+      .sheet-tabs {
+        background: var(--theme-bg-secondary, $bg-secondary);
+        border-bottom: 1px solid var(--theme-border-primary, $border-primary);
+        display: flex;
+        flex-shrink: 0;
+
+        .item {
+          padding: $spacing-sm $spacing-md;
+          background: transparent;
+          border: none;
+          color: var(--theme-text-secondary, $text-secondary);
+          @include orbitron-header(10px, 600);
+          text-transform: uppercase;
+          cursor: pointer;
+
+          &:hover {
+            background: rgba(0, 224, 220, 0.1);
+            color: var(--theme-accent-primary, $accent-cyan);
+          }
+
+          &.active {
+            background: var(--theme-bg-primary, $bg-primary);
+            color: var(--theme-text-primary, $text-primary);
+            border-bottom: 2px solid var(--theme-accent-primary, $accent-cyan);
+          }
+        }
+      }
+    }
+  }
+
+  // ApplicationV2 ITEM SHEET STYLES - Fixed selectors for actual class structure
+  // Target: <form class="application sheet avant item">
+  &.item,
+  &.application.item {
+    height: 100%;
+
+    .window-content {
+      display: flex !important;
+      flex-direction: column !important;
+      height: 100% !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+    }
+
+    .item-sheet {
+      display: flex !important;
+      flex-direction: column !important;
+      height: 100% !important;
+      min-height: 100% !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      background: var(--theme-bg-primary, $bg-primary) !important;
+      color: var(--theme-text-primary, $text-primary) !important;
+      overflow: visible !important;
+
+      // Flexcol layout support - CRITICAL for ApplicationV2
+      &.flexcol {
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100% !important;
+        min-height: 100% !important;
+      }
+
+      // Item type specific styling - force visibility
+      &.talent-sheet,
+      &.augment-sheet,
+      &.action-sheet,
+      &.feature-sheet,
+      &.gear-sheet,
+      &.weapon-sheet,
+      &.armor-sheet {
+        background: var(--theme-bg-primary, $bg-primary) !important;
+        border: none !important;
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100% !important;
+        min-height: 100% !important;
+      }
+
+      // Header styling - ensure visibility
+      .sheet-header {
+        display: flex !important;
+        align-items: center !important;
+        gap: $spacing-md !important;
+        padding: $spacing-md !important;
+        background: var(--theme-bg-secondary, $bg-secondary) !important;
+        border-bottom: 1px solid var(--theme-border-primary, $border-primary) !important;
+        flex-shrink: 0 !important;
+        height: 80px !important;
+        min-height: 80px !important;
+        max-height: 80px !important;
+
+        .profile-img {
+          width: 64px !important;
+          height: 64px !important;
+          border: 2px solid var(--theme-accent-primary, $accent-cyan) !important;
+          cursor: pointer !important;
+          flex-shrink: 0 !important;
+        }
+
+        .header-fields {
+          flex: 1 !important;
+          display: flex !important;
+          flex-direction: column !important;
+          gap: $spacing-sm !important;
+
+          .charname {
+            margin: 0 !important;
+
+            input {
+              @include orbitron-header(16px, 700);
+              @include form-input-base;
+
+              & {
+                background: transparent !important;
+                border: 1px solid var(--theme-border-primary, $border-primary) !important;
+                color: var(--theme-text-primary, $text-primary) !important;
+                width: 100% !important;
+                padding: $spacing-xs $spacing-sm !important;
+              }
+
+              &:focus {
+                outline: none !important;
+                border-color: var(--theme-accent-primary, $accent-cyan) !important;
+                box-shadow: 0 0 8px rgba(0, 224, 220, 0.3) !important;
+              }
+            }
+          }
+
+          .resource-row {
+            display: flex !important;
+            gap: $spacing-md !important;
+            align-items: center !important;
+
+            .resource {
+              display: flex !important;
+              flex-direction: column !important;
+              gap: 2px !important;
+
+              label {
+                @include orbitron-header(9px, 600);
+                color: var(--theme-text-secondary, $text-secondary) !important;
+                text-transform: uppercase !important;
+                letter-spacing: 0.5px !important;
+              }
+
+              input,
+              select {
+                @include form-input-base;
+                padding: 4px 8px !important;
+                width: 80px !important;
+              }
+            }
+          }
+        }
+      }
+
+      // Tab navigation - ensure visibility
+      .sheet-tabs {
+        background: var(--theme-bg-secondary, $bg-secondary) !important;
+        border-bottom: 1px solid var(--theme-border-primary, $border-primary) !important;
+        display: flex !important;
+        flex-shrink: 0 !important;
+        height: 36px !important;
+        min-height: 36px !important;
+        max-height: 36px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+
+        .item {
+          padding: $spacing-sm $spacing-md !important;
+          background: transparent !important;
+          border: none !important;
+          color: var(--theme-text-secondary, $text-secondary) !important;
+          @include orbitron-header(10px, 600);
+          text-transform: uppercase !important;
+          cursor: pointer !important;
+          text-decoration: none !important;
+          display: flex !important;
+          align-items: center !important;
+          height: 36px !important;
+
+          &:hover {
+            background: rgba(0, 224, 220, 0.1) !important;
+            color: var(--theme-accent-primary, $accent-cyan) !important;
+          }
+
+          &.active {
+            background: var(--theme-bg-primary, $bg-primary) !important;
+            color: var(--theme-text-primary, $text-primary) !important;
+            border-bottom: 2px solid var(--theme-accent-primary, $accent-cyan) !important;
+          }
+        }
+      }
+
+      // Tab content area - ensure proper layout
+      .sheet-body {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        min-height: 0 !important;
+        background: var(--theme-bg-primary, $bg-primary) !important;
+
+        .tab {
+          padding: $spacing-md !important;
+          display: none !important;
+          flex-direction: column !important;
+          gap: $spacing-md !important;
+
+          &.active {
+            display: flex !important;
+          }
+
+          .form-group {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: $spacing-xs !important;
+            margin-bottom: $spacing-md !important;
+
+            label {
+              @include orbitron-header(10px, 600);
+              color: var(--theme-text-secondary, $text-secondary) !important;
+              text-transform: uppercase !important;
+              letter-spacing: 0.5px !important;
+            }
+
+            input,
+            select,
+            textarea {
+              @include form-input-base;
+              padding: $spacing-sm !important;
+
+              &:focus {
+                border-color: var(--theme-accent-primary, $accent-cyan) !important;
+                box-shadow: 0 0 8px rgba(0, 224, 220, 0.3) !important;
+              }
+            }
+          }
+
+          .form-row {
+            display: flex !important;
+            gap: $spacing-md !important;
+
+            .form-group {
+              flex: 1 !important;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Item sheet tab content and form styling
+  &.item .sheet-body .tab,
+  &.application.item .sheet-body .tab {
+    display: block;
+    min-height: 200px;
+  }
+
+  // Form group styling for item sheets
+  &.item .form-group,
+  &.application.item .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 12px;
+    padding: 8px;
+
+    label {
+      display: block;
+      @include orbitron-header(10px, 600);
+      color: var(--theme-accent-primary, $accent-cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    input,
+    select,
+    textarea {
+      @include form-input-base;
+      display: block;
+      width: 100%;
+      min-height: 32px;
+      padding: 8px;
+      background: var(--theme-bg-tertiary, $bg-tertiary);
+      border: 1px solid var(--theme-border-primary, $border-primary);
+      color: var(--theme-text-primary, $text-primary);
+
+      &:focus {
+        border-color: var(--theme-accent-primary, $accent-cyan);
+        box-shadow: 0 0 8px rgba(0, 224, 220, 0.3);
+      }
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+  }
+
+  // Flexcol utility class - Essential for ApplicationV2 layouts
+  .flexcol {
+    display: flex;
+    flex-direction: column;
+    min-height: 0; // Prevent flex items from overflowing
+
+    &.full-height {
+      height: 100%;
+    }
+  }
+
+  // Item sheet tabs - Ensure proper styling for both selector variants
+  &.sheet.item .sheet-tabs,
+  &.item.sheet .sheet-tabs {
+    background: var(--theme-bg-secondary, $bg-secondary);
+    border-bottom: 1px solid var(--theme-border-primary, $border-primary);
+    display: flex;
+    gap: 0; // Override FoundryVTT's default nav.tabs gap
+    padding: 0;
+    margin: 0;
+    flex-shrink: 0;
+
+    .item {
+      @include orbitron-header(8px, 600); // Reduced from 10px for consistency
+      color: var(--theme-text-secondary, $text-secondary);
+      padding: 4px 6px; // More compact padding
+      border-right: 1px solid var(--theme-border-primary, $border-primary);
+      cursor: pointer;
+      @include transition-standard;
+      text-decoration: none;
+      background: transparent;
+      flex: 1 1 auto; // Flexible sizing
+      min-width: 0; // Allow shrinking
+      white-space: nowrap; // Prevent wrapping
+      overflow: hidden; // Hide overflow
+      text-overflow: ellipsis; // Add ellipsis
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        background: var(--theme-bg-tertiary, $bg-tertiary);
+        color: var(--theme-text-primary, $text-primary);
+      }
+
+      &.active {
+        background: var(--theme-bg-primary, $bg-primary);
+        color: var(--theme-accent-primary, $accent-cyan);
+        border-bottom: 2px solid var(--theme-accent-primary, $accent-cyan);
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 1024px) {
+  .avant {
+    .window-app {
+      width: 100%;
+      height: 100%;
+    }
+
+    .stats-sidebar {
+      width: 240px;
+    }
+
+    .main-content {
+      margin-left: 240px;
+    }
+
+    .sheet-tabs .item {
+      padding: 10px 16px;
+      font-size: 10px;
+    }
+
+    // Responsive adjustments for compressed skills grid
+    .skills-abilities-grid {
+      grid-template-columns: 1fr;
+      gap: 10px; // Reduced from 15px
+    }
+
+    .skill-tile {
+      grid-template-columns: 1fr 40px 40px; // Reduced from 50px
+      gap: $spacing-xs; // Reduced from 6px
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .avant {
+    .stats-sidebar {
+      width: 200px;
+    }
+
+    .main-content {
+      margin-left: 200px;
+    }
+
+    .sidebar-abilities {
+      grid-template-columns: 1fr;
+    }
+
+    .sheet-tabs {
+      flex-wrap: wrap;
+
+      .item {
+        flex: 1;
+        min-width: 100px;
+        padding: $spacing-sm $spacing-md;
+        font-size: 9px;
+      }
+    }
+
+    .skill-tile {
+      grid-template-columns: 1fr;
+      gap: 6px; // Reduced from 8px
+      text-align: center;
+
+      input,
+      .skill-roll {
+        width: 100%;
+      }
+    }
+  }
+}
+
+// Print Styles
+@media print {
+  .avant {
+    background: white;
+    color: black;
+    box-shadow: none;
+
+    .sheet-header {
+      background: white;
+      color: black;
+      border-bottom: 2px solid black;
+    }
+
+    .sheet-tabs {
+      display: none;
+    }
+
+    .tab {
+      display: block;
+    }
+
+    .item-controls {
+      display: none;
+    }
+  }
+}
+
+/* ============================================================================
+ * Tag Example Buttons for Trait Sheets
+ * ============================================================================ */
+
+.avant {
+
+  // Tag examples container
+  .tag-examples {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-xs;
+    margin: $spacing-sm 0;
+  }
+
+  // Individual tag example buttons
+  .tag-example {
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    border: 1px solid var(--theme-border-primary, $border-primary);
+    color: var(--theme-text-secondary, $text-secondary);
+    font-family: var(--theme-font-primary, $font-primary);
+    font-size: 10px;
+    font-weight: 500;
+    padding: $spacing-xs $spacing-sm;
+    border-radius: 3px;
+    cursor: pointer;
+    @include transition-standard;
+    text-transform: none;
+    letter-spacing: 0.25px;
+    white-space: nowrap;
+    user-select: none;
+
+    &:hover {
+      background: var(--theme-bg-primary, $bg-primary);
+      border-color: var(--theme-accent-primary, $accent-cyan);
+      color: var(--theme-text-primary, $text-primary);
+      box-shadow: 0 0 5px rgba(0, 224, 220, 0.3);
+    }
+
+    &:active {
+      transform: translateY(1px);
+    }
+
+    // Selected state when tag is applied
+    &.selected {
+      background: var(--theme-accent-primary, $accent-cyan);
+      border-color: var(--theme-accent-primary, $accent-cyan);
+      color: var(--theme-bg-primary, $bg-primary);
+      font-weight: 600;
+      box-shadow: 0 0 8px rgba(0, 224, 220, 0.4);
+
+      &:hover {
+        background: var(--theme-accent-secondary, $aqua-muted);
+        border-color: var(--theme-accent-secondary, $aqua-muted);
+        box-shadow: 0 0 10px rgba(76, 226, 225, 0.5);
+      }
+    }
+  }
+}
+
+/* ============================================================================
+ * Fortune Point Reroll Dialog
+ * ============================================================================ */
+
+.avant .reroll-dialog {
+  background: var(--theme-bg-secondary, #1E1E1E);
+  border: 2px solid var(--theme-accent-primary, $accent-cyan);
+  border-radius: 0;
+  color: var(--theme-text-primary, $text-primary);
+  min-height: 250px;
+  max-height: 300px;
+  overflow: hidden;
+}
+
+.avant .reroll-dialog .dialog-content {
+  padding: 12px 12px 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* Removed h3 header - redundant with dialog title bar */
+
+.avant .reroll-dialog .original-roll {
+  @include exo-body(12px);
+  color: var(--theme-text-secondary, $text-secondary);
+  margin: 0;
+}
+
+/* FP count moved to dedicated status area between dice and buttons */
+
+/* Removed "Select dice to reroll" h4 to save space for longer roll descriptions */
+
+.avant .reroll-dialog .dice-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 4px;
+}
+
+.avant .reroll-dialog .reroll-die {
+  cursor: pointer;
+  @include transition-standard;
+  position: relative;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  &.selected .die-face {
+    border-color: var(--theme-accent-secondary, $aqua-muted);
+    background: var(--theme-accent-secondary, $aqua-muted);
+    box-shadow: 0 0 16px var(--theme-accent-secondary, $aqua-muted);
+    transform: scale(1.05);
+    transition: all 0.15s ease; // Faster transition to reduce flicker
+
+    &.d10::before {
+      background: var(--theme-accent-secondary, $aqua-muted);
+      transition: all 0.15s ease; // Match the parent transition
+    }
+  }
+
+  // Already rerolled dice styling - greyed out and disabled
+  &.already-rerolled {
+    cursor: not-allowed;
+    opacity: 0.5;
+
+    &:hover {
+      transform: none;
+      /* Disable hover scale effect */
+    }
+
+    .die-face {
+      border-color: var(--theme-text-secondary, $text-secondary);
+      background: var(--theme-text-secondary, $text-secondary);
+
+      &.d10::before {
+        background: var(--theme-bg-primary, $bg-primary);
+      }
+    }
+
+    .die-value {
+      color: var(--theme-text-secondary, $text-secondary);
+      text-shadow: none;
+    }
+  }
+}
+
+.avant .reroll-dialog .die-face {
+  width: 60px;
+  height: 60px;
+  border: 3px solid var(--theme-accent-primary, $accent-cyan);
+  background: var(--theme-bg-tertiary, $bg-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  @include transition-standard;
+  /* Use solid border instead of box-shadow for cleaner appearance */
+
+  &.d10 {
+    /* Create border effect before clipping */
+    background: var(--theme-accent-primary, $accent-cyan);
+    padding: 3px;
+    clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      right: 3px;
+      bottom: 3px;
+      background: var(--theme-bg-tertiary, $bg-tertiary);
+      clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+      z-index: 1;
+    }
+  }
+}
+
+.avant .reroll-dialog .die-value {
+  @include orbitron-header(20px, 900);
+  color: var(--theme-accent-primary, $accent-cyan);
+  text-shadow: 0 0 4px var(--theme-accent-primary, $accent-cyan);
+  position: relative;
+  z-index: 2;
+}
+
+.avant .reroll-dialog .reroll-die.selected .die-value {
+  color: var(--theme-bg-primary, $black-pure);
+  text-shadow: 0 0 6px var(--theme-bg-primary, $black-pure);
+  font-weight: 900;
+}
+
+.avant .reroll-dialog .reroll-indicator {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 16px;
+  height: 16px;
+  background: var(--theme-text-secondary, $text-secondary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  color: var(--theme-bg-primary, $bg-primary);
+  z-index: 3;
+}
+
+/* Fortune points status - compact display between dice and buttons */
+.avant .reroll-dialog .fp-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  @include exo-body(12px);
+  margin: 2px 0;
+
+  i {
+    color: var(--theme-accent-secondary, $aqua-muted);
+    font-size: 14px;
+  }
+
+  .fp-count {
+    color: var(--theme-accent-primary, $accent-cyan);
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  .fp-label {
+    color: var(--theme-text-secondary, $text-secondary);
+    font-weight: 500;
+  }
+}
+
+.avant .reroll-dialog .dialog-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 4px;
+  flex-shrink: 0;
+
+  button {
+    background: var(--theme-bg-tertiary, $bg-tertiary);
+    border: 2px solid var(--theme-accent-primary, $accent-cyan);
+    color: var(--theme-text-primary, $text-primary);
+    padding: 4px 8px;
+    @include exo-body(10px, 600);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    @include transition-standard;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border-radius: 0;
+    /* Ensure buttons maintain theming compatibility */
+    box-shadow: 0 0 0 1px transparent;
+    max-width: 140px;
+    flex: 1;
+
+    &:hover:not(:disabled) {
+      background: var(--theme-accent-primary, $accent-cyan);
+      color: var(--theme-bg-primary, $black-pure);
+      text-shadow: none;
+      box-shadow: 0 0 8px var(--theme-accent-primary, $accent-cyan);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      border-color: var(--theme-text-secondary, $text-secondary);
+    }
+  }
+}
+
+.avant .reroll-dialog .reroll-cancel {
+  border-color: var(--theme-text-secondary, $text-secondary) !important;
+
+  &:hover:not(:disabled) {
+    background: var(--theme-text-secondary, $text-secondary) !important;
+    color: var(--theme-bg-primary, $black-pure) !important;
+    box-shadow: 0 0 8px var(--theme-text-secondary, $text-secondary) !important;
+  }
+}
+
+/* ============================================================================
+ * Chat Context Menu
+ * ============================================================================ */
+
+.avant-context-menu {
+  background: var(--theme-bg-secondary, #1E1E1E);
+  border: 2px solid var(--theme-accent-primary, $accent-cyan);
+  border-radius: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  min-width: 200px;
+
+  .context-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .context-menu-item {
+    padding: 12px 16px;
+    @include exo-body(14px, 500);
+    cursor: pointer;
+    @include transition-standard;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--theme-bg-tertiary, $bg-tertiary);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background: var(--theme-accent-primary, $accent-cyan);
+      color: var(--theme-bg-primary, $black-pure);
+    }
+
+    i {
+      font-size: 14px;
+      width: 16px;
+      text-align: center;
+    }
+  }
+}
+
+/* Gear Tab - Enhanced Item Details for Weapons and Armor */
+.gear-item {
+  .item-details {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--theme-text-secondary, $text-secondary);
+
+    span {
+      padding: 2px 6px;
+      border-radius: 3px;
+      background: rgba(0, 224, 220, 0.1);
+      border: 1px solid rgba(0, 224, 220, 0.3);
+      white-space: nowrap;
+    }
+
+    .item-damage {
+      background: rgba(255, 107, 107, 0.1);
+      border-color: rgba(255, 107, 107, 0.3);
+      color: #ff6b6b;
+    }
+
+    .item-damage-type {
+      background: rgba(255, 195, 0, 0.1);
+      border-color: rgba(255, 195, 0, 0.3);
+      color: #ffc300;
+    }
+
+    .item-ac {
+      background: rgba(74, 144, 226, 0.1);
+      border-color: rgba(74, 144, 226, 0.3);
+      color: #4a90e2;
+    }
+
+    .item-threshold {
+      background: rgba(156, 39, 176, 0.1);
+      border-color: rgba(156, 39, 176, 0.3);
+      color: #9c27b0;
+    }
+  }
+}

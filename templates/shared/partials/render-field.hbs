@@ -1,0 +1,763 @@
+{{!--
+Field Renderer Partial - Universal Field Rendering
+
+This partial renders any field type from the bodyFields array using
+the appropriate component partial. It acts as a dispatcher to the
+correct component based on field.type.
+
+Required context:
+- field: Field object with type, name, value, and other properties
+- editable: Whether the sheet is editable
+- displayTraits: For traits fields only
+
+Supported field types:
+- description: textarea with rich text editing
+- textarea: basic textarea
+- text: text input
+- number: number input
+- select: dropdown selection
+- checkbox: checkbox input
+- ap-selector: action point selector with visual dots
+- uses-counter: current/max counter
+- traits: trait chip input
+--}}
+
+{{#if (eq field.type "description")}}
+{{!-- Description field with rich text editing --}}
+{{> "systems/avant/templates/shared/partials/textarea-field"
+name=field.name
+value=field.value
+label=field.label
+rows=field.rows
+placeholder=field.placeholder
+hint=field.hint
+class=field.class}}
+
+{{else if (eq field.type "textarea")}}
+{{!-- Basic textarea field --}}
+{{> "systems/avant/templates/shared/partials/textarea-field"
+name=field.name
+value=field.value
+label=field.label
+rows=field.rows
+placeholder=field.placeholder
+hint=field.hint
+class=field.class}}
+
+{{else if (eq field.type "text")}}
+{{!-- Text input field --}}
+{{> "systems/avant/templates/shared/partials/text-field"
+name=field.name
+value=field.value
+label=field.label
+placeholder=field.placeholder
+hint=field.hint
+required=field.required
+maxlength=field.maxlength
+class=field.class}}
+
+{{else if (eq field.type "number")}}
+{{!-- Number input field --}}
+{{> "systems/avant/templates/shared/partials/number-field"
+name=field.name
+value=field.value
+label=field.label
+min=field.min
+max=field.max
+step=field.step
+placeholder=field.placeholder
+hint=field.hint
+class=field.class}}
+
+{{else if (eq field.type "select")}}
+{{!-- Select dropdown field --}}
+{{> "systems/avant/templates/shared/partials/select-field"
+name=field.name
+value=field.value
+label=field.label
+options=field.options
+hint=field.hint
+required=field.required
+class=field.class}}
+
+{{else if (eq field.type "checkbox")}}
+{{!-- Checkbox field --}}
+{{> "systems/avant/templates/shared/partials/checkbox-field"
+name=field.name
+checked=field.checked
+label=field.label
+hint=field.hint
+class=field.class}}
+
+{{else if (eq field.type "ap-selector")}}
+{{!-- Action Point selector with visual dots --}}
+{{> "systems/avant/templates/shared/partials/ap-selector"
+name=field.name
+value=field.value
+label=field.label
+hint=field.hint
+max=field.max
+class=field.class}}
+
+{{else if (eq field.type "uses-counter")}}
+{{!-- Uses counter field --}}
+{{> "systems/avant/templates/shared/partials/uses-counter"
+name=field.name
+current=field.current
+max=field.max
+label=field.label
+hint=field.hint
+class=field.class}}
+
+{{else if (eq field.type "traits")}}
+{{!-- Traits field --}}
+<script>
+  console.log('🔧 RENDER-FIELD DEBUG | Traits field context:', {
+    fieldType: field.type,
+    fieldName: field.name,
+    fieldValue: field.value,
+    fieldValueType: typeof field.value,
+    fieldValueLength: field.value ? field.value.length : 0,
+    hasDisplayTraits: !!displayTraits,
+    displayTraitsType: typeof displayTraits,
+    displayTraitsLength: displayTraits ? displayTraits.length : 0,
+    displayTraitsData: displayTraits,
+    editable: editable
+  });
+</script>
+{{> "systems/avant/templates/shared/partials/traits-field"
+name=field.name
+displayTraits=@root.displayTraits
+value=@root.displayTraits
+label=field.label
+hint=field.hint
+editable=editable
+class=field.class}}
+
+{{else if (eq field.type "image-upload")}}
+{{!-- Image upload field --}}
+{{> "systems/avant/templates/shared/partials/image-upload"
+src=field.value
+alt=@root.item.name
+title=@root.item.name
+size=field.size
+class=field.class}}
+
+{{else if (eq field.type "display-text")}}
+{{!-- Display text field (read-only text display) --}}
+<div class="display-field display-text {{#if field.class}}{{field.class}}{{/if}}">
+  {{#if field.label}}
+    <span class="display-label">{{field.label}}:</span>
+  {{/if}}
+  <span class="display-value">{{field.value}}</span>
+</div>
+
+{{else if (eq field.type "display-ap-cost")}}
+{{!-- Display AP cost with visual dots --}}
+<div class="display-field display-ap-cost {{#if field.class}}{{field.class}}{{/if}}">
+  {{#if field.label}}
+    <span class="display-label">{{field.label}}:</span>
+  {{/if}}
+  <div class="ap-icons-display">
+    {{#each (range 1 4) as |apValue|}}
+    <span class="ap-icon {{#if (gte ../field.value apValue)}}filled{{else}}empty{{/if}}">
+      <i class="fas fa-circle" aria-hidden="true"></i>
+    </span>
+    {{/each}}
+  </div>
+</div>
+
+{{else if (eq field.type "display-uses")}}
+{{!-- Display uses as current/max --}}
+<div class="display-field display-uses {{#if field.class}}{{field.class}}{{/if}}">
+  {{#if field.label}}
+    <span class="display-label">{{field.label}}:</span>
+  {{/if}}
+  <span class="display-value uses-fraction">{{field.current}}/{{field.max}}</span>
+</div>
+
+{{else if (eq field.type "display-traits")}}
+{{!-- Display traits as chips --}}
+<div class="display-field display-traits {{#if field.class}}{{field.class}}{{/if}}">
+  <div class="trait-chips-display">
+    {{#each field.value as |traitId|}}
+    <span class="trait-chip" data-trait="{{traitId}}" title="{{traitId}}">
+      <span class="trait-chip__text">{{traitId}}</span>
+    </span>
+    {{/each}}
+  </div>
+</div>
+
+{{else if (eq field.type "display-badge")}}
+{{!-- Display badge (status indicator) --}}
+<div class="display-field display-badge {{#if field.class}}{{field.class}}{{/if}}">
+  <span class="status-badge">{{field.value}}</span>
+</div>
+
+{{else if (eq field.type "talent-chat-button")}}
+{{!-- Talent chat/roll button --}}
+<button type="button" 
+        class="chat-roll-btn" 
+        data-action="useTalent" 
+        data-item-id="{{field.itemId}}"
+        title="Use Talent: {{field.itemName}}"
+        aria-label="Use Talent: {{field.itemName}}"
+        tabindex="0">
+  <i class="fas fa-comments" aria-hidden="true"></i>
+</button>
+
+{{else if (eq field.type "talent-title-line")}}
+{{!-- Talent title with level requirement --}}
+<div class="row-title-line">
+  <h4 class="row-title" 
+      data-action="editItem" 
+      data-item-id="{{field.itemId}}"
+      title="Edit {{field.title}}"
+      tabindex="0"
+      role="button">
+    {{field.title}}
+  </h4>
+  {{#if field.levelRequirement}}
+    <span class="row-level-inline">Level {{field.levelRequirement}}+</span>
+  {{/if}}
+</div>
+
+{{else if (eq field.type "talent-ap-cost")}}
+{{!-- Talent AP cost with visual dots (no PP cost) --}}
+<div class="row-ap-cost">
+  <span class="ap-cost-label">AP:</span>
+  <div class="ap-icons-inline">
+    <span class="ap-icon {{#if (gte field.value 1)}}filled{{else}}empty{{/if}}">
+      <i class="fas fa-circle" aria-hidden="true"></i>
+    </span>
+    <span class="ap-icon {{#if (gte field.value 2)}}filled{{else}}empty{{/if}}">
+      <i class="fas fa-circle" aria-hidden="true"></i>
+    </span>
+    <span class="ap-icon {{#if (gte field.value 3)}}filled{{else}}empty{{/if}}">
+      <i class="fas fa-circle" aria-hidden="true"></i>
+    </span>
+  </div>
+</div>
+
+{{else if (eq field.type "talent-requirements")}}
+{{!-- Talent requirements display --}}
+<div class="row-requirements">
+  <strong>Requirements:</strong> {{field.value}}
+</div>
+
+{{else if (eq field.type "talent-description")}}
+{{!-- Talent description display --}}
+<div class="row-description">
+  {{field.value}}
+</div>
+
+{{else if (eq field.type "talent-traits")}}
+{{!-- Talent traits with proper styling and overflow --}}
+<div class="trait-chips {{#if field.hasOverflow}}has-overflow{{/if}}">
+  {{#each field.displayTraits as |trait|}}
+    {{#if (lt @index 4)}}
+    <span class="trait-chip" 
+          data-trait="{{trait.id}}"
+          style="{{traitChipStyle trait}}"
+          title="{{#if trait.description}}{{trait.description}}{{else}}{{trait.name}}{{/if}}">
+      {{#if trait.icon}}<i class="trait-chip__icon {{trait.icon}}" aria-hidden="true"></i>{{/if}}
+      <span class="trait-chip__text">{{trait.name}}</span>
+    </span>
+    {{/if}}
+  {{/each}}
+  {{#if field.hasOverflow}}
+    <span class="trait-overflow-count">+{{math field.displayTraits.length "-" 4}}</span>
+  {{/if}}
+</div>
+
+{{else if (eq field.type "talent-edit-button")}}
+{{!-- Talent edit button --}}
+<button type="button" 
+        class="row-edit" 
+        data-action="editItem" 
+        data-item-id="{{field.itemId}}"
+        title="Edit {{field.itemName}}"
+        aria-label="Edit {{field.itemName}}"
+        tabindex="0">
+  <i class="fas fa-edit" aria-hidden="true"></i>
+</button>
+
+{{else if (eq field.type "talent-delete-button")}}
+{{!-- Talent delete button --}}
+<button type="button" 
+        class="row-delete" 
+        data-action="deleteItem" 
+        data-item-id="{{field.itemId}}"
+        title="Delete {{field.itemName}}"
+        aria-label="Delete {{field.itemName}}"
+        tabindex="0">
+  <i class="fas fa-trash" aria-hidden="true"></i>
+</button>
+
+{{else if (eq field.type "augment-chat-button")}}
+{{!-- Augment chat/roll button --}}
+<button type="button" 
+        class="chat-roll-btn" 
+        data-action="useAugment" 
+        data-item-id="{{field.itemId}}"
+        title="Use Augment: {{field.itemName}}"
+        aria-label="Use Augment: {{field.itemName}}"
+        tabindex="0">
+  <i class="fas fa-comments" aria-hidden="true"></i>
+</button>
+
+{{else if (eq field.type "augment-pp-button")}}
+{{!-- Augment PP spend button --}}
+<button type="button" 
+        class="pp-spend-btn" 
+        data-action="spendAugmentPP" 
+        data-item-id="{{field.itemId}}"
+        data-pp-cost="{{field.ppCost}}"
+        title="Spend {{field.ppCost}} PP: {{field.itemName}}"
+        aria-label="Spend {{field.ppCost}} power points for {{field.itemName}}"
+        tabindex="0">
+  <i class="fas fa-bolt" aria-hidden="true"></i>
+  <span class="pp-spend-cost">{{field.ppCost}}</span>
+</button>
+
+{{else if (eq field.type "augment-title-line")}}
+{{!-- Augment title with level requirement --}}
+<div class="row-title-line">
+  <h4 class="row-title" 
+      data-action="editItem" 
+      data-item-id="{{field.itemId}}"
+      title="Edit {{field.title}}"
+      tabindex="0"
+      role="button">
+    {{field.title}}
+  </h4>
+  {{#if field.levelRequirement}}
+    <span class="row-level-inline">Level {{field.levelRequirement}}+</span>
+  {{/if}}
+</div>
+
+{{else if (eq field.type "augment-ap-cost")}}
+{{!-- Augment AP cost with visual dots + PP cost inline --}}
+<div class="row-ap-cost">
+  <span class="ap-cost-label">AP:</span>
+  <div class="ap-icons-inline">
+    <span class="ap-icon {{#if (gte field.value 1)}}filled{{else}}empty{{/if}}">
+      <i class="fas fa-circle" aria-hidden="true"></i>
+    </span>
+    <span class="ap-icon {{#if (gte field.value 2)}}filled{{else}}empty{{/if}}">
+      <i class="fas fa-circle" aria-hidden="true"></i>
+    </span>
+    <span class="ap-icon {{#if (gte field.value 3)}}filled{{else}}empty{{/if}}">
+      <i class="fas fa-circle" aria-hidden="true"></i>
+    </span>
+  </div>
+  {{#if field.ppCost}}
+    <span class="pp-cost-inline">PP: {{field.ppCost}}</span>
+  {{/if}}
+</div>
+
+{{else if (eq field.type "augment-requirements")}}
+{{!-- Augment requirements display --}}
+<div class="row-requirements">
+  <strong>Requirements:</strong> {{field.value}}
+</div>
+
+{{else if (eq field.type "augment-description")}}
+{{!-- Augment description display --}}
+<div class="row-description">
+  {{field.value}}
+</div>
+
+{{else if (eq field.type "augment-traits")}}
+{{!-- Augment traits with proper styling and overflow --}}
+<div class="trait-chips {{#if field.hasOverflow}}has-overflow{{/if}}">
+  {{#each field.displayTraits as |trait|}}
+    {{#if (lt @index 4)}}
+    <span class="trait-chip" 
+          data-trait="{{trait.id}}"
+          style="{{traitChipStyle trait}}"
+          title="{{#if trait.description}}{{trait.description}}{{else}}{{trait.name}}{{/if}}">
+      {{#if trait.icon}}<i class="trait-chip__icon {{trait.icon}}" aria-hidden="true"></i>{{/if}}
+      <span class="trait-chip__text">{{trait.name}}</span>
+    </span>
+    {{/if}}
+  {{/each}}
+  {{#if field.hasOverflow}}
+    <span class="trait-overflow-count">+{{math field.displayTraits.length "-" 4}}</span>
+  {{/if}}
+</div>
+
+{{else if (eq field.type "augment-edit-button")}}
+{{!-- Augment edit button --}}
+<button type="button" 
+        class="row-edit" 
+        data-action="editItem" 
+        data-item-id="{{field.itemId}}"
+        title="Edit {{field.itemName}}"
+        aria-label="Edit {{field.itemName}}"
+        tabindex="0">
+  <i class="fas fa-edit" aria-hidden="true"></i>
+</button>
+
+{{else if (eq field.type "augment-delete-button")}}
+{{!-- Augment delete button --}}
+<button type="button" 
+        class="row-delete" 
+        data-action="deleteItem" 
+        data-item-id="{{field.itemId}}"
+        title="Delete {{field.itemName}}"
+        aria-label="Delete {{field.itemName}}"
+        tabindex="0">
+  <i class="fas fa-trash" aria-hidden="true"></i>
+</button>
+
+{{else if (eq field.type "weapon-roll-button")}}
+{{!-- Weapon roll button --}}
+<button type="button" 
+        class="chat-roll-btn" 
+        data-action="rollWeapon" 
+        data-item-id="{{field.itemId}}"
+        title="Roll {{field.itemName}}"
+        aria-label="Roll {{field.itemName}}"
+        tabindex="0">
+  <i class="fas fa-dice-d20" aria-hidden="true"></i>
+</button>
+
+{{else if (eq field.type "weapon-image-name")}}
+{{!-- Weapon image and name --}}
+<div class="weapon-header">
+  <div class="item-image">
+    <img src="{{field.img}}" title="{{field.title}}" width="24" height="24" />
+  </div>
+  <h4 class="item-name" 
+      data-action="editItem" 
+      data-item-id="{{field.itemId}}"
+      title="Edit {{field.title}}"
+      tabindex="0"
+      role="button">
+    {{field.title}}
+  </h4>
+</div>
+
+{{else if (eq field.type "weapon-damage")}}
+{{!-- Weapon damage display --}}
+<div class="weapon-damage-info">
+  {{#if field.damageDie}}<span class="item-damage">{{field.damageDie}}</span>{{/if}}
+  {{#if field.damageType}}<span class="item-damage-type">{{field.damageType}}</span>{{/if}}
+</div>
+
+{{else if (eq field.type "weapon-properties")}}
+{{!-- Weapon properties display --}}
+<div class="weapon-properties">
+  {{field.value}}
+</div>
+
+{{else if (eq field.type "weapon-details")}}
+{{!-- Weapon details display --}}
+<div class="weapon-details">
+  {{#if field.weight}}<span class="item-weight">{{field.weight}} lbs</span>{{/if}}
+  {{#if field.range}}<span class="item-range">{{field.range}}</span>{{/if}}
+</div>
+
+{{else if (eq field.type "weapon-edit-button")}}
+{{!-- Weapon edit button --}}
+<button type="button" 
+        class="row-edit" 
+        data-action="editItem" 
+        data-item-id="{{field.itemId}}"
+        title="Edit {{field.itemName}}"
+        aria-label="Edit {{field.itemName}}"
+        tabindex="0">
+  <i class="fas fa-edit" aria-hidden="true"></i>
+</button>
+
+{{else if (eq field.type "weapon-delete-button")}}
+{{!-- Weapon delete button --}}
+<button type="button" 
+        class="row-delete" 
+        data-action="deleteItem" 
+        data-item-id="{{field.itemId}}"
+        title="Delete {{field.itemName}}"
+        aria-label="Delete {{field.itemName}}"
+        tabindex="0">
+  <i class="fas fa-trash" aria-hidden="true"></i>
+</button>
+
+{{else if (eq field.type "armor-roll-button")}}
+{{!-- Armor roll button --}}
+<button type="button" 
+        class="chat-roll-btn" 
+        data-action="rollArmor" 
+        data-item-id="{{field.itemId}}"
+        title="Roll {{field.itemName}}"
+        aria-label="Roll {{field.itemName}}"
+        tabindex="0">
+  <i class="fas fa-dice-d20" aria-hidden="true"></i>
+</button>
+
+{{else if (eq field.type "armor-image-name")}}
+{{!-- Armor image and name --}}
+<div class="armor-header">
+  <div class="item-image">
+    <img src="{{field.img}}" title="{{field.title}}" width="24" height="24" />
+  </div>
+  <h4 class="item-name" 
+      data-action="editItem" 
+      data-item-id="{{field.itemId}}"
+      title="Edit {{field.title}}"
+      tabindex="0"
+      role="button">
+    {{field.title}}
+  </h4>
+</div>
+
+{{else if (eq field.type "armor-protection")}}
+{{!-- Armor protection display --}}
+<div class="armor-protection-info">
+  {{#if field.armorClass}}<span class="item-ac">AC +{{field.armorClass}}</span>{{/if}}
+  {{#if field.threshold}}<span class="item-threshold">Threshold {{field.threshold}}</span>{{/if}}
+</div>
+
+{{else if (eq field.type "armor-properties")}}
+{{!-- Armor properties display --}}
+<div class="armor-properties">
+  {{#if field.armorType}}<span class="armor-type">{{field.armorType}}</span>{{/if}}
+  {{#if field.properties}}<span class="armor-props">{{field.properties}}</span>{{/if}}
+</div>
+
+{{else if (eq field.type "armor-details")}}
+{{!-- Armor details display --}}
+<div class="armor-details">
+  {{#if field.weight}}<span class="item-weight">{{field.weight}} lbs</span>{{/if}}
+</div>
+
+{{else if (eq field.type "armor-edit-button")}}
+{{!-- Armor edit button --}}
+<button type="button" 
+        class="row-edit" 
+        data-action="editItem" 
+        data-item-id="{{field.itemId}}"
+        title="Edit {{field.itemName}}"
+        aria-label="Edit {{field.itemName}}"
+        tabindex="0">
+  <i class="fas fa-edit" aria-hidden="true"></i>
+</button>
+
+{{else if (eq field.type "armor-delete-button")}}
+{{!-- Armor delete button --}}
+<button type="button" 
+        class="row-delete" 
+        data-action="deleteItem" 
+        data-item-id="{{field.itemId}}"
+        title="Delete {{field.itemName}}"
+        aria-label="Delete {{field.itemName}}"
+        tabindex="0">
+  <i class="fas fa-trash" aria-hidden="true"></i>
+</button>
+
+{{else if (eq field.type "gear-roll-button")}}
+{{!-- Gear roll button --}}
+<button type="button" 
+        class="chat-roll-btn" 
+        data-action="rollGear" 
+        data-item-id="{{field.itemId}}"
+        title="Roll {{field.itemName}}"
+        aria-label="Roll {{field.itemName}}"
+        tabindex="0">
+  <i class="fas fa-dice-d20" aria-hidden="true"></i>
+</button>
+
+{{else if (eq field.type "gear-image-name")}}
+{{!-- Gear image and name --}}
+<div class="gear-header">
+  <div class="item-image">
+    <img src="{{field.img}}" title="{{field.title}}" width="24" height="24" />
+  </div>
+  <h4 class="item-name" 
+      data-action="editItem" 
+      data-item-id="{{field.itemId}}"
+      title="Edit {{field.title}}"
+      tabindex="0"
+      role="button">
+    {{field.title}}
+  </h4>
+</div>
+
+{{else if (eq field.type "gear-weight")}}
+{{!-- Gear weight display --}}
+<div class="gear-weight">
+  {{field.value}} lbs
+</div>
+
+{{else if (eq field.type "gear-category")}}
+{{!-- Gear category display --}}
+<div class="gear-category">
+  {{#if field.category}}<span class="gear-cat">{{field.category}}</span>{{/if}}
+  {{#if field.rarity}}<span class="gear-rarity rarity-{{field.rarity}}">{{field.rarity}}</span>{{/if}}
+</div>
+
+{{else if (eq field.type "gear-uses")}}
+{{!-- Gear uses display --}}
+<div class="gear-uses">
+  Uses: {{field.current}}/{{field.max}}
+</div>
+
+{{else if (eq field.type "gear-quantity")}}
+{{!-- Gear quantity display --}}
+<div class="gear-quantity">
+  Qty: {{field.value}}
+</div>
+
+{{else if (eq field.type "gear-edit-button")}}
+{{!-- Gear edit button --}}
+<button type="button" 
+        class="row-edit" 
+        data-action="editItem" 
+        data-item-id="{{field.itemId}}"
+        title="Edit {{field.itemName}}"
+        aria-label="Edit {{field.itemName}}"
+        tabindex="0">
+  <i class="fas fa-edit" aria-hidden="true"></i>
+</button>
+
+{{else if (eq field.type "gear-delete-button")}}
+{{!-- Gear delete button --}}
+<button type="button" 
+        class="row-delete" 
+        data-action="deleteItem" 
+        data-item-id="{{field.itemId}}"
+        title="Delete {{field.itemName}}"
+        aria-label="Delete {{field.itemName}}"
+        tabindex="0">
+  <i class="fas fa-trash" aria-hidden="true"></i>
+</button>
+
+{{else if (eq field.type "action-use-button")}}
+{{!-- Action use button --}}
+<button type="button" 
+        class="chat-roll-btn" 
+        data-action="useAction" 
+        data-item-id="{{field.itemId}}"
+        title="Use {{field.itemName}}"
+        aria-label="Use {{field.itemName}}"
+        tabindex="0">
+  <i class="fas fa-play" aria-hidden="true"></i>
+</button>
+
+{{else if (eq field.type "action-name")}}
+{{!-- Action name --}}
+<h4 class="action-name" 
+    data-action="editItem" 
+    data-item-id="{{field.itemId}}"
+    title="Edit {{field.title}}"
+    tabindex="0"
+    role="button">
+  {{field.title}}
+</h4>
+
+{{else if (eq field.type "action-costs")}}
+{{!-- Action costs display --}}
+<div class="action-costs">
+  {{#if field.apCost}}<span class="action-cost">AP: {{field.apCost}}</span>{{/if}}
+  {{#if field.ppCost}}<span class="action-cost">PP: {{field.ppCost}}</span>{{/if}}
+</div>
+
+{{else if (eq field.type "action-description")}}
+{{!-- Action description --}}
+<div class="action-description">
+  {{field.value}}
+</div>
+
+{{else if (eq field.type "action-edit-button")}}
+{{!-- Action edit button --}}
+<button type="button" 
+        class="row-edit" 
+        data-action="editItem" 
+        data-item-id="{{field.itemId}}"
+        title="Edit {{field.itemName}}"
+        aria-label="Edit {{field.itemName}}"
+        tabindex="0">
+  <i class="fas fa-edit" aria-hidden="true"></i>
+</button>
+
+{{else if (eq field.type "action-delete-button")}}
+{{!-- Action delete button --}}
+<button type="button" 
+        class="row-delete" 
+        data-action="deleteItem" 
+        data-item-id="{{field.itemId}}"
+        title="Delete {{field.itemName}}"
+        aria-label="Delete {{field.itemName}}"
+        tabindex="0">
+  <i class="fas fa-trash" aria-hidden="true"></i>
+</button>
+
+{{else if (eq field.type "feature-chat-button")}}
+{{!-- Feature chat/post button --}}
+<button type="button" 
+        class="chat-roll-btn" 
+        data-action="useFeature" 
+        data-item-id="{{field.itemId}}"
+        title="Use Feature: {{field.itemName}}"
+        aria-label="Use Feature: {{field.itemName}}"
+        tabindex="0">
+  <i class="fas fa-comments" aria-hidden="true"></i>
+</button>
+
+{{else if (eq field.type "feature-name")}}
+{{!-- Feature name --}}
+<h4 class="feature-name" 
+    data-action="editItem" 
+    data-item-id="{{field.itemId}}"
+    title="Edit {{field.title}}"
+    tabindex="0"
+    role="button">
+  {{field.title}}
+</h4>
+
+{{else if (eq field.type "feature-source-category")}}
+{{!-- Feature source and category display --}}
+<div class="feature-source-category">
+  {{#if field.source}}<span class="feature-source">{{field.source}}</span>{{/if}}
+  {{#if field.category}}<span class="feature-category">{{field.category}}</span>{{/if}}
+</div>
+
+{{else if (eq field.type "feature-description")}}
+{{!-- Feature description --}}
+<div class="feature-description">
+  {{field.value}}
+</div>
+
+{{else if (eq field.type "feature-edit-button")}}
+{{!-- Feature edit button --}}
+<button type="button" 
+        class="row-edit" 
+        data-action="editItem" 
+        data-item-id="{{field.itemId}}"
+        title="Edit {{field.itemName}}"
+        aria-label="Edit {{field.itemName}}"
+        tabindex="0">
+  <i class="fas fa-edit" aria-hidden="true"></i>
+</button>
+
+{{else if (eq field.type "feature-delete-button")}}
+{{!-- Feature delete button --}}
+<button type="button" 
+        class="row-delete" 
+        data-action="deleteItem" 
+        data-item-id="{{field.itemId}}"
+        title="Delete {{field.itemName}}"
+        aria-label="Delete {{field.itemName}}"
+        tabindex="0">
+  <i class="fas fa-trash" aria-hidden="true"></i>
+</button>
+
+{{else}}
+{{!-- Fallback for unknown field types --}}
+<div class="unknown-field-type" data-field-type="{{field.type}}">
+  <label class="form-label">{{field.label}}</label>
+  <div class="unknown-field-message">
+    Unsupported field type: {{field.type}}
+  </div>
+</div>
+{{/if}}

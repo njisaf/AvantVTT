@@ -1,0 +1,497 @@
+[
+  {
+    "_id": "Y36sHlZzOwYOn3si",
+    "name": "Antebaler",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Antebaler"
+    },
+    "sort": 100,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "PtfdBMWEZ5NQXIKB",
+    "name": "Accountant",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Accountant"
+    },
+    "sort": 200,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "TmcYy5XC0a2zcBvv",
+    "name": "Activist",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Activist"
+    },
+    "sort": 300,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "ajj84MROLBDnpZLA",
+    "name": "Actor",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Actor"
+    },
+    "sort": 400,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "Uf8qr9LKe8nDGYxu",
+    "name": "Analyst",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Analyst"
+    },
+    "sort": 500,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "bUXB6D2t0Pjh18HO",
+    "name": "Artist",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Artist"
+    },
+    "sort": 600,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "NSbPHGJQohYbdfeP",
+    "name": "Chef",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Chef"
+    },
+    "sort": 700,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "Zx82S8L9IXsiw4w0",
+    "name": "Clerk",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Clerk"
+    },
+    "sort": 800,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "O3yOL45vuLDhI9WR",
+    "name": "Dancer",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Dancer"
+    },
+    "sort": 900,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "7YIVXiA42PFx8urd",
+    "name": "Director",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Director"
+    },
+    "sort": 1000,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "wbVPKGCRkxzwuH4k",
+    "name": "Driver",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Driver"
+    },
+    "sort": 1100,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "h5ENP51tzP8nhOJj",
+    "name": "Handyperson",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Handyperson"
+    },
+    "sort": 1200,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "Q3yU9M56KvXsIsOB",
+    "name": "Housekeeper",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Housekeeper"
+    },
+    "sort": 1300,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "8EZYi2cEKJPZypsn",
+    "name": "HR Specialist",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.HRSpecialist"
+    },
+    "sort": 1400,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "TMPJFjLeKtOB1cVE",
+    "name": "Labourer",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Labourer"
+    },
+    "sort": 1500,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "70vb21jRZNjcccAS",
+    "name": "Landscaper",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Landscaper"
+    },
+    "sort": 1600,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "FSNyzwW9Ty0Hf8xX",
+    "name": "Lawyer",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Lawyer"
+    },
+    "sort": 1700,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "kM8xh5OhGYNMTk4b",
+    "name": "Magitek Administrator",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.MagitekAdministrator"
+    },
+    "sort": 1800,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "eVUfjzMpi0UqCCGv",
+    "name": "Manager",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Manager"
+    },
+    "sort": 1900,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "PbuncxRwtKYIs8ig",
+    "name": "Medic",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Medic"
+    },
+    "sort": 2000,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "ru5SUR1fR5LhOjfj",
+    "name": "Musician",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Musician"
+    },
+    "sort": 2100,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "kxULXhzHq6hwZRNr",
+    "name": "Police Officer",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.PoliceOfficer"
+    },
+    "sort": 2200,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "spYvQ56hUTocf3Jr",
+    "name": "PR Specialist",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.PRSpecialist"
+    },
+    "sort": 2300,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "wuEOZOWm4YkgtQpC",
+    "name": "Producer",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Producer"
+    },
+    "sort": 2400,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "0NAdQu1RsytSYNyr",
+    "name": "Receptionist",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Receptionist"
+    },
+    "sort": 2500,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "rDNm6FNSQjBxytW2",
+    "name": "Retailer",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Retailer"
+    },
+    "sort": 2600,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "798Ck5PJMOCSphaX",
+    "name": "Salesperson",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Salesperson"
+    },
+    "sort": 2700,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "8pT4uf4N97xwl7U0",
+    "name": "Security Guard",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.SecurityGuard"
+    },
+    "sort": 2800,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "hOH46wbu8ZRtsmlk",
+    "name": "Server",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Server"
+    },
+    "sort": 2900,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "vhJtOHyLg34wTb2D",
+    "name": "Stocker",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Stocker"
+    },
+    "sort": 3000,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "lvzFlm85QiZRc93W",
+    "name": "Support Servicer",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.SupportServicer"
+    },
+    "sort": 3100,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "gtcUet0KatrU9hey",
+    "name": "Teacher",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Teacher"
+    },
+    "sort": 3200,
+    "folder": "qAmjybtpATGylZfg"
+  },
+  {
+    "_id": "yRC1kkYy7VObA9MK",
+    "name": "Tradesperson",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "vocation-traits",
+      "color": "#34495E",
+      "icon": "fas fa-briefcase",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Tradesperson"
+    },
+    "sort": 3300,
+    "folder": "qAmjybtpATGylZfg"
+  }
+]

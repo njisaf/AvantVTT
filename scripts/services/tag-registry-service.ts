@@ -43,7 +43,7 @@ export class TagRegistryService {
     
     // Default configuration
     const defaultConfig: TagRegistryConfig = {
-      defaultTagsPath: 'systems/avant/data/default-tags.json',
+      defaultTagsPath: undefined, // Disable default tags loading
       enableCaching: true,
       cacheTimeout: 300000 // 5 minutes
     };
@@ -75,13 +75,15 @@ export class TagRegistryService {
     try {
       console.log('🏷️ TagRegistryService | Starting initialization...');
       
-      // Load default tags from JSON file
-      const loadResult = await this.loadDefaultTags();
-      if (!loadResult.success) {
-        return {
-          success: false,
-          error: `Failed to load default tags: ${loadResult.error}`
-        };
+      // Load default tags from JSON file (if path is configured)
+      if (this.config.defaultTagsPath) {
+        const loadResult = await this.loadDefaultTags();
+        if (!loadResult.success) {
+          console.warn(`🏷️ TagRegistryService | Failed to load default tags: ${loadResult.error}`);
+          // Continue initialization without default tags
+        }
+      } else {
+        console.log('🏷️ TagRegistryService | No default tags path configured, skipping default tags load');
       }
       
       this.isInitialized = true;

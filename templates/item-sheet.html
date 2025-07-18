@@ -1,60 +1,30 @@
-<form class="{{cssClass}} avant flexcol" autocomplete="off">
-    {{!-- Dynamic Content Based on Item Type --}}
-    {{#if (eq item.type "talent")}}
-        {{> "systems/avant/templates/item/item-talent-new.html"}}
-    {{else if (eq item.type "augment")}}
-        {{> "systems/avant/templates/item/item-augment-new.html"}}
-    {{else if (eq item.type "weapon")}}
-        {{> "systems/avant/templates/item/item-weapon-new.html"}}
-    {{else if (eq item.type "armor")}}
-        {{> "systems/avant/templates/item/item-armor-new.html"}}
-    {{else if (eq item.type "action")}}
-        {{> "systems/avant/templates/item/item-action-new.html"}}
-    {{else if (eq item.type "gear")}}
-        {{> "systems/avant/templates/item/item-gear-new.html"}}
-    {{else if (eq item.type "feature")}}
-        {{> "systems/avant/templates/item/item-feature-new.html"}}
-    {{else if (eq item.type "trait")}}
-        {{> "systems/avant/templates/item/item-trait-new.html"}}
-    {{else}}
-        {{!-- Sheet Header for other item types --}}
-        <header class="sheet-header">
-            <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" height="64" width="64"/>
-            <div class="header-fields">
-                <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Item Name"/></h1>
-            </div>
-        </header>
+{{!--
+Universal Item Sheet - Stage 2 Refactor Complete
 
-        {{!-- Sheet Tab Navigation for other item types --}}
-        <nav class="sheet-tabs tabs" data-group="primary">
-            <a class="item" data-tab="description">Description</a>
-            <a class="item" data-tab="details">Details</a>
-        </nav>
+This is the main item sheet template that handles ALL item types in the Avant system.
+It replaces the previous type-specific template routing with a unified approach using
+shared partials and structured field data.
 
-        {{!-- Sheet Body for other item types --}}
-        <section class="sheet-body">
-            {{!-- Description Tab --}}
-            <div class="tab" data-group="primary" data-tab="description">
-                <div class="form-group">
-                    <label>Description</label>
-                    {{editor enrichedDescription target="system.description" button=true editable=editable}}
-                </div>
-            </div>
+Every item type now uses:
+- Shared header partial with icon + name + dynamic meta fields
+- Shared body partial with organized field rows
+- Consistent styling and layout
+- Accessibility and theme support
 
-            {{!-- Details Tab - Component-based templates --}}
-            <div class="tab" data-group="primary" data-tab="details">
-                {{#if (eq item.type "action")}}
-                    {{> "systems/avant/templates/item/item-action-new.html"}}
-                {{else if (eq item.type "feature")}}
-                    {{> "systems/avant/templates/item/item-feature-new.html"}}
-                {{else if (eq item.type "weapon")}}
-                    {{> "systems/avant/templates/item/item-weapon-new.html"}}
-                {{else if (eq item.type "armor")}}
-                    {{> "systems/avant/templates/item/item-armor-new.html"}}
-                {{else}}
-                    {{> "systems/avant/templates/item/item-gear-new.html"}}
-                {{/if}}
+Supported item types:
+- weapon, armor, gear, talent, augment, feature, action, trait
+
+All templates now follow the same skeleton:
+<header> → {{> avant-item-header}}
+    <section class="sheet-body"> → {{> item-body}}
+        --}}
+
+        <div class="{{cssClass}} avant flexcol" data-nassir-test="test" autocomplete="off" data-application-part="form">
+            <div class="item-sheet {{item.type}}-sheet flexcol">
+                {{!-- Universal Header - Icon + Name + Meta Fields --}}
+                {{> "systems/avant/templates/shared/partials/avant-item-header"}}
+
+                {{!-- Universal Body - Description + Type-specific Fields + Traits --}}
+                {{> "systems/avant/templates/shared/partials/item-body"}}
             </div>
-        </section>
-    {{/if}}
-</form> 
+        </div>

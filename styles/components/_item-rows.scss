@@ -14,9 +14,14 @@
     gap: 8px; // Consistent spacing between rows
   }
 
-  // Individual talent/augment row
+  // Individual talent/augment/gear/action/feature row
   .talent-item,
-  .augment-item {
+  .augment-item,
+  .weapon-item,
+  .armor-item,
+  .gear-item,
+  .action-item,
+  .feature-item {
     display: grid;
     grid-template-columns: 32px 1fr auto;
     grid-template-areas: "control content actions";
@@ -378,7 +383,12 @@
 
   // Keyboard navigation states
   .talent-item:focus-within,
-  .augment-item:focus-within {
+  .augment-item:focus-within,
+  .weapon-item:focus-within,
+  .armor-item:focus-within,
+  .gear-item:focus-within,
+  .action-item:focus-within,
+  .feature-item:focus-within {
     outline: 2px solid var(--theme-accent-primary, #00E0DC);
     outline-offset: 1px;
   }
@@ -386,7 +396,12 @@
   // Compact variant for smaller screens
   @media (max-width: 768px) {
     .talent-item,
-    .augment-item {
+    .augment-item,
+    .weapon-item,
+    .armor-item,
+    .gear-item,
+    .action-item,
+    .feature-item {
       grid-template-columns: 28px 1fr auto;
       gap: 8px;
       padding: 6px 8px;
@@ -476,7 +491,12 @@
   // Dark theme specific adjustments
   &.theme-dark {
     .talent-item,
-    .augment-item {
+    .augment-item,
+    .weapon-item,
+    .armor-item,
+    .gear-item,
+    .action-item,
+    .feature-item {
       background: var(--theme-bg-tertiary, #333333);
       border-color: var(--theme-border-primary, #404040);
     }
@@ -646,7 +666,12 @@
   // Print styles
   @media print {
     .talent-item,
-    .augment-item {
+    .augment-item,
+    .weapon-item,
+    .armor-item,
+    .gear-item,
+    .action-item,
+    .feature-item {
       background: white !important;
       border: 1px solid #000 !important;
       box-shadow: none !important;

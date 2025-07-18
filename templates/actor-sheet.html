@@ -2,19 +2,23 @@
 <div class="{{cssClass}} flexcol" autocomplete="off">
     <!-- Fixed Header with Character Name and Avatar -->
     <header class="sheet-header">
-        <img class="profile-img" src="{{#if actor.img}}{{actor.img}}{{else}}icons/svg/mystery-man.svg{{/if}}" data-edit="img" title="{{actor.name}}"/>
+        <img class="profile-img" src="{{#if actor.img}}{{actor.img}}{{else}}icons/svg/mystery-man.svg{{/if}}"
+            data-edit="img" title="{{actor.name}}" />
         <div class="header-fields">
-            <h1 class="charname"><input name="name" type="text" value="{{actor.name}}" placeholder="Character Name"/></h1>
+            <h1 class="charname"><input name="name" type="text" value="{{actor.name}}" placeholder="Character Name" />
+            </h1>
         </div>
         <!-- Character Stats moved to header -->
         <div class="header-stats">
             <div class="header-stat">
                 <span class="header-stat-label">Level</span>
-                <input type="text" name="system.level" value="{{system.level}}" data-dtype="Number" class="header-stat-input"/>
+                <input type="text" name="system.level" value="{{system.level}}" data-dtype="Number"
+                    class="header-stat-input" />
             </div>
             <div class="header-stat">
                 <span class="header-stat-label">Fortune</span>
-                <input type="text" name="system.fortunePoints" value="{{system.fortunePoints}}" data-dtype="Number" min="0" max="5" class="header-stat-input"/>
+                <input type="text" name="system.fortunePoints" value="{{system.fortunePoints}}" data-dtype="Number"
+                    min="0" max="5" class="header-stat-input" />
             </div>
         </div>
     </header>
@@ -28,7 +32,8 @@
                 <h4>Defense Threshold</h4>
                 <div class="stat-tiles-row">
                     <div class="stat-tile">
-                        <input type="text" name="system.defenseThreshold" value="{{system.defenseThreshold}}" data-dtype="Number" class="stat-tile-input"/>
+                        <input type="text" name="system.defenseThreshold" value="{{system.defenseThreshold}}"
+                            data-dtype="Number" class="stat-tile-input" />
                         <span class="stat-tile-label">Defense</span>
                     </div>
                 </div>
@@ -39,15 +44,18 @@
                 <h4>Hit Points</h4>
                 <div class="stat-tiles-row">
                     <div class="stat-tile">
-                        <input type="text" name="system.health.value" value="{{system.health.value}}" data-dtype="Number" class="stat-tile-input"/>
+                        <input type="text" name="system.health.value" value="{{system.health.value}}"
+                            data-dtype="Number" class="stat-tile-input" />
                         <span class="stat-tile-label">Current</span>
                     </div>
                     <div class="stat-tile">
-                        <input type="text" name="system.health.max" value="{{system.health.max}}" data-dtype="Number" class="stat-tile-input"/>
+                        <input type="text" name="system.health.max" value="{{system.health.max}}" data-dtype="Number"
+                            class="stat-tile-input" />
                         <span class="stat-tile-label">Max</span>
                     </div>
                     <div class="stat-tile">
-                        <input type="text" name="system.health.temp" value="{{system.health.temp}}" data-dtype="Number" class="stat-tile-input"/>
+                        <input type="text" name="system.health.temp" value="{{system.health.temp}}" data-dtype="Number"
+                            class="stat-tile-input" />
                         <span class="stat-tile-label">Temp</span>
                     </div>
                 </div>
@@ -58,15 +66,18 @@
                 <h4>Expertise Points</h4>
                 <div class="stat-tiles-row">
                     <div class="stat-tile">
-                        <input type="text" name="system.expertisePoints.total" value="{{system.expertisePoints.total}}" data-dtype="Number" class="stat-tile-input"/>
+                        <input type="text" name="system.expertisePoints.total" value="{{system.expertisePoints.total}}"
+                            data-dtype="Number" class="stat-tile-input" />
                         <span class="stat-tile-label">Total</span>
                     </div>
                     <div class="stat-tile">
-                        <input type="text" name="system.expertisePoints.spent" value="{{system.expertisePoints.spent}}" data-dtype="Number" class="stat-tile-input"/>
+                        <input type="text" name="system.expertisePoints.spent" value="{{system.expertisePoints.spent}}"
+                            data-dtype="Number" class="stat-tile-input" />
                         <span class="stat-tile-label">Spent</span>
                     </div>
                     <div class="stat-tile">
-                        <input type="text" name="system.expertisePoints.remaining" value="{{system.expertisePoints.remaining}}" data-dtype="Number" class="stat-tile-input"/>
+                        <input type="text" name="system.expertisePoints.remaining"
+                            value="{{system.expertisePoints.remaining}}" data-dtype="Number" class="stat-tile-input" />
                         <span class="stat-tile-label">Remaining</span>
                     </div>
                 </div>
@@ -79,8 +90,11 @@
                     <div class="sidebar-ability">
                         <label>Might</label>
                         <div class="ability-input-row">
-                            <input type="text" name="system.abilities.might.modifier" value="{{system.abilities.might.modifier}}" data-dtype="Number" class="ability-modifier-input"/>
-                            <button type="button" class="ability-roll-btn rollable" data-action="rollAbility" data-ability="might" title="Click: Might Check (2d10+Level+Modifier)">
+                            <input type="text" name="system.abilities.might.modifier"
+                                value="{{system.abilities.might.modifier}}" data-dtype="Number"
+                                class="ability-modifier-input" />
+                            <button type="button" class="ability-roll-btn rollable" data-action="rollAbility"
+                                data-ability="might" title="Click: Might Check (2d10+Level+Modifier)">
                                 {{#if (gt abilityTotalModifiers.might 0)}}+{{/if}}{{abilityTotalModifiers.might}}
                             </button>
                         </div>
@@ -88,8 +102,11 @@
                     <div class="sidebar-ability">
                         <label>Grace</label>
                         <div class="ability-input-row">
-                            <input type="text" name="system.abilities.grace.modifier" value="{{system.abilities.grace.modifier}}" data-dtype="Number" class="ability-modifier-input"/>
-                            <button type="button" class="ability-roll-btn rollable" data-action="rollAbility" data-ability="grace" title="Click: Grace Check (2d10+Level+Modifier)">
+                            <input type="text" name="system.abilities.grace.modifier"
+                                value="{{system.abilities.grace.modifier}}" data-dtype="Number"
+                                class="ability-modifier-input" />
+                            <button type="button" class="ability-roll-btn rollable" data-action="rollAbility"
+                                data-ability="grace" title="Click: Grace Check (2d10+Level+Modifier)">
                                 {{#if (gt abilityTotalModifiers.grace 0)}}+{{/if}}{{abilityTotalModifiers.grace}}
                             </button>
                         </div>
@@ -97,17 +114,24 @@
                     <div class="sidebar-ability">
                         <label>Intellect</label>
                         <div class="ability-input-row">
-                            <input type="text" name="system.abilities.intellect.modifier" value="{{system.abilities.intellect.modifier}}" data-dtype="Number" class="ability-modifier-input"/>
-                            <button type="button" class="ability-roll-btn rollable" data-action="rollAbility" data-ability="intellect" title="Click: Intellect Check (2d10+Level+Modifier)">
-                                {{#if (gt abilityTotalModifiers.intellect 0)}}+{{/if}}{{abilityTotalModifiers.intellect}}
+                            <input type="text" name="system.abilities.intellect.modifier"
+                                value="{{system.abilities.intellect.modifier}}" data-dtype="Number"
+                                class="ability-modifier-input" />
+                            <button type="button" class="ability-roll-btn rollable" data-action="rollAbility"
+                                data-ability="intellect" title="Click: Intellect Check (2d10+Level+Modifier)">
+                                {{#if (gt abilityTotalModifiers.intellect
+                                0)}}+{{/if}}{{abilityTotalModifiers.intellect}}
                             </button>
                         </div>
                     </div>
                     <div class="sidebar-ability">
                         <label>Focus</label>
                         <div class="ability-input-row">
-                            <input type="text" name="system.abilities.focus.modifier" value="{{system.abilities.focus.modifier}}" data-dtype="Number" class="ability-modifier-input"/>
-                            <button type="button" class="ability-roll-btn rollable" data-action="rollAbility" data-ability="focus" title="Click: Focus Check (2d10+Level+Modifier)">
+                            <input type="text" name="system.abilities.focus.modifier"
+                                value="{{system.abilities.focus.modifier}}" data-dtype="Number"
+                                class="ability-modifier-input" />
+                            <button type="button" class="ability-roll-btn rollable" data-action="rollAbility"
+                                data-ability="focus" title="Click: Focus Check (2d10+Level+Modifier)">
                                 {{#if (gt abilityTotalModifiers.focus 0)}}+{{/if}}{{abilityTotalModifiers.focus}}
                             </button>
                         </div>
@@ -141,67 +165,103 @@
                                 <label>Ancestry</label>
                                 <select name="system.ancestry">
                                     <option value="">Select Ancestry</option>
-                                    <option value="Antherum" {{#if (eq system.ancestry "Antherum")}}selected{{/if}}>Antherum</option>
-                                    <option value="Cambion" {{#if (eq system.ancestry "Cambion")}}selected{{/if}}>Cambion</option>
-                                    <option value="Dracycid" {{#if (eq system.ancestry "Dracycid")}}selected{{/if}}>Dracycid</option>
-                                    <option value="Dworg" {{#if (eq system.ancestry "Dworg")}}selected{{/if}}>Dworg</option>
-                                    <option value="Elf" {{#if (eq system.ancestry "Elf")}}selected{{/if}}>Elf</option>
-                                    <option value="Fairy" {{#if (eq system.ancestry "Fairy")}}selected{{/if}}>Fairy</option>
-                                    <option value="Fignette" {{#if (eq system.ancestry "Fignette")}}selected{{/if}}>Fignette</option>
-                                    <option value="Goblin" {{#if (eq system.ancestry "Goblin")}}selected{{/if}}>Goblin</option>
-                                    <option value="Human" {{#if (eq system.ancestry "Human")}}selected{{/if}}>Human</option>
-                                    <option value="Hybrid" {{#if (eq system.ancestry "Hybrid")}}selected{{/if}}>Hybrid</option>
-                                    <option value="Kryon" {{#if (eq system.ancestry "Kryon")}}selected{{/if}}>Kryon</option>
-                                    <option value="Lux" {{#if (eq system.ancestry "Lux")}}selected{{/if}}>Lux</option>
-                                    <option value="Mixed" {{#if (eq system.ancestry "Mixed")}}selected{{/if}}>Mixed</option>
-                                    <option value="Mocro" {{#if (eq system.ancestry "Mocro")}}selected{{/if}}>Mocro</option>
-                                    <option value="Nephilim" {{#if (eq system.ancestry "Nephilim")}}selected{{/if}}>Nephilim</option>
-                                    <option value="Oaf" {{#if (eq system.ancestry "Oaf")}}selected{{/if}}>Oaf</option>
-                                    <option value="Orc" {{#if (eq system.ancestry "Orc")}}selected{{/if}}>Orc</option>
-                                    <option value="Shari" {{#if (eq system.ancestry "Shari")}}selected{{/if}}>Shari</option>
-                                    <option value="Stoich" {{#if (eq system.ancestry "Stoich")}}selected{{/if}}>Stoich</option>
-                                    <option value="Vivan" {{#if (eq system.ancestry "Vivan")}}selected{{/if}}>Vivan</option>
-                                    <option value="Wyrd" {{#if (eq system.ancestry "Wyrd")}}selected{{/if}}>Wyrd</option>
-                                    <option value="Yotun" {{#if (eq system.ancestry "Yotun")}}selected{{/if}}>Yotun</option>
+                                    <option value="Antherum" {{#if (eq system.ancestry "Antherum" )}}selected{{/if}}>
+                                        Antherum</option>
+                                    <option value="Cambion" {{#if (eq system.ancestry "Cambion" )}}selected{{/if}}>
+                                        Cambion</option>
+                                    <option value="Dracycid" {{#if (eq system.ancestry "Dracycid" )}}selected{{/if}}>
+                                        Dracycid</option>
+                                    <option value="Dworg" {{#if (eq system.ancestry "Dworg" )}}selected{{/if}}>Dworg
+                                    </option>
+                                    <option value="Elf" {{#if (eq system.ancestry "Elf" )}}selected{{/if}}>Elf</option>
+                                    <option value="Fairy" {{#if (eq system.ancestry "Fairy" )}}selected{{/if}}>Fairy
+                                    </option>
+                                    <option value="Fignette" {{#if (eq system.ancestry "Fignette" )}}selected{{/if}}>
+                                        Fignette</option>
+                                    <option value="Goblin" {{#if (eq system.ancestry "Goblin" )}}selected{{/if}}>Goblin
+                                    </option>
+                                    <option value="Human" {{#if (eq system.ancestry "Human" )}}selected{{/if}}>Human
+                                    </option>
+                                    <option value="Hybrid" {{#if (eq system.ancestry "Hybrid" )}}selected{{/if}}>Hybrid
+                                    </option>
+                                    <option value="Kryon" {{#if (eq system.ancestry "Kryon" )}}selected{{/if}}>Kryon
+                                    </option>
+                                    <option value="Lux" {{#if (eq system.ancestry "Lux" )}}selected{{/if}}>Lux</option>
+                                    <option value="Mixed" {{#if (eq system.ancestry "Mixed" )}}selected{{/if}}>Mixed
+                                    </option>
+                                    <option value="Mocro" {{#if (eq system.ancestry "Mocro" )}}selected{{/if}}>Mocro
+                                    </option>
+                                    <option value="Nephilim" {{#if (eq system.ancestry "Nephilim" )}}selected{{/if}}>
+                                        Nephilim</option>
+                                    <option value="Oaf" {{#if (eq system.ancestry "Oaf" )}}selected{{/if}}>Oaf</option>
+                                    <option value="Orc" {{#if (eq system.ancestry "Orc" )}}selected{{/if}}>Orc</option>
+                                    <option value="Shari" {{#if (eq system.ancestry "Shari" )}}selected{{/if}}>Shari
+                                    </option>
+                                    <option value="Stoich" {{#if (eq system.ancestry "Stoich" )}}selected{{/if}}>Stoich
+                                    </option>
+                                    <option value="Vivan" {{#if (eq system.ancestry "Vivan" )}}selected{{/if}}>Vivan
+                                    </option>
+                                    <option value="Wyrd" {{#if (eq system.ancestry "Wyrd" )}}selected{{/if}}>Wyrd
+                                    </option>
+                                    <option value="Yotun" {{#if (eq system.ancestry "Yotun" )}}selected{{/if}}>Yotun
+                                    </option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label>Lineage</label>
                                 <select name="system.lineage">
                                     <option value="">Select Lineage</option>
-                                    <option value="Absolved" {{#if (eq system.lineage "Absolved")}}selected{{/if}}>Absolved</option>
-                                    <option value="Ancestral" {{#if (eq system.lineage "Ancestral")}}selected{{/if}}>Ancestral</option>
-                                    <option value="Arcane" {{#if (eq system.lineage "Arcane")}}selected{{/if}}>Arcane</option>
-                                    <option value="Artisan" {{#if (eq system.lineage "Artisan")}}selected{{/if}}>Artisan</option>
-                                    <option value="Blue" {{#if (eq system.lineage "Blue")}}selected{{/if}}>Blue</option>
-                                    <option value="Brownie" {{#if (eq system.lineage "Brownie")}}selected{{/if}}>Brownie</option>
-                                    <option value="Clay" {{#if (eq system.lineage "Clay")}}selected{{/if}}>Clay</option>
-                                    <option value="Desert" {{#if (eq system.lineage "Desert")}}selected{{/if}}>Desert</option>
-                                    <option value="Dhampir" {{#if (eq system.lineage "Dhampir")}}selected{{/if}}>Dhampir</option>
-                                    <option value="Diamond" {{#if (eq system.lineage "Diamond")}}selected{{/if}}>Diamond</option>
-                                    <option value="Divine" {{#if (eq system.lineage "Divine")}}selected{{/if}}>Divine</option>
-                                    <option value="Draconic" {{#if (eq system.lineage "Draconic")}}selected{{/if}}>Draconic</option>
-                                    <option value="Elemental" {{#if (eq system.lineage "Elemental")}}selected{{/if}}>Elemental</option>
-                                    <option value="Fey" {{#if (eq system.lineage "Fey")}}selected{{/if}}>Fey</option>
-                                    <option value="Forest" {{#if (eq system.lineage "Forest")}}selected{{/if}}>Forest</option>
-                                    <option value="Giant" {{#if (eq system.lineage "Giant")}}selected{{/if}}>Giant</option>
+                                    <option value="Absolved" {{#if (eq system.lineage "Absolved" )}}selected{{/if}}>
+                                        Absolved</option>
+                                    <option value="Ancestral" {{#if (eq system.lineage "Ancestral" )}}selected{{/if}}>
+                                        Ancestral</option>
+                                    <option value="Arcane" {{#if (eq system.lineage "Arcane" )}}selected{{/if}}>Arcane
+                                    </option>
+                                    <option value="Artisan" {{#if (eq system.lineage "Artisan" )}}selected{{/if}}>
+                                        Artisan</option>
+                                    <option value="Blue" {{#if (eq system.lineage "Blue" )}}selected{{/if}}>Blue
+                                    </option>
+                                    <option value="Brownie" {{#if (eq system.lineage "Brownie" )}}selected{{/if}}>
+                                        Brownie</option>
+                                    <option value="Clay" {{#if (eq system.lineage "Clay" )}}selected{{/if}}>Clay
+                                    </option>
+                                    <option value="Desert" {{#if (eq system.lineage "Desert" )}}selected{{/if}}>Desert
+                                    </option>
+                                    <option value="Dhampir" {{#if (eq system.lineage "Dhampir" )}}selected{{/if}}>
+                                        Dhampir</option>
+                                    <option value="Diamond" {{#if (eq system.lineage "Diamond" )}}selected{{/if}}>
+                                        Diamond</option>
+                                    <option value="Divine" {{#if (eq system.lineage "Divine" )}}selected{{/if}}>Divine
+                                    </option>
+                                    <option value="Draconic" {{#if (eq system.lineage "Draconic" )}}selected{{/if}}>
+                                        Draconic</option>
+                                    <option value="Elemental" {{#if (eq system.lineage "Elemental" )}}selected{{/if}}>
+                                        Elemental</option>
+                                    <option value="Fey" {{#if (eq system.lineage "Fey" )}}selected{{/if}}>Fey</option>
+                                    <option value="Forest" {{#if (eq system.lineage "Forest" )}}selected{{/if}}>Forest
+                                    </option>
+                                    <option value="Giant" {{#if (eq system.lineage "Giant" )}}selected{{/if}}>Giant
+                                    </option>
                                 </select>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Culture</label>
-                                <input type="text" name="system.culture" value="{{system.culture}}" placeholder="Character Culture"/>
+                                <input type="text" name="system.culture" value="{{system.culture}}"
+                                    placeholder="Character Culture" />
                             </div>
                             <div class="form-group">
                                 <label>Vocation</label>
-                                <input type="text" name="system.vocation" value="{{system.vocation}}" placeholder="Character Vocation"/>
+                                <input type="text" name="system.vocation" value="{{system.vocation}}"
+                                    placeholder="Character Vocation" />
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label>Languages</label>
-                            <input type="text" name="system.languages" value="{{system.languages}}" placeholder="Known Languages"/>
+                            <input type="text" name="system.languages" value="{{system.languages}}"
+                                placeholder="Known Languages" />
                         </div>
                     </div>
 
@@ -210,11 +270,13 @@
                         <h3>Biography</h3>
                         <div class="form-group">
                             <label>Character Biography</label>
-                            <textarea name="system.biography" placeholder="Character's background, personality, and history...">{{{system.biography}}}</textarea>
+                            <textarea name="system.biography"
+                                placeholder="Character's background, personality, and history...">{{{system.biography}}}</textarea>
                         </div>
                         <div class="form-group">
                             <label>Notes</label>
-                            <textarea name="system.notes" placeholder="Additional notes and reminders...">{{{system.notes}}}</textarea>
+                            <textarea name="system.notes"
+                                placeholder="Additional notes and reminders...">{{{system.notes}}}</textarea>
                         </div>
                     </div>
                 </div>
@@ -223,7 +285,8 @@
                 <div class="tab" data-group="sheet" data-tab="combat">
                     <div class="items-header">
                         <h3>Weapons</h3>
-                        <button type="button" class="item-create" data-action="createItem" data-type="weapon" title="Create Weapon">
+                        <button type="button" class="item-create" data-action="createItem" data-type="weapon"
+                            title="Create Weapon">
                             <i class="fas fa-plus"></i> Add
                         </button>
                     </div>
@@ -231,11 +294,13 @@
                         {{#each items.weapon as |item id|}}
                         <div class="combat-item" data-item-id="{{item._id}}">
                             <div class="combat-item-actions">
-                                <button type="button" class="combat-action-btn attack-roll" data-action="rollAttack" data-item-id="{{item._id}}" title="Attack Roll">
+                                <button type="button" class="combat-action-btn attack-roll" data-action="rollAttack"
+                                    data-item-id="{{item._id}}" title="Attack Roll">
                                     <i class="fas fa-dice-d20"></i>
                                     <span>Attack</span>
                                 </button>
-                                <button type="button" class="combat-action-btn damage-roll" data-action="rollDamage" data-item-id="{{item._id}}" title="Damage Roll">
+                                <button type="button" class="combat-action-btn damage-roll" data-action="rollDamage"
+                                    data-item-id="{{item._id}}" title="Damage Roll">
                                     <i class="fas fa-dice-six"></i>
                                     <span>Damage</span>
                                 </button>
@@ -275,7 +340,8 @@
 
                     <div class="items-header">
                         <h3>Armor</h3>
-                        <button type="button" class="item-create" data-action="createItem" data-type="armor" title="Create Armor">
+                        <button type="button" class="item-create" data-action="createItem" data-type="armor"
+                            title="Create Armor">
                             <i class="fas fa-plus"></i> Add
                         </button>
                     </div>
@@ -283,7 +349,8 @@
                         {{#each items.armor as |item id|}}
                         <div class="combat-item" data-item-id="{{item._id}}">
                             <div class="combat-item-actions">
-                                <button type="button" class="combat-action-btn armor-roll" data-action="rollArmor" data-item-id="{{item._id}}" title="Armor Roll">
+                                <button type="button" class="combat-action-btn armor-roll" data-action="rollArmor"
+                                    data-item-id="{{item._id}}" title="Armor Roll">
                                     <i class="fas fa-dice-d20"></i>
                                     <span>Roll</span>
                                 </button>
@@ -314,7 +381,7 @@
                 <div class="tab" data-group="sheet" data-tab="skills">
                     <div class="skills-section">
                         <h3>Skills</h3>
-                        
+
                         <!-- 2x2 Grid for Ability Groups -->
                         <div class="skills-abilities-grid">
                             <!-- Might Skills -->
@@ -324,8 +391,11 @@
                                     {{#each skillsByAbility.might as |skill|}}
                                     <div class="skill-tile">
                                         <label>{{skill.label}}</label>
-                                        <input type="text" name="system.skills.{{skill.name}}" value="{{skill.value}}" data-dtype="Number"/>
-                                        <button type="button" class="skill-roll rollable" data-action="rollSkill" data-skill="{{skill.name}}" title="Roll {{skill.label}} (2d10+Level+Ability+Skill)">
+                                        <input type="text" name="system.skills.{{skill.name}}" value="{{skill.value}}"
+                                            data-dtype="Number" />
+                                        <button type="button" class="skill-roll rollable" data-action="rollSkill"
+                                            data-skill="{{skill.name}}"
+                                            title="Roll {{skill.label}} (2d10+Level+Ability+Skill)">
                                             {{#if (gt skill.totalModifier 0)}}+{{/if}}{{skill.totalModifier}}
                                         </button>
                                     </div>
@@ -340,8 +410,11 @@
                                     {{#each skillsByAbility.grace as |skill|}}
                                     <div class="skill-tile">
                                         <label>{{skill.label}}</label>
-                                        <input type="text" name="system.skills.{{skill.name}}" value="{{skill.value}}" data-dtype="Number"/>
-                                        <button type="button" class="skill-roll rollable" data-action="rollSkill" data-skill="{{skill.name}}" title="Roll {{skill.label}} (2d10+Level+Ability+Skill)">
+                                        <input type="text" name="system.skills.{{skill.name}}" value="{{skill.value}}"
+                                            data-dtype="Number" />
+                                        <button type="button" class="skill-roll rollable" data-action="rollSkill"
+                                            data-skill="{{skill.name}}"
+                                            title="Roll {{skill.label}} (2d10+Level+Ability+Skill)">
                                             {{#if (gt skill.totalModifier 0)}}+{{/if}}{{skill.totalModifier}}
                                         </button>
                                     </div>
@@ -356,8 +429,11 @@
                                     {{#each skillsByAbility.intellect as |skill|}}
                                     <div class="skill-tile">
                                         <label>{{skill.label}}</label>
-                                        <input type="text" name="system.skills.{{skill.name}}" value="{{skill.value}}" data-dtype="Number"/>
-                                        <button type="button" class="skill-roll rollable" data-action="rollSkill" data-skill="{{skill.name}}" title="Roll {{skill.label}} (2d10+Level+Ability+Skill)">
+                                        <input type="text" name="system.skills.{{skill.name}}" value="{{skill.value}}"
+                                            data-dtype="Number" />
+                                        <button type="button" class="skill-roll rollable" data-action="rollSkill"
+                                            data-skill="{{skill.name}}"
+                                            title="Roll {{skill.label}} (2d10+Level+Ability+Skill)">
                                             {{#if (gt skill.totalModifier 0)}}+{{/if}}{{skill.totalModifier}}
                                         </button>
                                     </div>
@@ -372,8 +448,11 @@
                                     {{#each skillsByAbility.focus as |skill|}}
                                     <div class="skill-tile">
                                         <label>{{skill.label}}</label>
-                                        <input type="text" name="system.skills.{{skill.name}}" value="{{skill.value}}" data-dtype="Number"/>
-                                        <button type="button" class="skill-roll rollable" data-action="rollSkill" data-skill="{{skill.name}}" title="Roll {{skill.label}} (2d10+Level+Ability+Skill)">
+                                        <input type="text" name="system.skills.{{skill.name}}" value="{{skill.value}}"
+                                            data-dtype="Number" />
+                                        <button type="button" class="skill-roll rollable" data-action="rollSkill"
+                                            data-skill="{{skill.name}}"
+                                            title="Roll {{skill.label}} (2d10+Level+Ability+Skill)">
                                             {{#if (gt skill.totalModifier 0)}}+{{/if}}{{skill.totalModifier}}
                                         </button>
                                     </div>
@@ -386,25 +465,48 @@
 
                 <!-- Gear Tab -->
                 <div class="tab" data-group="sheet" data-tab="gear">
+                    <!-- Weapons Section -->
                     <div class="items-header">
-                        <h3>Equipment & Gear</h3>
-                        <button type="button" class="item-create" data-action="createItem" data-type="gear" title="Create Gear">
+                        <h3>Weapons</h3>
+                        <button type="button" class="item-create" data-action="createItem" data-type="weapon"
+                            title="Create Weapon">
                             <i class="fas fa-plus"></i> Add
                         </button>
                     </div>
-                    <div class="items-list">
-                        {{#each items.gear as |item id|}}
-                        <div class="item gear-item" data-item-id="{{item._id}}">
-                            <div class="item-image">
-                                <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
-                            </div>
-                            <h4 class="item-name">{{item.name}}</h4>
-                            <div class="item-weight">{{item.system.weight}} lbs</div>
-                            <div class="item-controls">
-                                <a class="item-control item-edit" title="Edit Item" data-action="editItem"><i class="fas fa-edit"></i></a>
-                                <a class="item-control item-delete" title="Delete Item" data-action="deleteItem"><i class="fas fa-trash"></i></a>
-                            </div>
-                        </div>
+                    <div class="items-list weapon-cards">
+                        {{#each cardLayouts.weapon as |cardData id|}}
+                        {{> "systems/avant/templates/shared/partials/item-card" item=cardData.item
+                        layout=cardData.cardLayout}}
+                        {{/each}}
+                    </div>
+
+                    <!-- Armor Section -->
+                    <div class="items-header">
+                        <h3>Armor</h3>
+                        <button type="button" class="item-create" data-action="createItem" data-type="armor"
+                            title="Create Armor">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                    <div class="items-list armor-cards">
+                        {{#each cardLayouts.armor as |cardData id|}}
+                        {{> "systems/avant/templates/shared/partials/item-card" item=cardData.item
+                        layout=cardData.cardLayout}}
+                        {{/each}}
+                    </div>
+
+                    <!-- Equipment & Gear Section -->
+                    <div class="items-header">
+                        <h3>Equipment & Gear</h3>
+                        <button type="button" class="item-create" data-action="createItem" data-type="gear"
+                            title="Create Gear">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                    <div class="items-list gear-cards">
+                        {{#each cardLayouts.gear as |cardData id|}}
+                        {{> "systems/avant/templates/shared/partials/item-card" item=cardData.item
+                        layout=cardData.cardLayout}}
                         {{/each}}
                     </div>
                 </div>
@@ -413,30 +515,15 @@
                 <div class="tab" data-group="sheet" data-tab="actions">
                     <div class="items-header">
                         <h3>Actions</h3>
-                        <button type="button" class="item-create" data-action="createItem" data-type="action" title="Create Action">
+                        <button type="button" class="item-create" data-action="createItem" data-type="action"
+                            title="Create Action">
                             <i class="fas fa-plus"></i> Add
                         </button>
                     </div>
-                    <div class="items-list">
-                        {{#each items.action as |item id|}}
-                        <div class="action-item" data-item-id="{{item._id}}">
-                            <div class="action-header">
-                                <div class="action-name">{{item.name}}</div>
-                                <div class="action-controls">
-                                    <button type="button" class="action-use-btn" data-action="useAction" data-item-id="{{item._id}}" title="Use Action">
-                                        <i class="fas fa-play"></i>
-                                        Use
-                                    </button>
-                                    <a class="item-control item-edit" title="Edit Item" data-action="editItem"><i class="fas fa-edit"></i></a>
-                                    <a class="item-control item-delete" title="Delete Item" data-action="deleteItem"><i class="fas fa-trash"></i></a>
-                                </div>
-                            </div>
-                            <div class="action-details">
-                                {{#if item.system.apCost}}<span class="action-cost">AP: {{item.system.apCost}}</span>{{/if}}
-                                {{#if item.system.ppCost}}<span class="action-cost">PP: {{item.system.ppCost}}</span>{{/if}}
-                                {{#if item.system.description}}<div class="action-description">{{item.system.description}}</div>{{/if}}
-                            </div>
-                        </div>
+                    <div class="items-list action-cards">
+                        {{#each cardLayouts.action as |cardData id|}}
+                        {{> "systems/avant/templates/shared/partials/item-card" item=cardData.item
+                        layout=cardData.cardLayout}}
                         {{/each}}
                     </div>
                 </div>
@@ -445,24 +532,15 @@
                 <div class="tab" data-group="sheet" data-tab="features">
                     <div class="items-header">
                         <h3>Features</h3>
-                        <button type="button" class="item-create" data-action="createItem" data-type="feature" title="Create Feature">
+                        <button type="button" class="item-create" data-action="createItem" data-type="feature"
+                            title="Create Feature">
                             <i class="fas fa-plus"></i> Add
                         </button>
                     </div>
-                    <div class="items-list">
-                        {{#each items.feature as |item id|}}
-                        <div class="feature-item" data-item-id="{{item._id}}">
-                            <div class="feature-header">
-                                <div class="feature-name">{{item.name}}</div>
-                                <div class="feature-controls">
-                                    <a class="item-control item-edit" title="Edit Item" data-action="editItem"><i class="fas fa-edit"></i></a>
-                                    <a class="item-control item-delete" title="Delete Item" data-action="deleteItem"><i class="fas fa-trash"></i></a>
-                                </div>
-                            </div>
-                            <div class="feature-details">
-                                {{#if item.system.description}}<div class="feature-description">{{item.system.description}}</div>{{/if}}
-                            </div>
-                        </div>
+                    <div class="items-list feature-cards">
+                        {{#each cardLayouts.feature as |cardData id|}}
+                        {{> "systems/avant/templates/shared/partials/item-card" item=cardData.item
+                        layout=cardData.cardLayout}}
                         {{/each}}
                     </div>
                 </div>
@@ -470,36 +548,35 @@
                 <!-- Talents & Augments Tab -->
                 <div class="tab" data-group="sheet" data-tab="talents">
                     <!-- Power Points Section -->
-                    {{!-- PARTIAL TEMPLATE INCLUSION SYNTAX:
-                          - Use double-brace-gt "full-system-path" syntax to include partial templates
-                          - Path must match exactly what's registered in initialization-manager.ts
-                          - Template must be loaded during system initialization or it won't be found
-                          - No need for file extension in some contexts, but .hbs is explicit and clear --}}
-                    {{> "systems/avant/templates/actor/power-points-section.hbs"}}
-                    
+                    {{> "systems/avant/templates/actor/power-points-section"}}
+
                     <!-- Talents Section -->
                     <div class="items-header">
                         <h3>Talents</h3>
-                        <button type="button" class="item-create" data-action="createItem" data-type="talent" title="Create Talent">
+                        <button type="button" class="item-create" data-action="createItem" data-type="talent"
+                            title="Create Talent">
                             <i class="fas fa-plus"></i> Add
                         </button>
                     </div>
-                    <div class="items-list talent-rows">
-                        {{#each items.talent as |item id|}}
-                            {{> "systems/avant/templates/actor/row-talent-augment.hbs" item=item}}
+                    <div class="items-list talent-cards">
+                        {{#each cardLayouts.talent as |cardData id|}}
+                        {{> "systems/avant/templates/shared/partials/item-card" item=cardData.item
+                        layout=cardData.cardLayout}}
                         {{/each}}
                     </div>
 
                     <!-- Augments Section -->
                     <div class="items-header">
                         <h3>Augments</h3>
-                        <button type="button" class="item-create" data-action="createItem" data-type="augment" title="Create Augment">
+                        <button type="button" class="item-create" data-action="createItem" data-type="augment"
+                            title="Create Augment">
                             <i class="fas fa-plus"></i> Add
                         </button>
                     </div>
-                    <div class="items-list augment-rows">
-                        {{#each items.augment as |item id|}}
-                            {{> "systems/avant/templates/actor/row-talent-augment.hbs" item=item}}
+                    <div class="items-list augment-cards">
+                        {{#each cardLayouts.augment as |cardData id|}}
+                        {{> "systems/avant/templates/shared/partials/item-card" item=cardData.item
+                        layout=cardData.cardLayout}}
                         {{/each}}
                     </div>
                 </div>

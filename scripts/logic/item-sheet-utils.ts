@@ -12,22 +12,22 @@ import type { ItemType, ItemData } from '../types/domain/item';
  * Contains all data needed to render an item sheet in the UI.
  */
 export interface ItemTemplateData {
-  /** The item data object */
-  item: unknown;
-  /** The system data for the item */
-  system: Record<string, unknown>;
-  /** The flags data for the item */
-  flags: Record<string, unknown>;
-  /** CSS classes for the sheet */
-  cssClass: string;
-  /** Whether this is a weapon item */
-  isWeapon: boolean;
-  /** Whether this is an armor item */
-  isArmor: boolean;
-  /** Whether this is a feature item */
-  isFeature: boolean;
-  /** Whether this is an action item */
-  isAction: boolean;
+    /** The item data object */
+    item: unknown;
+    /** The system data for the item */
+    system: Record<string, unknown>;
+    /** The flags data for the item */
+    flags: Record<string, unknown>;
+    /** CSS classes for the sheet */
+    cssClass: string;
+    /** Whether this is a weapon item */
+    isWeapon: boolean;
+    /** Whether this is an armor item */
+    isArmor: boolean;
+    /** Whether this is a feature item */
+    isFeature: boolean;
+    /** Whether this is an action item */
+    isAction: boolean;
 }
 
 /**
@@ -35,20 +35,20 @@ export interface ItemTemplateData {
  * Contains formatted text and type-specific information for UI display.
  */
 export interface ItemDisplayInfo {
-  /** The item name */
-  name: string;
-  /** The item type */
-  type: string;
-  /** Formatted display text with details */
-  displayText: string;
-  /** Damage information for weapons */
-  damageInfo?: string;
-  /** Ability information */
-  abilityInfo?: string;
-  /** Armor class information for armor */
-  acInfo?: string;
-  /** Category information for features */
-  categoryInfo?: string;
+    /** The item name */
+    name: string;
+    /** The item type */
+    type: string;
+    /** Formatted display text with details */
+    displayText: string;
+    /** Damage information for weapons */
+    damageInfo?: string;
+    /** Ability information */
+    abilityInfo?: string;
+    /** Armor class information for armor */
+    acInfo?: string;
+    /** Category information for features */
+    categoryInfo?: string;
 }
 
 /**
@@ -56,36 +56,36 @@ export interface ItemDisplayInfo {
  * Defines appearance and behavior settings for different item types.
  */
 export interface ItemSheetConfig {
-  /** CSS classes to apply to the sheet */
-  classes: string[];
-  /** Template path for the sheet */
-  template: string;
-  /** Sheet width in pixels */
-  width: number;
-  /** Sheet height in pixels */
-  height: number;
-  /** Tab configuration */
-  tabs: Array<{
-    navSelector: string;
-    contentSelector: string;
-    initial: string;
-  }>;
-  /** Title for the sheet window */
-  title: string;
-  /** The item type */
-  itemType: string;
+    /** CSS classes to apply to the sheet */
+    classes: string[];
+    /** Template path for the sheet */
+    template: string;
+    /** Sheet width in pixels */
+    width: number;
+    /** Sheet height in pixels */
+    height: number;
+    /** Tab configuration */
+    tabs: Array<{
+        navSelector: string;
+        contentSelector: string;
+        initial: string;
+    }>;
+    /** Title for the sheet window */
+    title: string;
+    /** The item type */
+    itemType: string;
 }
 
 /**
  * Prepares template data for item sheet rendering
- * 
+ *
  * This function takes an item object and prepares all the data needed for
  * template rendering, including type-specific flags and CSS classes.
  * It determines what type of item this is and sets appropriate display flags.
- * 
+ *
  * @param item - The item data object
  * @returns Template data object or null if invalid item
- * 
+ *
  * @example
  * ```typescript
  * // Weapon item
@@ -101,12 +101,12 @@ export function prepareTemplateData(item: unknown): ItemTemplateData | null {
     if (!item || typeof item !== 'object' || item === null) {
         return null;
     }
-    
+
     const itemObj = item as any;
     const system = itemObj.system || {};
     const flags = itemObj.flags || {};
     const itemType = itemObj.type || 'unknown';
-    
+
     return {
         item: item,
         system: system,
@@ -121,20 +121,20 @@ export function prepareTemplateData(item: unknown): ItemTemplateData | null {
 
 /**
  * Validates if an item type is supported by the system
- * 
+ *
  * This function checks if the provided item type is one of the known
  * item types supported by the Avant system. Used for validation
  * before processing item operations.
- * 
+ *
  * @param itemType - The item type to validate
  * @returns True if the item type is valid, false otherwise
- * 
+ *
  * @example
  * ```typescript
  * // Valid types
  * const isValid = validateItemType('weapon'); // true
  * const isAlsoValid = validateItemType('armor'); // true
- * 
+ *
  * // Invalid types
  * const isInvalid = validateItemType('unknown'); // false
  * const isNull = validateItemType(null); // false
@@ -144,28 +144,28 @@ export function validateItemType(itemType: unknown): boolean {
     if (typeof itemType !== 'string') {
         return false;
     }
-    
+
     const validTypes = ['weapon', 'armor', 'feature', 'action', 'talent', 'augment'];
     return validTypes.includes(itemType);
 }
 
 /**
  * Calculates the total weight of an item including quantity
- * 
+ *
  * This function takes an item and calculates its total weight by
  * multiplying the base weight by the quantity. Handles missing
  * values gracefully with sensible defaults.
- * 
+ *
  * @param item - The item data object
  * @returns The total weight (weight * quantity)
- * 
+ *
  * @example
  * ```typescript
  * // Single item
  * const weight1 = calculateItemWeight({
  *     system: { weight: 2.5, quantity: 1 }
  * }); // 2.5
- * 
+ *
  * // Multiple items
  * const weight2 = calculateItemWeight({
  *     system: { weight: 1.5, quantity: 3 }
@@ -176,28 +176,28 @@ export function calculateItemWeight(item: unknown): number {
     if (!item || typeof item !== 'object' || item === null) {
         return 0;
     }
-    
+
     const itemObj = item as any;
     if (!itemObj.system) {
         return 0;
     }
-    
+
     const weight = Number(itemObj.system.weight) || 0;
     const quantity = Number(itemObj.system.quantity) || 1;
-    
+
     return weight * quantity;
 }
 
 /**
  * Formats item information for display purposes
- * 
+ *
  * This function takes an item and creates formatted display information
  * including appropriate details based on the item type. Used for creating
  * consistent item display text across the interface.
- * 
+ *
  * @param item - The item data object
  * @returns Formatted display information
- * 
+ *
  * @example
  * ```typescript
  * // Weapon formatting
@@ -213,24 +213,24 @@ export function formatItemDisplay(item: unknown): ItemDisplayInfo {
     if (!item || typeof item !== 'object' || item === null) {
         return { name: '', type: '', displayText: '' };
     }
-    
+
     const itemObj = item as any;
     const name = itemObj.name || 'Unnamed Item';
     const type = itemObj.type || 'unknown';
     const system = itemObj.system || {};
-    
+
     const result: ItemDisplayInfo = {
         name: name,
         type: type,
         displayText: name
     };
-    
+
     // Type-specific formatting
     if (type === 'weapon') {
         const damage = system.damage || '';
         const damageType = system.damageType || '';
         const ability = system.ability || '';
-        
+
         const parts: string[] = [];
         if (damage && damageType) {
             result.damageInfo = `${damage} ${damageType}`;
@@ -239,55 +239,55 @@ export function formatItemDisplay(item: unknown): ItemDisplayInfo {
             result.damageInfo = damage;
             parts.push(damage);
         }
-        
+
         if (ability) {
             result.abilityInfo = ability;
             parts.push(ability);
         }
-        
+
         if (parts.length > 0) {
             result.displayText = `${name} (${parts.join(', ')})`;
         }
     } else if (type === 'armor') {
         const ac = system.ac;
         const ability = system.ability || '';
-        
+
         const parts: string[] = [];
         if (ac !== undefined && ac !== null) {
             result.acInfo = `AC +${ac}`;
             parts.push(result.acInfo);
         }
-        
+
         if (ability) {
             result.abilityInfo = ability;
             parts.push(ability);
         }
-        
+
         if (parts.length > 0) {
             result.displayText = `${name} (${parts.join(', ')})`;
         }
     } else if (type === 'feature') {
         const category = system.category;
-        
+
         if (category) {
             result.categoryInfo = category;
             result.displayText = `${name} (${category})`;
         }
     }
-    
+
     return result;
 }
 
 /**
  * Extracts and processes form data from item sheet submissions
- * 
+ *
  * This function takes flat form data (like "system.damage": "10") and converts
  * it into nested objects with proper data type conversion. It handles array fields
  * (those ending with []) by building arrays from multiple values.
- * 
+ *
  * @param formData - Flat form data object from form submission
  * @returns Processed nested object with converted data types
- * 
+ *
  * @example
  * ```typescript
  * // Input form data with array field
@@ -297,7 +297,7 @@ export function formatItemDisplay(item: unknown): ItemDisplayInfo {
  *     'system.weight': '3.5',
  *     'system.equipped': 'true'
  * };
- * 
+ *
  * // Processed result
  * const result = extractItemFormData(formData);
  * // Result: {
@@ -310,32 +310,43 @@ export function extractItemFormData(formData: unknown): Record<string, unknown> 
     if (!formData || typeof formData !== 'object' || formData === null) {
         return {};
     }
-    
+
     const formObj = formData as Record<string, unknown>;
     const result: Record<string, any> = {};
-    const arrayFields = new Map<string, unknown[]>(); // Track array fields separately
-    
+    const arrayFields = new Map<string, unknown[]>();
+
     // First pass: collect all values, identifying array fields
     for (const [key, value] of Object.entries(formObj)) {
         // Check if this is an array field (ends with [])
         const isArrayField = key.endsWith('[]');
         const cleanKey = isArrayField ? key.slice(0, -2) : key; // Remove [] suffix
-        
+
         if (isArrayField) {
-            // Handle array field
+            // Handle array field - FIXED: properly handle multiple values with same key
             if (!arrayFields.has(cleanKey)) {
                 arrayFields.set(cleanKey, []);
             }
-            // Support both single values and arrays from FormData
+
+            // CRITICAL FIX: Support both single values and arrays from FormData
+            // When FormData has multiple entries with same key (like system.traits[])
+            // it can come in as either:
+            // 1. A single value: 'fire'
+            // 2. An array of values: ['fire', 'ice', 'lightning']
+            // 3. Object with multiple same keys gets converted to array by calling code
+
+            const arrayField = arrayFields.get(cleanKey)!;
+
             if (Array.isArray(value)) {
-                arrayFields.get(cleanKey)!.push(...value);
-            } else {
-                arrayFields.get(cleanKey)!.push(value);
+                // Already an array - add all values
+                arrayField.push(...value);
+            } else if (value !== undefined && value !== null) {
+                // Single value - add it to array
+                arrayField.push(value);
             }
         } else {
             // Handle regular field - split key into path segments
             const segments = cleanKey.split('.');
-            
+
             // Navigate/create the nested structure
             let current = result;
             for (let i = 0; i < segments.length - 1; i++) {
@@ -345,17 +356,17 @@ export function extractItemFormData(formData: unknown): Record<string, unknown> 
                 }
                 current = current[segment];
             }
-            
+
             // Set the final value with type conversion
             const finalKey = segments[segments.length - 1];
             current[finalKey] = convertFormValue(value);
         }
     }
-    
+
     // Second pass: process array fields
     for (const [key, values] of arrayFields) {
         const segments = key.split('.');
-        
+
         // Navigate/create the nested structure
         let current = result;
         for (let i = 0; i < segments.length - 1; i++) {
@@ -365,25 +376,25 @@ export function extractItemFormData(formData: unknown): Record<string, unknown> 
             }
             current = current[segment];
         }
-        
+
         // Set the array value with type conversion for each element
         const finalKey = segments[segments.length - 1];
         current[finalKey] = values.map(value => convertFormValue(value));
     }
-    
+
     return result;
 }
 
 /**
  * Creates sheet configuration for different item types
- * 
+ *
  * This function generates the configuration object used for item sheet
  * initialization, including CSS classes, templates, dimensions, and
  * other sheet-specific settings based on the item type.
- * 
+ *
  * @param item - The item data object
  * @returns Sheet configuration object or null if invalid item
- * 
+ *
  * @example
  * ```typescript
  * // Weapon sheet config
@@ -402,14 +413,14 @@ export function createItemSheetConfig(item: unknown): ItemSheetConfig | null {
     if (!item || typeof item !== 'object' || item === null) {
         return null;
     }
-    
+
     const itemObj = item as any;
     const itemType = itemObj.type || 'unknown';
     const itemName = itemObj.name || 'Unnamed Item';
-    
+
     const baseClasses = ['avant', 'sheet', 'item'];
     const classes = [...baseClasses, itemType];
-    
+
     // Determine template based on type
     let template: string;
     if (validateItemType(itemType)) {
@@ -417,7 +428,7 @@ export function createItemSheetConfig(item: unknown): ItemSheetConfig | null {
     } else {
         template = 'systems/avant/templates/item/item-sheet.html';
     }
-    
+
     return {
         classes: classes,
         template: template,
@@ -435,10 +446,10 @@ export function createItemSheetConfig(item: unknown): ItemSheetConfig | null {
 
 /**
  * Converts form values to appropriate types
- * 
+ *
  * This helper function determines the appropriate data type for a form value
  * and converts it accordingly. Enhanced version with better type detection.
- * 
+ *
  * @param value - The string value to convert
  * @returns The converted value
  */
@@ -446,11 +457,11 @@ function convertFormValue(value: unknown): number | boolean | string {
     if (typeof value !== 'string') {
         return value as any;
     }
-    
+
     // Handle boolean values
     if (value === 'true') return true;
     if (value === 'false') return false;
-    
+
     // Handle numeric values (including decimals)
     if (/^-?\d+\.?\d*$/.test(value)) {
         const num = Number(value);
@@ -458,7 +469,171 @@ function convertFormValue(value: unknown): number | boolean | string {
             return num;
         }
     }
-    
+
     // Return as string if no conversion applies
     return value;
-} 
+}
+
+/**
+ * Apply trait drop to an item (Phase 2 Drag-and-Drop Feature)
+ *
+ * This pure function handles the business logic for adding a trait to an item
+ * via drag-and-drop. It validates the operation, checks for duplicates, and
+ * respects optional limits while providing clear error messages.
+ *
+ * REFACTORED: Now uses the unified drag-drop utilities for consistent behavior
+ * across all item types and scenarios.
+ *
+ * @param item - The target item document
+ * @param droppedTrait - The trait item being dropped
+ * @param opts - Optional configuration
+ * @returns Promise that resolves when trait is applied
+ *
+ * @example
+ * ```typescript
+ * // Basic usage
+ * const result = await applyTraitDrop(targetItem, fireTraitItem);
+ * if (result.success) {
+ *     await targetItem.update({ 'system.traits': result.traits });
+ * }
+ * ```
+ */
+export async function applyTraitDrop(
+    item: any,
+    droppedTrait: any,
+    opts: { limit?: number; enableLogging?: boolean } = {}
+): Promise<{ success: boolean; error?: string; traits?: string[]; duplicate?: boolean }> {
+    const { limit, enableLogging = false } = opts;
+
+    // Import drag-drop utilities dynamically to avoid circular dependencies
+    const { handleTraitDrop, convertToLegacyFormat } = await import('./drag-drop');
+
+    // Get current traits
+    const currentTraits = Array.isArray(item.system.traits) ? [...item.system.traits] : [];
+
+    // Use the generic drag-drop handler with trait-specific configuration
+    const result = handleTraitDrop(
+        droppedTrait,
+        currentTraits,
+        limit,
+        enableLogging
+    );
+
+    if (!result.success) {
+        return convertToLegacyFormat(result);
+    }
+
+    // Add the new trait to the list
+    const newTraits = [...currentTraits, result.id!];
+
+    // Return in the expected legacy format
+    return convertToLegacyFormat(result, newTraits);
+}
+
+/**
+ * Prepare meta fields for item sheet headers
+ *
+ * This function organizes all header fields (except icon and name) into a standardized
+ * array that can be chunked into rows for consistent header layouts across all item types.
+ *
+ * REFACTORED: Now uses the new declarative layout system for supported item types,
+ * with fallback to legacy switch-based logic for unsupported types.
+ *
+ * @param item - The item data
+ * @param system - The item's system data
+ * @returns Array of field objects for header display
+ */
+// Import the layout system statically
+import { getHeaderLayout, isItemTypeSupported } from '../layout/item-sheet';
+
+export function prepareItemHeaderMetaFields(item: any, system: any): any[] {
+    // Try to use the new layout system first
+    try {
+        if (isItemTypeSupported(item.type)) {
+            const itemData = { ...item, system };
+            return getHeaderLayout(itemData);
+        }
+    } catch (error) {
+        console.warn('Layout system not available, falling back to legacy logic:', error);
+    }
+
+    // Legacy fallback for unsupported types
+    const metaFields: any[] = [];
+
+    // All known item types are now handled by the layout system
+    // This switch statement is kept for future unsupported types
+    switch (item.type) {
+        default:
+            // No meta fields for unknown types
+            break;
+    }
+
+    return metaFields;
+}
+
+/**
+ * Prepare body fields for item sheet body content
+ *
+ * This function organizes all body content (description, traits, stats, etc.) into
+ * a structured array that can be rendered consistently across all item types.
+ * Fields are grouped logically and can be chunked into rows for layout.
+ *
+ * REFACTORED: Now uses the new declarative layout system for supported item types,
+ * with fallback to legacy switch-based logic for unsupported types.
+ *
+ * @param item - The item data
+ * @param system - The item's system data
+ * @returns Array of field objects for body content
+ */
+// Import the layout system statically
+import { getBodyLayout } from '../layout/item-sheet';
+
+export function prepareItemBodyFields(item: any, system: any): any[] {
+    // Try to use the new layout system first
+    try {
+        if (isItemTypeSupported(item.type)) {
+            const itemData = { ...item, system };
+            return getBodyLayout(itemData);
+        }
+    } catch (error) {
+        console.warn('Layout system not available, falling back to legacy logic:', error);
+    }
+
+    // Legacy fallback for unsupported types
+    const bodyFields: any[] = [];
+
+    // All known item types are now handled by the layout system
+    // This includes description and traits fields which are handled by commonFields
+    // This switch statement is kept for future unsupported types
+    switch (item.type) {
+        default:
+            // Always include description field for unknown types
+            bodyFields.push({
+                type: 'description',
+                name: 'system.description',
+                value: system.description || '',
+                label: 'Description',
+                placeholder: `Describe this ${item.type}...`,
+                rows: 6,
+                hint: `Detailed description of the ${item.type}'s appearance and function`,
+                class: `${item.type}-description`,
+                fullWidth: true  // Description spans full width
+            });
+
+            // Always include traits field at the end for unknown types (except trait items themselves)
+            if (item.type !== 'trait') {
+                bodyFields.push({
+                    type: 'traits',
+                    name: 'system.traits',
+                    value: system.traits || [],
+                    label: 'Traits',
+                    hint: 'Add descriptive traits for this item',
+                    class: `${item.type}-traits`,
+                    fullWidth: true  // Traits span full width
+                });
+            }
+            break;
+    }
+
+    return bodyFields;
+}

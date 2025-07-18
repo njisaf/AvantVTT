@@ -1,0 +1,47 @@
+{{!--
+Item Body Partial - Consistent Body Layout
+
+This partial provides a standardized body layout for all item sheets.
+It renders fields in row-containers based on the bodyFields array,
+respecting the exact field order from the layout system.
+
+Required context:
+- bodyFields: Array of field objects prepared by prepareItemBodyFields()
+- editable: Whether the sheet is editable
+- displayTraits: Prepared trait display data (for traits fields)
+
+Features:
+- Respects exact field order from layout system
+- Full-width support for description and traits
+- Regular fields get individual containers (can be styled to appear as rows)
+- All component types supported (text, number, select, textarea, etc.)
+- Responsive design with mobile support
+--}}
+
+<section class="sheet-body">
+  {{#if bodyFields}}
+  {{#each bodyFields as |field fieldIndex|}}
+  {{#if field.fullWidth}}
+  {{!-- Full-width fields get their own container --}}
+  <div class="row-container full-width">
+    {{> "systems/avant/templates/shared/partials/render-field" field=field editable=editable
+    displayTraits=displayTraits}}
+  </div>
+  {{else if field.sideBy}}
+  {{!-- Side-by-side fields get a shared container --}}
+  <div class="row-container side-by-side" data-field-index="{{fieldIndex}}">
+    {{#each field.fields as |subField|}}
+    {{> "systems/avant/templates/shared/partials/render-field" field=subField editable=editable
+    displayTraits=displayTraits}}
+    {{/each}}
+  </div>
+  {{else}}
+  {{!-- Regular fields get individual containers that can be styled to appear as rows --}}
+  <div class="row-container field-container" data-field-index="{{fieldIndex}}">
+    {{> "systems/avant/templates/shared/partials/render-field" field=field editable=editable
+    displayTraits=displayTraits}}
+  </div>
+  {{/if}}
+  {{/each}}
+  {{/if}}
+</section>

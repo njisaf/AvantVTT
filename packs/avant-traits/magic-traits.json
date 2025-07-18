@@ -1,0 +1,227 @@
+[
+  {
+    "_id": "tzd1cp95Ky6B29T0",
+    "name": "Conjuration",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "magic-traits",
+      "color": "#9B59B6",
+      "icon": "fas fa-magic",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Conjuration"
+    },
+    "sort": 100,
+    "folder": "fmRygluovFW0OZX2"
+  },
+  {
+    "_id": "0VuoqlxYRKVkkZFO",
+    "name": "Curse",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "magic-traits",
+      "color": "#9B59B6",
+      "icon": "fas fa-skull",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Curse"
+    },
+    "sort": 200,
+    "folder": "fmRygluovFW0OZX2"
+  },
+  {
+    "_id": "AgbGgxcMMoYazst0",
+    "name": "Darkness",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "magic-traits",
+      "color": "#9B59B6",
+      "icon": "fas fa-moon",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Darkness"
+    },
+    "sort": 300,
+    "folder": "fmRygluovFW0OZX2"
+  },
+  {
+    "_id": "qCGnYiBAScVPsk8M",
+    "name": "Evocation",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "magic-traits",
+      "color": "#9B59B6",
+      "icon": "fas fa-magic",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Evocation"
+    },
+    "sort": 400,
+    "folder": "fmRygluovFW0OZX2"
+  },
+  {
+    "_id": "WrfxFJ7eAg4tFaw7",
+    "name": "Enchantment",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "magic-traits",
+      "color": "#9B59B6",
+      "icon": "fas fa-magic",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Enchantment"
+    },
+    "sort": 500,
+    "folder": "fmRygluovFW0OZX2"
+  },
+  {
+    "_id": "1WtEWtllfL4QpixY",
+    "name": "Holy",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "magic-traits",
+      "color": "#9B59B6",
+      "icon": "fas fa-cross",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Holy"
+    },
+    "sort": 600,
+    "folder": "fmRygluovFW0OZX2"
+  },
+  {
+    "_id": "hexExoGezfWxDPTU",
+    "name": "Illusion",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "magic-traits",
+      "color": "#9B59B6",
+      "icon": "fas fa-mask",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Illusion"
+    },
+    "sort": 700,
+    "folder": "fmRygluovFW0OZX2"
+  },
+  {
+    "_id": "qkDLvIN0G2m9tUmh",
+    "name": "Light",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "magic-traits",
+      "color": "#9B59B6",
+      "icon": "fas fa-sun",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Light"
+    },
+    "sort": 800,
+    "folder": "fmRygluovFW0OZX2"
+  },
+  {
+    "_id": "5r9P2xqdnrs1eyVv",
+    "name": "Magical",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "magic-traits",
+      "color": "#9B59B6",
+      "icon": "fas fa-magic",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Magical"
+    },
+    "sort": 900,
+    "folder": "fmRygluovFW0OZX2"
+  },
+  {
+    "_id": "7COfZjLDxp6mECU2",
+    "name": "Mental",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "magic-traits",
+      "color": "#9B59B6",
+      "icon": "fas fa-brain",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Mental"
+    },
+    "sort": 1000,
+    "folder": "fmRygluovFW0OZX2"
+  },
+  {
+    "_id": "oA5xbf9WUUZ7PlOd",
+    "name": "Necromancy",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "magic-traits",
+      "color": "#9B59B6",
+      "icon": "fas fa-skull",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Necromancy"
+    },
+    "sort": 1100,
+    "folder": "fmRygluovFW0OZX2"
+  },
+  {
+    "_id": "fgWKY5D7aa872GQ4",
+    "name": "Premonition",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "magic-traits",
+      "color": "#9B59B6",
+      "icon": "fas fa-eye",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Premonition"
+    },
+    "sort": 1200,
+    "folder": "fmRygluovFW0OZX2"
+  },
+  {
+    "_id": "4oBiDcQyU7n3kbZL",
+    "name": "Radiation",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "magic-traits",
+      "color": "#9B59B6",
+      "icon": "fas fa-radiation",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Radiation"
+    },
+    "sort": 1300,
+    "folder": "fmRygluovFW0OZX2"
+  },
+  {
+    "_id": "BncDIksS1msSdOsR",
+    "name": "Time",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "magic-traits",
+      "color": "#9B59B6",
+      "icon": "fas fa-clock",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Time"
+    },
+    "sort": 1400,
+    "folder": "fmRygluovFW0OZX2"
+  },
+  {
+    "_id": "Ei4I8GIVcvLXEPAq",
+    "name": "Transmutation",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "magic-traits",
+      "color": "#9B59B6",
+      "icon": "fas fa-magic",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Transmutation"
+    },
+    "sort": 1500,
+    "folder": "fmRygluovFW0OZX2"
+  }
+]

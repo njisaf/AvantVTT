@@ -59,7 +59,6 @@ ehthumbs.db
 Thumbs.db
 
 # FoundryVTT specific
-packs/
 *.db 
 
 # release artifacts
@@ -68,3 +67,5 @@ _sprints/
 _exports/
 _devDocs/
 changelogs/
+
+CLAUDE.md

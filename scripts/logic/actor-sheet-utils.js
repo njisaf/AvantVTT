@@ -105,160 +105,132 @@ export function validatePowerPointUsage(currentPoints, costPoints) {
 }
 
 /**
- * Prepares weapon attack roll data
+ * Prepares weapon attack roll data using the Role Utility Framework
  * 
- * This function extracts weapon and actor data to create the roll expression
- * and roll data needed for a weapon attack. Uses the weapon's ability and
- * modifier along with the character's level and relevant ability modifier.
+ * This function creates a complete roll payload for weapon attacks using
+ * the unified Role Utility Framework. Returns a RollPayload object ready
+ * for execution and display.
  * 
  * @param {Object} weapon - The weapon item data
  * @param {Object} actor - The actor data
- * @returns {Object} Roll configuration with expression, data, and flavor
+ * @returns {Object} RollPayload from the Role Utility Framework
  * 
  * @example
  * // Weapon attack preparation
- * const rollConfig = prepareWeaponAttackRoll(weapon, actor);
- * // Result: {
- * //   rollExpression: "2d10 + @level + @abilityMod + @weaponMod",
- * //   rollData: { level: 3, abilityMod: 2, weaponMod: 1 },
- * //   flavor: "Iron Sword Attack"
- * // }
+ * const rollPayload = prepareWeaponAttackRoll(weapon, actor);
+ * // Result: RollPayload with formula, tooltip, sendToChat, etc.
+ * await rollPayload.sendToChat();
  */
-export function prepareWeaponAttackRoll(weapon, actor) {
+export async function prepareWeaponAttackRoll(weapon, actor) {
     if (!weapon || !actor) {
         return null;
     }
     
-    const weaponAbility = weapon.system?.ability || 'might';
-    const abilityMod = actor.system?.abilities?.[weaponAbility]?.mod || 0;
-    const weaponModifier = weapon.system?.modifier || 0;
-    const level = actor.system?.level || 1;
-    
-    return {
-        rollExpression: '2d10 + @level + @abilityMod + @weaponMod',
-        rollData: {
-            level: level,
-            abilityMod: abilityMod,
-            weaponMod: weaponModifier
-        },
-        flavor: `${weapon.name} Attack`
-    };
+    try {
+        // Use the new role utility framework
+        const { buildWeaponAttackRoll } = await import('./roles-utils.js');
+        return buildWeaponAttackRoll(weapon, actor);
+    } catch (error) {
+        console.error('Error creating weapon attack roll:', error);
+        return null;
+    }
 }
 
 /**
- * Prepares weapon damage roll data
+ * Prepares weapon damage roll data using the Role Utility Framework
  * 
- * This function creates the roll configuration for weapon damage using
- * the weapon's damage die and the character's relevant ability modifier.
- * Includes damage type in the flavor text if available.
+ * This function creates a complete roll payload for weapon damage using
+ * the unified Role Utility Framework. Returns a RollPayload object ready
+ * for execution and display.
  * 
  * @param {Object} weapon - The weapon item data
  * @param {Object} actor - The actor data
- * @returns {Object} Roll configuration with expression, data, and flavor
+ * @returns {Object} RollPayload from the Role Utility Framework
  * 
  * @example
  * // Weapon damage preparation
- * const rollConfig = prepareWeaponDamageRoll(weapon, actor);
- * // Result: {
- * //   rollExpression: "1d8 + @abilityMod",
- * //   rollData: { abilityMod: 2 },
- * //   flavor: "Iron Sword Damage (slashing)"
- * // }
+ * const rollPayload = prepareWeaponDamageRoll(weapon, actor);
+ * // Result: RollPayload with formula, tooltip, sendToChat, etc.
+ * await rollPayload.sendToChat();
  */
-export function prepareWeaponDamageRoll(weapon, actor) {
+export async function prepareWeaponDamageRoll(weapon, actor) {
     if (!weapon || !actor) {
         return null;
     }
     
-    const damageRoll = weapon.system?.damageDie || "1d6";
-    const weaponAbility = weapon.system?.ability || 'might';
-    const abilityMod = actor.system?.abilities?.[weaponAbility]?.mod || 0;
-    const damageType = weapon.system?.damageType || "";
-    
-    const flavorText = damageType ? 
-        `${weapon.name} Damage (${damageType})` : 
-        `${weapon.name} Damage`;
-    
-    return {
-        rollExpression: `${damageRoll} + @abilityMod`,
-        rollData: { abilityMod: abilityMod },
-        flavor: flavorText
-    };
+    try {
+        // Use the new role utility framework
+        const { buildWeaponDamageRoll } = await import('./roles-utils.js');
+        return buildWeaponDamageRoll(weapon, actor);
+    } catch (error) {
+        console.error('Error creating weapon damage roll:', error);
+        return null;
+    }
 }
 
 /**
- * Prepares armor roll data
+ * Prepares armor roll data using the Role Utility Framework
  * 
- * This function creates the roll configuration for armor checks using
- * the armor's ability (usually grace) and modifier along with the
- * character's level and relevant ability modifier.
+ * This function creates a complete roll payload for armor checks using
+ * the unified Role Utility Framework. Returns a RollPayload object ready
+ * for execution and display.
  * 
  * @param {Object} armor - The armor item data
  * @param {Object} actor - The actor data
- * @returns {Object} Roll configuration with expression, data, and flavor
+ * @returns {Object} RollPayload from the Role Utility Framework
  * 
  * @example
  * // Armor roll preparation
- * const rollConfig = prepareArmorRoll(armor, actor);
- * // Result: {
- * //   rollExpression: "2d10 + @level + @abilityMod + @armorMod",
- * //   rollData: { level: 2, abilityMod: 3, armorMod: 1 },
- * //   flavor: "Leather Armor Armor Check"
- * // }
+ * const rollPayload = prepareArmorRoll(armor, actor);
+ * // Result: RollPayload with formula, tooltip, sendToChat, etc.
+ * await rollPayload.sendToChat();
  */
-export function prepareArmorRoll(armor, actor) {
+export async function prepareArmorRoll(armor, actor) {
     if (!armor || !actor) {
         return null;
     }
     
-    const armorAbility = armor.system?.ability || 'grace';
-    const abilityMod = actor.system?.abilities?.[armorAbility]?.mod || 0;
-    const armorModifier = armor.system?.modifier || 0;
-    const level = actor.system?.level || 1;
-    
-    return {
-        rollExpression: '2d10 + @level + @abilityMod + @armorMod',
-        rollData: {
-            level: level,
-            abilityMod: abilityMod,
-            armorMod: armorModifier
-        },
-        flavor: `${armor.name} Armor Check`
-    };
+    try {
+        // Use the new role utility framework
+        const { buildArmorRoll } = await import('./roles-utils.js');
+        return buildArmorRoll(armor, actor);
+    } catch (error) {
+        console.error('Error creating armor roll:', error);
+        return null;
+    }
 }
 
 /**
- * Prepares generic roll data from dataset
+ * Prepares generic roll data from dataset using the Role Utility Framework
  * 
- * This function extracts roll information from a UI element's dataset
- * and prepares it for execution. Returns null if no valid roll is found.
+ * This function creates a complete roll payload for generic rolls using
+ * the unified Role Utility Framework. Returns a RollPayload object ready
+ * for execution and display.
  * 
  * @param {Object} dataset - The dataset from the UI element
  * @param {string} dataset.roll - The roll expression
  * @param {string} [dataset.label] - Optional label for the roll
- * @returns {Object|null} Roll configuration or null if invalid
+ * @returns {Object|null} RollPayload from the Role Utility Framework or null if invalid
  * 
  * @example
  * // Generic roll preparation
- * const rollConfig = prepareGenericRoll({ roll: "1d20+5", label: "Save" });
- * // Result: { rollExpression: "1d20+5", flavor: "Save" }
+ * const rollPayload = prepareGenericRoll({ roll: "1d20+5", label: "Save" });
+ * // Result: RollPayload with formula, tooltip, sendToChat, etc.
+ * await rollPayload.sendToChat();
  */
-export function prepareGenericRoll(dataset) {
+export async function prepareGenericRoll(dataset) {
     if (!dataset || !dataset.roll) {
         return null;
     }
     
-    const rollExpression = dataset.roll.trim();
-    if (!rollExpression) {
+    try {
+        // Use the new role utility framework
+        const { buildGenericRoll } = await import('./roles-utils.js');
+        return buildGenericRoll(dataset);
+    } catch (error) {
+        console.error('Error creating generic roll:', error);
         return null;
     }
-    
-    const flavor = dataset.label || '';
-    
-    return {
-        rollExpression: rollExpression,
-        flavor: flavor
-    };
 }
 
 /**

@@ -1,0 +1,33 @@
+{{!--
+Universal Item Sheet Template - Stage 2 Refactor
+
+This template provides the universal structure for ALL item sheets in the Avant system.
+Every item type (weapon, armor, gear, talent, augment, feature, action, trait) uses
+this same template structure with shared partials for consistent layout.
+
+Architecture:
+- Header: {{> avant-item-header}} - Icon + name + dynamic meta fields
+- Body: {{> item-body}} - Organized field rows based on bodyFields array
+
+Features:
+- Consistent layout across all item types
+- Dynamic field organization via metaFields and bodyFields
+- Row-container system with max 2 fields per row
+- Full-width support for description and traits
+- Theme integration and accessibility support
+- TypeScript-compatible with comprehensive error handling
+
+Stage 2 Benefits:
+- No template duplication across item types
+- Centralized layout logic in shared partials
+- Easy to maintain and extend
+- Consistent UX across all item sheets
+--}}
+
+<div class="item-sheet {{item.type}}-sheet flexcol" autocomplete="off" data-application-part="form">
+    {{!-- Universal Header - Icon + Name + Meta Fields --}}
+    {{> "systems/avant/templates/shared/partials/avant-item-header"}}
+
+    {{!-- Universal Body - Description + Type-specific Fields + Traits --}}
+    {{> "systems/avant/templates/shared/partials/item-body"}}
+</div>

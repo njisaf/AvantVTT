@@ -1,0 +1,317 @@
+[
+  {
+    "_id": "30qrmNpTBNWm5wst",
+    "name": "AOE",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "mechanics-traits",
+      "color": "#3498DB",
+      "icon": "fas fa-dice-d20",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.AOE"
+    },
+    "sort": 100,
+    "folder": "ZuMoxONEA3iORtKN"
+  },
+  {
+    "_id": "YdqiKiYr4vmB2gq6",
+    "name": "Attack",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "mechanics-traits",
+      "color": "#3498DB",
+      "icon": "fas fa-sword",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Attack"
+    },
+    "sort": 200,
+    "folder": "ZuMoxONEA3iORtKN"
+  },
+  {
+    "_id": "mqoVv39hLn563LQi",
+    "name": "Aura",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "mechanics-traits",
+      "color": "#3498DB",
+      "icon": "fas fa-dice-d20",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Aura"
+    },
+    "sort": 300,
+    "folder": "ZuMoxONEA3iORtKN"
+  },
+  {
+    "_id": "veUQtdUy79vzG7NC",
+    "name": "Encounter",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "mechanics-traits",
+      "color": "#3498DB",
+      "icon": "fas fa-dice-d20",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Encounter"
+    },
+    "sort": 400,
+    "folder": "ZuMoxONEA3iORtKN"
+  },
+  {
+    "_id": "fICQVqrYDb8uqKOa",
+    "name": "Disarm",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "mechanics-traits",
+      "color": "#3498DB",
+      "icon": "fas fa-dice-d20",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Disarm"
+    },
+    "sort": 500,
+    "folder": "ZuMoxONEA3iORtKN"
+  },
+  {
+    "_id": "feYBw0Ei6juv2gvj",
+    "name": "Grapple",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "mechanics-traits",
+      "color": "#3498DB",
+      "icon": "fas fa-dice-d20",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Grapple"
+    },
+    "sort": 600,
+    "folder": "ZuMoxONEA3iORtKN"
+  },
+  {
+    "_id": "SqokF8dfGejXJ6Ts",
+    "name": "Hostile",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "mechanics-traits",
+      "color": "#3498DB",
+      "icon": "fas fa-dice-d20",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Hostile"
+    },
+    "sort": 700,
+    "folder": "ZuMoxONEA3iORtKN"
+  },
+  {
+    "_id": "qoSW56DEtH0XIwhR",
+    "name": "Intermediate",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "mechanics-traits",
+      "color": "#3498DB",
+      "icon": "fas fa-dice-d20",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Intermediate"
+    },
+    "sort": 800,
+    "folder": "ZuMoxONEA3iORtKN"
+  },
+  {
+    "_id": "nAXL8SGcwwuyriP8",
+    "name": "Lethal",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "mechanics-traits",
+      "color": "#3498DB",
+      "icon": "fas fa-dice-d20",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Lethal"
+    },
+    "sort": 900,
+    "folder": "ZuMoxONEA3iORtKN"
+  },
+  {
+    "_id": "bFFjt3u2F8H4YmkS",
+    "name": "Long-Term",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "mechanics-traits",
+      "color": "#3498DB",
+      "icon": "fas fa-dice-d20",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.LongTerm"
+    },
+    "sort": 1000,
+    "folder": "ZuMoxONEA3iORtKN"
+  },
+  {
+    "_id": "HOnIOYjU2sPDuZcV",
+    "name": "Manipulate",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "mechanics-traits",
+      "color": "#3498DB",
+      "icon": "fas fa-dice-d20",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Manipulate"
+    },
+    "sort": 1100,
+    "folder": "ZuMoxONEA3iORtKN"
+  },
+  {
+    "_id": "KMU7tOygteoEHsZ8",
+    "name": "Melee",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "mechanics-traits",
+      "color": "#3498DB",
+      "icon": "fas fa-sword",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Melee"
+    },
+    "sort": 1200,
+    "folder": "ZuMoxONEA3iORtKN"
+  },
+  {
+    "_id": "FM4EKus1RkAcJACa",
+    "name": "Movement",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "mechanics-traits",
+      "color": "#3498DB",
+      "icon": "fas fa-dice-d20",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Movement"
+    },
+    "sort": 1300,
+    "folder": "ZuMoxONEA3iORtKN"
+  },
+  {
+    "_id": "HZwava6HbHCafomT",
+    "name": "Pacifying",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "mechanics-traits",
+      "color": "#3498DB",
+      "icon": "fas fa-dice-d20",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Pacifying"
+    },
+    "sort": 1400,
+    "folder": "ZuMoxONEA3iORtKN"
+  },
+  {
+    "_id": "vJFiWzagkov0IsQg",
+    "name": "Passive",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "mechanics-traits",
+      "color": "#3498DB",
+      "icon": "fas fa-dice-d20",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Passive"
+    },
+    "sort": 1500,
+    "folder": "ZuMoxONEA3iORtKN"
+  },
+  {
+    "_id": "D9b4WSbdSqLTVqug",
+    "name": "Reach",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "mechanics-traits",
+      "color": "#3498DB",
+      "icon": "fas fa-dice-d20",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Reach"
+    },
+    "sort": 1600,
+    "folder": "ZuMoxONEA3iORtKN"
+  },
+  {
+    "_id": "TmLxVzSlkplxrY0V",
+    "name": "Ranged",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "mechanics-traits",
+      "color": "#3498DB",
+      "icon": "fas fa-bow-arrow",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Ranged"
+    },
+    "sort": 1700,
+    "folder": "ZuMoxONEA3iORtKN"
+  },
+  {
+    "_id": "ODTQd2fk1pnD0N4N",
+    "name": "Splash",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "mechanics-traits",
+      "color": "#3498DB",
+      "icon": "fas fa-dice-d20",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Splash"
+    },
+    "sort": 1800,
+    "folder": "ZuMoxONEA3iORtKN"
+  },
+  {
+    "_id": "UfGsMqA7xYMt4EDm",
+    "name": "Subtle",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "mechanics-traits",
+      "color": "#3498DB",
+      "icon": "fas fa-dice-d20",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Subtle"
+    },
+    "sort": 1900,
+    "folder": "ZuMoxONEA3iORtKN"
+  },
+  {
+    "_id": "rkSxsdVbAMU7lwt0",
+    "name": "Trip",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "mechanics-traits",
+      "color": "#3498DB",
+      "icon": "fas fa-dice-d20",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Trip"
+    },
+    "sort": 2000,
+    "folder": "ZuMoxONEA3iORtKN"
+  },
+  {
+    "_id": "3NTMdhOpoc0Vtd6v",
+    "name": "Vocal",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "mechanics-traits",
+      "color": "#3498DB",
+      "icon": "fas fa-dice-d20",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Vocal"
+    },
+    "sort": 2100,
+    "folder": "ZuMoxONEA3iORtKN"
+  }
+]

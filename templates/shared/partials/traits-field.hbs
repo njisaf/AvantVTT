@@ -1,91 +1,120 @@
-{{!-- 
-  Traits Field Component
-  
-  Usage:
-    {{> "systems/avant/templates/shared/partials/traits-field"
-        name="system.traits"
-        displayTraits=displayTraits
-        label="Traits"
-        hint="Add traits to categorize this item"
-        class="custom-class"
-        editable=editable
-    }}
-  
-  Required: name, label, displayTraits
-  Optional: hint, class, editable (defaults to true)
+{{!--
+Traits Field Component
+
+Usage:
+{{> "systems/avant/templates/shared/partials/traits-field"
+name="system.traits"
+displayTraits=displayTraits
+label="Traits"
+hint="Add traits to categorize this item"
+class="custom-class"
+editable=editable
+}}
+
+Required: name, label
+Optional: hint, class, editable (defaults to true), displayTraits
 --}}
+
+{{!-- DEBUGGING: Use Handlebars helper to trace context (inline JS disabled in FoundryVTT v13+) --}}
+{{debugContext "TRAITS-FIELD displayTraits" displayTraits}}
+{{debugContext "TRAITS-FIELD testTraits" testTraits}}
+{{debugContext "TRAITS-FIELD traitsData" traitsData}}
+{{debugContext "TRAITS-FIELD value" value}}
 
 <div class="form-group {{#if class}}{{class}}{{/if}}">
     <label for="{{name}}" class="form-label">
         {{label}}
     </label>
-    
+
     {{#if (ne editable false)}}
-        <!-- Edit mode: Trait chip input with autocomplete -->
-        <div class="trait-chip-input" data-trait-input="true" {{#if hint}}aria-describedby="{{name}}-hint"{{/if}}>
-            <div class="trait-chip-input__field" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox">
-                <!-- Existing trait chips -->
-                {{#each displayTraits as |trait|}}
-                    <span class="trait-chip trait-chip--removable" 
-                          data-trait="{{trait.id}}" 
-                          {{traitChipData trait}}
-                          style="{{traitChipStyle trait}}"
-                          title="{{#if trait.description}}{{trait.description}}{{else}}{{trait.name}}{{/if}}"
-                          role="option"
-                          aria-selected="true">
-                        {{#if trait.icon}}<i class="trait-chip__icon {{trait.icon}}" aria-hidden="true"></i>{{/if}}
-                        <span class="trait-chip__text">{{trait.name}}</span>
-                        <button type="button" 
-                                class="trait-chip__remove" 
-                                data-action="removeTrait" 
-                                aria-label="Remove {{trait.name}} trait"
-                                tabindex="0">×</button>
-                    </span>
-                {{/each}}
-                
-                <!-- Input field for adding new traits -->
-                <input type="text" 
-                       class="trait-chip-input__input" 
-                       placeholder="Add trait..." 
-                       autocomplete="off"
-                       aria-label="Add new trait"
-                       role="textbox" />
+    <!-- Edit mode: Trait chip input with autocomplete -->
+    <div class="trait-chip-input">
+        <div class="trait-chips">
+            {{!-- Smart trait display: detect enhanced objects vs raw IDs in value parameter --}}
+            {{#if value}}
+            {{#each value as |traitItem|}}
+            {{#if traitItem.name}}
+            {{!-- Enhanced trait object with name, color, icon --}}
+            <div class="trait-chip" style="background-color: {{traitItem.color}}; color: {{traitItem.textColor}};"
+                data-trait-id="{{traitItem.id}}" data-trait-type="{{traitItem.type}}"
+                data-trait-source="{{traitItem.source}}">
+                {{#if traitItem.icon}}<i class="{{traitItem.icon}}" aria-hidden="true"></i>{{/if}}
+                <span class="trait-name">{{traitItem.name}}</span>
+                <button type="button" class="trait-remove" data-action="removeTrait" data-trait-id="{{traitItem.id}}"
+                    aria-label="Remove {{traitItem.name}}">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
             </div>
-            
-            <!-- Dropdown for autocomplete suggestions (hidden by default) -->
-            <div class="trait-chip-input__dropdown" 
-                 data-trait-dropdown="true" 
-                 role="listbox" 
-                 aria-label="Trait suggestions">
-                <div class="trait-chip-input__no-results" aria-live="polite">
-                    No matching traits found
-                </div>
-            </div>
-            
-            <!-- Hidden inputs to store actual trait data -->
-            {{#each displayTraits as |trait index|}}
-                <input type="hidden" name="{{../name}}.{{index}}" value="{{trait.id}}" />
-            {{/each}}
-        </div>
-    {{else}}
-        <!-- View mode: Display trait chips (readonly) -->
-        <div class="trait-chips trait-chips--readonly" {{#if hint}}aria-describedby="{{name}}-hint"{{/if}}>
-            {{#each displayTraits as |trait|}}
-                <span class="trait-chip" 
-                      data-trait="{{trait.id}}"
-                      {{traitChipData trait}}
-                      style="{{traitChipStyle trait}}"
-                      title="{{#if trait.description}}{{trait.description}}{{else}}{{trait.name}}{{/if}}">
-                    {{#if trait.icon}}<i class="trait-chip__icon {{trait.icon}}" aria-hidden="true"></i>{{/if}}
-                    <span class="trait-chip__text">{{trait.name}}</span>
-                </span>
             {{else}}
-                <span class="trait-chips__empty">No traits assigned</span>
+            {{!-- Raw trait ID - use fallback helpers --}}
+            <div class="trait-chip" style="{{traitChipStyleFromId traitItem}}" data-trait-id="{{traitItem}}">
+                {{#if (traitIconFromId traitItem)}}<i class="{{traitIconFromId traitItem}}"
+                    aria-hidden="true"></i>{{/if}}
+                <span class="trait-name">{{traitNameFromId traitItem}}</span>
+                <button type="button" class="trait-remove" data-action="removeTrait" data-trait-id="{{traitItem}}"
+                    aria-label="Remove {{traitNameFromId traitItem}}">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+            </div>
+            {{/if}}
             {{/each}}
+            {{/if}}
         </div>
+
+        <!-- Drag-and-Drop Zone (Phase 2 Feature) -->
+        <div class="trait-drop-zone" data-drop-zone="trait" style="display: none;">
+            <div class="drop-zone-content">
+                <i class="fas fa-plus-circle"></i>
+                <span class="drop-zone-text">Drag traits from compendium here</span>
+            </div>
+            <div class="drop-zone-highlight"></div>
+        </div>
+
+        <div class="trait-input-container">
+            <input type="text" class="trait-autocomplete" placeholder="Type to add traits..." autocomplete="off"
+                data-target="{{name}}" {{#if hint}}aria-describedby="{{name}}-hint" {{/if}}>
+            <div class="trait-suggestions" style="display: none;"></div>
+        </div>
+    </div>
+    {{else}}
+    <!-- Read-only mode: Display trait chips without input -->
+    <div class="trait-display">
+        {{#if value}}
+        {{#each value as |traitItem|}}
+        {{#if traitItem.name}}
+        {{!-- Enhanced trait object with name, color, icon --}}
+        <div class="trait-chip trait-chip-readonly"
+            style="background-color: {{traitItem.color}}; color: {{traitItem.textColor}};"
+            data-trait-id="{{traitItem.id}}" data-trait-type="{{traitItem.type}}"
+            data-trait-source="{{traitItem.source}}">
+            {{#if traitItem.icon}}<i class="{{traitItem.icon}}" aria-hidden="true"></i>{{/if}}
+            <span class="trait-name">{{traitItem.name}}</span>
+        </div>
+        {{else}}
+        {{!-- Raw trait ID - use fallback helpers --}}
+        <div class="trait-chip trait-chip-readonly" style="{{traitChipStyleFromId traitItem}}"
+            data-trait-id="{{traitItem}}">
+            {{#if (traitIconFromId traitItem)}}<i class="{{traitIconFromId traitItem}}" aria-hidden="true"></i>{{/if}}
+            <span class="trait-name">{{traitNameFromId traitItem}}</span>
+        </div>
+        {{/if}}
+        {{/each}}
+        {{/if}}
+    </div>
     {{/if}}
-    
+
+    <!-- Hidden inputs to store the actual trait IDs as array -->
+    {{#each value as |traitItem|}}
+    {{#if traitItem.name}}
+    {{!-- Enhanced trait object - use the ID --}}
+    <input type="hidden" name="{{../name}}[]" value="{{traitItem.id}}">
+    {{else}}
+    {{!-- Raw trait ID --}}
+    <input type="hidden" name="{{../name}}[]" value="{{traitItem}}">
+    {{/if}}
+    {{/each}}
+
     {{#if hint}}
-        <div id="{{name}}-hint" class="form-hint" role="note">{{hint}}</div>
+    <small id="{{name}}-hint" class="form-text text-muted">{{hint}}</small>
     {{/if}}
-</div> 
+</div>

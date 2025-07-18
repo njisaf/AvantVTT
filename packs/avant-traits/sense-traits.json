@@ -1,0 +1,77 @@
+[
+  {
+    "_id": "wEF8HFrplLzdLBBm",
+    "name": "Auditory",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "sense-traits",
+      "color": "#F1C40F",
+      "icon": "fas fa-ear",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Auditory"
+    },
+    "sort": 100,
+    "folder": "lH4iqTPOfgbhGP6L"
+  },
+  {
+    "_id": "rMqLVNpsMs5C2odg",
+    "name": "Gustatory",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "sense-traits",
+      "color": "#F1C40F",
+      "icon": "fas fa-mouth-open",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Gustatory"
+    },
+    "sort": 200,
+    "folder": "lH4iqTPOfgbhGP6L"
+  },
+  {
+    "_id": "gWX0xtIAzZfCvy8A",
+    "name": "Olfactory",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "sense-traits",
+      "color": "#F1C40F",
+      "icon": "fas fa-nose",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Olfactory"
+    },
+    "sort": 300,
+    "folder": "lH4iqTPOfgbhGP6L"
+  },
+  {
+    "_id": "X3sleANXtZEhj4nn",
+    "name": "Tactile",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "sense-traits",
+      "color": "#F1C40F",
+      "icon": "fas fa-hand",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Tactile"
+    },
+    "sort": 400,
+    "folder": "lH4iqTPOfgbhGP6L"
+  },
+  {
+    "_id": "FctnGpi9IHfPv4kE",
+    "name": "Visual",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "sense-traits",
+      "color": "#F1C40F",
+      "icon": "fas fa-eye",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Visual"
+    },
+    "sort": 500,
+    "folder": "lH4iqTPOfgbhGP6L"
+  }
+]

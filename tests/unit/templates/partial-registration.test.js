@@ -26,8 +26,9 @@ describe('Template Partial Registration', () => {
         const content = fs.readFileSync(partialPath, 'utf8');
         expect(content).toContain('image-upload');
         expect(content).toContain('data-edit="img"');
-        expect(content).toContain('role="button"');
-        expect(content).toContain('aria-label=');
+        expect(content).toContain('fa-pen'); // Updated icon
+        expect(content).toContain('image-upload__overlay');
+        expect(content).toContain('aria-hidden="true"'); // Accessibility feature
     });
 
     test('all component library partials exist', () => {
@@ -60,25 +61,29 @@ describe('Template Partial Registration', () => {
         expect(content).toContain('"systems/avant/templates/shared/partials/image-upload.hbs"');
     });
 
-    test('talent and augment templates use full system paths', () => {
-        const talentTemplatePath = path.join(PROJECT_ROOT, 'templates/item/item-talent-new.html');
-        const augmentTemplatePath = path.join(PROJECT_ROOT, 'templates/item/item-augment-new.html');
+    test('universal template uses full system paths (Phase 4)', () => {
+        const universalTemplatePath = path.join(PROJECT_ROOT, 'templates/item-sheet.html');
         
-        // Verify both templates exist
-        expect(fs.existsSync(talentTemplatePath)).toBe(true);
-        expect(fs.existsSync(augmentTemplatePath)).toBe(true);
+        // Verify universal template exists
+        expect(fs.existsSync(universalTemplatePath)).toBe(true);
         
-        // Verify they use full system paths for partials
-        const talentContent = fs.readFileSync(talentTemplatePath, 'utf8');
-        const augmentContent = fs.readFileSync(augmentTemplatePath, 'utf8');
+        // Verify it uses full system paths for partials
+        const templateContent = fs.readFileSync(universalTemplatePath, 'utf8');
         
         // Should contain full system path references
-        expect(talentContent).toContain('"systems/avant/templates/shared/partials/image-upload"');
-        expect(augmentContent).toContain('"systems/avant/templates/shared/partials/image-upload"');
+        expect(templateContent).toContain('"systems/avant/templates/shared/partials/image-upload"');
         
         // Should NOT contain short path references
-        expect(talentContent).not.toContain('{{> shared/partials/image-upload');
-        expect(augmentContent).not.toContain('{{> shared/partials/image-upload');
+        expect(templateContent).not.toContain('{{> shared/partials/image-upload');
+    });
+
+    test('per-item templates have been removed (Phase 4)', () => {
+        const itemTypes = ['talent', 'augment', 'weapon', 'armor', 'gear', 'action', 'feature', 'trait'];
+        
+        for (const itemType of itemTypes) {
+            const templatePath = path.join(PROJECT_ROOT, `templates/item/item-${itemType}-new.html`);
+            expect(fs.existsSync(templatePath)).toBe(false);
+        }
     });
 
     test('no template uses deprecated short partial paths', () => {

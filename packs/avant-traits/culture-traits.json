@@ -1,0 +1,377 @@
+[
+  {
+    "_id": "GMglhh7Nf2hHqQZo",
+    "name": "Alsharic",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "culture-traits",
+      "color": "#E74C3C",
+      "icon": "fas fa-globe-americas",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Alsharic"
+    },
+    "sort": 100,
+    "folder": "dEGTOkKorHOcE93S"
+  },
+  {
+    "_id": "Gow2CO2vKe4SUA8t",
+    "name": "Banrizan",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "culture-traits",
+      "color": "#E74C3C",
+      "icon": "fas fa-globe-americas",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Banrizan"
+    },
+    "sort": 200,
+    "folder": "dEGTOkKorHOcE93S"
+  },
+  {
+    "_id": "AN4qupSkpu4woyCz",
+    "name": "Bhendesan",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "culture-traits",
+      "color": "#E74C3C",
+      "icon": "fas fa-globe-americas",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Bhendesan"
+    },
+    "sort": 300,
+    "folder": "dEGTOkKorHOcE93S"
+  },
+  {
+    "_id": "ReqosuTh6G6ldC2D",
+    "name": "Cosmopolitan",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "culture-traits",
+      "color": "#E74C3C",
+      "icon": "fas fa-globe-americas",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Cosmopolitan"
+    },
+    "sort": 400,
+    "folder": "dEGTOkKorHOcE93S"
+  },
+  {
+    "_id": "gTeCzdxWjLgWWRhS",
+    "name": "Counterculture",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "culture-traits",
+      "color": "#E74C3C",
+      "icon": "fas fa-globe-americas",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Counterculture"
+    },
+    "sort": 500,
+    "folder": "dEGTOkKorHOcE93S"
+  },
+  {
+    "_id": "Pe9rwK68GUYVk14a",
+    "name": "Doheedian",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "culture-traits",
+      "color": "#E74C3C",
+      "icon": "fas fa-globe-americas",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Doheedian"
+    },
+    "sort": 600,
+    "folder": "dEGTOkKorHOcE93S"
+  },
+  {
+    "_id": "gG09OBlgpUXXYIIQ",
+    "name": "Gökish",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "culture-traits",
+      "color": "#E74C3C",
+      "icon": "fas fa-globe-americas",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Gokish"
+    },
+    "sort": 700,
+    "folder": "dEGTOkKorHOcE93S"
+  },
+  {
+    "_id": "Tr5DgUZvEwq0K0mK",
+    "name": "Govriyan",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "culture-traits",
+      "color": "#E74C3C",
+      "icon": "fas fa-globe-americas",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Govriyan"
+    },
+    "sort": 800,
+    "folder": "dEGTOkKorHOcE93S"
+  },
+  {
+    "_id": "1is5SOrQxi9VqPOv",
+    "name": "Inculture",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "culture-traits",
+      "color": "#E74C3C",
+      "icon": "fas fa-globe-americas",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Inculture"
+    },
+    "sort": 900,
+    "folder": "dEGTOkKorHOcE93S"
+  },
+  {
+    "_id": "RBNsvPpLUYOTWCwN",
+    "name": "Inillan",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "culture-traits",
+      "color": "#E74C3C",
+      "icon": "fas fa-globe-americas",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Inillan"
+    },
+    "sort": 1000,
+    "folder": "dEGTOkKorHOcE93S"
+  },
+  {
+    "_id": "mdwJMpcvfyWcqbkF",
+    "name": "Kiningan",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "culture-traits",
+      "color": "#E74C3C",
+      "icon": "fas fa-globe-americas",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Kiningan"
+    },
+    "sort": 1100,
+    "folder": "dEGTOkKorHOcE93S"
+  },
+  {
+    "_id": "g5CnPjycCbeTqF6Y",
+    "name": "Mafawaiin",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "culture-traits",
+      "color": "#E74C3C",
+      "icon": "fas fa-globe-americas",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Mafawaiin"
+    },
+    "sort": 1200,
+    "folder": "dEGTOkKorHOcE93S"
+  },
+  {
+    "_id": "oRj251tJCz7gfRB9",
+    "name": "Nodayanian",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "culture-traits",
+      "color": "#E74C3C",
+      "icon": "fas fa-globe-americas",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Nodayanian"
+    },
+    "sort": 1300,
+    "folder": "dEGTOkKorHOcE93S"
+  },
+  {
+    "_id": "SO6yxij8Ti5ABE4q",
+    "name": "Nordivic",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "culture-traits",
+      "color": "#E74C3C",
+      "icon": "fas fa-globe-americas",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Nordivic"
+    },
+    "sort": 1400,
+    "folder": "dEGTOkKorHOcE93S"
+  },
+  {
+    "_id": "5LRp7vQ0iCC5stKS",
+    "name": "Pamungan",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "culture-traits",
+      "color": "#E74C3C",
+      "icon": "fas fa-globe-americas",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Pamungan"
+    },
+    "sort": 1500,
+    "folder": "dEGTOkKorHOcE93S"
+  },
+  {
+    "_id": "5EBGDNwpzAAexxtq",
+    "name": "Sozilean",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "culture-traits",
+      "color": "#E74C3C",
+      "icon": "fas fa-globe-americas",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Sozilean"
+    },
+    "sort": 1600,
+    "folder": "dEGTOkKorHOcE93S"
+  },
+  {
+    "_id": "h4J0gVaGiOdF7Wya",
+    "name": "Sanese",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "culture-traits",
+      "color": "#E74C3C",
+      "icon": "fas fa-globe-americas",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Sanese"
+    },
+    "sort": 1700,
+    "folder": "dEGTOkKorHOcE93S"
+  },
+  {
+    "_id": "KVcOsII7ETSBn5uU",
+    "name": "Morlian",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "culture-traits",
+      "color": "#E74C3C",
+      "icon": "fas fa-globe-americas",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Morlian"
+    },
+    "sort": 1800,
+    "folder": "dEGTOkKorHOcE93S"
+  },
+  {
+    "_id": "I0fplBckBa6TnJLC",
+    "name": "Thallinic",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "culture-traits",
+      "color": "#E74C3C",
+      "icon": "fas fa-globe-americas",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Thallinic"
+    },
+    "sort": 1900,
+    "folder": "dEGTOkKorHOcE93S"
+  },
+  {
+    "_id": "1WC4TOVLO46m0Mv1",
+    "name": "Tlalpan",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "culture-traits",
+      "color": "#E74C3C",
+      "icon": "fas fa-globe-americas",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Tlalpan"
+    },
+    "sort": 2000,
+    "folder": "dEGTOkKorHOcE93S"
+  },
+  {
+    "_id": "RxWnr2XA0dsdVon3",
+    "name": "Ungtukhan",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "culture-traits",
+      "color": "#E74C3C",
+      "icon": "fas fa-globe-americas",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Ungtukhan"
+    },
+    "sort": 2100,
+    "folder": "dEGTOkKorHOcE93S"
+  },
+  {
+    "_id": "3OhjfxgyNrK4Cej3",
+    "name": "Visatari",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "culture-traits",
+      "color": "#E74C3C",
+      "icon": "fas fa-globe-americas",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Visatari"
+    },
+    "sort": 2200,
+    "folder": "dEGTOkKorHOcE93S"
+  },
+  {
+    "_id": "gUzROFP57L0JLxgr",
+    "name": "Wistaran",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "culture-traits",
+      "color": "#E74C3C",
+      "icon": "fas fa-globe-americas",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Wistaran"
+    },
+    "sort": 2300,
+    "folder": "dEGTOkKorHOcE93S"
+  },
+  {
+    "_id": "yBFGgAjQWDPPebb7",
+    "name": "Yahlimic",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "culture-traits",
+      "color": "#E74C3C",
+      "icon": "fas fa-globe-americas",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Yahlimic"
+    },
+    "sort": 2400,
+    "folder": "dEGTOkKorHOcE93S"
+  },
+  {
+    "_id": "Q98HVszcEWD8LiNE",
+    "name": "Zinbakan",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "culture-traits",
+      "color": "#E74C3C",
+      "icon": "fas fa-globe-americas",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Zinbakan"
+    },
+    "sort": 2500,
+    "folder": "dEGTOkKorHOcE93S"
+  }
+]

@@ -14,8 +14,7 @@ import {
   extractTraitFromChip
 } from '../../../../scripts/logic/chat/trait-renderer.ts';
 
-// Import accessibility functions from centralized module
-import { isLightColor } from '../../../../scripts/accessibility';
+// Note: isLightColor function removed as part of accessibility module deprecation
 
 // Mock trait objects for testing
 const mockTraits = [
@@ -109,46 +108,7 @@ beforeEach(() => {
   }
 });
 
-describe('isLightColor', () => {
-  test('should identify dark colors correctly', () => {
-    expect(isLightColor('#000000')).toBe(false); // Black
-    expect(isLightColor('#FF0000')).toBe(false); // Red
-    expect(isLightColor('#0000FF')).toBe(false); // Blue
-    // Note: #FF6B6B (107, 107, 107 RGB) has luminance ~0.68, so it's actually light
-    // Note: #4ECDC4 (78, 205, 196 RGB) has luminance ~0.75, so it's actually light
-    expect(isLightColor('#800000')).toBe(false); // Dark red
-    expect(isLightColor('#008080')).toBe(false); // Dark teal
-  });
-
-  test('should identify light colors correctly', () => {
-    expect(isLightColor('#FFFFFF')).toBe(true); // White
-    expect(isLightColor('#FFEB3B')).toBe(true); // Bright yellow
-    expect(isLightColor('#E8F5E8')).toBe(true); // Light green
-    expect(isLightColor('#FFE0B2')).toBe(true); // Light orange
-    // Note: More accurate WCAG luminance calculation shows these are actually dark:
-    expect(isLightColor('#FF6B6B')).toBe(false); // Red - darker than simple calculation suggested
-    expect(isLightColor('#4ECDC4')).toBe(false); // Teal - darker than simple calculation suggested
-  });
-
-  test('should handle hex colors without # prefix', () => {
-    expect(isLightColor('FFFFFF')).toBe(true);
-    expect(isLightColor('000000')).toBe(false);
-    expect(isLightColor('FFEB3B')).toBe(true);
-  });
-
-  test('should handle invalid hex colors gracefully', () => {
-    expect(isLightColor('invalid')).toBe(false);
-    expect(isLightColor('#GGG')).toBe(false);
-    expect(isLightColor('')).toBe(false);
-    expect(isLightColor('#FF')).toBe(false); // Too short
-  });
-
-  test('should handle mixed case hex colors', () => {
-    expect(isLightColor('#ffeb3b')).toBe(true);
-    expect(isLightColor('#FFEB3B')).toBe(true);
-    expect(isLightColor('#FfEb3B')).toBe(true);
-  });
-});
+// Tests for isLightColor removed - function deprecated with accessibility module
 
 describe('escapeHtml', () => {
   test('should escape HTML special characters', () => {

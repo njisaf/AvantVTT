@@ -1,0 +1,353 @@
+/**
+ * @fileoverview Trait Input System Styles - Extracted from SCSS files
+ * @deprecated This file contains styling for the legacy trait input system
+ * that has been deprecated in favor of drag-and-drop functionality.
+ * 
+ * @author Avant VTT Team
+ * @version 1.0.0
+ * @since 2025-01-17
+ * 
+ * DEPRECATION NOTICE:
+ * These trait input styles have been deprecated in favor of native FoundryVTT drag-and-drop.
+ * The code is preserved here for potential restoration but should not be used in new development.
+ * 
+ * RESTORATION INSTRUCTIONS:
+ * 1. Copy trait input styles back to _chips.scss
+ * 2. Copy application-specific styles back to _applicationv2-item-sheets.scss  
+ * 3. Copy form-specific styles back to _form-components.scss
+ * 4. Remove stub selectors from original SCSS files
+ * 5. Rebuild CSS with npm run build
+ * 
+ * ORIGINAL LOCATIONS:
+ * - avantVtt/styles/components/_chips.scss (lines 280-507)
+ * - avantVtt/styles/components/_applicationv2-item-sheets.scss (lines 177, 237, 256, 273)
+ * - avantVtt/styles/components/_form-components.scss (lines 203, 447)
+ */
+
+// ================================
+// TRAIT CHIP INPUT COMPONENT (DEPRECATED)
+// ================================
+
+.trait-chip-input {
+    position: relative;
+
+    // Input field with chips
+    .trait-chip-input__field {
+        min-height: 32px;
+        padding: 6px;
+        border: 1px solid var(--color-border, #ccc);
+        border-radius: 4px;
+        background: var(--color-bg-input, #fff);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px;
+        cursor: text;
+        transition: all 0.2s ease-in-out;
+
+        &:focus-within {
+            border-color: var(--color-primary, #00E0DC);
+            box-shadow: 0 0 0 2px rgba(0, 224, 220, 0.2);
+        }
+
+        // Text input within the field
+        .trait-chip-input__input {
+            flex: 1;
+            min-width: 120px;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 11px;
+            font-family: inherit;
+            color: var(--color-text, #333);
+
+            &::placeholder {
+                color: var(--color-text-secondary, #666);
+            }
+        }
+
+        // Chips within the input field
+        .trait-chip {
+            margin: 0;
+        }
+    }
+
+    // Dropdown suggestions
+    .trait-chip-input__dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        max-height: 200px;
+        overflow-y: auto;
+        background: var(--color-bg-dropdown, #fff);
+        border: 1px solid var(--color-border, #ccc);
+        border-top: none;
+        border-radius: 0 0 4px 4px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        display: none;
+
+        &--open {
+            display: block;
+        }
+
+        // Suggestion items
+        .trait-chip-input__suggestion {
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            &:hover,
+            &--highlighted {
+                background: var(--color-bg-hover, #f5f5f5);
+            }
+
+            &:active {
+                background: var(--color-bg-active, #e5e5e5);
+            }
+
+            // Mini chip preview
+            .trait-chip--preview {
+                pointer-events: none;
+            }
+
+            // Suggestion text
+            .trait-chip-input__suggestion-text {
+                flex: 1;
+
+                .trait-chip-input__suggestion-name {
+                    font-weight: 500;
+                    color: var(--color-text, #333);
+                }
+
+                .trait-chip-input__suggestion-match {
+                    background: var(--color-highlight, #ffeb3b);
+                    padding: 1px 2px;
+                    border-radius: 2px;
+                }
+            }
+        }
+
+        // No results message
+        .trait-chip-input__no-results {
+            padding: 12px;
+            text-align: center;
+            color: var(--color-text-secondary, #666);
+            font-style: italic;
+        }
+    }
+}
+
+// ================================
+// LEGACY TRAIT AUTOCOMPLETE STYLES
+// ================================
+
+.trait-input-container {
+    position: relative;
+}
+
+.trait-autocomplete {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--color-border, #ccc);
+    border-radius: 4px;
+    background: var(--color-bg-input, #fff);
+    font-size: 11px;
+    font-family: inherit;
+    color: var(--color-text, #333);
+
+    &:focus {
+        outline: none;
+        border-color: var(--color-primary, #00E0DC);
+        box-shadow: 0 0 0 2px rgba(0, 224, 220, 0.2);
+    }
+
+    &::placeholder {
+        color: var(--color-text-secondary, #666);
+    }
+}
+
+.trait-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    background: var(--color-bg-dropdown, #fff);
+    border: 1px solid var(--color-border, #ccc);
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+
+    .trait-suggestion {
+        padding: 8px 12px;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        border-bottom: 1px solid var(--color-border-light, #eee);
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        &:hover {
+            background: var(--color-bg-hover, #f5f5f5);
+        }
+
+        &.highlighted {
+            background: var(--color-bg-hover, #f5f5f5);
+        }
+    }
+}
+
+// ================================
+// THEME INTEGRATION (DEPRECATED)
+// ================================
+
+// Dark theme adjustments
+.theme-dark {
+    .trait-chip-input__field {
+        background: var(--color-bg-input-dark, #2a2a2a);
+        border-color: var(--color-border-dark, #555);
+        color: var(--color-text-dark, #fff);
+    }
+
+    .trait-chip-input__dropdown {
+        background: var(--color-bg-dropdown-dark, #2a2a2a);
+        border-color: var(--color-border-dark, #555);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .trait-chip-input__suggestion {
+
+        &:hover,
+        &--highlighted {
+            background: var(--color-bg-hover-dark, #3a3a3a);
+        }
+
+        &:active {
+            background: var(--color-bg-active-dark, #1a1a1a);
+        }
+    }
+
+    .trait-autocomplete {
+        background: var(--color-bg-input-dark, #2a2a2a);
+        border-color: var(--color-border-dark, #555);
+        color: var(--color-text-dark, #fff);
+    }
+
+    .trait-suggestions {
+        background: var(--color-bg-dropdown-dark, #2a2a2a);
+        border-color: var(--color-border-dark, #555);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .trait-suggestion {
+        border-color: var(--color-border-dark, #444);
+
+        &:hover,
+        &.highlighted {
+            background: var(--color-bg-hover-dark, #3a3a3a);
+        }
+    }
+}
+
+// ================================
+// ACCESSIBILITY (DEPRECATED)
+// ================================
+
+// Focus visible support for keyboard navigation
+.trait-chip-input__suggestion:focus-visible {
+    outline: 2px solid var(--color-focus, var(--color-primary));
+    outline-offset: 2px;
+}
+
+// ================================
+// RESPONSIVE DESIGN (DEPRECATED)
+// ================================
+
+// Mobile adjustments
+@media (max-width: 768px) {
+    .trait-chip-input__field {
+        min-height: 36px;
+        padding: 8px;
+    }
+
+    .trait-chip-input__dropdown {
+        max-height: 150px;
+    }
+
+    .trait-autocomplete {
+        padding: 10px 12px;
+    }
+}
+
+// Large screen optimizations
+@media (min-width: 1200px) {
+    .trait-chip-input__dropdown {
+        max-height: 300px;
+    }
+
+    .trait-suggestions {
+        max-height: 300px;
+    }
+}
+
+// ================================
+// APPLICATION V2 ITEM SHEET SPECIFIC (DEPRECATED)
+// ================================
+
+.application.sheet.avant.item {
+    .window-content {
+        .item-sheet {
+            .sheet-body {
+                .tab {
+                    .form-group {
+                        .trait-chip-input {
+                            margin-bottom: 8px;
+
+                            .trait-chip-input__field {
+                                min-height: 34px;
+
+                                .trait-chip-input__input {
+                                    font-size: 10px;
+
+                                    &::placeholder {
+                                        color: var(--color-text-light, #999);
+                                    }
+
+                                    &:focus {
+                                        outline: none;
+                                    }
+                                }
+                            }
+
+                            .trait-chip-input__dropdown {
+                                font-size: 10px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* WARNING: DEPRECATED STYLES
+ * 
+ * These styles support the legacy trait input system with autocomplete functionality.
+ * This system has been deprecated in favor of drag-and-drop from compendium.
+ * 
+ * When restoring:
+ * 1. Copy back to original SCSS files
+ * 2. Run npm run build to regenerate CSS
+ * 3. Test in FoundryVTT v13
+ * 4. Update any breaking changes
+ * 
+ * Recommended: Use drag-and-drop instead of restoring this system
+ */

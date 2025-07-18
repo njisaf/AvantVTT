@@ -20,13 +20,13 @@ export function registerSheets(actorCollection, itemCollection, actorSheetClass,
     if (!actorCollection || !itemCollection) {
         throw new Error('Actor and item collections are required for sheet registration');
     }
-    
+
     if (!actorSheetClass || !itemSheetClass) {
         throw new Error('Actor and item sheet classes are required for registration');
     }
-    
+
     let registeredSheets = 0;
-    
+
     try {
         // For v13 - only use namespaced classes, avoid deprecated global access
         try {
@@ -44,23 +44,62 @@ export function registerSheets(actorCollection, itemCollection, actorSheetClass,
             // In v13, if we can't access namespaced classes, something is wrong
             throw new Error(`FoundryVTT v13 classes not available: ${error.message}`);
         }
-        
+
         // Register custom actor sheet (ApplicationV2)
         actorCollection.registerSheet("avant", actorSheetClass, { makeDefault: true });
         registeredSheets++;
         console.log(`✅ Registered ApplicationV2 actor sheet: ${actorSheetClass.name}`);
-        
+
         // Register custom item sheet (ApplicationV2)
         itemCollection.registerSheet("avant", itemSheetClass, { makeDefault: true });
         registeredSheets++;
         console.log(`✅ Registered ApplicationV2 item sheet: ${itemSheetClass.name}`);
-        
+
+        // CRITICAL v13 FIX: Manually set default sheets since v13 removed default registrations
+        // See: https://foundryvtt.com/releases/13.341 - Breaking Change 12617
+        console.log('🚨 V13 FIX | Manually setting default sheets to resolve v13 breaking change...');
+
+        // Debug: Check what actor types are actually available
+        console.log('🚨 V13 FIX DEBUG | game.system.documentTypes:', game.system.documentTypes);
+        console.log('🚨 V13 FIX DEBUG | CONFIG.Actor.sheetClasses:', CONFIG.Actor.sheetClasses);
+        console.log('🚨 V13 FIX DEBUG | Object.keys(CONFIG.Actor.sheetClasses):', Object.keys(CONFIG.Actor.sheetClasses || {}));
+
+        // Set default actor sheet for all actor types
+        const actorTypes = Object.keys(CONFIG.Actor.sheetClasses || {});
+        console.log('🚨 V13 FIX | Actor types found:', actorTypes);
+
+        actorTypes.forEach(actorType => {
+            if (CONFIG.Actor?.sheetClasses?.[actorType]) {
+                CONFIG.Actor.sheetClasses[actorType]['avant'] = {
+                    id: 'avant',
+                    cls: actorSheetClass,
+                    default: true
+                };
+                console.log(`✅ V13 FIX | Set default actor sheet for type: ${actorType}`);
+            }
+        });
+
+        // Set default item sheet for all item types  
+        const itemTypes = Object.keys(CONFIG.Item.sheetClasses || {});
+        console.log('🚨 V13 FIX | Item types found:', itemTypes);
+
+        itemTypes.forEach(itemType => {
+            if (CONFIG.Item?.sheetClasses?.[itemType]) {
+                CONFIG.Item.sheetClasses[itemType]['avant'] = {
+                    id: 'avant',
+                    cls: itemSheetClass,
+                    default: true
+                };
+                console.log(`✅ V13 FIX | Set default item sheet for type: ${itemType}`);
+            }
+        });
+
         return {
             success: true,
             registeredSheets,
             message: `Successfully registered ${registeredSheets} ApplicationV2 sheet types`
         };
-        
+
     } catch (error) {
         return {
             success: false,
@@ -87,46 +126,46 @@ export function setupConfigDebug(config, options = {}) {
     if (!config) {
         throw new Error('CONFIG object is required for debug setup');
     }
-    
+
     const {
         enableDebug = false,
         logLevel = 'info',
         enableTiming = false
     } = options;
-    
+
     const appliedSettings = {};
-    
+
     try {
         // Set debug flag if specified
         if (typeof enableDebug === 'boolean') {
             config.debug = enableDebug;
             appliedSettings.debug = enableDebug;
         }
-        
+
         // Configure logging level
         if (['debug', 'info', 'warn', 'error'].includes(logLevel)) {
             config.logLevel = logLevel;
             appliedSettings.logLevel = logLevel;
         }
-        
+
         // Set performance timing flag
         if (typeof enableTiming === 'boolean') {
             config.time = enableTiming;
             appliedSettings.timing = enableTiming;
         }
-        
+
         // Set Avant-specific debug flags
         if (!config.AVANT) config.AVANT = {};
         config.AVANT.debug = enableDebug;
         config.AVANT.logLevel = logLevel;
         appliedSettings.avantDebug = enableDebug;
-        
+
         return {
             success: true,
             appliedSettings,
             message: `Debug configuration applied successfully`
         };
-        
+
     } catch (error) {
         return {
             success: false,
@@ -153,32 +192,32 @@ export function setupDataModels(config, actorClass, itemClass, actorModels = {},
     if (!config) {
         throw new Error('CONFIG object is required for data model setup');
     }
-    
+
     let configuredModels = 0;
-    
+
     try {
         // Configure actor document class and data models
         if (actorClass) {
             config.Actor.documentClass = actorClass;
             configuredModels++;
         }
-        
+
         if (Object.keys(actorModels).length > 0) {
             config.Actor.dataModels = { ...actorModels };
             configuredModels += Object.keys(actorModels).length;
         }
-        
+
         // Configure item document class and data models
         if (itemClass) {
             config.Item.documentClass = itemClass;
             configuredModels++;
         }
-        
+
         if (Object.keys(itemModels).length > 0) {
             config.Item.dataModels = { ...itemModels };
             configuredModels += Object.keys(itemModels).length;
         }
-        
+
         return {
             success: true,
             configuredModels,
@@ -186,7 +225,7 @@ export function setupDataModels(config, actorClass, itemClass, actorModels = {},
             itemTypes: Object.keys(itemModels),
             message: `Successfully configured ${configuredModels} data models`
         };
-        
+
     } catch (error) {
         return {
             success: false,

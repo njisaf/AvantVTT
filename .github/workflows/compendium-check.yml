@@ -1,0 +1,104 @@
+name: Compendium Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'packs/**/*.json'
+      - 'scripts/compendium/**'
+      - '.github/workflows/compendium-check.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'packs/**/*.json'
+      - 'scripts/compendium/**'
+      - '.github/workflows/compendium-check.yml'
+
+jobs:
+  compendium-validation:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run compendium validation
+      run: npm run compendium:check
+      
+    - name: Check for duplicate IDs (dry run)
+      run: npm run compendium:check --verbose
+      
+    - name: Validate JSON syntax
+      run: |
+        echo "🔍 Validating JSON syntax in packs directory..."
+        find packs -name "*.json" -type f | while read file; do
+          if ! python3 -m json.tool "$file" > /dev/null 2>&1; then
+            echo "❌ Invalid JSON: $file"
+            exit 1
+          fi
+        done
+        echo "✅ All JSON files have valid syntax"
+        
+    - name: Check for required fields
+      run: |
+        echo "🔍 Checking for required _id fields..."
+        missing_count=0
+        find packs -name "*.json" -type f | while read file; do
+          if ! grep -q '"_id"' "$file"; then
+            echo "❌ Missing _id field: $file"
+            missing_count=$((missing_count + 1))
+          fi
+        done
+        
+        if [ $missing_count -gt 0 ]; then
+          echo "❌ Found $missing_count files missing _id field"
+          echo "💡 Run 'npm run compendium:fix' to auto-generate missing IDs"
+          exit 1
+        fi
+        
+        echo "✅ All files have required _id field"
+        
+    - name: Build test (smoke test)
+      run: |
+        echo "🔍 Running smoke test build..."
+        npm run build:packs || {
+          echo "❌ Build failed - compendium validation may have missed issues"
+          exit 1
+        }
+        echo "✅ Build completed successfully"
+        
+    - name: Hash consistency check
+      run: |
+        echo "🔍 Checking build consistency..."
+        npm run build:packs
+        
+        # Generate first hash
+        find dist/packs -name "*.db" -type f | sort | xargs sha256sum > /tmp/hash1.txt
+        
+        # Clean and rebuild
+        rm -rf dist/packs
+        npm run build:packs
+        
+        # Generate second hash
+        find dist/packs -name "*.db" -type f | sort | xargs sha256sum > /tmp/hash2.txt
+        
+        # Compare hashes
+        if diff /tmp/hash1.txt /tmp/hash2.txt; then
+          echo "✅ Build is deterministic (identical hashes)"
+        else
+          echo "❌ Build is non-deterministic (different hashes)"
+          echo "First build:"
+          cat /tmp/hash1.txt
+          echo "Second build:"
+          cat /tmp/hash2.txt
+          exit 1
+        fi
