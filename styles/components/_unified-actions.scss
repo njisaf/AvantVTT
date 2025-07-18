@@ -1,0 +1,269 @@
+/**
+ * Unified Actions Tab Styles
+ * Styles for the unified actions system that combines gear and standalone actions
+ * Updated to match talent/augment icon-only styling for consistency
+ */
+
+.unified-actions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+}
+
+.unified-action-item {
+  display: grid;
+  grid-template-columns: 32px 1fr auto; // Consistent 32px left column like talent/augment
+  grid-template-areas: "buttons content controls";
+  gap: 12px;
+  padding: 8px 12px; // Match talent/augment padding
+  background: var(--theme-bg-tertiary, #333333);
+  border: 1px solid var(--theme-border-primary, #404040);
+  border-left: 2px solid var(--theme-accent-primary, #00E0DC);
+  transition: all 0.3s ease;
+  align-items: start; // Match talent/augment alignment
+  min-height: 44px; // Match talent/augment min-height
+
+  &:hover {
+    background: var(--theme-bg-secondary, #2A2A2A);
+    box-shadow: var(--theme-shadow-primary, 0 4px 20px rgba(0, 224, 220, 0.1));
+  }
+
+  // Different accent colors based on source type
+  &.weapon-action {
+    border-left-color: #ff6b6b; // Red for weapons
+  }
+
+  &.armor-action {
+    border-left-color: #4ecdc4; // Blue-green for armor
+  }
+
+  &.gear-action {
+    border-left-color: #ffe66d; // Yellow for gear
+  }
+
+  &.action-action {
+    border-left-color: var(--theme-accent-primary, #00E0DC); // Default cyan for actions
+  }
+}
+
+// Left column: Action buttons (consistent with .row-control)
+.action-buttons {
+  grid-area: buttons;
+  display: flex;
+  flex-direction: column; // Stack buttons vertically like talent/augment
+  align-items: center;
+  justify-content: flex-start;
+  width: 32px; // Consistent width
+  padding-top: 2px; // Match talent/augment padding
+  gap: 4px; // Space between stacked buttons
+}
+
+// Icon-only action buttons (consistent with .chat-roll-btn)
+.action-btn {
+  background: transparent;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  color: var(--theme-accent-primary, #00E0DC);
+  font-size: 16px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+
+  // Icon styling
+  i {
+    font-size: 14px;
+  }
+
+  // Hover effect matching talent/augment
+  &:hover {
+    background: var(--theme-accent-primary, #00E0DC);
+    color: var(--theme-bg-primary, #1C1C1C);
+    box-shadow: 0 0 8px rgba(0, 224, 220, 0.4) !important;
+  }
+
+  // Focus styling for accessibility - minimal
+  &:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  // Active state
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.action-content {
+  grid-area: content;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+  min-width: 0; // Allow text to wrap
+}
+
+.action-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.action-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--avant-text-primary, #fff);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.action-source-type {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--avant-text-secondary, #aaa);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 6px;
+  border-radius: 2px;
+  background: var(--avant-badge-bg, #444);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.action-stats {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.stat-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 2px 4px;
+  border-radius: 2px;
+  background: var(--avant-stat-tile-bg, #333);
+  min-width: 32px;
+}
+
+.stat-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--avant-text-primary, #fff);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 9px;
+  font-weight: 400;
+  color: var(--avant-text-secondary, #aaa);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  line-height: 1;
+}
+
+.action-description {
+  font-size: 11px;
+  color: var(--avant-text-secondary, #ccc);
+  margin-top: 2px;
+  line-height: 1.3;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.action-controls {
+  grid-area: controls;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+// Edit and delete buttons (matching .row-edit and .row-delete exactly)
+.control-btn {
+  background: transparent;
+  border: none;
+  color: var(--theme-text-secondary, #BFBFBF);
+  font-size: 12px;
+  padding: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:focus {
+    outline: 2px solid var(--theme-accent-primary, #00E0DC);
+    outline-offset: 2px;
+  }
+
+  &.edit-btn:hover {
+    color: var(--theme-accent-secondary, #4CE2E1);
+    background: rgba(76, 226, 225, 0.1);
+  }
+
+  &.delete-btn:hover {
+    color: #ff4757;
+    background: rgba(255, 71, 87, 0.1);
+  }
+}
+
+.no-actions-message {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--avant-text-secondary, #aaa);
+  font-style: italic;
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .unified-action-item {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "buttons"
+      "content"
+      "controls";
+    text-align: left;
+  }
+
+  .action-buttons {
+    justify-content: flex-start;
+  }
+
+  .action-controls {
+    justify-content: flex-end;
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .unified-action-item {
+    border-width: 2px;
+  }
+
+  .action-btn {
+    border-width: 2px;
+  }
+}

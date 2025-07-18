@@ -1,0 +1,24 @@
+{{!--
+Unified Action Controls Partial
+Renders the right-side edit controls for unified actions
+
+Context:
+- action: Unified action object with sourceItemId
+--}}
+
+<div class="action-controls">
+    {{#if action.sourceItemId}}
+    <button type="button" class="control-btn edit-btn" 
+            data-action="editItem" 
+            data-item-id="{{action.sourceItemId}}"
+            title="Edit {{action.name}}">
+        <i class="fas fa-edit"></i>
+    </button>
+    <button type="button" class="control-btn delete-btn" 
+            data-action="deleteItem" 
+            data-item-id="{{action.sourceItemId}}"
+            title="Delete {{action.name}}">
+        <i class="fas fa-trash"></i>
+    </button>
+    {{/if}}
+</div>

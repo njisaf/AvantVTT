@@ -1,0 +1,27 @@
+{{!--
+Unified Action Content Partial
+Renders the center content area for unified actions
+
+Context:
+- action: Unified action object with name, source, system data, etc.
+--}}
+
+<div class="action-content">
+    <div class="action-header">
+        <div class="action-name">{{action.name}}</div>
+        <div class="action-source-type">{{action.source}}</div>
+    </div>
+    
+    <!-- Display relevant stats based on source type -->
+    {{#if (eq action.source "weapon")}}
+    {{> "systems/avant/templates/shared/partials/weapon-action-stats" action=action}}
+    {{else if (eq action.source "armor")}}
+    {{> "systems/avant/templates/shared/partials/armor-action-stats" action=action}}
+    {{else if (eq action.source "action")}}
+    {{> "systems/avant/templates/shared/partials/action-action-stats" action=action}}
+    {{/if}}
+    
+    {{#if action.system.description}}
+    <div class="action-description">{{action.system.description}}</div>
+    {{/if}}
+</div>

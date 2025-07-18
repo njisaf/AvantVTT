@@ -145,10 +145,9 @@
             <!-- Navigation Tabs -->
             <nav class="sheet-tabs tabs" data-group="sheet">
                 <a class="item" data-tab="core" data-group="sheet">Core</a>
-                <a class="item" data-tab="combat" data-group="sheet">Combat</a>
+                <a class="item" data-tab="actions" data-group="sheet">Actions</a>
                 <a class="item" data-tab="gear" data-group="sheet">Gear</a>
                 <a class="item" data-tab="skills" data-group="sheet">Skills</a>
-                <a class="item" data-tab="actions" data-group="sheet">Actions</a>
                 <a class="item" data-tab="features" data-group="sheet">Features</a>
                 <a class="item" data-tab="talents" data-group="sheet">Talents & Powers</a>
             </nav>
@@ -281,101 +280,6 @@
                     </div>
                 </div>
 
-                <!-- Combat Tab -->
-                <div class="tab" data-group="sheet" data-tab="combat">
-                    <div class="items-header">
-                        <h3>Weapons</h3>
-                        <button type="button" class="item-create" data-action="createItem" data-type="weapon"
-                            title="Create Weapon">
-                            <i class="fas fa-plus"></i> Add
-                        </button>
-                    </div>
-                    <div class="items-list">
-                        {{#each items.weapon as |item id|}}
-                        <div class="combat-item" data-item-id="{{item._id}}">
-                            <div class="combat-item-actions">
-                                <button type="button" class="combat-action-btn attack-roll" data-action="rollAttack"
-                                    data-item-id="{{item._id}}" title="Attack Roll">
-                                    <i class="fas fa-dice-d20"></i>
-                                    <span>Attack</span>
-                                </button>
-                                <button type="button" class="combat-action-btn damage-roll" data-action="rollDamage"
-                                    data-item-id="{{item._id}}" title="Damage Roll">
-                                    <i class="fas fa-dice-six"></i>
-                                    <span>Damage</span>
-                                </button>
-                            </div>
-                            <div class="combat-item-content">
-                                <div class="combat-item-header">
-                                    <div class="combat-item-name">{{item.name}}</div>
-                                </div>
-                                <div class="combat-stats-layout">
-                                    <div class="combat-threshold-tile">
-                                        <span class="combat-threshold-value">{{item.system.threshold}}</span>
-                                        <span class="combat-threshold-label">Threshold</span>
-                                    </div>
-                                    <div class="combat-stats-grid">
-                                        <div class="combat-stat-tile">
-                                            <span class="combat-stat-value">{{item.system.damageDie}}</span>
-                                            <span class="combat-stat-label">Damage</span>
-                                        </div>
-                                        {{#if item.system.damageType}}
-                                        <div class="combat-stat-tile">
-                                            <span class="combat-stat-value">{{item.system.damageType}}</span>
-                                            <span class="combat-stat-label">Type</span>
-                                        </div>
-                                        {{/if}}
-                                        {{#if item.system.range}}
-                                        <div class="combat-stat-tile">
-                                            <span class="combat-stat-value">{{item.system.range}}</span>
-                                            <span class="combat-stat-label">Range</span>
-                                        </div>
-                                        {{/if}}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {{/each}}
-                    </div>
-
-                    <div class="items-header">
-                        <h3>Armor</h3>
-                        <button type="button" class="item-create" data-action="createItem" data-type="armor"
-                            title="Create Armor">
-                            <i class="fas fa-plus"></i> Add
-                        </button>
-                    </div>
-                    <div class="items-list">
-                        {{#each items.armor as |item id|}}
-                        <div class="combat-item" data-item-id="{{item._id}}">
-                            <div class="combat-item-actions">
-                                <button type="button" class="combat-action-btn armor-roll" data-action="rollArmor"
-                                    data-item-id="{{item._id}}" title="Armor Roll">
-                                    <i class="fas fa-dice-d20"></i>
-                                    <span>Roll</span>
-                                </button>
-                            </div>
-                            <div class="combat-item-content">
-                                <div class="combat-item-header">
-                                    <div class="combat-item-name">{{item.name}}</div>
-                                </div>
-                                <div class="combat-stats-layout">
-                                    <div class="combat-threshold-tile">
-                                        <span class="combat-threshold-value">{{item.system.threshold}}</span>
-                                        <span class="combat-threshold-label">Threshold</span>
-                                    </div>
-                                    <div class="combat-stats-grid">
-                                        <div class="combat-stat-tile">
-                                            <span class="combat-stat-value">{{item.system.armorClass}}</span>
-                                            <span class="combat-stat-label">AC</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {{/each}}
-                    </div>
-                </div>
 
                 <!-- Skills Tab -->
                 <div class="tab" data-group="sheet" data-tab="skills">
@@ -466,83 +370,39 @@
                 <!-- Gear Tab -->
                 <div class="tab" data-group="sheet" data-tab="gear">
                     <!-- Weapons Section -->
-                    <div class="items-header">
-                        <h3>Weapons</h3>
-                        <button type="button" class="item-create" data-action="createItem" data-type="weapon"
-                            title="Create Weapon">
-                            <i class="fas fa-plus"></i> Add
-                        </button>
-                    </div>
-                    <div class="items-list weapon-cards">
-                        {{#each cardLayouts.weapon as |cardData id|}}
-                        {{> "systems/avant/templates/shared/partials/item-card" item=cardData.item
-                        layout=cardData.cardLayout}}
-                        {{/each}}
-                    </div>
+                    {{> "systems/avant/templates/shared/partials/items-section" 
+                        title="Weapons" 
+                        itemType="weapon" 
+                        items=cardLayouts.weapon 
+                        cssClass="weapon-cards"}}
 
                     <!-- Armor Section -->
-                    <div class="items-header">
-                        <h3>Armor</h3>
-                        <button type="button" class="item-create" data-action="createItem" data-type="armor"
-                            title="Create Armor">
-                            <i class="fas fa-plus"></i> Add
-                        </button>
-                    </div>
-                    <div class="items-list armor-cards">
-                        {{#each cardLayouts.armor as |cardData id|}}
-                        {{> "systems/avant/templates/shared/partials/item-card" item=cardData.item
-                        layout=cardData.cardLayout}}
-                        {{/each}}
-                    </div>
+                    {{> "systems/avant/templates/shared/partials/items-section" 
+                        title="Armor" 
+                        itemType="armor" 
+                        items=cardLayouts.armor 
+                        cssClass="armor-cards"}}
 
                     <!-- Equipment & Gear Section -->
-                    <div class="items-header">
-                        <h3>Equipment & Gear</h3>
-                        <button type="button" class="item-create" data-action="createItem" data-type="gear"
-                            title="Create Gear">
-                            <i class="fas fa-plus"></i> Add
-                        </button>
-                    </div>
-                    <div class="items-list gear-cards">
-                        {{#each cardLayouts.gear as |cardData id|}}
-                        {{> "systems/avant/templates/shared/partials/item-card" item=cardData.item
-                        layout=cardData.cardLayout}}
-                        {{/each}}
-                    </div>
+                    {{> "systems/avant/templates/shared/partials/items-section" 
+                        title="Equipment & Gear" 
+                        itemType="gear" 
+                        items=cardLayouts.gear 
+                        cssClass="gear-cards"}}
                 </div>
 
-                <!-- Actions Tab -->
+                <!-- Actions Tab (Unified) -->
                 <div class="tab" data-group="sheet" data-tab="actions">
-                    <div class="items-header">
-                        <h3>Actions</h3>
-                        <button type="button" class="item-create" data-action="createItem" data-type="action"
-                            title="Create Action">
-                            <i class="fas fa-plus"></i> Add
-                        </button>
-                    </div>
-                    <div class="items-list action-cards">
-                        {{#each cardLayouts.action as |cardData id|}}
-                        {{> "systems/avant/templates/shared/partials/item-card" item=cardData.item
-                        layout=cardData.cardLayout}}
-                        {{/each}}
-                    </div>
+                    {{> "systems/avant/templates/shared/partials/actions-section" unifiedActions=unifiedActions}}
                 </div>
 
                 <!-- Features Tab -->
                 <div class="tab" data-group="sheet" data-tab="features">
-                    <div class="items-header">
-                        <h3>Features</h3>
-                        <button type="button" class="item-create" data-action="createItem" data-type="feature"
-                            title="Create Feature">
-                            <i class="fas fa-plus"></i> Add
-                        </button>
-                    </div>
-                    <div class="items-list feature-cards">
-                        {{#each cardLayouts.feature as |cardData id|}}
-                        {{> "systems/avant/templates/shared/partials/item-card" item=cardData.item
-                        layout=cardData.cardLayout}}
-                        {{/each}}
-                    </div>
+                    {{> "systems/avant/templates/shared/partials/items-section" 
+                        title="Features" 
+                        itemType="feature" 
+                        items=cardLayouts.feature 
+                        cssClass="feature-cards"}}
                 </div>
 
                 <!-- Talents & Augments Tab -->
@@ -551,34 +411,18 @@
                     {{> "systems/avant/templates/actor/power-points-section"}}
 
                     <!-- Talents Section -->
-                    <div class="items-header">
-                        <h3>Talents</h3>
-                        <button type="button" class="item-create" data-action="createItem" data-type="talent"
-                            title="Create Talent">
-                            <i class="fas fa-plus"></i> Add
-                        </button>
-                    </div>
-                    <div class="items-list talent-cards">
-                        {{#each cardLayouts.talent as |cardData id|}}
-                        {{> "systems/avant/templates/shared/partials/item-card" item=cardData.item
-                        layout=cardData.cardLayout}}
-                        {{/each}}
-                    </div>
+                    {{> "systems/avant/templates/shared/partials/items-section" 
+                        title="Talents" 
+                        itemType="talent" 
+                        items=cardLayouts.talent 
+                        cssClass="talent-cards"}}
 
                     <!-- Augments Section -->
-                    <div class="items-header">
-                        <h3>Augments</h3>
-                        <button type="button" class="item-create" data-action="createItem" data-type="augment"
-                            title="Create Augment">
-                            <i class="fas fa-plus"></i> Add
-                        </button>
-                    </div>
-                    <div class="items-list augment-cards">
-                        {{#each cardLayouts.augment as |cardData id|}}
-                        {{> "systems/avant/templates/shared/partials/item-card" item=cardData.item
-                        layout=cardData.cardLayout}}
-                        {{/each}}
-                    </div>
+                    {{> "systems/avant/templates/shared/partials/items-section" 
+                        title="Augments" 
+                        itemType="augment" 
+                        items=cardLayouts.augment 
+                        cssClass="augment-cards"}}
                 </div>
             </section>
         </main>

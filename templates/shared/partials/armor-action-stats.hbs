@@ -1,0 +1,18 @@
+{{!--
+Armor Action Stats Partial
+Renders armor-specific stats for unified actions
+
+Context:
+- action: Unified action object with armor system data
+--}}
+
+<div class="action-stats">
+    <div class="stat-tile">
+        <span class="stat-value">{{action.system.threshold}}</span>
+        <span class="stat-label">Threshold</span>
+    </div>
+    <div class="stat-tile">
+        <span class="stat-value">{{action.system.armorClass}}</span>
+        <span class="stat-label">AC</span>
+    </div>
+</div>

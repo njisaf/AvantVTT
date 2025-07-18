@@ -29,6 +29,9 @@ import { AvantRerollDialog } from './dialogs/reroll-dialog';
 import { AvantChatContextMenu } from './chat/context-menu.ts';
 import { initializeChatIntegration } from './logic/chat/chat-integration.js';
 
+// Unified actions system
+import { registerUnifiedActionsHooks } from './logic/unified-actions-hooks.js';
+
 // Commands module
 import { initializeAvantCommands } from './commands/index.ts';
 
@@ -170,6 +173,10 @@ Hooks.once('ready', async function (): Promise<void> {
         if (chatResult.success) {
             console.log("✅ Avant | Chat integration initialized successfully");
             console.log("✅ Avant | Available chat API:", Object.keys(chatResult.api || {}));
+            
+            // Register unified actions hooks
+            registerUnifiedActionsHooks();
+            console.log("✅ Avant | Unified actions hooks registered successfully");
         } else {
             console.error("❌ Avant | Chat integration failed:", chatResult.error);
         }

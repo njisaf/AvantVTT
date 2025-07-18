@@ -1,0 +1,30 @@
+{{!--
+Weapon Action Stats Partial
+Renders weapon-specific stats for unified actions
+
+Context:
+- action: Unified action object with weapon system data
+--}}
+
+<div class="action-stats">
+    <div class="stat-tile">
+        <span class="stat-value">{{action.system.threshold}}</span>
+        <span class="stat-label">Threshold</span>
+    </div>
+    <div class="stat-tile">
+        <span class="stat-value">{{action.system.damageDie}}</span>
+        <span class="stat-label">Damage</span>
+    </div>
+    {{#if action.system.damageType}}
+    <div class="stat-tile">
+        <span class="stat-value">{{action.system.damageType}}</span>
+        <span class="stat-label">Type</span>
+    </div>
+    {{/if}}
+    {{#if action.system.range}}
+    <div class="stat-tile">
+        <span class="stat-value">{{action.system.range}}</span>
+        <span class="stat-label">Range</span>
+    </div>
+    {{/if}}
+</div>

@@ -1,0 +1,29 @@
+{{!--
+Unified Action Buttons Partial
+Renders the left-side action buttons for unified actions
+Icon-only styling to match talent/augment cards
+
+Context:
+- action: Unified action object with buttons array
+--}}
+
+<div class="action-buttons">
+    {{#each action.buttons as |button|}}
+    <button type="button" class="action-btn {{button}}-btn" 
+            data-action="rollCombinedAction" 
+            data-action-id="{{../action.id}}"
+            data-button="{{button}}"
+            title="{{#if (eq button "attack")}}Attack {{../action.name}}{{else if (eq button "damage")}}Damage {{../action.name}}{{else if (eq button "armor")}}Armor {{../action.name}}{{else if (eq button "use")}}Use {{../action.name}}{{/if}}"
+            aria-label="{{#if (eq button "attack")}}Attack {{../action.name}}{{else if (eq button "damage")}}Damage {{../action.name}}{{else if (eq button "armor")}}Armor {{../action.name}}{{else if (eq button "use")}}Use {{../action.name}}{{/if}}">
+        {{#if (eq button "attack")}}
+        <i class="fas fa-dice-d20" aria-hidden="true"></i>
+        {{else if (eq button "damage")}}
+        <i class="fas fa-dice-six" aria-hidden="true"></i>
+        {{else if (eq button "armor")}}
+        <i class="fas fa-shield-alt" aria-hidden="true"></i>
+        {{else if (eq button "use")}}
+        <i class="fas fa-play" aria-hidden="true"></i>
+        {{/if}}
+    </button>
+    {{/each}}
+</div>

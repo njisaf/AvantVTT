@@ -39,6 +39,7 @@ import {
 } from '../logic/actor-sheet-utils.ts';
 import { itemHasTraits, createTraitHtmlForChat } from '../logic/chat/trait-resolver.ts';
 import { CardLayoutIntegration } from '../layout/item-card/integration-example.ts';
+import { combineActionSources, rollCombinedAction, type CombinedAction } from '../logic/unified-actions.js';
 
 // Import local foundry UI adapter for safe notifications
 import { FoundryUI } from '../types/adapters/foundry-ui.ts';
@@ -115,6 +116,9 @@ export function createAvantActorSheet() {
     class AvantActorSheet extends HandlebarsApplicationMixin(BaseClass) {
         /** The actor document associated with this sheet */
         declare document: any;
+        
+        /** Context data for template rendering */
+        context?: any;
 
         /**
          * 🎯 APPLICATIONV2 ACTION REGISTRATION SYSTEM
@@ -192,6 +196,9 @@ export function createAvantActorSheet() {
                 // 💬 Chat Integration Actions
                 postChatCard: AvantActorSheet._onPostChatCard,
                 useAction: AvantActorSheet._onUseAction,
+                
+                // 🎯 Unified Actions System
+                rollCombinedAction: AvantActorSheet._onRollCombinedAction,
 
                 // 🎯 FEATURE CARD SYSTEM - The main fix that resolved the debugging issue
                 // These actions connect to the complete feature card infrastructure:
@@ -365,6 +372,12 @@ export function createAvantActorSheet() {
             const itemsArray = Array.from(this.document.items.values());
             context.items = organizeItemsByType(itemsArray);
 
+            // Add comprehensive display data to items (traits, descriptions, requirements, etc.)
+            // IMPORTANT: This must happen BEFORE card layouts are prepared
+            console.log('🔍 ACTOR SHEET DEBUG | Adding trait display data to items...');
+            await this._addTraitDisplayDataToItems(context.items);
+            console.log('🔍 ACTOR SHEET DEBUG | Trait display data added successfully');
+
             // Prepare card layouts for each item type
             console.log('🔍 ACTOR SHEET DEBUG | Preparing card layouts for items...');
             context.cardLayouts = {};
@@ -381,10 +394,10 @@ export function createAvantActorSheet() {
             }
             console.log('🔍 ACTOR SHEET DEBUG | Card layouts prepared successfully');
 
-            // Add comprehensive display data to items (traits, descriptions, requirements, etc.)
-            console.log('🔍 ACTOR SHEET DEBUG | Adding trait display data to items...');
-            await this._addTraitDisplayDataToItems(context.items);
-            console.log('🔍 ACTOR SHEET DEBUG | Trait display data added successfully');
+            // Prepare unified actions for the Actions tab
+            console.log('🔍 ACTOR SHEET DEBUG | Preparing unified actions...');
+            context.unifiedActions = await this._prepareUnifiedActions();
+            console.log('🔍 ACTOR SHEET DEBUG | Unified actions prepared:', context.unifiedActions.length);
 
             // Add system configuration data
             context.config = (globalThis as any).CONFIG?.AVANT || {};
@@ -397,6 +410,9 @@ export function createAvantActorSheet() {
             console.log('🔍 ACTOR SHEET DEBUG | Final context.editable:', context.editable);
             console.log('🔍 ACTOR SHEET DEBUG | Final context.cssClass:', context.cssClass);
             console.log('🔍 ACTOR SHEET DEBUG | Returning context from _prepareContext()');
+
+            // Store context for use in action handlers
+            this.context = context;
 
             return context;
         }
@@ -426,6 +442,28 @@ export function createAvantActorSheet() {
             // Initialize custom functionality that ApplicationV2 doesn't handle automatically
             this._initializeTabs();    // Manual tab management for Avant sheets
             this._ensureItemStyling(); // Ensure proper item display styling
+        }
+
+        /**
+         * Prepare unified actions for the Actions tab
+         * Combines gear-based actions with standalone actions
+         * @returns Promise<CombinedAction[]> Array of combined actions
+         */
+        private async _prepareUnifiedActions(): Promise<CombinedAction[]> {
+            try {
+                const result = combineActionSources(this.document);
+                
+                if (result.success) {
+                    logger.log(`AvantActorSheet | Prepared ${result.data!.length} unified actions`);
+                    return result.data!;
+                } else {
+                    logger.warn(`AvantActorSheet | Failed to prepare unified actions: ${result.error}`);
+                    return [];
+                }
+            } catch (error) {
+                logger.error('AvantActorSheet | Error preparing unified actions:', error);
+                return [];
+            }
         }
 
         /**
@@ -1129,6 +1167,50 @@ export function createAvantActorSheet() {
             } catch (error) {
                 logger.error('AvantActorSheet | Armor roll failed:', error);
                 FoundryUI.notify('Armor roll failed', 'error');
+            }
+        }
+
+        /**
+         * Handle unified action rolls
+         * @param event - The originating click event
+         * @param target - The target element
+         * @this {AvantActorSheet} The ApplicationV2 instance (bound automatically)
+         */
+        static async _onRollCombinedAction(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
+            event.preventDefault();
+
+            const sheet = this;
+            if (!sheet?.document) return;
+
+            // Extract action data from the target element
+            const actionId = target.dataset.actionId;
+            const buttonType = target.dataset.button;
+            
+            if (!actionId || !buttonType) {
+                logger.warn('AvantActorSheet | Missing action ID or button type for combined action');
+                return;
+            }
+
+            // Get the unified actions from the sheet context
+            const unifiedActions = sheet.context?.unifiedActions || [];
+            const action = unifiedActions.find((a: CombinedAction) => a.id === actionId);
+            
+            if (!action) {
+                logger.warn(`AvantActorSheet | Combined action not found: ${actionId}`);
+                return;
+            }
+
+            try {
+                // Dispatch the action through the unified system
+                const result = rollCombinedAction(action, buttonType, sheet.document, sheet);
+                
+                if (!result.success) {
+                    logger.warn(`AvantActorSheet | Combined action failed: ${result.error}`);
+                    FoundryUI.notify(`Action failed: ${result.error}`, 'warn');
+                }
+            } catch (error) {
+                logger.error('AvantActorSheet | Combined action error:', error);
+                FoundryUI.notify('Action failed', 'error');
             }
         }
 

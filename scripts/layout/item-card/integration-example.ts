@@ -5,7 +5,16 @@
  * @author Avant Development Team
  */
 
-import { getCardLayout, getAugmentCardLayout, getTalentCardLayout } from './index';
+import { 
+    getCardLayout, 
+    getAugmentCardLayout, 
+    getTalentCardLayout,
+    getWeaponCardLayout,
+    getArmorCardLayout,
+    getGearCardLayout,
+    getActionCardLayout,
+    getFeatureCardLayout
+} from './index';
 import type { LayoutItemData, CardSection } from './index';
 
 /**
@@ -46,6 +55,16 @@ export class CardLayoutIntegration {
                 return getAugmentCardLayout(item);
             case 'talent':
                 return getTalentCardLayout(item);
+            case 'weapon':
+                return getWeaponCardLayout(item);
+            case 'armor':
+                return getArmorCardLayout(item);
+            case 'gear':
+                return getGearCardLayout(item);
+            case 'action':
+                return getActionCardLayout(item);
+            case 'feature':
+                return getFeatureCardLayout(item);
             default:
                 // Fallback to generic card layout
                 return getCardLayout(item);
