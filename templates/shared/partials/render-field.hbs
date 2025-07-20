@@ -459,6 +459,19 @@ class=field.class}}
   {{#if field.range}}<span class="item-range">{{field.range}}</span>{{/if}}
 </div>
 
+{{else if (eq field.type "weapon-ability")}}
+{{!-- Weapon ability display --}}
+<div class="weapon-ability">
+  {{#if field.ability}}<span class="item-ability">{{field.ability}}</span>{{/if}}
+</div>
+
+{{else if (eq field.type "weapon-description")}}
+{{!-- Weapon description display --}}
+<div class="weapon-description">
+  {{field.value}}
+  {{#if field.description}}<span class="item-description">{{field.description}}</span>{{/if}}
+</div>
+
 {{else if (eq field.type "weapon-edit-button")}}
 {{!-- Weapon edit button --}}
 <button type="button" 

@@ -54,20 +54,27 @@ export function getWeaponCardLayout(item: any): CardSection {
 
         // Properties and other details
         when(!!system.properties, () => field({
-            type: 'weapon-properties',
-            name: 'properties',
-            value: system.properties,
-            class: 'weapon-properties'
+            type: 'weapon-ability',
+            name: 'ability-modifier',
+            value: system.ability,
+            class: 'weapon-ability'
         })),
 
+        field({
+            type: 'weapon-description',
+            name: 'description',
+            value: system.description,
+            class: 'weapon-description'
+        })
+
         // Weight and range (if present)
-        when(!!(system.weight || system.range), () => field({
-            type: 'weapon-details',
-            name: 'details',
-            weight: system.weight,
-            range: system.range,
-            class: 'weapon-details'
-        }))
+        // when(!!(system.weight || system.range), () => field({
+        //     type: 'weapon-details',
+        //     name: 'details',
+        //     weight: system.weight,
+        //     range: system.range,
+        //     class: 'weapon-details'
+        // }))
     ]);
 
     // Right section: Edit and delete buttons

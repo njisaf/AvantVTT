@@ -82,11 +82,11 @@ export function body(item: LayoutItemData): Field[] {
 
     return filterFields([
         // 1. Combat stats side-by-side
-        when((system.damage !== undefined || system.damageDie !== undefined) && system.modifier !== undefined, () => {
+        when(system.damageDie !== undefined && system.modifier !== undefined, () => {
             const damageField = field({
                 type: 'text',
-                name: 'system.damage',
-                value: system.damage || system.damageDie,
+                name: 'system.damageDie',
+                value: system.damageDie,
                 label: 'Damage',
                 placeholder: '1d8',
                 hint: 'Weapon damage dice (e.g., 1d8, 2d6)',
@@ -103,40 +103,43 @@ export function body(item: LayoutItemData): Field[] {
                 hint: 'Attack modifier bonus/penalty',
                 class: 'weapon-modifier'
             });
+
             return sideBy(damageField, modifierField);
         }),
 
-        // Fallback: individual fields if one is missing
-        when((system.damage !== undefined || system.damageDie !== undefined) && system.modifier === undefined, () => field({
-            type: 'text',
-            name: 'system.damage',
-            value: system.damage || system.damageDie,
-            label: 'Damage',
-            placeholder: '1d8',
-            hint: 'Weapon damage dice (e.g., 1d8, 2d6)',
-            class: 'weapon-damage'
-        })),
+        commonFields.ability(system.ability, 'weapon'),
 
-        when(system.modifier !== undefined && (system.damage === undefined && system.damageDie === undefined), () => field({
-            type: 'number',
-            name: 'system.modifier',
-            value: system.modifier,
-            label: 'Modifier',
-            min: -10,
-            max: 20,
-            placeholder: '0',
-            hint: 'Attack modifier bonus/penalty',
-            class: 'weapon-modifier'
-        })),
+        // // Fallback: individual fields if one is missing
+        // when(system.damageDie !== undefined && system.modifier === undefined, () => field({
+        //     type: 'text',
+        //     name: 'system.damageDie',
+        //     value: system.damageDie,
+        //     label: 'Damage',
+        //     placeholder: '1d8',
+        //     hint: 'Weapon damage dice (e.g., 1d8, 2d6)',
+        //     class: 'weapon-damage'
+        // })),
+
+        // when(system.modifier !== undefined && system.damageDie === undefined, () => field({
+        //     type: 'number',
+        //     name: 'system.modifier',
+        //     value: system.modifier,
+        //     label: 'Modifier',
+        //     min: -10,
+        //     max: 20,
+        //     placeholder: '0',
+        //     hint: 'Attack modifier bonus/penalty',
+        //     class: 'weapon-modifier'
+        // })),
 
         // 2. Description (full width)
         commonFields.description(system.description, 'weapon'),
 
-        // 3. Ability and weight side-by-side
-        sideBy(
-            commonFields.ability(system.ability, 'weapon'),
-            commonFields.weight(system.weight, 'weapon')
-        ),
+        // // 3. Ability and weight side-by-side
+        // sideBy(
+        //     commonFields.ability(system.ability, 'weapon'),
+        //     commonFields.weight(system.weight, 'weapon')
+        // ),
 
         // // 4. Cost (individual field)
         // commonFields.cost(system.cost, 'weapon'),

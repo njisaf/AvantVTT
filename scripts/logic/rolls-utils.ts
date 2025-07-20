@@ -489,13 +489,13 @@ export function buildWeaponAttackRoll(
   options: RollOptions = {}
 ): RollPayload {
   const weaponAbility = weaponItem.system?.ability || 'might';
-  const abilityMod = actorData.system?.abilities?.[weaponAbility]?.mod || 0;
+  const abilityMod = actorData.system?.abilities?.[weaponAbility]?.modifier || 0;
   const weaponModifier = weaponItem.system?.modifier || 0;
   const level = actorData.system?.level || 1;
 
   const modifiers: RollModifier[] = [
     { label: 'Level', value: level },
-    { label: 'Ability', value: abilityMod },
+    { label: `${weaponAbility.charAt(0).toUpperCase() + weaponAbility.slice(1)}`, value: abilityMod },
     { label: 'Weapon', value: weaponModifier }
   ];
 
@@ -522,7 +522,7 @@ export function buildWeaponDamageRoll(
 ): RollPayload {
   const damageRoll = weaponItem.system?.damageDie || '1d6';
   const weaponAbility = weaponItem.system?.ability || 'might';
-  const abilityMod = actorData.system?.abilities?.[weaponAbility]?.mod || 0;
+  const abilityMod = actorData.system?.abilities?.[weaponAbility]?.modifier || 0;
   const damageType = weaponItem.system?.damageType || '';
 
   const modifiers: RollModifier[] = [
@@ -555,7 +555,7 @@ export function buildArmorRoll(
   options: RollOptions = {}
 ): RollPayload {
   const armorAbility = armorItem.system?.ability || 'grace';
-  const abilityMod = actorData.system?.abilities?.[armorAbility]?.mod || 0;
+  const abilityMod = actorData.system?.abilities?.[armorAbility]?.modifier || 0;
   const armorModifier = armorItem.system?.modifier || 0;
   const level = actorData.system?.level || 1;
 

@@ -170,8 +170,8 @@ export function createAvantActorSheet() {
             // Form handling configuration
             form: {
                 submitOnChange: true,  // Auto-submit on field changes
-                closeOnSubmit: false, // Keep sheet open after submission
-                handler: AvantActorSheet._handleFormSubmission // Custom form handler
+                closeOnSubmit: false // Keep sheet open after submission
+                // Use default ApplicationV2 form handler instead of custom one
             },
 
             // 🎯 CRITICAL: All ApplicationV2 actions must be registered here
@@ -1064,7 +1064,6 @@ export function createAvantActorSheet() {
          * @this {AvantActorSheet} The ApplicationV2 instance (bound automatically)
          */
         static async _onRollAttack(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
-
             event.preventDefault();
 
             // FIXED: In ApplicationV2, 'this' is bound to the sheet instance
@@ -1077,18 +1076,24 @@ export function createAvantActorSheet() {
             const item = sheet.document.items.get(itemId);
             if (!item) return;
 
-            // Roll 2d10 + attack bonus
-            const attackValue = item.system.attack || 0;
-            const Roll = (globalThis as any).Roll;
-            const roll = new Roll('2d10 + @attack', { attack: attackValue });
-            await roll.evaluate();
+            try {
+                // 🎯 CRITICAL FIX: Use the proper rolls-utils system for weapon attack rolls
+                // This ensures rolls include Level + Ability modifier + Weapon modifier as shown on the button
+                const { buildWeaponAttackRoll } = await import('../logic/rolls-utils.js');
+                
+                // Build the roll payload with proper modifiers (2d10+level+ability+weapon)
+                const rollPayload = buildWeaponAttackRoll(item, sheet.document, {
+                    speaker: (globalThis as any).ChatMessage.getSpeaker({ actor: sheet.document })
+                });
 
-            const ChatMessage = (globalThis as any).ChatMessage;
-            await roll.toMessage({
-                speaker: ChatMessage.getSpeaker({ actor: sheet.document }),
-                flavor: `${item.name} Attack Roll`
-            });
+                // Execute the roll and send to chat
+                await rollPayload.sendToChat();
 
+                logger.log(`AvantActorSheet | Executed ${item.name} weapon attack roll`);
+            } catch (error) {
+                logger.error('AvantActorSheet | Weapon attack roll failed:', error);
+                FoundryUI.notify(`Failed to roll ${item.name} attack`, 'error');
+            }
         }
 
         /**
@@ -1111,7 +1116,7 @@ export function createAvantActorSheet() {
             if (!item) return;
 
             // Roll damage (use weapon damage formula or default)
-            const damageFormula = item.system.damage || '1d6';
+            const damageFormula = item.system.damageDie || item.system.damage || '1d6';
             const Roll = (globalThis as any).Roll;
             const roll = new Roll(damageFormula);
             await roll.evaluate();
