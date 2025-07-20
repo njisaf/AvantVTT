@@ -249,7 +249,7 @@ describe('Actor Sheet Roll Integration', () => {
   describe('Roll Payload Validation', () => {
     it('should create valid roll payloads for abilities', async () => {
       // Import the role utility to test payload creation directly
-      const { buildAbilityRoll } = await import('../../../scripts/logic/roles-utils.js');
+      const { buildAbilityRoll } = await import('../../../scripts/logic/rolls-utils.js');
       
       // Create a roll payload for might ability
       const payload = buildAbilityRoll('might', mockActor);
@@ -268,7 +268,7 @@ describe('Actor Sheet Roll Integration', () => {
 
     it('should create valid roll payloads for skills', async () => {
       // Import the role utility to test payload creation directly
-      const { buildSkillRoll } = await import('../../../scripts/logic/roles-utils.js');
+      const { buildSkillRoll } = await import('../../../scripts/logic/rolls-utils.js');
       
       // Create a roll payload for athletics skill
       const payload = buildSkillRoll('athletics', mockActor);
@@ -388,7 +388,7 @@ describe('Roll Payload Chat Integration', () => {
   });
 
   it('should create and execute roll payloads correctly', async () => {
-    const { buildRollPayload } = await import('../../../scripts/logic/roles-utils.js');
+    const { buildRollPayload } = await import('../../../scripts/logic/rolls-utils.js');
     
     const modifiers = [
       { label: 'Ability', value: 3 },
@@ -417,7 +417,7 @@ describe('Roll Payload Chat Integration', () => {
   });
 
   it('should handle chat posting errors with retry mechanism', async () => {
-    const { buildRollPayload } = await import('../../../scripts/logic/roles-utils.js');
+    const { buildRollPayload } = await import('../../../scripts/logic/rolls-utils.js');
     
     // Mock console.error to avoid test output pollution
     const originalConsoleError = console.error;

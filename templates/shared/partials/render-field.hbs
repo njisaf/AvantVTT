@@ -752,6 +752,19 @@ class=field.class}}
   <i class="fas fa-trash" aria-hidden="true"></i>
 </button>
 
+{{else if (eq field.type "trait-preview")}}
+{{!-- Trait Preview --}}
+<div class="{{field.class}}">
+  <label class="form-label">{{field.label}}</label>
+  <div class="trait-chip trait-chip--preview" 
+       style="background-color: {{field.trait.color}}; color: {{#if field.trait.color}}#000{{else}}#fff{{/if}};">
+    {{#if field.trait.icon}}
+      <i class="{{field.trait.icon}}" aria-hidden="true"></i>
+    {{/if}}
+    {{field.itemName}}
+  </div>
+</div>
+
 {{else}}
 {{!-- Fallback for unknown field types --}}
 <div class="unknown-field-type" data-field-type="{{field.type}}">

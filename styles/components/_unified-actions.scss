@@ -49,7 +49,7 @@
 }
 
 // Left column: Action buttons (consistent with .row-control)
-.action-buttons {
+.avant .action-buttons {
   grid-area: buttons;
   display: flex;
   flex-direction: column; // Stack buttons vertically like talent/augment
@@ -248,7 +248,7 @@
     text-align: left;
   }
 
-  .action-buttons {
+  .avant .action-buttons {
     justify-content: flex-start;
   }
 

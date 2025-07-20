@@ -128,7 +128,7 @@ export async function prepareWeaponAttackRoll(weapon, actor) {
     
     try {
         // Use the new role utility framework
-        const { buildWeaponAttackRoll } = await import('./roles-utils.js');
+        const { buildWeaponAttackRoll } = await import('./rolls-utils.js');
         return buildWeaponAttackRoll(weapon, actor);
     } catch (error) {
         console.error('Error creating weapon attack roll:', error);
@@ -160,7 +160,7 @@ export async function prepareWeaponDamageRoll(weapon, actor) {
     
     try {
         // Use the new role utility framework
-        const { buildWeaponDamageRoll } = await import('./roles-utils.js');
+        const { buildWeaponDamageRoll } = await import('./rolls-utils.js');
         return buildWeaponDamageRoll(weapon, actor);
     } catch (error) {
         console.error('Error creating weapon damage roll:', error);
@@ -192,7 +192,7 @@ export async function prepareArmorRoll(armor, actor) {
     
     try {
         // Use the new role utility framework
-        const { buildArmorRoll } = await import('./roles-utils.js');
+        const { buildArmorRoll } = await import('./rolls-utils.js');
         return buildArmorRoll(armor, actor);
     } catch (error) {
         console.error('Error creating armor roll:', error);
@@ -225,7 +225,7 @@ export async function prepareGenericRoll(dataset) {
     
     try {
         // Use the new role utility framework
-        const { buildGenericRoll } = await import('./roles-utils.js');
+        const { buildGenericRoll } = await import('./rolls-utils.js');
         return buildGenericRoll(dataset);
     } catch (error) {
         console.error('Error creating generic roll:', error);

@@ -12,6 +12,7 @@
 @use 'components/item-sheets';
 @use 'components/item-cards';
 @use 'components/unified-actions';
+@use 'components/foundry-overrides';
 @use 'themes/base';
 @use 'themes/dark';
 
@@ -157,41 +158,6 @@ form.avant.theme-dark {
     color: inherit;
     background-color: inherit;
   }
-
-  // Explicitly apply theme to form elements
-  input,
-  textarea,
-  select,
-  button {
-    background: var(--theme-bg-tertiary, $bg-tertiary) !important;
-    border-color: var(--theme-border-primary, $border-primary) !important;
-    color: var(--theme-text-primary, $text-primary) !important;
-
-    &:focus {
-      background: var(--theme-bg-primary, $bg-primary) !important;
-      border-color: var(--theme-accent-primary, $accent-cyan) !important;
-    }
-  }
-
-  // Apply theme to window content
-  .window-content {
-    background: var(--theme-bg-primary, $bg-primary) !important;
-    color: var(--theme-text-primary, $text-primary) !important;
-  }
-
-  // Apply theme to sheet content area
-  .sheet-content {
-    background: var(--theme-bg-primary, $bg-primary) !important;
-    color: var(--theme-text-primary, $text-primary) !important;
-  }
-
-  // Apply theme to tabs and tab content
-  .tabs,
-  .tab {
-    background: var(--theme-bg-secondary, $bg-secondary) !important;
-    color: var(--theme-text-primary, $text-primary) !important;
-    border-color: var(--theme-border-primary, $border-primary) !important;
-  }
 }
 
 
@@ -246,11 +212,89 @@ form.avant.theme-dark {
     @include box-sizing-border-box;
   }
 
-  input,
-  select,
-  textarea {
-    font-family: inherit;
-    @include box-sizing-border-box;
+  // Only target form elements within sheet content areas
+  .sheet-body,
+  .sheet-content,
+  .tab,
+  .form-group,
+  .form-fields {
+    input,
+    select,
+    textarea {
+      @include form-input-base;
+    }
+
+    button:not(.ability-roll-btn):not(.skill-roll):not(.rollable) {
+      @include button-base;
+    }
+  }
+
+  h1:not(.window-title),
+  h2,
+  h3,
+  h4,
+  h5 {
+    @include orbitron-header;
+    border-bottom: 1px solid var(--theme-border-primary, $border-primary);
+    padding-bottom: $spacing-sm;
+    margin-bottom: $spacing-md;
+  }
+
+  a {
+    color: var(--theme-accent-primary, $accent-cyan);
+    text-decoration: none;
+    @include transition-standard;
+
+    &:hover {
+      color: var(--theme-text-primary, $text-primary);
+      text-decoration: underline;
+    }
+  }
+
+
+
+  // Foundry Core Overrides
+  .window-content {
+    background: var(--theme-bg-primary, $bg-primary);
+    color: var(--theme-text-primary, $text-primary);
+    padding: 0;
+  }
+
+  .form-group {
+    margin-bottom: $spacing-md;
+
+    label {
+      @include orbitron-header(12px, 600);
+      display: block;
+      margin-bottom: $spacing-sm;
+    }
+  }
+
+  .form-fields {
+    display: flex;
+    gap: $spacing-sm;
+  }
+
+  .sheet-tabs {
+    border-bottom: 1px solid var(--theme-border-primary, $border-primary);
+
+    .item {
+      @include orbitron-header(14px, 700);
+      padding: $spacing-md $spacing-lg;
+      border: none;
+      background: transparent;
+      color: var(--theme-text-secondary, $text-secondary);
+
+      &.active {
+        background: var(--theme-bg-secondary, $bg-secondary);
+        color: var(--theme-accent-primary, $accent-cyan);
+        border-bottom: 2px solid var(--theme-accent-primary, $accent-cyan);
+      }
+    }
+  }
+
+  .sheet-body {
+    padding: $spacing-lg;
   }
 
   // Window Container - ApplicationV2 compatible styling
@@ -324,9 +368,7 @@ form.avant.theme-dark {
 
       .header-button,
       .header-control {
-        font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 5 Free", "FontAwesome" !important;
-        font-weight: 900 !important;
-        font-style: normal !important;
+        // Font styling moved to _foundry-overrides.scss for better scoping
       }
     }
   }
@@ -694,9 +736,13 @@ form.avant.theme-dark {
     &:hover {
       color: var(--theme-bg-primary, $bg-primary);
       background: var(--theme-accent-primary, $accent-cyan) !important;
-      border: none !important;
+      box-shadow: 0 0 8px rgba(0, 224, 220, 0.4);
       border-radius: 2px;
-      box-shadow: var(--theme-shadow-accent, 0 0 8px rgba(0, 224, 220, 0.4));
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
     }
   }
 
@@ -1194,6 +1240,11 @@ form.avant.theme-dark {
         box-shadow: 0 0 8px rgba(0, 224, 220, 0.4);
         border-radius: 2px;
       }
+
+      &:focus {
+        outline: none;
+        box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
+      }
     }
   }
 
@@ -1346,6 +1397,11 @@ form.avant.theme-dark {
       color: var(--theme-bg-primary, $bg-primary);
       box-shadow: 0 0 8px rgba(0, 224, 220, 0.4);
       border-radius: 2px;
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
     }
   }
 
