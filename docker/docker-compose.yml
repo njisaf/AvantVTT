@@ -1,0 +1,47 @@
+services:
+  # FoundryVTT v13+ Only (Primary Development)
+  foundry-vtt-v13:
+    image: felddy/foundryvtt:release
+    user: "1000:1000"
+    container_name: foundry-vtt-v13
+    hostname: foundry-vtt-v13
+    ports:
+      - "30000:30000"  # Primary port for v13
+    volumes:
+      - foundry-data-v13:/data
+      # Mount complete built system from dist/
+      - /Users/njisaf/code/avantVtt/dist:/data/Data/systems/avant
+    environment:
+      - FOUNDRY_LICENSE_KEY=${FOUNDRY_LICENSE_KEY}
+      - FOUNDRY_USERNAME=${FOUNDRY_USERNAME}
+      - FOUNDRY_PASSWORD=${FOUNDRY_PASSWORD}
+      - FOUNDRY_MINIFY_STATIC_FILES=true
+      - FOUNDRY_HOSTNAME=localhost
+      - FOUNDRY_LOCAL_HOSTNAME=foundry-vtt-v13
+      - FOUNDRY_PROTOCOL=4
+      - FOUNDRY_PROXY_PORT=30000
+      - FOUNDRY_PROXY_SSL=false
+      - FOUNDRY_UPNP=false
+      - FOUNDRY_WORLD=test-world-v13
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:30000 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    labels:
+      - "foundry.version=v13"
+      - "foundry.port=30000"
+      - "foundry.type=primary"
+
+volumes:
+  foundry-data-v13:
+    driver: local
+    labels:
+      - "foundry.version=v13"
+
+networks:
+  default:
+    name: foundry-network
+    driver: bridge 
