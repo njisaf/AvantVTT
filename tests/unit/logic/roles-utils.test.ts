@@ -24,7 +24,7 @@ import {
   measureRollPerformance,
   configureRollSystem,
   getRollSystemConfig
-} from '../../../scripts/logic/roles-utils.js';
+} from '../../../scripts/logic/rolls-utils.js';
 import { RollModifier, RollOptions } from '../../../scripts/types/roll-types.js';
 
 // Mock FoundryVTT globals

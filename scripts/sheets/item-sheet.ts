@@ -1388,10 +1388,17 @@ export function createAvantItemSheet() {
                     const processedData = extractionResult.value.data;
 
                     // Validate critical fields using the new validation system
-                    if (processedData && (this.document?.type === 'talent' || this.document?.type === 'augment')) {
+                    if (processedData && this.document?.type) {
                         const validationResult = validateCriticalFields(processedData, this.document.type);
                         if (!validationResult.isValid) {
-                            logger.warn('AvantItemSheet | Form validation failed:', validationResult.errors);
+                            logger.warn(`AvantItemSheet | Form validation failed for ${this.document.type}:`, validationResult.errors);
+                            // For weapons with invalid damage dice, show user notification
+                            if (this.document.type === 'weapon' && validationResult.errors.some(e => e.includes('damageDie'))) {
+                                const ui = (globalThis as any).ui;
+                                if (ui?.notifications) {
+                                    ui.notifications.error('Invalid damage dice format. Use dice notation like 1d6, 2d10, etc.');
+                                }
+                            }
                             // Continue processing but log the issues
                         }
                     }

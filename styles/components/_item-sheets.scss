@@ -874,17 +874,16 @@
     // Field containers for individual fields (preserves order from layout system)
     .row-container.field-container {
         width: 100%;
-        
         // If the field container only has one child, it takes full width
         &:has(> *:only-child) {
             .form-group {
                 max-width: 100%;
             }
         }
-        
+
         // Add some spacing between field containers
         margin-bottom: var(--space-sm, 8px);
-        
+
         &:last-child {
             margin-bottom: 0;
         }
@@ -897,23 +896,23 @@
         align-items: flex-start;
         width: 100%;
         margin-bottom: var(--space-sm, 8px);
-        
+
         // Each field in a side-by-side container takes equal space
-        > .form-group {
+        >.form-group {
             flex: 1 1 50%;
             min-width: 0;
         }
-        
+
         // Responsive: stack vertically on small screens
         @media (max-width: 480px) {
             flex-direction: column;
             gap: var(--space-sm, 8px);
-            
-            > .form-group {
+
+            >.form-group {
                 flex: 1 1 100%;
             }
         }
-        
+
         &:last-child {
             margin-bottom: 0;
         }

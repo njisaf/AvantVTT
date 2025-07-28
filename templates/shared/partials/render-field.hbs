@@ -459,6 +459,19 @@ class=field.class}}
   {{#if field.range}}<span class="item-range">{{field.range}}</span>{{/if}}
 </div>
 
+{{else if (eq field.type "weapon-ability")}}
+{{!-- Weapon ability display --}}
+<div class="weapon-ability">
+  {{#if field.ability}}<span class="item-ability">{{field.ability}}</span>{{/if}}
+</div>
+
+{{else if (eq field.type "weapon-description")}}
+{{!-- Weapon description display --}}
+<div class="weapon-description">
+  {{field.value}}
+  {{#if field.description}}<span class="item-description">{{field.description}}</span>{{/if}}
+</div>
+
 {{else if (eq field.type "weapon-edit-button")}}
 {{!-- Weapon edit button --}}
 <button type="button" 
@@ -751,6 +764,19 @@ class=field.class}}
         tabindex="0">
   <i class="fas fa-trash" aria-hidden="true"></i>
 </button>
+
+{{else if (eq field.type "trait-preview")}}
+{{!-- Trait Preview --}}
+<div class="{{field.class}}">
+  <label class="form-label">{{field.label}}</label>
+  <div class="trait-chip trait-chip--preview" 
+       style="background-color: {{field.trait.color}}; color: {{#if field.trait.color}}#000{{else}}#fff{{/if}};">
+    {{#if field.trait.icon}}
+      <i class="{{field.trait.icon}}" aria-hidden="true"></i>
+    {{/if}}
+    {{field.itemName}}
+  </div>
+</div>
 
 {{else}}
 {{!-- Fallback for unknown field types --}}

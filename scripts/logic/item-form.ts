@@ -18,6 +18,7 @@ import { logger } from '../utils/logger.js';
 import { ValidationUtils } from '../utils/validation.js';
 import { extractItemFormData } from './item-sheet-utils.js';
 import type { Result } from '../types/core/result.js';
+import { validateDiceExpression } from './rolls-utils.js';
 
 /**
  * ApplicationV2 Form Data Sources
@@ -468,6 +469,9 @@ export function getValidationRules(itemType: string): ValidationRules {
         baseRules.requiredFields.push('requirements', 'levelRequirement', 'apCost');
     } else if (itemType === 'augment') {
         baseRules.requiredFields.push('requirements', 'levelRequirement', 'apCost', 'ppCost');
+    } else if (itemType === 'weapon') {
+        // Weapons require damageDie to be present and valid
+        baseRules.requiredFields.push('damageDie');
     }
 
     // Add validation functions for optional fields
@@ -486,6 +490,11 @@ export function getValidationRules(itemType: string): ValidationRules {
             if (value === null || value === undefined) return true;
             const num = Number(value);
             return !isNaN(num) && num >= 0;
+        },
+        'damageDie': (value: any) => {
+            if (value === null || value === undefined || value === '') return false;
+            const validation = validateDiceExpression(String(value));
+            return validation.valid;
         }
     };
 

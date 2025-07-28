@@ -68,4 +68,15 @@ _exports/
 _devDocs/
 changelogs/
 
+# Kilo
+.kilocode/
+
+# Cursor
+.cursor
+
+# Claude specific files
 CLAUDE.md
+.claude
+
+# Specifications
+.specstory

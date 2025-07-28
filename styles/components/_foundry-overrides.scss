@@ -1,0 +1,109 @@
+/**
+ * FoundryVTT Overrides
+ * 
+ * This file contains all styles that override FoundryVTT's default behavior.
+ * These overrides are intentionally scoped to specific contexts to prevent
+ * bleeding into other FoundryVTT interfaces like dialogs, compendiums, etc.
+ * 
+ * IMPORTANT: Only add styles here if they are specifically intended to
+ * override FoundryVTT's default styling. All other styles should be in
+ * their respective component files.
+ */
+
+// ========================================================================
+// SCOPED FORM ELEMENT OVERRIDES
+// Only apply to specific Avant sheet contexts, not global dialogs
+// ========================================================================
+
+// Actor and Item sheet form element overrides
+.avant.sheet.actor,
+.avant.sheet.item {
+  // Form elements within sheets only
+  .sheet-body,
+  .sheet-content,
+  .tab,
+  .form-group,
+  .form-fields {
+    input:not(.foundry-default),
+    textarea:not(.foundry-default),
+    select:not(.foundry-default),
+    button:not(.foundry-default) {
+      background: var(--theme-bg-tertiary, #333333) !important;
+      border-color: var(--theme-border-primary, #404040) !important;
+      color: var(--theme-text-primary, #FFFFFF) !important;
+
+      &:focus {
+        background: var(--theme-bg-primary, #1C1C1C) !important;
+        border-color: var(--theme-accent-primary, #00E0DC) !important;
+      }
+    }
+  }
+}
+
+// ========================================================================
+// WINDOW CONTENT OVERRIDES - SCOPED TO AVANT SHEETS
+// Prevent affecting FoundryVTT dialogs and popups
+// ========================================================================
+
+// Only target Avant application windows, not general FoundryVTT windows
+.application.avant {
+  .window-content {
+    background: var(--theme-bg-primary, #1C1C1C) !important;
+    color: var(--theme-text-primary, #FFFFFF) !important;
+  }
+
+  .sheet-content {
+    background: var(--theme-bg-primary, #1C1C1C) !important;
+    color: var(--theme-text-primary, #FFFFFF) !important;
+  }
+}
+
+// ========================================================================
+// TAB OVERRIDES - SCOPED TO AVANT SHEETS
+// Only affect tabs within Avant sheets, not FoundryVTT system tabs
+// ========================================================================
+
+.avant.sheet {
+  .tabs,
+  .tab {
+    background: var(--theme-bg-secondary, #2A2A2A) !important;
+    color: var(--theme-text-primary, #FFFFFF) !important;
+    border-color: var(--theme-border-primary, #404040) !important;
+  }
+}
+
+// ========================================================================
+// HEADER CONTROLS OVERRIDE
+// Font Awesome icons in sheet headers need specific font family
+// ========================================================================
+
+.avant .window-header {
+  .header-button,
+  .header-control {
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 5 Free", "FontAwesome" !important;
+    font-weight: 900 !important;
+    font-style: normal !important;
+  }
+}
+
+// ========================================================================
+// SPECIFIC SHEET TYPE OVERRIDES
+// These target specific sheet types to prevent affecting other FoundryVTT UI
+// ========================================================================
+
+.avant.sheet.item {
+  &.talent-sheet,
+  &.augment-sheet,
+  &.action-sheet,
+  &.feature-sheet,
+  &.gear-sheet,
+  &.weapon-sheet,
+  &.armor-sheet {
+    background: var(--theme-bg-primary, #1C1C1C) !important;
+    border: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    min-height: 100% !important;
+  }
+}

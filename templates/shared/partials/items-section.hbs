@@ -1,0 +1,24 @@
+{{!--
+Items Section Partial
+Reusable section for rendering item lists with consistent header and add button
+
+Context:
+- title: Section title (e.g., "Weapons", "Talents")
+- itemType: Item type for create button (e.g., "weapon", "talent")
+- items: Array of item card data
+- cssClass: CSS class for the items list (e.g., "weapon-cards", "talent-cards")
+--}}
+
+<div class="items-header">
+    <h3>{{title}}</h3>
+    <button type="button" class="item-create" data-action="createItem" data-type="{{itemType}}"
+        title="Create {{title}}">
+        <i class="fas fa-plus"></i> Add
+    </button>
+</div>
+<div class="items-list {{cssClass}}">
+    {{#each items as |cardData id|}}
+    {{> "systems/avant/templates/shared/partials/item-card" item=cardData.item
+    layout=cardData.cardLayout}}
+    {{/each}}
+</div>

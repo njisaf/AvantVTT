@@ -39,6 +39,7 @@ import {
 } from '../logic/actor-sheet-utils.ts';
 import { itemHasTraits, createTraitHtmlForChat } from '../logic/chat/trait-resolver.ts';
 import { CardLayoutIntegration } from '../layout/item-card/integration-example.ts';
+import { combineActionSources, rollCombinedAction, type CombinedAction } from '../logic/unified-actions.js';
 
 // Import local foundry UI adapter for safe notifications
 import { FoundryUI } from '../types/adapters/foundry-ui.ts';
@@ -115,6 +116,9 @@ export function createAvantActorSheet() {
     class AvantActorSheet extends HandlebarsApplicationMixin(BaseClass) {
         /** The actor document associated with this sheet */
         declare document: any;
+        
+        /** Context data for template rendering */
+        context?: any;
 
         /**
          * 🎯 APPLICATIONV2 ACTION REGISTRATION SYSTEM
@@ -166,8 +170,8 @@ export function createAvantActorSheet() {
             // Form handling configuration
             form: {
                 submitOnChange: true,  // Auto-submit on field changes
-                closeOnSubmit: false, // Keep sheet open after submission
-                handler: AvantActorSheet._handleFormSubmission // Custom form handler
+                closeOnSubmit: false // Keep sheet open after submission
+                // Use default ApplicationV2 form handler instead of custom one
             },
 
             // 🎯 CRITICAL: All ApplicationV2 actions must be registered here
@@ -192,6 +196,9 @@ export function createAvantActorSheet() {
                 // 💬 Chat Integration Actions
                 postChatCard: AvantActorSheet._onPostChatCard,
                 useAction: AvantActorSheet._onUseAction,
+                
+                // 🎯 Unified Actions System
+                rollCombinedAction: AvantActorSheet._onRollCombinedAction,
 
                 // 🎯 FEATURE CARD SYSTEM - The main fix that resolved the debugging issue
                 // These actions connect to the complete feature card infrastructure:
@@ -369,6 +376,28 @@ export function createAvantActorSheet() {
             console.log('🔍 ACTOR SHEET DEBUG | Preparing card layouts for items...');
             context.cardLayouts = {};
 
+            // // Generate card layouts for each item type
+            // const itemTypes = ['weapon', 'armor', 'gear', 'action', 'feature', 'talent', 'augment'];
+            // for (const itemType of itemTypes) {
+            //     const itemsOfType = context.items[itemType] || [];
+            //     if (itemsOfType.length > 0) {
+            //         context.cardLayouts[itemType] = await CardLayoutIntegration.prepareItemCards(itemsOfType);
+            //     } else {
+            //         context.cardLayouts[itemType] = [];
+            //     }
+            // }
+            // console.log('🔍 ACTOR SHEET DEBUG | Card layouts prepared successfully');
+
+            // Add comprehensive display data to items (traits, descriptions, requirements, etc.)
+            // IMPORTANT: This must happen BEFORE card layouts are prepared
+            console.log('🔍 ACTOR SHEET DEBUG | Adding trait display data to items...');
+            await this._addTraitDisplayDataToItems(context.items);
+            console.log('🔍 ACTOR SHEET DEBUG | Trait display data added successfully');
+
+            // Prepare card layouts for each item type
+            console.log('🔍 ACTOR SHEET DEBUG | Preparing card layouts for items...');
+            context.cardLayouts = {};
+
             // Generate card layouts for each item type
             const itemTypes = ['weapon', 'armor', 'gear', 'action', 'feature', 'talent', 'augment'];
             for (const itemType of itemTypes) {
@@ -381,10 +410,10 @@ export function createAvantActorSheet() {
             }
             console.log('🔍 ACTOR SHEET DEBUG | Card layouts prepared successfully');
 
-            // Add comprehensive display data to items (traits, descriptions, requirements, etc.)
-            console.log('🔍 ACTOR SHEET DEBUG | Adding trait display data to items...');
-            await this._addTraitDisplayDataToItems(context.items);
-            console.log('🔍 ACTOR SHEET DEBUG | Trait display data added successfully');
+            // Prepare unified actions for the Actions tab
+            console.log('🔍 ACTOR SHEET DEBUG | Preparing unified actions...');
+            context.unifiedActions = await this._prepareUnifiedActions();
+            console.log('🔍 ACTOR SHEET DEBUG | Unified actions prepared:', context.unifiedActions.length);
 
             // Add system configuration data
             context.config = (globalThis as any).CONFIG?.AVANT || {};
@@ -397,6 +426,9 @@ export function createAvantActorSheet() {
             console.log('🔍 ACTOR SHEET DEBUG | Final context.editable:', context.editable);
             console.log('🔍 ACTOR SHEET DEBUG | Final context.cssClass:', context.cssClass);
             console.log('🔍 ACTOR SHEET DEBUG | Returning context from _prepareContext()');
+
+            // Store context for use in action handlers
+            this.context = context;
 
             return context;
         }
@@ -426,6 +458,28 @@ export function createAvantActorSheet() {
             // Initialize custom functionality that ApplicationV2 doesn't handle automatically
             this._initializeTabs();    // Manual tab management for Avant sheets
             this._ensureItemStyling(); // Ensure proper item display styling
+        }
+
+        /**
+         * Prepare unified actions for the Actions tab
+         * Combines gear-based actions with standalone actions
+         * @returns Promise<CombinedAction[]> Array of combined actions
+         */
+        private async _prepareUnifiedActions(): Promise<CombinedAction[]> {
+            try {
+                const result = combineActionSources(this.document);
+                
+                if (result.success) {
+                    logger.log(`AvantActorSheet | Prepared ${result.data!.length} unified actions`);
+                    return result.data!;
+                } else {
+                    logger.warn(`AvantActorSheet | Failed to prepare unified actions: ${result.error}`);
+                    return [];
+                }
+            } catch (error) {
+                logger.error('AvantActorSheet | Error preparing unified actions:', error);
+                return [];
+            }
         }
 
         /**
@@ -849,6 +903,15 @@ export function createAvantActorSheet() {
             console.log('🔍 ACTOR SHEET DEBUG | Constructor called with options:', options);
             console.log('🔍 ACTOR SHEET DEBUG | Document in constructor:', options.document?.name || 'undefined');
             super(options);
+            
+            // 🚨 DEBUG ApplicationV2 Form Configuration
+            console.log('🔍 FORM CONFIG DEBUG | DEFAULT_OPTIONS.tag:', (this.constructor as any).DEFAULT_OPTIONS?.tag);
+            console.log('🔍 FORM CONFIG DEBUG | DEFAULT_OPTIONS.form:', (this.constructor as any).DEFAULT_OPTIONS?.form);
+            console.log('🔍 FORM CONFIG DEBUG | Form handler reference:', (this.constructor as any).DEFAULT_OPTIONS?.form?.handler);
+            console.log('🔍 FORM CONFIG DEBUG | submitOnChange:', (this.constructor as any).DEFAULT_OPTIONS?.form?.submitOnChange);
+            console.log('🔍 FORM CONFIG DEBUG | _handleFormSubmission exists?', typeof (this.constructor as any)._handleFormSubmission);
+            console.log('🔍 FORM CONFIG DEBUG | Handler function name:', (this.constructor as any).DEFAULT_OPTIONS?.form?.handler?.name);
+            
             console.log('🔍 ACTOR SHEET DEBUG | Constructor completed, this.document exists:', !!this.document);
         }
 
@@ -881,8 +944,8 @@ export function createAvantActorSheet() {
         /**
          * Handle ability rolls from sheet buttons
          * 
-         * Rolls 2d10 + ability value and sends the result to chat. The ability to roll
-         * is determined from the data-ability attribute on the clicked element.
+         * Rolls 2d10 + Level + Ability modifier using the proper rolls-utils system.
+         * The ability to roll is determined from the data-ability attribute on the clicked element.
          * 
          * @param {Event} event - The originating click event
          * @param {HTMLElement} target - The clicked element with data-ability attribute
@@ -902,31 +965,31 @@ export function createAvantActorSheet() {
                 return;
             }
 
-            // Get the ability data from the actor
-            const ability = sheet.document.system.abilities?.[abilityName];
-            if (!ability) {
-                logger.warn('AvantActorSheet | Ability not found:', abilityName);
-                return;
+            try {
+                // 🎯 CRITICAL FIX: Use the proper rolls-utils system for ability rolls
+                // This ensures rolls include Level + Ability modifier as shown on the button
+                const { buildAbilityRoll } = await import('../logic/rolls-utils.js');
+                
+                // Build the roll payload with proper modifiers
+                const rollPayload = buildAbilityRoll(abilityName, sheet.document, {
+                    speaker: (globalThis as any).ChatMessage.getSpeaker({ actor: sheet.document })
+                });
+
+                // Execute the roll and send to chat
+                await rollPayload.sendToChat();
+
+                logger.log(`AvantActorSheet | Executed ${abilityName} ability roll`);
+            } catch (error) {
+                logger.error('AvantActorSheet | Ability roll failed:', error);
+                FoundryUI.notify(`Failed to roll ${abilityName}`, 'error');
             }
-
-            // Execute the 2d10 + ability value roll
-            const Roll = (globalThis as any).Roll;
-            const roll = new Roll('2d10 + @value', { value: ability.value });
-            await roll.evaluate();
-
-            // Send the result to chat
-            const ChatMessage = (globalThis as any).ChatMessage;
-            await roll.toMessage({
-                speaker: ChatMessage.getSpeaker({ actor: sheet.document }),
-                flavor: `${ability.label || abilityName} Roll`
-            });
         }
 
         /**
          * Handle skill rolls from sheet buttons
          * 
-         * Rolls 2d10 + skill value and sends the result to chat. The skill to roll
-         * is determined from the data-skill attribute on the clicked element.
+         * Rolls 2d10 + Level + Ability modifier + Skill modifier using the proper rolls-utils system.
+         * The skill to roll is determined from the data-skill attribute on the clicked element.
          * 
          * @param {Event} event - The originating click event
          * @param {HTMLElement} target - The clicked element with data-skill attribute
@@ -946,24 +1009,24 @@ export function createAvantActorSheet() {
                 return;
             }
 
-            // Get the skill data from the actor
-            const skill = sheet.document.system.skills?.[skillName];
-            if (!skill) {
-                logger.warn('AvantActorSheet | Skill not found:', skillName);
-                return;
+            try {
+                // 🎯 CRITICAL FIX: Use the proper rolls-utils system for skill rolls
+                // This ensures rolls include Level + Ability modifier + Skill modifier as shown on the button
+                const { buildSkillRoll } = await import('../logic/rolls-utils.js');
+                
+                // Build the roll payload with proper modifiers
+                const rollPayload = buildSkillRoll(skillName, sheet.document, {
+                    speaker: (globalThis as any).ChatMessage.getSpeaker({ actor: sheet.document })
+                });
+
+                // Execute the roll and send to chat
+                await rollPayload.sendToChat();
+
+                logger.log(`AvantActorSheet | Executed ${skillName} skill roll`);
+            } catch (error) {
+                logger.error('AvantActorSheet | Skill roll failed:', error);
+                FoundryUI.notify(`Failed to roll ${skillName}`, 'error');
             }
-
-            // Execute the 2d10 + skill value roll
-            const Roll = (globalThis as any).Roll;
-            const roll = new Roll('2d10 + @value', { value: skill.value });
-            await roll.evaluate();
-
-            // Send the result to chat
-            const ChatMessage = (globalThis as any).ChatMessage;
-            await roll.toMessage({
-                speaker: ChatMessage.getSpeaker({ actor: sheet.document }),
-                flavor: `${skill.label || skillName} Skill Roll`
-            });
         }
 
         /**
@@ -1017,7 +1080,6 @@ export function createAvantActorSheet() {
          * @this {AvantActorSheet} The ApplicationV2 instance (bound automatically)
          */
         static async _onRollAttack(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
-
             event.preventDefault();
 
             // FIXED: In ApplicationV2, 'this' is bound to the sheet instance
@@ -1030,18 +1092,24 @@ export function createAvantActorSheet() {
             const item = sheet.document.items.get(itemId);
             if (!item) return;
 
-            // Roll 2d10 + attack bonus
-            const attackValue = item.system.attack || 0;
-            const Roll = (globalThis as any).Roll;
-            const roll = new Roll('2d10 + @attack', { attack: attackValue });
-            await roll.evaluate();
+            try {
+                // 🎯 CRITICAL FIX: Use the proper rolls-utils system for weapon attack rolls
+                // This ensures rolls include Level + Ability modifier + Weapon modifier as shown on the button
+                const { buildWeaponAttackRoll } = await import('../logic/rolls-utils.js');
+                
+                // Build the roll payload with proper modifiers (2d10+level+ability+weapon)
+                const rollPayload = buildWeaponAttackRoll(item, sheet.document, {
+                    speaker: (globalThis as any).ChatMessage.getSpeaker({ actor: sheet.document })
+                });
 
-            const ChatMessage = (globalThis as any).ChatMessage;
-            await roll.toMessage({
-                speaker: ChatMessage.getSpeaker({ actor: sheet.document }),
-                flavor: `${item.name} Attack Roll`
-            });
+                // Execute the roll and send to chat
+                await rollPayload.sendToChat();
 
+                logger.log(`AvantActorSheet | Executed ${item.name} weapon attack roll`);
+            } catch (error) {
+                logger.error('AvantActorSheet | Weapon attack roll failed:', error);
+                FoundryUI.notify(`Failed to roll ${item.name} attack`, 'error');
+            }
         }
 
         /**
@@ -1064,7 +1132,7 @@ export function createAvantActorSheet() {
             if (!item) return;
 
             // Roll damage (use weapon damage formula or default)
-            const damageFormula = item.system.damage || '1d6';
+            const damageFormula = item.system.damageDie || item.system.damage || '1d6';
             const Roll = (globalThis as any).Roll;
             const roll = new Roll(damageFormula);
             await roll.evaluate();
@@ -1129,6 +1197,50 @@ export function createAvantActorSheet() {
             } catch (error) {
                 logger.error('AvantActorSheet | Armor roll failed:', error);
                 FoundryUI.notify('Armor roll failed', 'error');
+            }
+        }
+
+        /**
+         * Handle unified action rolls
+         * @param event - The originating click event
+         * @param target - The target element
+         * @this {AvantActorSheet} The ApplicationV2 instance (bound automatically)
+         */
+        static async _onRollCombinedAction(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
+            event.preventDefault();
+
+            const sheet = this;
+            if (!sheet?.document) return;
+
+            // Extract action data from the target element
+            const actionId = target.dataset.actionId;
+            const buttonType = target.dataset.button;
+            
+            if (!actionId || !buttonType) {
+                logger.warn('AvantActorSheet | Missing action ID or button type for combined action');
+                return;
+            }
+
+            // Get the unified actions from the sheet context
+            const unifiedActions = sheet.context?.unifiedActions || [];
+            const action = unifiedActions.find((a: CombinedAction) => a.id === actionId);
+            
+            if (!action) {
+                logger.warn(`AvantActorSheet | Combined action not found: ${actionId}`);
+                return;
+            }
+
+            try {
+                // Dispatch the action through the unified system
+                const result = rollCombinedAction(action, buttonType, sheet.document, sheet);
+                
+                if (!result.success) {
+                    logger.warn(`AvantActorSheet | Combined action failed: ${result.error}`);
+                    FoundryUI.notify(`Action failed: ${result.error}`, 'warn');
+                }
+            } catch (error) {
+                logger.error('AvantActorSheet | Combined action error:', error);
+                FoundryUI.notify('Action failed', 'error');
             }
         }
 
@@ -1684,97 +1796,51 @@ export function createAvantActorSheet() {
          * @returns Promise<void>
          */
         static async _handleFormSubmission(event: Event, form: HTMLFormElement, formData: any): Promise<void> {
-            // Try multiple methods to find the sheet instance
-            let sheet: AvantActorSheet | null = null;
+            console.log('🚀 CUSTOM HANDLER DEBUG | *** CUSTOM HANDLER CALLED SUCCESSFULLY ***');
+            console.log('🚀 CUSTOM HANDLER DEBUG | Event:', event);
+            console.log('🚀 CUSTOM HANDLER DEBUG | Form element:', form);
+            console.log('🚀 CUSTOM HANDLER DEBUG | FormData received:', formData);
+            console.log('🚀 CUSTOM HANDLER DEBUG | FormData type:', typeof formData);
+            console.log('🚀 CUSTOM HANDLER DEBUG | FormData.object:', formData?.object);
+            console.log('🚀 CUSTOM HANDLER DEBUG | Event type:', event?.type);
 
-            // Method 1: Try the ApplicationV2 way (closest .app element)
+            // Find the sheet instance via the ApplicationV2 way
             const appElement = form.closest('.app') as any;
-            if (appElement?.app) {
-                sheet = appElement.app as AvantActorSheet;
+            if (!appElement?.app) {
+                console.log('🔧 FORM DEBUG | No app element found');
+                return;
             }
 
-            // Method 2: Try finding via the form's data attributes
-            if (!sheet && form.dataset.actorId) {
-                const game = (globalThis as any).game;
-                const actor = game?.actors?.get(form.dataset.actorId);
-                if (actor?.sheet) {
-                    sheet = actor.sheet as AvantActorSheet;
-                }
-            }
+            const sheet = appElement.app as AvantActorSheet;
+            console.log('🔧 FORM DEBUG | Found sheet:', !!sheet);
+            console.log('🔧 FORM DEBUG | Sheet document:', !!sheet?.document);
 
-            // Method 3: Try finding via the window applications registry
-            if (!sheet && form.closest('.window-app')) {
-                const windowElement = form.closest('.window-app') as any;
-                const appId = windowElement?.dataset?.appid;
-                if (appId) {
-                    const game = (globalThis as any).game;
-                    const app = Object.values(game?.applications || {}).find((app: any) => app.appId === appId);
-                    if (app instanceof AvantActorSheet) {
-                        sheet = app;
-                    }
-                }
-            }
-
-            // If we found a sheet, use it; otherwise handle gracefully
-            if (sheet && sheet._onSubmitForm) {
-                try {
-                    return await sheet._onSubmitForm(event, form, formData);
-                } catch (error) {
-                    logger.error('AvantActorSheet | Form submission error:', error);
-                    // Don't throw - let the form submission continue with default behavior
-                }
-            }
-
-            // Fallback: Handle the form data directly if no sheet found
-            if (formData?.object) {
-                try {
-                    // Extract actor ID from form or event target
-                    const actorId = form.dataset.actorId ||
-                        (event.target as HTMLElement)?.closest('[data-actor-id]')?.getAttribute('data-actor-id');
-
-                    if (actorId) {
-                        const game = (globalThis as any).game;
-                        const actor = game?.actors?.get(actorId);
-                        if (actor) {
-                            await actor.update(formData.object);
-                            return;
-                        }
-                    }
-                } catch (error) {
-                    logger.error('AvantActorSheet | Fallback form submission error:', error);
-                }
-            }
-
-            return Promise.resolve();
-        }
-
-        /**
-         * Handle form submission for ApplicationV2 compatibility
-         * @param event - The form submission event
-         * @param form - The form element
-         * @param formData - The form data
-         */
-        async _onSubmitForm(event: Event, form: HTMLFormElement, formData: any): Promise<void> {
-            if (!this.document) {
+            if (!sheet?.document) {
                 logger.warn('AvantActorSheet | No document available for form submission');
+                console.log('🔧 FORM DEBUG | No document - returning');
                 return;
             }
 
             try {
-                // Validate formData before processing
+                // 🎯 CRITICAL: In ApplicationV2, formData should contain the processed form data
+                // The formData.object contains the actual data to update
                 if (!formData || !formData.object) {
                     logger.warn('AvantActorSheet | No form data to process');
+                    console.log('🔧 FORM DEBUG | No form data.object - returning');
                     return;
                 }
 
+                console.log('🔧 FORM DEBUG | Updating document with data:', formData.object);
                 // Process and update the actor with the form data
-                await this.document.update(formData.object);
+                await sheet.document.update(formData.object);
+                console.log('🔧 FORM DEBUG | Document update completed successfully');
 
                 // Log successful update for debugging
-                logger.debug('AvantActorSheet | Actor updated successfully:', this.document.name);
+                logger.debug('AvantActorSheet | Actor updated successfully:', sheet.document.name);
 
             } catch (error) {
                 logger.error('AvantActorSheet | Form submission failed:', error);
+                console.log('🔧 FORM DEBUG | Form submission error:', error);
 
                 // Show user-friendly error message
                 const ui = (globalThis as any).ui;
@@ -1786,6 +1852,8 @@ export function createAvantActorSheet() {
                 throw error;
             }
         }
+
+        // 🚨 REMOVED _onSubmitForm - ApplicationV2 should use custom handler only
 
         /**
          * Initialize ApplicationV2 options for the actor sheet

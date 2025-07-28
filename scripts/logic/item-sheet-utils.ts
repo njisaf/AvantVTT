@@ -227,7 +227,7 @@ export function formatItemDisplay(item: unknown): ItemDisplayInfo {
 
     // Type-specific formatting
     if (type === 'weapon') {
-        const damage = system.damage || '';
+        const damage = system.damageDie || system.damage || '';
         const damageType = system.damageType || '';
         const ability = system.ability || '';
 

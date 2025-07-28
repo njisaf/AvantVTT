@@ -1,0 +1,17 @@
+{{!--
+Actions Section Partial
+Special section for the unified actions tab
+
+Context:
+- unifiedActions: Array of unified action objects
+--}}
+
+<div class="items-header">
+    <h3>Actions</h3>
+    <button type="button" class="item-create" data-action="createItem" data-type="action"
+        title="Create Action">
+        <i class="fas fa-plus"></i> Add
+    </button>
+</div>
+
+{{> "systems/avant/templates/shared/partials/unified-actions-list" unifiedActions=unifiedActions}}

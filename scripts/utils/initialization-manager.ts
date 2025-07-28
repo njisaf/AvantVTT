@@ -666,6 +666,7 @@ export class FoundryInitializationHelper {
                 "systems/avant/templates/shared/partials/avant-item-header.hbs",  // Universal header with icon + name + meta fields
                 "systems/avant/templates/shared/partials/item-body.hbs",          // Universal body with organized field rows
                 "systems/avant/templates/shared/partials/render-field.hbs",       // Field renderer for all field types
+                "systems/avant/templates/shared/partials/render-card-field.hbs",  // Card field renderer for item cards
 
                 // Phase 5 Additional Components
                 "systems/avant/templates/shared/partials/category-select.hbs",
@@ -674,7 +675,19 @@ export class FoundryInitializationHelper {
                 // Phase 3 Layout Partials - NEW layout components
                 "systems/avant/templates/shared/partials/single-content.hbs",
                 "systems/avant/templates/shared/partials/description-tab.hbs",
-                "systems/avant/templates/shared/partials/details-tab.hbs"
+                "systems/avant/templates/shared/partials/details-tab.hbs",
+
+                // Unified Actions System Partials - NEW unified actions components
+                "systems/avant/templates/shared/partials/actions-section.hbs",
+                "systems/avant/templates/shared/partials/items-section.hbs",
+                "systems/avant/templates/shared/partials/unified-actions-list.hbs",
+                "systems/avant/templates/shared/partials/unified-action-item.hbs",
+                "systems/avant/templates/shared/partials/unified-action-content.hbs",
+                "systems/avant/templates/shared/partials/unified-action-controls.hbs",
+                "systems/avant/templates/shared/partials/unified-action-buttons.hbs",
+                "systems/avant/templates/shared/partials/action-action-stats.hbs",
+                "systems/avant/templates/shared/partials/weapon-action-stats.hbs",
+                "systems/avant/templates/shared/partials/armor-action-stats.hbs"
             ];
 
             // Load all templates into FoundryVTT's template cache

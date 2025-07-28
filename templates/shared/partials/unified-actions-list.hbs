@@ -1,0 +1,19 @@
+{{!--
+Unified Actions List Partial
+Renders the unified actions list for the Actions tab
+
+Context:
+- unifiedActions: Array of unified action objects
+--}}
+
+<div class="unified-actions-list">
+    {{#if unifiedActions}}
+    {{#each unifiedActions as |action|}}
+    {{> "systems/avant/templates/shared/partials/unified-action-item" action=action}}
+    {{/each}}
+    {{else}}
+    <div class="no-actions-message">
+        <p>No actions available. Add gear items or create standalone actions to get started.</p>
+    </div>
+    {{/if}}
+</div>

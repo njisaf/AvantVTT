@@ -1,0 +1,22 @@
+{{!--
+Action Action Stats Partial
+Renders action-specific stats for unified actions
+
+Context:
+- action: Unified action object with action system data
+--}}
+
+<div class="action-stats">
+    {{#if action.system.apCost}}
+    <div class="stat-tile">
+        <span class="stat-value">{{action.system.apCost}}</span>
+        <span class="stat-label">AP</span>
+    </div>
+    {{/if}}
+    {{#if action.system.ppCost}}
+    <div class="stat-tile">
+        <span class="stat-value">{{action.system.ppCost}}</span>
+        <span class="stat-label">PP</span>
+    </div>
+    {{/if}}
+</div>

@@ -40,7 +40,7 @@ describe('Role Utility Framework', () => {
     let validateDiceExpression, validateModifiers, validateRollConfiguration;
 
     beforeEach(async () => {
-      const module = await import('../../../scripts/logic/roles-utils.js');
+      const module = await import('../../../scripts/logic/rolls-utils.js');
       validateDiceExpression = module.validateDiceExpression;
       validateModifiers = module.validateModifiers;
       validateRollConfiguration = module.validateRollConfiguration;
@@ -154,7 +154,7 @@ describe('Role Utility Framework', () => {
     let calculateTotalModifier, formatModifierBreakdown, generateRollFormula, generateTooltip;
 
     beforeEach(async () => {
-      const module = await import('../../../scripts/logic/roles-utils.js');
+      const module = await import('../../../scripts/logic/rolls-utils.js');
       calculateTotalModifier = module.calculateTotalModifier;
       formatModifierBreakdown = module.formatModifierBreakdown;
       generateRollFormula = module.generateRollFormula;
@@ -281,7 +281,7 @@ describe('Role Utility Framework', () => {
     let buildRollPayload;
 
     beforeEach(async () => {
-      const module = await import('../../../scripts/logic/roles-utils.js');
+      const module = await import('../../../scripts/logic/rolls-utils.js');
       buildRollPayload = module.buildRollPayload;
     });
 
@@ -363,7 +363,7 @@ describe('Role Utility Framework', () => {
     let buildAbilityRoll, buildSkillRoll, buildWeaponAttackRoll, buildWeaponDamageRoll, buildArmorRoll, buildGenericRoll;
 
     beforeEach(async () => {
-      const module = await import('../../../scripts/logic/roles-utils.js');
+      const module = await import('../../../scripts/logic/rolls-utils.js');
       buildAbilityRoll = module.buildAbilityRoll;
       buildSkillRoll = module.buildSkillRoll;
       buildWeaponAttackRoll = module.buildWeaponAttackRoll;
@@ -579,7 +579,7 @@ describe('Role Utility Framework', () => {
     let buildRollPayload;
 
     beforeEach(async () => {
-      const module = await import('../../../scripts/logic/roles-utils.js');
+      const module = await import('../../../scripts/logic/rolls-utils.js');
       buildRollPayload = module.buildRollPayload;
     });
 

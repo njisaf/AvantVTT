@@ -1257,39 +1257,38 @@
   opacity: 0.7;
 }
 
-.form-row {
+.avant .form-row {
   display: flex;
   gap: 1rem;
   margin-bottom: 1rem;
 }
-.form-row .form-group {
+.avant .form-row .form-group {
   flex: 1;
 }
 @media (max-width: 768px) {
-  .form-row {
+  .avant .form-row {
     flex-direction: column;
     gap: 0.5rem;
   }
 }
-
-.form-group {
+.avant .form-group {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
   margin-bottom: 1rem;
 }
-.form-group label {
+.avant .form-group label {
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--theme-text-primary, #333);
 }
-.form-group label.required::after {
+.avant .form-group label.required::after {
   content: " *";
   color: var(--theme-error, #ff4444);
 }
-.form-group input,
-.form-group select,
-.form-group textarea {
+.avant .form-group input,
+.avant .form-group select,
+.avant .form-group textarea {
   padding: 0.5rem;
   border: 1px solid var(--theme-border, #ddd);
   border-radius: 0.25rem;
@@ -1298,21 +1297,21 @@
   color: var(--theme-text-primary, #333);
   transition: border-color 0.2s ease;
 }
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
+.avant .form-group input:focus,
+.avant .form-group select:focus,
+.avant .form-group textarea:focus {
   outline: none;
   border-color: var(--theme-primary, #00E0DC);
   box-shadow: 0 0 0 2px rgba(0, 224, 220, 0.2);
 }
-.form-group input:invalid,
-.form-group select:invalid,
-.form-group textarea:invalid {
+.avant .form-group input:invalid,
+.avant .form-group select:invalid,
+.avant .form-group textarea:invalid {
   border-color: var(--theme-error, #ff4444);
 }
-.form-group input:disabled,
-.form-group select:disabled,
-.form-group textarea:disabled {
+.avant .form-group input:disabled,
+.avant .form-group select:disabled,
+.avant .form-group textarea:disabled {
   background-color: var(--theme-bg-disabled, #f5f5f5);
   color: var(--theme-text-muted, #999);
   cursor: not-allowed;
@@ -1360,7 +1359,7 @@
  * @version 2.0.0
  * @since Phase 2
  */
-:root {
+.avant {
   --form-input-bg: var(--color-bg-secondary, #f8f9fa);
   --form-input-border: var(--color-border, #dee2e6);
   --form-input-focus: var(--color-primary, #00E0DC);
@@ -1387,36 +1386,34 @@
   --ap-selector-icon-size: 1.5rem;
 }
 
-.form-group {
+.avant .form-group {
   display: flex;
   flex-direction: column;
   gap: var(--form-hint-gap);
   margin-bottom: var(--form-group-gap);
 }
-.form-group:last-child {
+.avant .form-group:last-child {
   margin-bottom: 0;
 }
-
-.form-label {
+.avant .form-label {
   font-family: var(--form-label-font);
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--form-input-text);
   margin-bottom: var(--form-hint-gap);
 }
-.form-label .required-indicator {
+.avant .form-label .required-indicator {
   color: var(--form-input-error);
   margin-left: 0.25rem;
 }
-.form-label--checkbox {
+.avant .form-label--checkbox {
   font-weight: 500;
   margin-bottom: 0;
   margin-left: var(--form-hint-gap);
 }
-
-.form-input,
-.form-select,
-.form-textarea {
+.avant .form-input,
+.avant .form-select,
+.avant .form-textarea {
   font-family: var(--form-input-font);
   font-size: 0.875rem;
   color: var(--form-input-text);
@@ -1426,42 +1423,40 @@
   padding: var(--form-input-padding);
   transition: all 0.2s ease;
 }
-.form-input:focus,
-.form-select:focus,
-.form-textarea:focus {
+.avant .form-input:focus,
+.avant .form-select:focus,
+.avant .form-textarea:focus {
   outline: none;
   border-color: var(--form-input-focus);
   box-shadow: 0 0 0 var(--form-focus-ring-width) rgba(0, 224, 220, 0.25);
 }
-.form-input:disabled,
-.form-select:disabled,
-.form-textarea:disabled {
+.avant .form-input:disabled,
+.avant .form-select:disabled,
+.avant .form-textarea:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   background-color: var(--color-bg-disabled, #f5f5f5);
 }
-.form-input::placeholder,
-.form-select::placeholder,
-.form-textarea::placeholder {
+.avant .form-input::placeholder,
+.avant .form-select::placeholder,
+.avant .form-textarea::placeholder {
   color: var(--color-text-placeholder, #6c757d);
   opacity: 0.7;
 }
-
-.form-input {
+.avant .form-input {
   height: var(--form-input-height);
 }
-.form-input--number {
+.avant .form-input--number {
   text-align: right;
 }
-.form-input--number::-webkit-outer-spin-button, .form-input--number::-webkit-inner-spin-button {
+.avant .form-input--number::-webkit-outer-spin-button, .avant .form-input--number::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-.form-input--number[type=number] {
+.avant .form-input--number[type=number] {
   -moz-appearance: textfield;
 }
-
-.form-select {
+.avant .form-select {
   height: var(--form-select-height);
   cursor: pointer;
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23212529' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E");
@@ -1470,52 +1465,47 @@
   background-size: 16px 12px;
   padding-right: calc(var(--form-input-padding) * 2 + 16px);
 }
-
-.form-textarea {
+.avant .form-textarea {
   min-height: var(--form-textarea-min-height);
   resize: vertical;
   font-family: var(--form-input-font);
 }
-
-.form-group--checkbox {
+.avant .form-group--checkbox {
   flex-direction: row;
   align-items: flex-start;
   gap: 0;
 }
-.form-group--checkbox .checkbox-wrapper {
+.avant .form-group--checkbox .checkbox-wrapper {
   display: flex;
   align-items: center;
   gap: var(--form-hint-gap);
 }
-
-.form-checkbox {
+.avant .form-checkbox {
   width: 1rem;
   height: 1rem;
   accent-color: var(--form-input-focus);
   cursor: pointer;
 }
-.form-checkbox:disabled {
+.avant .form-checkbox:disabled {
   cursor: not-allowed;
 }
-
-.form-hint {
+.avant .form-hint {
   font-family: var(--form-hint-font);
   font-size: 0.75rem;
   color: var(--color-text-secondary, #6c757d);
   font-style: italic;
   line-height: 1.4;
 }
-
-.form-row {
+.avant .form-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: var(--form-group-gap);
   margin-bottom: var(--form-group-gap);
 }
-.form-row:last-child {
+.avant .form-row:last-child {
   margin-bottom: 0;
 }
-.form-row .form-group {
+.avant .form-row .form-group {
   margin-bottom: 0;
 }
 
@@ -1744,7 +1734,12 @@
   gap: 8px;
 }
 .avant .talent-item,
-.avant .augment-item {
+.avant .augment-item,
+.avant .weapon-item,
+.avant .armor-item,
+.avant .gear-item,
+.avant .action-item,
+.avant .feature-item {
   display: grid;
   grid-template-columns: 32px 1fr auto;
   grid-template-areas: "control content actions";
@@ -1758,7 +1753,12 @@
   min-height: 44px;
 }
 .avant .talent-item:hover,
-.avant .augment-item:hover {
+.avant .augment-item:hover,
+.avant .weapon-item:hover,
+.avant .armor-item:hover,
+.avant .gear-item:hover,
+.avant .action-item:hover,
+.avant .feature-item:hover {
   background: var(--theme-bg-secondary, #2A2A2A);
   box-shadow: var(--theme-shadow-primary, 0 4px 20px rgba(0, 224, 220, 0.1));
 }
@@ -2044,13 +2044,23 @@
   background: rgba(255, 71, 87, 0.1);
 }
 .avant .talent-item:focus-within,
-.avant .augment-item:focus-within {
+.avant .augment-item:focus-within,
+.avant .weapon-item:focus-within,
+.avant .armor-item:focus-within,
+.avant .gear-item:focus-within,
+.avant .action-item:focus-within,
+.avant .feature-item:focus-within {
   outline: 2px solid var(--theme-accent-primary, #00E0DC);
   outline-offset: 1px;
 }
 @media (max-width: 768px) {
   .avant .talent-item,
-  .avant .augment-item {
+  .avant .augment-item,
+  .avant .weapon-item,
+  .avant .armor-item,
+  .avant .gear-item,
+  .avant .action-item,
+  .avant .feature-item {
     grid-template-columns: 28px 1fr auto;
     gap: 8px;
     padding: 6px 8px;
@@ -2119,7 +2129,12 @@
   }
 }
 .avant.theme-dark .talent-item,
-.avant.theme-dark .augment-item {
+.avant.theme-dark .augment-item,
+.avant.theme-dark .weapon-item,
+.avant.theme-dark .armor-item,
+.avant.theme-dark .gear-item,
+.avant.theme-dark .action-item,
+.avant.theme-dark .feature-item {
   background: var(--theme-bg-tertiary, #333333);
   border-color: var(--theme-border-primary, #404040);
 }
@@ -2261,7 +2276,12 @@
 }
 @media print {
   .avant .talent-item,
-  .avant .augment-item {
+  .avant .augment-item,
+  .avant .weapon-item,
+  .avant .armor-item,
+  .avant .gear-item,
+  .avant .action-item,
+  .avant .feature-item {
     background: white !important;
     border: 1px solid #000 !important;
     box-shadow: none !important;
@@ -3874,6 +3894,375 @@
 }
 
 /**
+ * Unified Actions Tab Styles
+ * Styles for the unified actions system that combines gear and standalone actions
+ * Updated to match talent/augment icon-only styling for consistency
+ */
+.unified-actions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+}
+
+.unified-action-item {
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  grid-template-areas: "buttons content controls";
+  gap: 12px;
+  padding: 8px 12px;
+  background: var(--theme-bg-tertiary, #333333);
+  border: 1px solid var(--theme-border-primary, #404040);
+  border-left: 2px solid var(--theme-accent-primary, #00E0DC);
+  transition: all 0.3s ease;
+  align-items: start;
+  min-height: 44px;
+}
+.unified-action-item:hover {
+  background: var(--theme-bg-secondary, #2A2A2A);
+  box-shadow: var(--theme-shadow-primary, 0 4px 20px rgba(0, 224, 220, 0.1));
+}
+.unified-action-item.weapon-action {
+  border-left-color: #ff6b6b;
+}
+.unified-action-item.armor-action {
+  border-left-color: #4ecdc4;
+}
+.unified-action-item.gear-action {
+  border-left-color: #ffe66d;
+}
+.unified-action-item.action-action {
+  border-left-color: var(--theme-accent-primary, #00E0DC);
+}
+
+.avant .action-buttons {
+  grid-area: buttons;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 32px;
+  padding-top: 2px;
+  gap: 4px;
+}
+
+.action-btn {
+  background: transparent;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  color: var(--theme-accent-primary, #00E0DC);
+  font-size: 16px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.action-btn i {
+  font-size: 14px;
+}
+.action-btn:hover {
+  background: var(--theme-accent-primary, #00E0DC);
+  color: var(--theme-bg-primary, #1C1C1C);
+  box-shadow: 0 0 8px rgba(0, 224, 220, 0.4) !important;
+}
+.action-btn:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+.action-btn:active {
+  transform: scale(0.95);
+}
+
+.action-content {
+  grid-area: content;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.action-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.action-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--avant-text-primary, #fff);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.action-source-type {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--avant-text-secondary, #aaa);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 6px;
+  border-radius: 2px;
+  background: var(--avant-badge-bg, #444);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.action-stats {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.stat-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 2px 4px;
+  border-radius: 2px;
+  background: var(--avant-stat-tile-bg, #333);
+  min-width: 32px;
+}
+
+.stat-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--avant-text-primary, #fff);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 9px;
+  font-weight: 400;
+  color: var(--avant-text-secondary, #aaa);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  line-height: 1;
+}
+
+.action-description {
+  font-size: 11px;
+  color: var(--avant-text-secondary, #ccc);
+  margin-top: 2px;
+  line-height: 1.3;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.action-controls {
+  grid-area: controls;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.control-btn {
+  background: transparent;
+  border: none;
+  color: var(--theme-text-secondary, #BFBFBF);
+  font-size: 12px;
+  padding: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.control-btn:focus {
+  outline: 2px solid var(--theme-accent-primary, #00E0DC);
+  outline-offset: 2px;
+}
+.control-btn.edit-btn:hover {
+  color: var(--theme-accent-secondary, #4CE2E1);
+  background: rgba(76, 226, 225, 0.1);
+}
+.control-btn.delete-btn:hover {
+  color: #ff4757;
+  background: rgba(255, 71, 87, 0.1);
+}
+
+.no-actions-message {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--avant-text-secondary, #aaa);
+  font-style: italic;
+}
+.no-actions-message p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+  .unified-action-item {
+    grid-template-columns: 1fr;
+    grid-template-areas: "buttons" "content" "controls";
+    text-align: left;
+  }
+  .avant .action-buttons {
+    justify-content: flex-start;
+  }
+  .action-controls {
+    justify-content: flex-end;
+  }
+}
+@media (prefers-contrast: high) {
+  .unified-action-item {
+    border-width: 2px;
+  }
+  .action-btn {
+    border-width: 2px;
+  }
+}
+/**
+ * FoundryVTT Overrides
+ * 
+ * This file contains all styles that override FoundryVTT's default behavior.
+ * These overrides are intentionally scoped to specific contexts to prevent
+ * bleeding into other FoundryVTT interfaces like dialogs, compendiums, etc.
+ * 
+ * IMPORTANT: Only add styles here if they are specifically intended to
+ * override FoundryVTT's default styling. All other styles should be in
+ * their respective component files.
+ */
+.avant.sheet.actor .sheet-body input:not(.foundry-default),
+.avant.sheet.actor .sheet-body textarea:not(.foundry-default),
+.avant.sheet.actor .sheet-body select:not(.foundry-default),
+.avant.sheet.actor .sheet-body button:not(.foundry-default),
+.avant.sheet.actor .sheet-content input:not(.foundry-default),
+.avant.sheet.actor .sheet-content textarea:not(.foundry-default),
+.avant.sheet.actor .sheet-content select:not(.foundry-default),
+.avant.sheet.actor .sheet-content button:not(.foundry-default),
+.avant.sheet.actor .tab input:not(.foundry-default),
+.avant.sheet.actor .tab textarea:not(.foundry-default),
+.avant.sheet.actor .tab select:not(.foundry-default),
+.avant.sheet.actor .tab button:not(.foundry-default),
+.avant.sheet.actor .form-group input:not(.foundry-default),
+.avant.sheet.actor .form-group textarea:not(.foundry-default),
+.avant.sheet.actor .form-group select:not(.foundry-default),
+.avant.sheet.actor .form-group button:not(.foundry-default),
+.avant.sheet.actor .form-fields input:not(.foundry-default),
+.avant.sheet.actor .form-fields textarea:not(.foundry-default),
+.avant.sheet.actor .form-fields select:not(.foundry-default),
+.avant.sheet.actor .form-fields button:not(.foundry-default),
+.avant.sheet.item .sheet-body input:not(.foundry-default),
+.avant.sheet.item .sheet-body textarea:not(.foundry-default),
+.avant.sheet.item .sheet-body select:not(.foundry-default),
+.avant.sheet.item .sheet-body button:not(.foundry-default),
+.avant.sheet.item .sheet-content input:not(.foundry-default),
+.avant.sheet.item .sheet-content textarea:not(.foundry-default),
+.avant.sheet.item .sheet-content select:not(.foundry-default),
+.avant.sheet.item .sheet-content button:not(.foundry-default),
+.avant.sheet.item .tab input:not(.foundry-default),
+.avant.sheet.item .tab textarea:not(.foundry-default),
+.avant.sheet.item .tab select:not(.foundry-default),
+.avant.sheet.item .tab button:not(.foundry-default),
+.avant.sheet.item .form-group input:not(.foundry-default),
+.avant.sheet.item .form-group textarea:not(.foundry-default),
+.avant.sheet.item .form-group select:not(.foundry-default),
+.avant.sheet.item .form-group button:not(.foundry-default),
+.avant.sheet.item .form-fields input:not(.foundry-default),
+.avant.sheet.item .form-fields textarea:not(.foundry-default),
+.avant.sheet.item .form-fields select:not(.foundry-default),
+.avant.sheet.item .form-fields button:not(.foundry-default) {
+  background: var(--theme-bg-tertiary, #333333) !important;
+  border-color: var(--theme-border-primary, #404040) !important;
+  color: var(--theme-text-primary, #FFFFFF) !important;
+}
+.avant.sheet.actor .sheet-body input:not(.foundry-default):focus,
+.avant.sheet.actor .sheet-body textarea:not(.foundry-default):focus,
+.avant.sheet.actor .sheet-body select:not(.foundry-default):focus,
+.avant.sheet.actor .sheet-body button:not(.foundry-default):focus,
+.avant.sheet.actor .sheet-content input:not(.foundry-default):focus,
+.avant.sheet.actor .sheet-content textarea:not(.foundry-default):focus,
+.avant.sheet.actor .sheet-content select:not(.foundry-default):focus,
+.avant.sheet.actor .sheet-content button:not(.foundry-default):focus,
+.avant.sheet.actor .tab input:not(.foundry-default):focus,
+.avant.sheet.actor .tab textarea:not(.foundry-default):focus,
+.avant.sheet.actor .tab select:not(.foundry-default):focus,
+.avant.sheet.actor .tab button:not(.foundry-default):focus,
+.avant.sheet.actor .form-group input:not(.foundry-default):focus,
+.avant.sheet.actor .form-group textarea:not(.foundry-default):focus,
+.avant.sheet.actor .form-group select:not(.foundry-default):focus,
+.avant.sheet.actor .form-group button:not(.foundry-default):focus,
+.avant.sheet.actor .form-fields input:not(.foundry-default):focus,
+.avant.sheet.actor .form-fields textarea:not(.foundry-default):focus,
+.avant.sheet.actor .form-fields select:not(.foundry-default):focus,
+.avant.sheet.actor .form-fields button:not(.foundry-default):focus,
+.avant.sheet.item .sheet-body input:not(.foundry-default):focus,
+.avant.sheet.item .sheet-body textarea:not(.foundry-default):focus,
+.avant.sheet.item .sheet-body select:not(.foundry-default):focus,
+.avant.sheet.item .sheet-body button:not(.foundry-default):focus,
+.avant.sheet.item .sheet-content input:not(.foundry-default):focus,
+.avant.sheet.item .sheet-content textarea:not(.foundry-default):focus,
+.avant.sheet.item .sheet-content select:not(.foundry-default):focus,
+.avant.sheet.item .sheet-content button:not(.foundry-default):focus,
+.avant.sheet.item .tab input:not(.foundry-default):focus,
+.avant.sheet.item .tab textarea:not(.foundry-default):focus,
+.avant.sheet.item .tab select:not(.foundry-default):focus,
+.avant.sheet.item .tab button:not(.foundry-default):focus,
+.avant.sheet.item .form-group input:not(.foundry-default):focus,
+.avant.sheet.item .form-group textarea:not(.foundry-default):focus,
+.avant.sheet.item .form-group select:not(.foundry-default):focus,
+.avant.sheet.item .form-group button:not(.foundry-default):focus,
+.avant.sheet.item .form-fields input:not(.foundry-default):focus,
+.avant.sheet.item .form-fields textarea:not(.foundry-default):focus,
+.avant.sheet.item .form-fields select:not(.foundry-default):focus,
+.avant.sheet.item .form-fields button:not(.foundry-default):focus {
+  background: var(--theme-bg-primary, #1C1C1C) !important;
+  border-color: var(--theme-accent-primary, #00E0DC) !important;
+}
+
+.application.avant .window-content {
+  background: var(--theme-bg-primary, #1C1C1C) !important;
+  color: var(--theme-text-primary, #FFFFFF) !important;
+}
+.application.avant .sheet-content {
+  background: var(--theme-bg-primary, #1C1C1C) !important;
+  color: var(--theme-text-primary, #FFFFFF) !important;
+}
+
+.avant.sheet .tabs,
+.avant.sheet .tab {
+  background: var(--theme-bg-secondary, #2A2A2A) !important;
+  color: var(--theme-text-primary, #FFFFFF) !important;
+  border-color: var(--theme-border-primary, #404040) !important;
+}
+
+.avant .window-header .header-button,
+.avant .window-header .header-control {
+  font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 5 Free", "FontAwesome" !important;
+  font-weight: 900 !important;
+  font-style: normal !important;
+}
+
+.avant.sheet.item.talent-sheet, .avant.sheet.item.augment-sheet, .avant.sheet.item.action-sheet, .avant.sheet.item.feature-sheet, .avant.sheet.item.gear-sheet, .avant.sheet.item.weapon-sheet, .avant.sheet.item.armor-sheet {
+  background: var(--theme-bg-primary, #1C1C1C) !important;
+  border: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  min-height: 100% !important;
+}
+
+/**
  * @fileoverview Chat Card Component Styles
  * @version 1.0.0 - Phase 3: TypeScript Conversion & UX Polish
  * @description SCSS styling for talent and augment chat cards with accessibility and responsive design
@@ -4141,83 +4530,6 @@ form.avant.theme-dark *::before,
 form.avant.theme-dark *::after {
   color: inherit;
   background-color: inherit;
-}
-.avant.theme-dark input,
-.avant.theme-dark textarea,
-.avant.theme-dark select,
-.avant.theme-dark button,
-.avant.theme-dark.themed input,
-.avant.theme-dark.themed textarea,
-.avant.theme-dark.themed select,
-.avant.theme-dark.themed button,
-.application.sheet.avant.actor.theme-dark input,
-.application.sheet.avant.actor.theme-dark textarea,
-.application.sheet.avant.actor.theme-dark select,
-.application.sheet.avant.actor.theme-dark button,
-.application.sheet.avant.item.theme-dark input,
-.application.sheet.avant.item.theme-dark textarea,
-.application.sheet.avant.item.theme-dark select,
-.application.sheet.avant.item.theme-dark button,
-form.avant.theme-dark input,
-form.avant.theme-dark textarea,
-form.avant.theme-dark select,
-form.avant.theme-dark button {
-  background: var(--theme-bg-tertiary, #333333) !important;
-  border-color: var(--theme-border-primary, #404040) !important;
-  color: var(--theme-text-primary, #FFFFFF) !important;
-}
-.avant.theme-dark input:focus,
-.avant.theme-dark textarea:focus,
-.avant.theme-dark select:focus,
-.avant.theme-dark button:focus,
-.avant.theme-dark.themed input:focus,
-.avant.theme-dark.themed textarea:focus,
-.avant.theme-dark.themed select:focus,
-.avant.theme-dark.themed button:focus,
-.application.sheet.avant.actor.theme-dark input:focus,
-.application.sheet.avant.actor.theme-dark textarea:focus,
-.application.sheet.avant.actor.theme-dark select:focus,
-.application.sheet.avant.actor.theme-dark button:focus,
-.application.sheet.avant.item.theme-dark input:focus,
-.application.sheet.avant.item.theme-dark textarea:focus,
-.application.sheet.avant.item.theme-dark select:focus,
-.application.sheet.avant.item.theme-dark button:focus,
-form.avant.theme-dark input:focus,
-form.avant.theme-dark textarea:focus,
-form.avant.theme-dark select:focus,
-form.avant.theme-dark button:focus {
-  background: var(--theme-bg-primary, #1C1C1C) !important;
-  border-color: var(--theme-accent-primary, #00E0DC) !important;
-}
-.avant.theme-dark .window-content,
-.avant.theme-dark.themed .window-content,
-.application.sheet.avant.actor.theme-dark .window-content,
-.application.sheet.avant.item.theme-dark .window-content,
-form.avant.theme-dark .window-content {
-  background: var(--theme-bg-primary, #1C1C1C) !important;
-  color: var(--theme-text-primary, #FFFFFF) !important;
-}
-.avant.theme-dark .sheet-content,
-.avant.theme-dark.themed .sheet-content,
-.application.sheet.avant.actor.theme-dark .sheet-content,
-.application.sheet.avant.item.theme-dark .sheet-content,
-form.avant.theme-dark .sheet-content {
-  background: var(--theme-bg-primary, #1C1C1C) !important;
-  color: var(--theme-text-primary, #FFFFFF) !important;
-}
-.avant.theme-dark .tabs,
-.avant.theme-dark .tab,
-.avant.theme-dark.themed .tabs,
-.avant.theme-dark.themed .tab,
-.application.sheet.avant.actor.theme-dark .tabs,
-.application.sheet.avant.actor.theme-dark .tab,
-.application.sheet.avant.item.theme-dark .tabs,
-.application.sheet.avant.item.theme-dark .tab,
-form.avant.theme-dark .tabs,
-form.avant.theme-dark .tab {
-  background: var(--theme-bg-secondary, #2A2A2A) !important;
-  color: var(--theme-text-primary, #FFFFFF) !important;
-  border-color: var(--theme-border-primary, #404040) !important;
 }
 
 [class*=avant].theme-dark,
@@ -4532,11 +4844,142 @@ form.avant.theme-dark .tab {
 .avant * {
   box-sizing: border-box !important;
 }
-.avant input,
-.avant select,
-.avant textarea {
-  font-family: inherit;
+.avant .sheet-body input,
+.avant .sheet-body select,
+.avant .sheet-body textarea,
+.avant .sheet-content input,
+.avant .sheet-content select,
+.avant .sheet-content textarea,
+.avant .tab input,
+.avant .tab select,
+.avant .tab textarea,
+.avant .form-group input,
+.avant .form-group select,
+.avant .form-group textarea,
+.avant .form-fields input,
+.avant .form-fields select,
+.avant .form-fields textarea {
+  background: var(--theme-bg-tertiary, #333333);
+  border: 1px solid var(--theme-border-primary, #404040);
+  color: var(--theme-text-primary, #FFFFFF);
+  font-family: var(--theme-font-primary, "Exo 2", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif);
+  border-radius: 0;
+  transition: all 0.3s ease;
   box-sizing: border-box !important;
+}
+.avant .sheet-body input:focus,
+.avant .sheet-body select:focus,
+.avant .sheet-body textarea:focus,
+.avant .sheet-content input:focus,
+.avant .sheet-content select:focus,
+.avant .sheet-content textarea:focus,
+.avant .tab input:focus,
+.avant .tab select:focus,
+.avant .tab textarea:focus,
+.avant .form-group input:focus,
+.avant .form-group select:focus,
+.avant .form-group textarea:focus,
+.avant .form-fields input:focus,
+.avant .form-fields select:focus,
+.avant .form-fields textarea:focus {
+  background: var(--theme-bg-primary, #1C1C1C);
+  border-color: var(--theme-accent-primary, #00E0DC);
+  outline: none;
+  box-shadow: inset 0 0 10px var(--theme-shadow-primary, rgba(0, 224, 220, 0.2));
+}
+.avant .sheet-body button:not(.ability-roll-btn):not(.skill-roll):not(.rollable),
+.avant .sheet-content button:not(.ability-roll-btn):not(.skill-roll):not(.rollable),
+.avant .tab button:not(.ability-roll-btn):not(.skill-roll):not(.rollable),
+.avant .form-group button:not(.ability-roll-btn):not(.skill-roll):not(.rollable),
+.avant .form-fields button:not(.ability-roll-btn):not(.skill-roll):not(.rollable) {
+  background: var(--theme-bg-tertiary, #333333);
+  border: 1px solid var(--theme-accent-primary, #00E0DC);
+  color: var(--theme-accent-primary, #00E0DC);
+  font-family: var(--theme-font-display, "Orbitron", monospace);
+  font-weight: 600;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.avant .sheet-body button:not(.ability-roll-btn):not(.skill-roll):not(.rollable):hover,
+.avant .sheet-content button:not(.ability-roll-btn):not(.skill-roll):not(.rollable):hover,
+.avant .tab button:not(.ability-roll-btn):not(.skill-roll):not(.rollable):hover,
+.avant .form-group button:not(.ability-roll-btn):not(.skill-roll):not(.rollable):hover,
+.avant .form-fields button:not(.ability-roll-btn):not(.skill-roll):not(.rollable):hover {
+  background: var(--theme-accent-primary, #00E0DC);
+  color: var(--theme-bg-primary, #1C1C1C);
+  box-shadow: var(--theme-shadow-accent, 0 0 15px rgba(0, 224, 220, 0.5));
+}
+.avant h1:not(.window-title),
+.avant h2,
+.avant h3,
+.avant h4,
+.avant h5 {
+  font-family: var(--theme-font-display, "Orbitron", monospace);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--theme-accent-primary, #00E0DC);
+  border-bottom: 1px solid var(--theme-border-primary, #404040);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+}
+.avant a {
+  color: var(--theme-accent-primary, #00E0DC);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+.avant a:hover {
+  color: var(--theme-text-primary, #FFFFFF);
+  text-decoration: underline;
+}
+.avant .window-content {
+  background: var(--theme-bg-primary, #1C1C1C);
+  color: var(--theme-text-primary, #FFFFFF);
+  padding: 0;
+}
+.avant .form-group {
+  margin-bottom: 12px;
+}
+.avant .form-group label {
+  font-family: var(--theme-font-display, "Orbitron", monospace);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--theme-accent-primary, #00E0DC);
+  display: block;
+  margin-bottom: 8px;
+}
+.avant .form-fields {
+  display: flex;
+  gap: 8px;
+}
+.avant .sheet-tabs {
+  border-bottom: 1px solid var(--theme-border-primary, #404040);
+}
+.avant .sheet-tabs .item {
+  font-family: var(--theme-font-display, "Orbitron", monospace);
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--theme-accent-primary, #00E0DC);
+  padding: 12px 15px;
+  border: none;
+  background: transparent;
+  color: var(--theme-text-secondary, #BFBFBF);
+}
+.avant .sheet-tabs .item.active {
+  background: var(--theme-bg-secondary, #2A2A2A);
+  color: var(--theme-accent-primary, #00E0DC);
+  border-bottom: 2px solid var(--theme-accent-primary, #00E0DC);
+}
+.avant .sheet-body {
+  padding: 15px;
 }
 .avant .window-app {
   background: var(--theme-bg-primary, #1C1C1C);
@@ -4597,12 +5040,6 @@ form.avant.theme-dark .tab {
   display: flex !important;
   align-items: center;
   gap: 4px;
-}
-.avant .window-header .window-controls .header-button,
-.avant .window-header .window-controls .header-control {
-  font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 5 Free", "FontAwesome" !important;
-  font-weight: 900 !important;
-  font-style: normal !important;
 }
 .avant .sheet-header {
   background: var(--theme-bg-secondary, #2A2A2A);

@@ -1,0 +1,18 @@
+{{!--
+Unified Action Item Partial
+Renders a single unified action item with three-zone layout
+
+Context:
+- action: Unified action object with buttons, name, source, system data, etc.
+--}}
+
+<div class="unified-action-item {{action.source}}-action" data-action-id="{{action.id}}">
+    <!-- Left: Action Buttons -->
+    {{> "systems/avant/templates/shared/partials/unified-action-buttons" action=action}}
+    
+    <!-- Center: Action Content -->
+    {{> "systems/avant/templates/shared/partials/unified-action-content" action=action}}
+    
+    <!-- Right: Edit Controls -->
+    {{> "systems/avant/templates/shared/partials/unified-action-controls" action=action}}
+</div>
