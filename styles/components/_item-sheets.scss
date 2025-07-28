@@ -874,7 +874,6 @@
     // Field containers for individual fields (preserves order from layout system)
     .row-container.field-container {
         width: 100%;
-
         // If the field container only has one child, it takes full width
         &:has(> *:only-child) {
             .form-group {

@@ -372,6 +372,22 @@ export function createAvantActorSheet() {
             const itemsArray = Array.from(this.document.items.values());
             context.items = organizeItemsByType(itemsArray);
 
+            // Prepare card layouts for each item type
+            console.log('🔍 ACTOR SHEET DEBUG | Preparing card layouts for items...');
+            context.cardLayouts = {};
+
+            // // Generate card layouts for each item type
+            // const itemTypes = ['weapon', 'armor', 'gear', 'action', 'feature', 'talent', 'augment'];
+            // for (const itemType of itemTypes) {
+            //     const itemsOfType = context.items[itemType] || [];
+            //     if (itemsOfType.length > 0) {
+            //         context.cardLayouts[itemType] = await CardLayoutIntegration.prepareItemCards(itemsOfType);
+            //     } else {
+            //         context.cardLayouts[itemType] = [];
+            //     }
+            // }
+            // console.log('🔍 ACTOR SHEET DEBUG | Card layouts prepared successfully');
+
             // Add comprehensive display data to items (traits, descriptions, requirements, etc.)
             // IMPORTANT: This must happen BEFORE card layouts are prepared
             console.log('🔍 ACTOR SHEET DEBUG | Adding trait display data to items...');
