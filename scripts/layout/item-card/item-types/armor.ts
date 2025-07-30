@@ -20,11 +20,11 @@ import type { LayoutItemData, ArmorSystemData } from '../../shared/types';
 export function getArmorCardLayout(item: any): CardSection {
     const system = item.system as ArmorSystemData;
 
-    // Left section: Dice roll button (placeholder)
+    // Left section: Use button (same as talent/augment)
     const leftFields = [
         field({
-            type: 'armor-roll-button',
-            name: 'rollArmor',
+            type: 'armor-chat-button',
+            name: 'useArmor',
             itemId: item._id,
             itemName: item.name,
             class: 'chat-roll-btn'
@@ -59,6 +59,15 @@ export function getArmorCardLayout(item: any): CardSection {
             armorType: system.armorType,
             properties: system.properties,
             class: 'armor-properties'
+        })),
+        
+        // Traits display
+        when(item.displayTraits && item.displayTraits.length > 0, () => field({
+            type: 'armor-traits',
+            name: 'traits',
+            displayTraits: item.displayTraits,
+            hasOverflow: item.displayTraits.length > 4,
+            class: 'trait-chips'
         })),
 
         // Weight and other details

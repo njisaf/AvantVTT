@@ -207,6 +207,10 @@ export function createAvantActorSheet() {
                 // - chat-integration.ts: Provides clean API for posting to chat
                 useTalent: AvantActorSheet._onUseTalent,      // Posts talent feature cards
                 useAugment: AvantActorSheet._onUseAugment,     // Posts augment feature cards
+                useWeapon: AvantActorSheet._onUseWeapon,      // Posts weapon feature cards
+                useArmor: AvantActorSheet._onUseArmor,        // Posts armor feature cards
+                useGear: AvantActorSheet._onUseGear,          // Posts gear feature cards
+                useFeature: AvantActorSheet._onUseFeature,    // Posts feature feature cards
                 spendAugmentPP: AvantActorSheet._onSpendAugmentPP  // Direct PP spend handler
             }
         };
@@ -1654,6 +1658,230 @@ export function createAvantActorSheet() {
             } catch (error) {
                 logger.error('Avant | Error in _onUseAugment:', error);
                 FoundryUI.notify('Error posting augment card', 'error');
+            }
+        }
+
+        /**
+         * Handle using a weapon
+         * @param event - The originating click event
+         * @param target - The target element
+         * @this {AvantActorSheet} The ApplicationV2 instance (bound automatically)
+         */
+        static async _onUseWeapon(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
+            console.log('🎯 Avant | _onUseWeapon triggered!', { event, target });
+            event.preventDefault();
+
+            const sheet = this;
+            if (!sheet?.document) return;
+
+            // Extract item ID from the button's data attributes
+            const itemId = extractItemIdFromElement(target);
+            if (!itemId) {
+                logger.warn('AvantActorSheet | No item ID for weapon use');
+                return;
+            }
+
+            // Get the weapon item from the actor
+            const item = sheet.document.items.get(itemId);
+            if (!item) {
+                FoundryUI.notify('Weapon not found', 'warn');
+                return;
+            }
+
+            try {
+                console.log('🎯 Avant | Posting weapon feature card for:', item.name);
+
+                // Import required modules
+                const { postFeatureCard } = await import('../logic/chat/feature-card-builder.js');
+                const { TraitProvider } = await import('../services/trait-provider.js');
+
+                // Initialize trait provider for trait resolution
+                const traitProvider = new TraitProvider();
+
+                // Post feature card
+                const result = await postFeatureCard(item, sheet.document, traitProvider);
+
+                if (result.success) {
+                    console.log('🎯 Avant | Posted weapon card successfully:', result.messageId);
+                    logger.log(`AvantActorSheet | Posted weapon card for: ${item.name}`);
+                } else {
+                    console.error('🎯 Avant | Weapon card posting failed:', result.error);
+                    logger.error('AvantActorSheet | Weapon card posting failed:', result.error);
+                    FoundryUI.notify(result.error || 'Failed to post weapon card', 'error');
+                }
+
+            } catch (error) {
+                console.error('🎯 Avant | Failed to post weapon card:', error);
+                logger.error('AvantActorSheet | Failed to post weapon card:', error);
+                FoundryUI.notify('Failed to post weapon card', 'error');
+            }
+        }
+
+        /**
+         * Handle using armor
+         * @param event - The originating click event
+         * @param target - The target element
+         * @this {AvantActorSheet} The ApplicationV2 instance (bound automatically)
+         */
+        static async _onUseArmor(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
+            console.log('🎯 Avant | _onUseArmor triggered!', { event, target });
+            event.preventDefault();
+
+            const sheet = this;
+            if (!sheet?.document) return;
+
+            // Extract item ID from the button's data attributes
+            const itemId = extractItemIdFromElement(target);
+            if (!itemId) {
+                logger.warn('AvantActorSheet | No item ID for armor use');
+                return;
+            }
+
+            // Get the armor item from the actor
+            const item = sheet.document.items.get(itemId);
+            if (!item) {
+                FoundryUI.notify('Armor not found', 'warn');
+                return;
+            }
+
+            try {
+                console.log('🎯 Avant | Posting armor feature card for:', item.name);
+
+                // Import required modules
+                const { postFeatureCard } = await import('../logic/chat/feature-card-builder.js');
+                const { TraitProvider } = await import('../services/trait-provider.js');
+
+                // Initialize trait provider for trait resolution
+                const traitProvider = new TraitProvider();
+
+                // Post feature card
+                const result = await postFeatureCard(item, sheet.document, traitProvider);
+
+                if (result.success) {
+                    console.log('🎯 Avant | Posted armor card successfully:', result.messageId);
+                    logger.log(`AvantActorSheet | Posted armor card for: ${item.name}`);
+                } else {
+                    console.error('🎯 Avant | Armor card posting failed:', result.error);
+                    logger.error('AvantActorSheet | Armor card posting failed:', result.error);
+                    FoundryUI.notify(result.error || 'Failed to post armor card', 'error');
+                }
+
+            } catch (error) {
+                console.error('🎯 Avant | Failed to post armor card:', error);
+                logger.error('AvantActorSheet | Failed to post armor card:', error);
+                FoundryUI.notify('Failed to post armor card', 'error');
+            }
+        }
+
+        /**
+         * Handle using gear
+         * @param event - The originating click event
+         * @param target - The target element
+         * @this {AvantActorSheet} The ApplicationV2 instance (bound automatically)
+         */
+        static async _onUseGear(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
+            console.log('🎯 Avant | _onUseGear triggered!', { event, target });
+            event.preventDefault();
+
+            const sheet = this;
+            if (!sheet?.document) return;
+
+            // Extract item ID from the button's data attributes
+            const itemId = extractItemIdFromElement(target);
+            if (!itemId) {
+                logger.warn('AvantActorSheet | No item ID for gear use');
+                return;
+            }
+
+            // Get the gear item from the actor
+            const item = sheet.document.items.get(itemId);
+            if (!item) {
+                FoundryUI.notify('Gear not found', 'warn');
+                return;
+            }
+
+            try {
+                console.log('🎯 Avant | Posting gear feature card for:', item.name);
+
+                // Import required modules
+                const { postFeatureCard } = await import('../logic/chat/feature-card-builder.js');
+                const { TraitProvider } = await import('../services/trait-provider.js');
+
+                // Initialize trait provider for trait resolution
+                const traitProvider = new TraitProvider();
+
+                // Post feature card
+                const result = await postFeatureCard(item, sheet.document, traitProvider);
+
+                if (result.success) {
+                    console.log('🎯 Avant | Posted gear card successfully:', result.messageId);
+                    logger.log(`AvantActorSheet | Posted gear card for: ${item.name}`);
+                } else {
+                    console.error('🎯 Avant | Gear card posting failed:', result.error);
+                    logger.error('AvantActorSheet | Gear card posting failed:', result.error);
+                    FoundryUI.notify(result.error || 'Failed to post gear card', 'error');
+                }
+
+            } catch (error) {
+                console.error('🎯 Avant | Failed to post gear card:', error);
+                logger.error('AvantActorSheet | Failed to post gear card:', error);
+                FoundryUI.notify('Failed to post gear card', 'error');
+            }
+        }
+
+        /**
+         * Handle using a feature
+         * @param event - The originating click event
+         * @param target - The target element
+         * @this {AvantActorSheet} The ApplicationV2 instance (bound automatically)
+         */
+        static async _onUseFeature(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
+            console.log('🎯 Avant | _onUseFeature triggered!', { event, target });
+            event.preventDefault();
+
+            const sheet = this;
+            if (!sheet?.document) return;
+
+            // Extract item ID from the button's data attributes
+            const itemId = extractItemIdFromElement(target);
+            if (!itemId) {
+                logger.warn('AvantActorSheet | No item ID for feature use');
+                return;
+            }
+
+            // Get the feature item from the actor
+            const item = sheet.document.items.get(itemId);
+            if (!item) {
+                FoundryUI.notify('Feature not found', 'warn');
+                return;
+            }
+
+            try {
+                console.log('🎯 Avant | Posting feature feature card for:', item.name);
+
+                // Import required modules
+                const { postFeatureCard } = await import('../logic/chat/feature-card-builder.js');
+                const { TraitProvider } = await import('../services/trait-provider.js');
+
+                // Initialize trait provider for trait resolution
+                const traitProvider = new TraitProvider();
+
+                // Post feature card
+                const result = await postFeatureCard(item, sheet.document, traitProvider);
+
+                if (result.success) {
+                    console.log('🎯 Avant | Posted feature card successfully:', result.messageId);
+                    logger.log(`AvantActorSheet | Posted feature card for: ${item.name}`);
+                } else {
+                    console.error('🎯 Avant | Feature card posting failed:', result.error);
+                    logger.error('AvantActorSheet | Feature card posting failed:', result.error);
+                    FoundryUI.notify(result.error || 'Failed to post feature card', 'error');
+                }
+
+            } catch (error) {
+                console.error('🎯 Avant | Failed to post feature card:', error);
+                logger.error('AvantActorSheet | Failed to post feature card:', error);
+                FoundryUI.notify('Failed to post feature card', 'error');
             }
         }
 

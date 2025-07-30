@@ -20,11 +20,11 @@ import type { LayoutItemData, WeaponSystemData } from '../../shared/types';
 export function getWeaponCardLayout(item: any): CardSection {
     const system = item.system as WeaponSystemData;
 
-    // Left section: Dice roll button (placeholder)
+    // Left section: Use button (same as talent/augment)
     const leftFields = [
         field({
-            type: 'weapon-roll-button',
-            name: 'rollWeapon',
+            type: 'weapon-chat-button',
+            name: 'useWeapon',
             itemId: item._id,
             itemName: item.name,
             class: 'chat-roll-btn'
@@ -65,8 +65,17 @@ export function getWeaponCardLayout(item: any): CardSection {
             name: 'description',
             value: system.description,
             class: 'weapon-description'
-        })
-
+        }),
+        
+        // Traits display
+        when(item.displayTraits && item.displayTraits.length > 0, () => field({
+            type: 'weapon-traits',
+            name: 'traits',
+            displayTraits: item.displayTraits,
+            hasOverflow: item.displayTraits.length > 4,
+            class: 'trait-chips'
+        }))
+        
         // Weight and range (if present)
         // when(!!(system.weight || system.range), () => field({
         //     type: 'weapon-details',

@@ -31,6 +31,7 @@ export { getArmorCardLayout } from './item-types/armor';
 export { getGearCardLayout } from './item-types/gear';
 export { getActionCardLayout } from './item-types/action';
 export { getFeatureCardLayout } from './item-types/feature';
+export { getTraitCardLayout } from './item-types/trait';
 
 // Re-export layout system types for convenience
 export type { Field } from '../shared/types';
