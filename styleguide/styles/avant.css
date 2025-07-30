@@ -3512,7 +3512,7 @@
 /**
  * @fileoverview Item Card Layout System - Styling
  * @description SCSS for three-zone item cards in Actor Sheets
- * @version 0.1.0
+ * @version 0.2.0
  * @author Avant Development Team
  */
 .avant .item-card {
@@ -3670,7 +3670,19 @@
   color: var(--theme-text-secondary, #a0aec0);
 }
 
+.avant .item-card__center {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+.avant .item-card__center:last-child {
+  margin-bottom: 0;
+}
 .avant .item-card__center .field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
   margin-bottom: 0.25rem;
 }
 .avant .item-card__center .field-group:last-child {
@@ -3689,7 +3701,76 @@
   color: var(--theme-text-primary, #f7fafc);
   font-weight: 500;
 }
+.avant .item-card__center .title-line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+}
+.avant .item-card__center .title-line .title {
+  font-weight: 600;
+  color: var(--theme-text-primary, #f7fafc);
+}
+.avant .item-card__center .title-line .badge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.125rem 0.375rem;
+  background: var(--theme-accent, #63b3ed);
+  color: var(--theme-text-on-accent, #ffffff);
+  border-radius: 12px;
+}
+.avant .item-card__center .meta-info {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.875rem;
+  color: var(--theme-text-secondary, #a0aec0);
+}
+.avant .item-card__center .meta-info .meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.avant .item-card__center .feature-meta {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.875rem;
+  color: var(--theme-text-secondary, #a0aec0);
+  font-size: 0.8125rem;
+}
+.avant .item-card__center .feature-meta .feature-pp-cost {
+  color: var(--theme-accent, #63b3ed);
+  font-weight: 500;
+}
+.avant .item-card__center .feature-meta .feature-active-status {
+  padding: 0.125rem 0.375rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+.avant .item-card__center .feature-meta .feature-active-status.active {
+  background: var(--theme-success, #38a169);
+  color: var(--theme-text-on-success, #ffffff);
+}
+.avant .item-card__center .feature-meta .feature-active-status.inactive {
+  background: var(--theme-text-secondary, #a0aec0);
+  color: var(--theme-text-on-secondary, #ffffff);
+}
+.avant .item-card__center .feature-category {
+  font-size: 0.8125rem;
+  color: var(--theme-text-secondary, #a0aec0);
+  font-style: italic;
+}
+.avant .item-card__center .feature-source {
+  font-size: 0.8125rem;
+  color: var(--theme-text-secondary, #a0aec0);
+}
 .avant .item-card__center .display-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
   margin-bottom: 0.25rem;
 }
 .avant .item-card__center .display-field:last-child {

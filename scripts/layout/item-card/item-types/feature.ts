@@ -31,7 +31,7 @@ export function getFeatureCardLayout(item: any): CardSection {
         })
     ];
 
-    // Center section: Feature name, source, category, description
+    // Center section: Feature name, meta, description
     const centerFields = filterFields([
         // Feature name
         field({
@@ -42,13 +42,29 @@ export function getFeatureCardLayout(item: any): CardSection {
             class: 'feature-name'
         }),
 
-        // Source and category display
-        when(!!(system.source || system.category), () => field({
-            type: 'feature-source-category',
-            name: 'sourceCategory',
-            source: system.source,
-            category: system.category,
-            class: 'feature-source-category'
+        // PP cost and active status
+        when(!!(system.powerPointCost || system.isActive !== undefined), () => field({
+            type: 'feature-meta',
+            name: 'meta',
+            ppCost: system.powerPointCost,
+            isActive: system.isActive,
+            class: 'feature-meta'
+        })),
+
+        // Category select (display only, sheet changes value)
+        when(!!system.category, () => field({
+            type: 'feature-category',
+            name: 'category',
+            value: system.category,
+            class: 'feature-category'
+        })),
+
+        // Source display (source + category were merged; keep source only)
+        when(!!system.source, () => field({
+            type: 'feature-source',
+            name: 'source',
+            value: system.source,
+            class: 'feature-source'
         })),
 
         // Description display
@@ -57,6 +73,15 @@ export function getFeatureCardLayout(item: any): CardSection {
             name: 'description',
             value: system.description,
             class: 'feature-description'
+        })),
+        
+        // Traits display
+        when(item.displayTraits && item.displayTraits.length > 0, () => field({
+            type: 'feature-traits',
+            name: 'traits',
+            displayTraits: item.displayTraits,
+            hasOverflow: item.displayTraits.length > 4,
+            class: 'trait-chips'
         }))
     ]);
 

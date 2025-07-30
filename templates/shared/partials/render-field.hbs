@@ -769,13 +769,150 @@ class=field.class}}
 {{!-- Trait Preview --}}
 <div class="{{field.class}}">
   <label class="form-label">{{field.label}}</label>
-  <div class="trait-chip trait-chip--preview" 
+  <div class="trait-chip trait-chip--preview"
        style="background-color: {{field.trait.color}}; color: {{#if field.trait.color}}#000{{else}}#fff{{/if}};">
     {{#if field.trait.icon}}
       <i class="{{field.trait.icon}}" aria-hidden="true"></i>
     {{/if}}
     {{field.itemName}}
   </div>
+</div>
+
+{{else if (eq field.type "feature-meta")}}
+{{!-- Feature PP cost and active status --}}
+<div class="feature-meta {{#if field.class}}{{field.class}}{{/if}}">
+  {{#if field.ppCost}}
+    <span class="feature-pp-cost">PP: {{field.ppCost}}</span>
+  {{/if}}
+  {{#if (ne field.isActive undefined)}}
+    <span class="feature-active-status {{#if field.isActive}}active{{else}}inactive{{/if}}">
+      {{#if field.isActive}}Active{{else}}Inactive{{/if}}
+    </span>
+  {{/if}}
+</div>
+
+{{else if (eq field.type "feature-category")}}
+{{!-- Feature category display --}}
+<div class="feature-category {{#if field.class}}{{field.class}}{{/if}}">
+  <span class="feature-category-value">{{field.value}}</span>
+</div>
+
+{{else if (eq field.type "feature-source")}}
+{{!-- Feature source display --}}
+<div class="feature-source {{#if field.class}}{{field.class}}{{/if}}">
+  <span class="feature-source-value">{{field.value}}</span>
+</div>
+
+{{else if (eq field.type "weapon-chat-button")}}
+{{!-- Weapon use button --}}
+<button type="button"
+        class="chat-roll-btn"
+        data-action="useWeapon"
+        data-item-id="{{field.itemId}}"
+        title="Use {{field.itemName}}"
+        aria-label="Use {{field.itemName}}"
+        tabindex="0">
+  <i class="fas fa-comments" aria-hidden="true"></i>
+</button>
+
+{{else if (eq field.type "armor-chat-button")}}
+{{!-- Armor use button --}}
+<button type="button"
+        class="chat-roll-btn"
+        data-action="useArmor"
+        data-item-id="{{field.itemId}}"
+        title="Use {{field.itemName}}"
+        aria-label="Use {{field.itemName}}"
+        tabindex="0">
+  <i class="fas fa-comments" aria-hidden="true"></i>
+</button>
+
+{{else if (eq field.type "gear-chat-button")}}
+{{!-- Gear use button --}}
+<button type="button"
+        class="chat-roll-btn"
+        data-action="useGear"
+        data-item-id="{{field.itemId}}"
+        title="Use {{field.itemName}}"
+        aria-label="Use {{field.itemName}}"
+        tabindex="0">
+  <i class="fas fa-comments" aria-hidden="true"></i>
+</button>
+
+{{else if (eq field.type "weapon-traits")}}
+{{!-- Weapon traits with proper styling and overflow --}}
+<div class="trait-chips {{#if field.hasOverflow}}has-overflow{{/if}}">
+  {{#each field.displayTraits as |trait|}}
+    {{#if (lt @index 4)}}
+    <span class="trait-chip"
+          data-trait="{{trait.id}}"
+          style="{{traitChipStyle trait}}"
+          title="{{#if trait.description}}{{trait.description}}{{else}}{{trait.name}}{{/if}}">
+      {{#if trait.icon}}<i class="trait-chip__icon {{trait.icon}}" aria-hidden="true"></i>{{/if}}
+      <span class="trait-chip__text">{{trait.name}}</span>
+    </span>
+    {{/if}}
+  {{/each}}
+  {{#if field.hasOverflow}}
+    <span class="trait-overflow-count">+{{math field.displayTraits.length "-" 4}}</span>
+  {{/if}}
+</div>
+
+{{else if (eq field.type "armor-traits")}}
+{{!-- Armor traits with proper styling and overflow --}}
+<div class="trait-chips {{#if field.hasOverflow}}has-overflow{{/if}}">
+  {{#each field.displayTraits as |trait|}}
+    {{#if (lt @index 4)}}
+    <span class="trait-chip"
+          data-trait="{{trait.id}}"
+          style="{{traitChipStyle trait}}"
+          title="{{#if trait.description}}{{trait.description}}{{else}}{{trait.name}}{{/if}}">
+      {{#if trait.icon}}<i class="trait-chip__icon {{trait.icon}}" aria-hidden="true"></i>{{/if}}
+      <span class="trait-chip__text">{{trait.name}}</span>
+    </span>
+    {{/if}}
+  {{/each}}
+  {{#if field.hasOverflow}}
+    <span class="trait-overflow-count">+{{math field.displayTraits.length "-" 4}}</span>
+  {{/if}}
+</div>
+
+{{else if (eq field.type "gear-traits")}}
+{{!-- Gear traits with proper styling and overflow --}}
+<div class="trait-chips {{#if field.hasOverflow}}has-overflow{{/if}}">
+  {{#each field.displayTraits as |trait|}}
+    {{#if (lt @index 4)}}
+    <span class="trait-chip"
+          data-trait="{{trait.id}}"
+          style="{{traitChipStyle trait}}"
+          title="{{#if trait.description}}{{trait.description}}{{else}}{{trait.name}}{{/if}}">
+      {{#if trait.icon}}<i class="trait-chip__icon {{trait.icon}}" aria-hidden="true"></i>{{/if}}
+      <span class="trait-chip__text">{{trait.name}}</span>
+    </span>
+    {{/if}}
+  {{/each}}
+  {{#if field.hasOverflow}}
+    <span class="trait-overflow-count">+{{math field.displayTraits.length "-" 4}}</span>
+  {{/if}}
+</div>
+
+{{else if (eq field.type "feature-traits")}}
+{{!-- Feature traits with proper styling and overflow --}}
+<div class="trait-chips {{#if field.hasOverflow}}has-overflow{{/if}}">
+  {{#each field.displayTraits as |trait|}}
+    {{#if (lt @index 4)}}
+    <span class="trait-chip"
+          data-trait="{{trait.id}}"
+          style="{{traitChipStyle trait}}"
+          title="{{#if trait.description}}{{trait.description}}{{else}}{{trait.name}}{{/if}}">
+      {{#if trait.icon}}<i class="trait-chip__icon {{trait.icon}}" aria-hidden="true"></i>{{/if}}
+      <span class="trait-chip__text">{{trait.name}}</span>
+    </span>
+    {{/if}}
+  {{/each}}
+  {{#if field.hasOverflow}}
+    <span class="trait-overflow-count">+{{math field.displayTraits.length "-" 4}}</span>
+  {{/if}}
 </div>
 
 {{else}}

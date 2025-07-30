@@ -20,11 +20,11 @@ import type { LayoutItemData, GearSystemData } from '../../shared/types';
 export function getGearCardLayout(item: any): CardSection {
     const system = item.system as GearSystemData;
 
-    // Left section: Dice roll button (placeholder)
+    // Left section: Use button (same as talent/augment)
     const leftFields = [
         field({
-            type: 'gear-roll-button',
-            name: 'rollGear',
+            type: 'gear-chat-button',
+            name: 'useGear',
             itemId: item._id,
             itemName: item.name,
             class: 'chat-roll-btn'
@@ -67,6 +67,15 @@ export function getGearCardLayout(item: any): CardSection {
             current: system.uses.value,
             max: system.uses.max,
             class: 'gear-uses'
+        })),
+        
+        // Traits display
+        when(item.displayTraits && item.displayTraits.length > 0, () => field({
+            type: 'gear-traits',
+            name: 'traits',
+            displayTraits: item.displayTraits,
+            hasOverflow: item.displayTraits.length > 4,
+            class: 'trait-chips'
         })),
 
         // Quantity

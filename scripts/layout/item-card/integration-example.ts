@@ -5,15 +5,16 @@
  * @author Avant Development Team
  */
 
-import { 
-    getCardLayout, 
-    getAugmentCardLayout, 
+import {
+    getCardLayout,
+    getAugmentCardLayout,
     getTalentCardLayout,
     getWeaponCardLayout,
     getArmorCardLayout,
     getGearCardLayout,
     getActionCardLayout,
-    getFeatureCardLayout
+    getFeatureCardLayout,
+    getTraitCardLayout
 } from './index';
 import type { LayoutItemData, CardSection } from './index';
 
@@ -49,27 +50,29 @@ export class CardLayoutIntegration {
      * Get the appropriate card layout for an item type
      */
     private static async getCardLayoutForItem(item: LayoutItemData): Promise<CardSection> {
-        // Use type-specific layouts when available
-        switch (item.type) {
-            case 'augment':
-                return getAugmentCardLayout(item);
-            case 'talent':
-                return getTalentCardLayout(item);
-            case 'weapon':
-                return getWeaponCardLayout(item);
-            case 'armor':
-                return getArmorCardLayout(item);
-            case 'gear':
-                return getGearCardLayout(item);
-            case 'action':
-                return getActionCardLayout(item);
-            case 'feature':
-                return getFeatureCardLayout(item);
-            default:
-                // Fallback to generic card layout
-                return getCardLayout(item);
-        }
-    }
+       // Use type-specific layouts when available
+       switch (item.type) {
+           case 'augment':
+               return getAugmentCardLayout(item);
+           case 'talent':
+               return getTalentCardLayout(item);
+           case 'weapon':
+               return getWeaponCardLayout(item);
+           case 'armor':
+               return getArmorCardLayout(item);
+           case 'gear':
+               return getGearCardLayout(item);
+           case 'action':
+               return getActionCardLayout(item);
+           case 'feature':
+               return getFeatureCardLayout(item);
+           case 'trait':
+               return getTraitCardLayout(item);
+           default:
+               // Fallback to generic card layout
+               return getCardLayout(item);
+       }
+   }
 
     /**
      * Example: ActorSheet data preparation method integration
