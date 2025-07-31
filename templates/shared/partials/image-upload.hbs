@@ -12,11 +12,11 @@ Required: src, alt
 Optional: size (defaults to 64), class
 --}}
 
-<div class="image-upload {{class}}">
-  <img class="image-upload__img" src="{{#if src}}{{src}}{{else}}icons/svg/mystery-man.svg{{/if}}"
+<div class="tw-image-upload {{class}}">
+  <img class="tw-image-upload-img" src="{{#if src}}{{src}}{{else}}icons/svg/mystery-man.svg{{/if}}"
     width="{{#if size}}{{size}}{{else}}64{{/if}}" height="{{#if size}}{{size}}{{else}}64{{/if}}" alt="{{alt}}"
     data-edit="img">
-  <div class="image-upload__overlay" aria-hidden="true">
+  <div class="tw-image-upload-overlay" aria-hidden="true">
     <i class="fa-solid fa-pen"></i>
   </div>
 </div>

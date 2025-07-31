@@ -1,0 +1,1012 @@
+/**
+ * @fileoverview Tailwind CSS Base Styles - Minimal Setup for Avant VTT
+ * @description Basic Tailwind import to test build pipeline
+ * @version 1.0.0
+ * @author Avant VTT Team
+ */
+
+/* Import Tailwind's layers */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Test component to verify Tailwind is working */
+@layer components {
+  // ==============================================
+  // Item Card Component - Tailwind Implementation
+  // ==============================================
+  
+  // Main item card container
+  .avant .tw-item-card {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: "left center right";
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 3rem;
+    margin-bottom: 0.5rem;
+    padding: 0.75rem;
+    background-color: #2a2a2a;
+    border: 1px solid #555;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background-color: #333;
+      border-color: #60a5fa;
+    }
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  // Zone layouts
+  .avant .tw-item-card__left {
+    grid-area: left;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: fit-content;
+  }
+
+  .avant .tw-item-card__center {
+    grid-area: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .avant .tw-item-card__right {
+    grid-area: right;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-width: fit-content;
+  }
+
+  // Button base
+  .avant .tw-card-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    text-decoration: none;
+    
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  .avant .tw-card-roll-btn {
+    background: #2563eb;
+    color: #ffffff;
+    border-color: #1d4ed8;
+    
+    &:hover {
+      background: #1d4ed8;
+    }
+  }
+
+  .avant .tw-card-edit-btn {
+    background: #4b5563;
+    color: #ffffff;
+    border-color: #374151;
+    
+    &:hover {
+      background: #374151;
+    }
+  }
+
+  .avant .tw-card-delete-btn {
+    background: #dc2626;
+    color: #ffffff;
+    border-color: #b91c1c;
+    
+    &:hover {
+      background: #b91c1c;
+    }
+  }
+
+  .avant .tw-card-drag-handle {
+    background: transparent;
+    color: #9ca3af;
+    border-color: transparent;
+    cursor: grab;
+    padding: 0.375rem;
+    
+    &:hover {
+      background: #4b5563;
+      color: #f9fafb;
+    }
+    
+    &:active {
+      cursor: grabbing;
+    }
+    
+    .btn-label {
+      display: none;
+    }
+  }
+
+  // Icon containers
+  .avant .tw-card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 4px;
+    background: #4b5563;
+    border: 1px solid #4b5563;
+    
+    .item-icon-img {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 2px;
+      object-fit: cover;
+    }
+    
+    i {
+      font-size: 1.25rem;
+      color: #9ca3af;
+    }
+  }
+
+  // Content styling
+  .avant .tw-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 0.25rem;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .avant .tw-field-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.125rem;
+  }
+
+  .avant .tw-field-value {
+    font-size: 0.875rem;
+    color: #f9fafb;
+    font-weight: 500;
+  }
+
+  .avant .tw-title-line {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    font-weight: 600;
+    
+    .title {
+      font-weight: 600;
+      color: #f9fafb;
+    }
+    
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 0.125rem 0.375rem;
+      background: #3b82f6;
+      color: #ffffff;
+      border-radius: 12px;
+    }
+  }
+
+  .avant .tw-meta-info {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    font-size: 0.875rem;
+    color: #9ca3af;
+    
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+  }
+
+  // Feature-specific styles
+  .avant .tw-feature-meta {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    font-size: 0.8125rem;
+    color: #9ca3af;
+    
+    .feature-pp-cost {
+      color: #60a5fa;
+      font-weight: 500;
+    }
+    
+    .feature-active-status {
+      padding: 0.125rem 0.375rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      
+      &.active {
+        background: #059669;
+        color: #ffffff;
+      }
+      
+      &.inactive {
+        background: #9ca3af;
+        color: #ffffff;
+      }
+    }
+  }
+
+  .avant .tw-feature-category {
+    font-size: 0.8125rem;
+    color: #9ca3af;
+    font-style: italic;
+  }
+
+  .avant .tw-feature-source {
+    font-size: 0.8125rem;
+    color: #9ca3af;
+  }
+
+  // Display field variants
+  .avant .tw-display-text {
+    .display-value {
+      color: #f9fafb;
+    }
+    
+    &.card-item-name .display-value {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #f9fafb;
+    }
+  }
+
+  .avant .tw-display-ap-cost {
+    .ap-icons-display {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.125rem;
+      margin-left: 0.25rem;
+      
+      .ap-icon {
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: 50%;
+        
+        &.filled i {
+          color: #3b82f6;
+        }
+        
+        &.empty i {
+          color: #4b5563;
+        }
+        
+        i {
+          font-size: 0.5rem;
+        }
+      }
+    }
+  }
+
+  .avant .tw-display-uses {
+    .uses-fraction {
+      font-family: 'Roboto Mono', monospace;
+      color: #9ca3af;
+    }
+  }
+
+  .avant .tw-display-badge {
+    .status-badge {
+      display: inline-block;
+      padding: 0.125rem 0.375rem;
+      background: #3b82f6;
+      color: #ffffff;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  }
+
+  .avant .tw-display-traits {
+    .trait-chips-display {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+    }
+    
+    .trait-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.125rem 0.375rem;
+      background: #4b5563;
+      color: #f9fafb;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      
+      .trait-chip__text {
+        font-size: 0.75rem;
+      }
+      
+      .trait-icon {
+        font-size: 0.625rem;
+      }
+    }
+  }
+
+  // Card states
+  .avant .tw-item-card.item-equipped {
+    border-color: #059669;
+    background: rgba(5, 150, 105, 0.1);
+  }
+
+  .avant .tw-item-card.item-disabled {
+    opacity: 0.6;
+    
+    .tw-card-roll-btn {
+      opacity: 0.5;
+      cursor: not-allowed;
+      
+      &:hover {
+        transform: none;
+        box-shadow: none;
+      }
+    }
+  }
+
+  .avant .tw-item-card.item-loading {
+    .tw-card-roll-btn {
+      position: relative;
+      
+      &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 1rem;
+        height: 1rem;
+        margin: -0.5rem 0 0 -0.5rem;
+        border: 2px solid transparent;
+        border-top-color: currentColor;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      .btn-label,
+      i {
+        opacity: 0;
+      }
+    }
+  }
+
+  // Responsive design
+  @media (max-width: 768px) {
+    .avant .tw-item-card {
+      grid-template-columns: auto 1fr;
+      grid-template-areas: 
+        "left center"
+        "right right";
+      gap: 0.375rem;
+      
+      .tw-item-card__right {
+        grid-area: right;
+        justify-content: flex-end;
+        padding-top: 0.25rem;
+        border-top: 1px solid #4b5563;
+        margin-top: 0.25rem;
+      }
+    }
+    
+    .avant .tw-card-btn .btn-label {
+      display: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .avant .tw-item-card {
+      padding: 0.5rem;
+      
+      .tw-item-card__left,
+      .tw-item-card__right {
+        gap: 0.125rem;
+      }
+      
+      .tw-card-icon {
+        width: 2rem;
+        height: 2rem;
+        
+        .item-icon-img {
+          width: 1.5rem;
+          height: 1.5rem;
+        }
+        
+        i {
+          font-size: 1rem;
+        }
+      }
+    }
+  }
+
+  // Animation keyframes
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  // Animation transitions
+  .avant .tw-item-card-enter {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+
+  .avant .tw-item-card-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .avant .tw-item-card-exit {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .avant .tw-item-card-exit-active {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  // ==============================================
+  // Item Sheet Components - Complete Tailwind Implementation
+  // ==============================================
+  
+  // Base item sheet container with grid layout
+  .avant .tw-item-sheet {
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+      "header"
+      "tabs"
+      "body";
+    gap: 0.75rem;
+    min-height: 400px;
+    width: 100%;
+    padding: 1rem;
+    background: var(--theme-bg-primary, #2a2a2a);
+    color: var(--theme-text-primary, #ffffff);
+    border: 1px solid var(--theme-border-primary, #555);
+    border-radius: 6px;
+    font-family: var(--theme-font-primary, 'Exo 2', sans-serif);
+    font-size: 14px;
+    line-height: 1.4;
+    
+    &:focus-within {
+      outline: 2px solid var(--theme-accent-primary, #00E0DC);
+      outline-offset: 2px;
+    }
+  }
+
+  // Item sheet container without tabs/grid (for ApplicationV2)
+  .avant .tw-item-sheet-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    min-height: 400px;
+    width: 100%;
+    padding: 1rem;
+    background: var(--theme-bg-primary, #2a2a2a);
+    color: var(--theme-text-primary, #ffffff);
+    font-family: var(--theme-font-primary, 'Exo 2', sans-serif);
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  // Sheet header with proper column layout
+  .avant .tw-sheet-header {
+    grid-area: header;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: var(--theme-bg-secondary, #333);
+    border-bottom: 1px solid var(--theme-border-primary, #555);
+    flex-shrink: 0;
+  }
+
+  // Row containers - the foundation of the layout system
+  .avant .tw-row-container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0.75rem;
+    width: 100%;
+    margin-bottom: 0.5rem;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    // Default: equal width children
+    > * {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+    
+    // Mobile responsive - stack vertically
+    @media (max-width: 480px) {
+      flex-direction: column;
+      gap: 0.5rem;
+      
+      > * {
+        flex: none;
+        width: 100%;
+      }
+    }
+  }
+
+  // Header main row with 20-80 layout (image + name)
+  .avant .tw-row-container.tw-header-main {
+    align-items: center;
+    
+    // Image section gets fixed 20% width
+    .tw-form-group:has(.tw-image-upload) {
+      flex: 0 0 20%;
+      max-width: 20%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    // Name field gets remaining 80% width
+    .tw-form-group:not(:has(.tw-image-upload)) {
+      flex: 1 1 80%;
+      max-width: 80%;
+      min-width: 0;
+    }
+    
+    @media (max-width: 480px) {
+      flex-direction: column;
+      
+      .tw-form-group:has(.tw-image-upload),
+      .tw-form-group:not(:has(.tw-image-upload)) {
+        flex: none;
+        max-width: 100%;
+        width: 100%;
+      }
+    }
+  }
+
+  // Side-by-side row container (two fields in one row)
+  .avant .tw-row-container.tw-row-side-by-side {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    width: 100%;
+    
+    // Each field gets equal space (50% each)
+    > .tw-form-group {
+      flex: 1 1 50%;
+      min-width: 0;
+    }
+    
+    @media (max-width: 480px) {
+      flex-direction: column;
+      gap: 0.5rem;
+      
+      > .tw-form-group {
+        flex: 1 1 100%;
+      }
+    }
+  }
+
+  // Full-width row container (description, traits)
+  .avant .tw-row-container.tw-row-full-width {
+    .tw-form-group {
+      width: 100%;
+      margin-bottom: 0;
+    }
+  }
+
+  // Field container for individual fields
+  .avant .tw-row-container.tw-field-container {
+    width: 100%;
+    
+    // Single field takes full width
+    &:has(> *:only-child) .tw-form-group {
+      max-width: 100%;
+    }
+  }
+
+  // Form groups - the building blocks
+  .avant .tw-form-group {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.25rem !important;
+    margin-bottom: 0;
+    
+    // Remove margin when inside row containers
+    .tw-row-container & {
+      margin-bottom: 0;
+    }
+  }
+
+  // Form labels with proper styling
+  .avant .tw-form-label {
+    font-family: var(--theme-font-display, 'Orbitron', monospace);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--theme-text-secondary, #aaa);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  // Form inputs with consistent styling
+  .avant .tw-form-input,
+  .avant .tw-form-textarea,
+  .avant .tw-form-select {
+    background: var(--theme-bg-tertiary, #444);
+    border: 1px solid var(--theme-border-primary, #555);
+    color: var(--theme-text-primary, #ffffff);
+    font-size: 12px;
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    font-family: var(--theme-font-primary, 'Exo 2', sans-serif);
+    transition: border-color 0.2s ease;
+    display: block;
+    
+    &:focus {
+      border-color: var(--theme-accent-primary, #00e0dc);
+      outline: none;
+      box-shadow: 0 0 8px rgba(0, 224, 220, 0.3);
+    }
+    
+    &::placeholder {
+      color: var(--theme-text-secondary, #aaa);
+      opacity: 0.5;
+    }
+  }
+
+  // Textarea specific styling
+  .avant .tw-form-textarea {
+    min-height: 80px;
+    resize: vertical;
+    line-height: 1.4;
+  }
+
+  // Checkbox styling
+  .avant .tw-form-checkbox {
+    width: auto;
+    margin-right: 0.25rem;
+  }
+
+  .avant .tw-checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    
+    input[type="checkbox"] {
+      width: auto;
+      margin-right: 0;
+    }
+    
+    label {
+      margin-bottom: 0;
+      font-size: 12px;
+      color: var(--theme-text-primary, #ffffff);
+      font-family: var(--theme-font-primary, 'Exo 2', sans-serif);
+      text-transform: none;
+      letter-spacing: normal;
+    }
+  }
+
+  // Form hints
+  .avant .tw-form-hint {
+    font-size: 10px;
+    color: var(--theme-text-secondary, #aaa);
+    font-style: italic;
+    margin-top: 0.25rem;
+  }
+
+  // Tab navigation
+  .avant .tw-sheet-tabs {
+    grid-area: tabs;
+    display: flex;
+    background: var(--theme-bg-secondary, #333);
+    border-bottom: 1px solid var(--theme-border-primary, #555);
+    min-height: 36px;
+    flex-shrink: 0;
+    
+    &:empty {
+      display: none;
+    }
+  }
+
+  .avant .tw-tab-item {
+    background: transparent;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-family: var(--theme-font-primary, 'Exo 2', sans-serif);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--theme-text-secondary, #aaa);
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    height: 36px;
+    
+    &:hover {
+      background: rgba(0, 224, 220, 0.1);
+      color: var(--theme-accent-primary, #00e0dc);
+    }
+    
+    &:focus {
+      outline: 2px solid var(--theme-accent-primary, #00E0DC);
+      outline-offset: 2px;
+    }
+  }
+
+  .avant .tw-tab-active {
+    background: var(--theme-bg-primary, #2a2a2a);
+    color: var(--theme-text-primary, #ffffff);
+    border-bottom-color: var(--theme-accent-primary, #00e0dc);
+  }
+
+  // Sheet body
+  .avant .tw-sheet-body {
+    grid-area: body;
+    overflow-y: auto;
+    min-height: 0;
+    background: var(--theme-bg-primary, #2a2a2a);
+    min-height: 200px;
+    flex: 1;
+    padding: 0.75rem;
+  }
+
+  .avant .tw-tab {
+    background: var(--theme-bg-primary, #2a2a2a);
+    min-height: 150px;
+    display: none;
+    padding: 0;
+    margin: 0;
+    
+    &.tw-tab-active {
+      display: block;
+    }
+  }
+
+  // Image upload component
+  .avant .tw-image-upload {
+    @apply relative w-16 h-16 inline-block flex-shrink-0;
+    cursor: pointer;
+  }
+
+  .avant .tw-image-upload-img {
+    width: 64px;
+    height: 64px;
+    border: 2px solid var(--theme-accent-primary, #00e0dc);
+    cursor: pointer;
+    border-radius: 4px;
+    object-fit: cover;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      border-color: var(--theme-accent-secondary, #4ce2e1);
+      box-shadow: 0 0 8px rgba(0, 224, 220, 0.3);
+    }
+  }
+
+  .avant .tw-image-upload-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 4px;
+    
+    i {
+      color: var(--theme-accent-primary, #00e0dc);
+      font-size: 16px;
+    }
+  }
+
+  .avant .tw-image-upload:hover .tw-image-upload-overlay {
+    opacity: 1;
+  }
+
+  // Trait chip system
+  .avant .tw-trait-chip-input {
+    background: var(--theme-bg-tertiary, #444);
+    border: 1px solid var(--theme-border-primary, #555);
+    border-radius: 4px;
+    padding: 4px;
+  }
+
+  .avant .tw-trait-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 4px;
+  }
+
+  .avant .tw-trait-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1.2;
+    white-space: nowrap;
+    background: var(--theme-bg-secondary, #333);
+    color: var(--theme-text-primary, #ffffff);
+    
+    .trait-remove {
+      background: none;
+      border: none;
+      color: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      padding: 0;
+      margin-left: 4px;
+      opacity: 0.7;
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        opacity: 1;
+        background: rgba(0, 0, 0, 0.2);
+      }
+    }
+  }
+
+  .avant .tw-trait-autocomplete {
+    background: transparent;
+    border: none;
+    color: var(--theme-text-primary, #ffffff);
+    padding: 4px;
+    width: 100%;
+    min-height: 24px;
+    font-size: 12px;
+    
+    &::placeholder {
+      color: var(--theme-text-secondary, #aaa);
+    }
+    
+    &:focus {
+      outline: none;
+      box-shadow: none;
+    }
+  }
+
+  .avant .tw-trait-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--theme-bg-secondary, #333);
+    border: 1px solid var(--theme-border-primary, #555);
+    border-radius: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+    
+    &.tw-visible {
+      display: block;
+    }
+    
+    .trait-suggestion {
+      padding: 8px 12px;
+      cursor: pointer;
+      color: var(--theme-text-primary, #ffffff);
+      border-bottom: 1px solid var(--theme-border-primary, #555);
+      transition: background-color 0.2s ease;
+      
+      &:hover {
+        background: var(--theme-bg-primary, #2a2a2a);
+      }
+      
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+
+  // Utility classes
+  .avant .tw-hidden {
+    display: none;
+  }
+
+  .avant .tw-visible {
+    display: block;
+  }
+
+  // Responsive design for item sheets
+  @media (max-width: 480px) {
+    .avant .tw-item-sheet {
+      padding: 0.5rem;
+      gap: 0.5rem;
+    }
+    
+    .avant .tw-sheet-header {
+      padding: 0.5rem;
+    }
+    
+    .avant .tw-image-upload,
+    .avant .tw-image-upload-img {
+      width: 48px;
+      height: 48px;
+    }
+  }
+
+  // Test component to verify Tailwind integration (keeping for backward compatibility)
+  .avant .tw-test-card {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: "left center right";
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 3rem;
+    margin-bottom: 0.5rem;
+    padding: 0.75rem;
+    background-color: #2a2a2a;
+    border: 1px solid #555;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background-color: #333;
+      border-color: #00e0dc;
+    }
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}

@@ -1,5 +1,5 @@
 {{!--
-  Item Card Layout - Matches original row-talent-augment.hbs structure
+  Item Card Layout - TAILWIND VERSION - Three-zone grid layout
   
   Context expects:
   - item: The item data object
@@ -8,24 +8,24 @@
   Usage:
   {{> shared/partials/item-card item=item layout=cardLayout}}
 --}}
-<div class="{{layout.containerClass}}" {{#each layout.containerData}}{{@key}}="{{this}}"{{/each}}>
+<div class="tw-item-card {{layout.containerClass}}" {{#each layout.containerData}}{{@key}}="{{this}}"{{/each}}>
   
-  {{!-- Left Column: Chat/Roll Control (matches row-control) --}}
-  <div class="row-control">
+  {{!-- Left Zone: Actions/Roll buttons + Icon --}}
+  <div class="tw-item-card__left">
     {{#each layout.left}}
       {{> "systems/avant/templates/shared/partials/render-field" field=this editable=true}}
     {{/each}}
   </div>
   
-  {{!-- Middle Column: Main content (matches row-content) --}}
-  <div class="row-content">
+  {{!-- Center Zone: Main content (name, details, fields) --}}
+  <div class="tw-item-card__center">
     {{#each layout.center}}
       {{> "systems/avant/templates/shared/partials/render-field" field=this editable=true}}
     {{/each}}
   </div>
   
-  {{!-- Right Column: Edit/Delete (matches row-actions) --}}
-  <div class="row-actions">
+  {{!-- Right Zone: Control buttons (edit, delete, drag) --}}
+  <div class="tw-item-card__right">
     {{#each layout.right}}
       {{> "systems/avant/templates/shared/partials/render-field" field=this editable=true}}
     {{/each}}

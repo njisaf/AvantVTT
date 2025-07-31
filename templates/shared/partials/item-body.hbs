@@ -18,28 +18,34 @@ Features:
 - Responsive design with mobile support
 --}}
 
-<section class="sheet-body">
+<section class="tw-sheet-body">
   {{#if bodyFields}}
   {{#each bodyFields as |field fieldIndex|}}
   {{#if field.fullWidth}}
   {{!-- Full-width fields get their own container --}}
-  <div class="row-container full-width">
-    {{> "systems/avant/templates/shared/partials/render-field" field=field editable=editable
-    displayTraits=displayTraits}}
+  <div class="tw-row-container tw-row-full-width">
+    <div class="tw-form-group">
+      {{> "systems/avant/templates/shared/partials/render-field" field=field editable=editable
+      displayTraits=displayTraits}}
+    </div>
   </div>
   {{else if field.sideBy}}
   {{!-- Side-by-side fields get a shared container --}}
-  <div class="row-container side-by-side" data-field-index="{{fieldIndex}}">
+  <div class="tw-row-container tw-row-side-by-side" data-field-index="{{fieldIndex}}">
     {{#each field.fields as |subField|}}
-    {{> "systems/avant/templates/shared/partials/render-field" field=subField editable=editable
-    displayTraits=displayTraits}}
+    <div class="tw-form-group">
+      {{> "systems/avant/templates/shared/partials/render-field" field=subField editable=editable
+      displayTraits=displayTraits}}
+    </div>
     {{/each}}
   </div>
   {{else}}
   {{!-- Regular fields get individual containers that can be styled to appear as rows --}}
-  <div class="row-container field-container" data-field-index="{{fieldIndex}}">
-    {{> "systems/avant/templates/shared/partials/render-field" field=field editable=editable
-    displayTraits=displayTraits}}
+  <div class="tw-row-container tw-field-container" data-field-index="{{fieldIndex}}">
+    <div class="tw-form-group">
+      {{> "systems/avant/templates/shared/partials/render-field" field=field editable=editable
+      displayTraits=displayTraits}}
+    </div>
   </div>
   {{/if}}
   {{/each}}

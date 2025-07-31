@@ -17,8 +17,8 @@
   Optional: value, label, placeholder, required (boolean), maxlength, hint, class
 --}}
 
-<div class="form-group form-group--text-field {{#if class}}{{class}}{{/if}}">
-    <label for="{{name}}" class="form-label">
+<div class="tw-form-group {{#if class}}{{class}}{{/if}}">
+    <label for="{{name}}" class="tw-form-label">
         {{#if label}}{{label}}{{else}}Text Field{{/if}}
         {{#if required}}<span class="required" aria-label="required">*</span>{{/if}}
     </label>
@@ -31,9 +31,9 @@
            {{#if required}}required{{/if}}
            {{#if maxlength}}maxlength="{{maxlength}}"{{/if}}
            {{#if hint}}aria-describedby="{{name}}-hint"{{/if}}
-           class="form-input">
+           class="tw-form-input">
     
     {{#if hint}}
-        <div id="{{name}}-hint" class="form-hint" role="note">{{hint}}</div>
+        <div id="{{name}}-hint" class="tw-form-hint" role="note">{{hint}}</div>
     {{/if}}
-</div> 
+</div>

@@ -18,18 +18,18 @@ Features:
 - Consistent spacing and alignment
 --}}
 
-<header class="sheet-header">
+<header class="tw-sheet-header">
   {{#if metaFields}}
   {{#each metaFields as |field fieldIndex|}}
   {{#if field.fullWidth}}
   {{!-- Full-width fields get their own container --}}
-  <div class="row-container full-width">
+  <div class="tw-row-container tw-row-full-width">
     {{> "systems/avant/templates/shared/partials/render-field" field=field editable=editable
     displayTraits=displayTraits}}
   </div>
   {{else if field.sideBy}}
   {{!-- Side-by-side fields get a shared container --}}
-  <div class="row-container side-by-side" data-field-index="{{fieldIndex}}">
+  <div class="tw-row-container tw-row-side-by-side" data-field-index="{{fieldIndex}}">
     {{#each field.fields as |subField|}}
     {{> "systems/avant/templates/shared/partials/render-field" field=subField editable=editable
     displayTraits=displayTraits}}
@@ -37,7 +37,7 @@ Features:
   </div>
   {{else}}
   {{!-- Regular fields get individual containers --}}
-  <div class="row-container field-container" data-field-index="{{fieldIndex}}">
+  <div class="tw-row-container tw-field-container" data-field-index="{{fieldIndex}}">
     {{> "systems/avant/templates/shared/partials/render-field" field=field editable=editable
     displayTraits=displayTraits}}
   </div>
@@ -45,23 +45,27 @@ Features:
   {{/each}}
   {{else}}
   {{!-- Fallback to hardcoded header if metaFields is not available --}}
-  <div class="header-main row-container">
+  <div class="tw-row-container tw-header-main">
     {{!-- Image Upload Component --}}
-    {{> "systems/avant/templates/shared/partials/image-upload"
-    src=item.img
-    alt=item.name
-    title=item.name
-    size=48
-    class="item-icon"}}
+    <div class="tw-form-group">
+      {{> "systems/avant/templates/shared/partials/image-upload"
+      src=item.img
+      alt=item.name
+      title=item.name
+      size=48
+      class="tw-item-icon"}}
+    </div>
 
     {{!-- Name Field --}}
-    {{> "systems/avant/templates/shared/partials/text-field"
-    name="name"
-    value=item.name
-    label="Item Name"
-    placeholder=(concat "Enter " (titleCase item.type) " name...")
-    required=true
-    class="item-name-field"}}
+    <div class="tw-form-group">
+      {{> "systems/avant/templates/shared/partials/text-field"
+      name="name"
+      value=item.name
+      label="Item Name"
+      placeholder=(concat "Enter " (titleCase item.type) " name...")
+      required=true
+      class="tw-item-name-field"}}
+    </div>
   </div>
   {{/if}}
 </header>

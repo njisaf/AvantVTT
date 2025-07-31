@@ -18,15 +18,15 @@
   Optional: value, placeholder, rows, maxlength, required, hint, class, readonly, disabled
 --}}
 
-<div class="form-group {{#if class}}{{class}}{{/if}}">
-    <label for="{{name}}" class="form-label">
+<div class="tw-form-group {{#if class}}{{class}}{{/if}}">
+    <label for="{{name}}" class="tw-form-label">
         {{label}}
         {{#if required}}<span class="required-indicator" aria-label="required">*</span>{{/if}}
     </label>
     
-    <textarea 
+    <textarea
         id="{{name}}"
-        name="{{name}}" 
+        name="{{name}}"
         {{#if placeholder}}placeholder="{{placeholder}}"{{/if}}
         {{#if rows}}rows="{{rows}}"{{else}}rows="4"{{/if}}
         {{#if maxlength}}maxlength="{{maxlength}}"{{/if}}
@@ -34,10 +34,10 @@
         {{#if readonly}}readonly{{/if}}
         {{#if disabled}}disabled{{/if}}
         {{#if hint}}aria-describedby="{{name}}-hint"{{/if}}
-        class="form-textarea"
+        class="tw-form-textarea"
     >{{value}}</textarea>
     
     {{#if hint}}
-        <div id="{{name}}-hint" class="form-hint" role="note">{{hint}}</div>
+        <div id="{{name}}-hint" class="tw-form-hint" role="note">{{hint}}</div>
     {{/if}}
-</div> 
+</div>

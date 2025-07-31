@@ -380,17 +380,17 @@ export function createAvantActorSheet() {
             console.log('🔍 ACTOR SHEET DEBUG | Preparing card layouts for items...');
             context.cardLayouts = {};
 
-            // // Generate card layouts for each item type
-            // const itemTypes = ['weapon', 'armor', 'gear', 'action', 'feature', 'talent', 'augment'];
-            // for (const itemType of itemTypes) {
-            //     const itemsOfType = context.items[itemType] || [];
-            //     if (itemsOfType.length > 0) {
-            //         context.cardLayouts[itemType] = await CardLayoutIntegration.prepareItemCards(itemsOfType);
-            //     } else {
-            //         context.cardLayouts[itemType] = [];
-            //     }
-            // }
-            // console.log('🔍 ACTOR SHEET DEBUG | Card layouts prepared successfully');
+            // Generate card layouts for each item type (with Tailwind classes)
+            const itemTypes = ['weapon', 'armor', 'gear', 'action', 'feature', 'talent', 'augment'];
+            for (const itemType of itemTypes) {
+                const itemsOfType = context.items[itemType] || [];
+                if (itemsOfType.length > 0) {
+                    context.cardLayouts[itemType] = await CardLayoutIntegration.prepareItemCards(itemsOfType);
+                } else {
+                    context.cardLayouts[itemType] = [];
+                }
+            }
+            console.log('🔍 ACTOR SHEET DEBUG | Card layouts prepared successfully (with Tailwind classes)');
 
             // Add comprehensive display data to items (traits, descriptions, requirements, etc.)
             // IMPORTANT: This must happen BEFORE card layouts are prepared
@@ -402,8 +402,7 @@ export function createAvantActorSheet() {
             console.log('🔍 ACTOR SHEET DEBUG | Preparing card layouts for items...');
             context.cardLayouts = {};
 
-            // Generate card layouts for each item type
-            const itemTypes = ['weapon', 'armor', 'gear', 'action', 'feature', 'talent', 'augment'];
+            // Use the already declared itemTypes from above
             for (const itemType of itemTypes) {
                 const itemsOfType = context.items[itemType] || [];
                 if (itemsOfType.length > 0) {

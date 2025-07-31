@@ -19,12 +19,10 @@ All templates now follow the same skeleton:
     <section class="sheet-body"> → {{> item-body}}
         --}}
 
-        <div class="{{cssClass}} avant flexcol" data-nassir-test="test" autocomplete="off" data-application-part="form">
-            <div class="item-sheet {{item.type}}-sheet flexcol">
-                {{!-- Universal Header - Icon + Name + Meta Fields --}}
-                {{> "systems/avant/templates/shared/partials/avant-item-header"}}
+<form class="{{cssClass}} avant tw-item-sheet" autocomplete="off" data-application-part="form">
+    {{!-- Universal Header - Icon + Name + Meta Fields --}}
+    {{> "systems/avant/templates/shared/partials/avant-item-header"}}
 
-                {{!-- Universal Body - Description + Type-specific Fields + Traits --}}
-                {{> "systems/avant/templates/shared/partials/item-body"}}
-            </div>
-        </div>
+    {{!-- Universal Body - Description + Type-specific Fields + Traits --}}
+    {{> "systems/avant/templates/shared/partials/item-body"}}
+</form>

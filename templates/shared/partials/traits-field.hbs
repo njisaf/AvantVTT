@@ -21,21 +21,21 @@ Optional: hint, class, editable (defaults to true), displayTraits
 {{debugContext "TRAITS-FIELD traitsData" traitsData}}
 {{debugContext "TRAITS-FIELD value" value}}
 
-<div class="form-group {{#if class}}{{class}}{{/if}}">
-    <label for="{{name}}" class="form-label">
+<div class="tw-form-group {{#if class}}{{class}}{{/if}}">
+    <label for="{{name}}" class="tw-form-label">
         {{label}}
     </label>
 
     {{#if (ne editable false)}}
     <!-- Edit mode: Trait chip input with autocomplete -->
-    <div class="trait-chip-input">
-        <div class="trait-chips">
+    <div class="tw-trait-chip-input">
+        <div class="tw-trait-chips">
             {{!-- Smart trait display: detect enhanced objects vs raw IDs in value parameter --}}
             {{#if value}}
             {{#each value as |traitItem|}}
             {{#if traitItem.name}}
             {{!-- Enhanced trait object with name, color, icon --}}
-            <div class="trait-chip" style="background-color: {{traitItem.color}}; color: {{traitItem.textColor}};"
+            <div class="tw-trait-chip" style="background-color: {{traitItem.color}}; color: {{traitItem.textColor}};"
                 data-trait-id="{{traitItem.id}}" data-trait-type="{{traitItem.type}}"
                 data-trait-source="{{traitItem.source}}">
                 {{#if traitItem.icon}}<i class="{{traitItem.icon}}" aria-hidden="true"></i>{{/if}}
@@ -47,7 +47,7 @@ Optional: hint, class, editable (defaults to true), displayTraits
             </div>
             {{else}}
             {{!-- Raw trait ID - use fallback helpers --}}
-            <div class="trait-chip" style="{{traitChipStyleFromId traitItem}}" data-trait-id="{{traitItem}}">
+            <div class="tw-trait-chip" style="{{traitChipStyleFromId traitItem}}" data-trait-id="{{traitItem}}">
                 {{#if (traitIconFromId traitItem)}}<i class="{{traitIconFromId traitItem}}"
                     aria-hidden="true"></i>{{/if}}
                 <span class="trait-name">{{traitNameFromId traitItem}}</span>
@@ -70,10 +70,10 @@ Optional: hint, class, editable (defaults to true), displayTraits
             <div class="drop-zone-highlight"></div>
         </div>
 
-        <div class="trait-input-container">
-            <input type="text" class="trait-autocomplete" placeholder="Type to add traits..." autocomplete="off"
+        <div class="tw-trait-input-container">
+            <input type="text" class="tw-trait-autocomplete" placeholder="Type to add traits..." autocomplete="off"
                 data-target="{{name}}" {{#if hint}}aria-describedby="{{name}}-hint" {{/if}}>
-            <div class="trait-suggestions" style="display: none;"></div>
+            <div class="tw-trait-suggestions" style="display: none;"></div>
         </div>
     </div>
     {{else}}
@@ -83,7 +83,7 @@ Optional: hint, class, editable (defaults to true), displayTraits
         {{#each value as |traitItem|}}
         {{#if traitItem.name}}
         {{!-- Enhanced trait object with name, color, icon --}}
-        <div class="trait-chip trait-chip-readonly"
+        <div class="tw-trait-chip tw-trait-chip-readonly"
             style="background-color: {{traitItem.color}}; color: {{traitItem.textColor}};"
             data-trait-id="{{traitItem.id}}" data-trait-type="{{traitItem.type}}"
             data-trait-source="{{traitItem.source}}">
@@ -92,7 +92,7 @@ Optional: hint, class, editable (defaults to true), displayTraits
         </div>
         {{else}}
         {{!-- Raw trait ID - use fallback helpers --}}
-        <div class="trait-chip trait-chip-readonly" style="{{traitChipStyleFromId traitItem}}"
+        <div class="tw-trait-chip tw-trait-chip-readonly" style="{{traitChipStyleFromId traitItem}}"
             data-trait-id="{{traitItem}}">
             {{#if (traitIconFromId traitItem)}}<i class="{{traitIconFromId traitItem}}" aria-hidden="true"></i>{{/if}}
             <span class="trait-name">{{traitNameFromId traitItem}}</span>
@@ -115,6 +115,6 @@ Optional: hint, class, editable (defaults to true), displayTraits
     {{/each}}
 
     {{#if hint}}
-    <small id="{{name}}-hint" class="form-text text-muted">{{hint}}</small>
+    <small id="{{name}}-hint" class="tw-form-hint">{{hint}}</small>
     {{/if}}
 </div>

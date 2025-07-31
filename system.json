@@ -22,7 +22,8 @@
     "scripts/avant-vtt.js"
   ],
   "styles": [
-    "styles/avant.css"
+    "styles/avant.css",
+    "styles/tailwind.css"
   ],
   "languages": [
     {

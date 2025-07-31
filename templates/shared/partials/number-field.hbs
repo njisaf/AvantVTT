@@ -17,8 +17,8 @@
   Optional: value, label, min, max, placeholder, hint, class
 --}}
 
-<div class="form-group form-group--number-field {{#if class}}{{class}}{{/if}}">
-    <label for="{{name}}" class="form-label">
+<div class="tw-form-group {{#if class}}{{class}}{{/if}}">
+    <label for="{{name}}" class="tw-form-label">
         {{#if label}}{{label}}{{else}}Number Field{{/if}}
     </label>
     
@@ -30,10 +30,10 @@
            {{#if max}}max="{{max}}"{{/if}}
            {{#if placeholder}}placeholder="{{placeholder}}"{{/if}}
            {{#if hint}}aria-describedby="{{name}}-hint"{{/if}}
-           class="form-input"
+           class="tw-form-input"
            data-dtype="Number">
     
     {{#if hint}}
-        <div id="{{name}}-hint" class="form-hint" role="note">{{hint}}</div>
+        <div id="{{name}}-hint" class="tw-form-hint" role="note">{{hint}}</div>
     {{/if}}
-</div> 
+</div>
