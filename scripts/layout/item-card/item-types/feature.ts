@@ -43,36 +43,36 @@ export function getFeatureCardLayout(item: any): CardSection {
         }),
 
         // PP cost and active status
-        when(!!(system.powerPointCost || system.isActive !== undefined), () => field({
-            type: 'feature-meta',
-            name: 'meta',
-            ppCost: system.powerPointCost,
-            isActive: system.isActive,
-            class: 'feature-meta'
-        })),
+        // when(!!(system.powerPointCost || system.isActive !== undefined), () => field({
+        //     type: 'feature-meta',
+        //     name: 'meta',
+        //     ppCost: system.powerPointCost,
+        //     isActive: system.isActive,
+        //     class: 'feature-meta'
+        // })),
 
-        // Category select (display only, sheet changes value)
-        when(!!system.category, () => field({
-            type: 'feature-category',
-            name: 'category',
-            value: system.category,
-            class: 'feature-category'
-        })),
+        // // Category select (display only, sheet changes value)
+        // when(!!system.category, () => field({
+        //     type: 'feature-category',
+        //     name: 'category',
+        //     value: system.category,
+        //     class: 'feature-category'
+        // })),
 
         // Source display (source + category were merged; keep source only)
-        when(!!system.source, () => field({
-            type: 'feature-source',
-            name: 'source',
-            value: system.source,
-            class: 'feature-source'
-        })),
+        // when(!!system.source, () => field({
+        //     type: 'feature-source',
+        //     name: 'source',
+        //     value: system.source,
+        //     class: 'feature-source'
+        // })),
 
         // Description display
         when(!!system.description, () => field({
             type: 'feature-description',
             name: 'description',
             value: system.description,
-            class: 'feature-description'
+            class: 'row-description'
         })),
         
         // Traits display

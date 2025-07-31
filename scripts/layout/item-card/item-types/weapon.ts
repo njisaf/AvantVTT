@@ -40,7 +40,7 @@ export function getWeaponCardLayout(item: any): CardSection {
             img: item.img,
             title: item.name,
             itemId: item._id,
-            class: 'weapon-header'
+            class: 'item-header weapon-header'
         }),
 
         // Damage and type display

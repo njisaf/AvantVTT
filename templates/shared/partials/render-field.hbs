@@ -425,12 +425,12 @@ class=field.class}}
 
 {{else if (eq field.type "weapon-image-name")}}
 {{!-- Weapon image and name --}}
-<div class="weapon-header">
+<div class="item-header weapon-header">
   <div class="item-image">
     <img src="{{field.img}}" title="{{field.title}}" width="24" height="24" />
   </div>
-  <h4 class="item-name" 
-      data-action="editItem" 
+  <h4 class="item-name"
+      data-action="editItem"
       data-item-id="{{field.itemId}}"
       title="Edit {{field.title}}"
       tabindex="0"
@@ -510,12 +510,12 @@ class=field.class}}
 
 {{else if (eq field.type "armor-image-name")}}
 {{!-- Armor image and name --}}
-<div class="armor-header">
+<div class="item-header armor-header">
   <div class="item-image">
     <img src="{{field.img}}" title="{{field.title}}" width="24" height="24" />
   </div>
-  <h4 class="item-name" 
-      data-action="editItem" 
+  <h4 class="item-name"
+      data-action="editItem"
       data-item-id="{{field.itemId}}"
       title="Edit {{field.title}}"
       tabindex="0"
@@ -529,6 +529,13 @@ class=field.class}}
 <div class="armor-protection-info">
   {{#if field.armorClass}}<span class="item-ac">AC +{{field.armorClass}}</span>{{/if}}
   {{#if field.threshold}}<span class="item-threshold">Threshold {{field.threshold}}</span>{{/if}}
+</div>
+
+{{else if (eq field.type "armor-description")}}
+{{!-- armor description display --}}
+<div class="armor-description">
+  {{field.value}}
+  {{#if field.description}}<span class="item-description">{{field.description}}</span>{{/if}}
 </div>
 
 {{else if (eq field.type "armor-properties")}}
@@ -582,12 +589,12 @@ class=field.class}}
 
 {{else if (eq field.type "gear-image-name")}}
 {{!-- Gear image and name --}}
-<div class="gear-header">
+<div class="item-header gear-header">
   <div class="item-image">
     <img src="{{field.img}}" title="{{field.title}}" width="24" height="24" />
   </div>
-  <h4 class="item-name" 
-      data-action="editItem" 
+  <h4 class="item-name"
+      data-action="editItem"
       data-item-id="{{field.itemId}}"
       title="Edit {{field.title}}"
       tabindex="0"
