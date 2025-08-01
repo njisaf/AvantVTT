@@ -107,6 +107,8 @@ export function body(item: LayoutItemData): Field[] {
             return sideBy(damageField, modifierField);
         }),
 
+        commonFields.expertise(system.expertise, 'weapon'),
+
         commonFields.ability(system.ability, 'weapon'),
 
         // // Fallback: individual fields if one is missing

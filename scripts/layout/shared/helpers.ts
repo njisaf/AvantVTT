@@ -213,6 +213,21 @@ export const commonFields = {
     })),
 
     /**
+     * Standard expertise field
+     */
+    expertise: (value: number | undefined, itemType: string) => when(value !== undefined, () => field({
+        type: 'number',
+        name: 'system.expertise',
+        value: value,
+        label: 'Expertise',
+        min: 0,
+        step: 1,
+        placeholder: '0',
+        hint: 'Expertise bonus for this item',
+        class: `${itemType}-expertise`
+    })),
+
+    /**
      * Standard level requirement field
      */
     levelRequirement: (value: number | undefined, itemType: string) => when(value !== undefined, () => field({

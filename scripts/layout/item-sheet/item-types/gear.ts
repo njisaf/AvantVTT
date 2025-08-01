@@ -23,11 +23,11 @@ export function header(item: LayoutItemData): Field[] {
             commonFields.name(item.name, 'gear')
         ),
 
-        // Weight and cost side-by-side
-        sideBy(
-            commonFields.weight(system.weight, 'gear'),
-            commonFields.cost(system.cost, 'gear')
-        )
+        // // Weight and cost side-by-side
+        // sideBy(
+        //     commonFields.weight(system.weight, 'gear'),
+        //     commonFields.cost(system.cost, 'gear')
+        // )
     ]);
 }
 
@@ -39,12 +39,14 @@ export function body(item: LayoutItemData): Field[] {
     const system = item.system as GearSystemData;
 
     return filterFields([
-        // 1. Meta fields first (if not already in header)
-        commonFields.weight(system.weight, 'gear'),
-        commonFields.cost(system.cost, 'gear'),
+        // // 1. Meta fields first (if not already in header)
+        // commonFields.weight(system.weight, 'gear'),
+        // commonFields.cost(system.cost, 'gear'),
 
         // 2. Description (full width)
         commonFields.description(system.description, 'gear'),
+
+        commonFields.expertise(system.expertise, 'gear'),
 
         // 3. Traits last (full width)
         commonFields.traits(system.traits, 'gear')

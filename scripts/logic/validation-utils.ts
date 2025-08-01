@@ -427,6 +427,49 @@ export function validateUsesData(usesData: any): any {
 }
 
 /**
+ * Validates expertise points data structure
+ *
+ * This function validates expertise point values including total, spent,
+ * and remaining values. All values are validated as positive integers.
+ *
+ * @param {Object} expertisePointsData - The expertise points data to validate
+ * @returns {Object} Validated expertise points data
+ *
+ * @example
+ * // Expertise points validation
+ * const expertisePoints = validateExpertisePointsData({
+ *     total: "10",
+ *     spent: "5",
+ *     remaining: "5"
+ * });
+ * // Result: {
+ * //   total: 10,
+ * //   spent: 5,
+ * //   remaining: 5
+ * // }
+ */
+export function validateExpertisePointsData(expertisePointsData: any): any {
+    console.log("Validating expertise points data:", expertisePointsData);
+    if (!expertisePointsData || typeof expertisePointsData !== 'object') {
+        return expertisePointsData;
+    }
+    
+    const validated = { ...expertisePointsData };
+    
+    if (expertisePointsData.total !== undefined) {
+        validated.total = validateNumber(expertisePointsData.total, 0, true);
+    }
+    if (expertisePointsData.spent !== undefined) {
+        validated.spent = validateNumber(expertisePointsData.spent, 0, true);
+    }
+    if (expertisePointsData.remaining !== undefined) {
+        validated.remaining = validateNumber(expertisePointsData.remaining, 0, true);
+    }
+    
+    return validated;
+}
+
+/**
  * Validates FoundryVTT document ID format
  * 
  * This function checks if a string matches the expected format

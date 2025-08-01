@@ -6571,14 +6571,16 @@ form.avant.theme-dark *::after {
   outline: none;
   box-shadow: inset 0 0 10px var(--theme-shadow-primary, rgba(0, 224, 220, 0.2));
 }
-.avant .power-points-section {
+.avant .points-section, .avant .power-points-section,
+.avant .expertise-points-section {
   background: var(--theme-bg-secondary, #2A2A2A);
   border: 2px solid var(--theme-accent-primary, #00E0DC);
   border-radius: 0;
   padding: 20px;
   margin-bottom: 30px;
 }
-.avant .power-points-section h3 {
+.avant .points-section h3, .avant .power-points-section h3,
+.avant .expertise-points-section h3 {
   margin: 0 0 15px 0;
   font-family: var(--theme-font-display, "Orbitron", monospace);
   font-size: 16px;
@@ -6592,13 +6594,15 @@ form.avant.theme-dark *::after {
   border-bottom: 1px solid var(--theme-accent-primary, #00E0DC);
   padding-bottom: 8px;
 }
-.avant .power-points-tiles {
+.avant .points-tiles, .avant .power-points-tiles,
+.avant .expertise-points-tiles {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 15px;
   justify-items: center;
 }
-.avant .power-point-tile {
+.avant .point-tile, .avant .power-point-tile,
+.avant .expertise-point-tile {
   background: var(--theme-bg-tertiary, #333333);
   border: 2px solid var(--theme-border-primary, #404040);
   border-bottom: 4px solid var(--theme-accent-primary, #00E0DC);
@@ -6607,11 +6611,13 @@ form.avant.theme-dark *::after {
   transition: all 0.3s ease;
   min-width: 120px;
 }
-.avant .power-point-tile:hover {
+.avant .point-tile:hover, .avant .power-point-tile:hover,
+.avant .expertise-point-tile:hover {
   border-color: var(--theme-accent-primary, #00E0DC);
   box-shadow: var(--theme-shadow-primary, 0 4px 20px rgba(0, 224, 220, 0.1));
 }
-.avant .power-point-tile label {
+.avant .point-tile label, .avant .power-point-tile label,
+.avant .expertise-point-tile label {
   display: block;
   font-family: var(--theme-font-display, "Orbitron", monospace);
   font-size: 12px;
@@ -6623,7 +6629,8 @@ form.avant.theme-dark *::after {
   margin-bottom: 8px;
   letter-spacing: 1px;
 }
-.avant .power-point-input {
+.avant .point-input, .avant .power-point-input,
+.avant .expertise-point-input {
   background: var(--theme-bg-primary, #1C1C1C);
   border: 2px solid var(--theme-border-primary, #404040);
   color: var(--theme-text-primary, #FFFFFF);
@@ -6637,7 +6644,8 @@ form.avant.theme-dark *::after {
   text-align: center;
   transition: all 0.3s ease;
 }
-.avant .power-point-input:focus {
+.avant .point-input:focus, .avant .power-point-input:focus,
+.avant .expertise-point-input:focus {
   border-color: var(--theme-accent-primary, #00E0DC);
   outline: none;
   box-shadow: inset 0 0 10px rgba(0, 224, 220, 0.3);

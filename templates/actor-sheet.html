@@ -61,7 +61,7 @@
                 </div>
             </div>
 
-            <!-- Expertise Points -->
+            <!-- Expertise Points
             <div class="sidebar-section">
                 <h4>Expertise Points</h4>
                 <div class="stat-tiles-row">
@@ -81,7 +81,7 @@
                         <span class="stat-tile-label">Remaining</span>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
             <!-- Abilities -->
             <div class="sidebar-section">
@@ -281,11 +281,20 @@
                 </div>
 
 
+
+
                 <!-- Skills Tab -->
                 <div class="tab" data-group="sheet" data-tab="skills">
                     <div class="skills-section">
-                        <h3>Skills</h3>
-
+                        <!-- Expertise Points Section -->
+                        <!--
+                            NOTE ON DUPLICATE PARTIALS:
+                            This partial is included here and on the Gear tab. To prevent form submission errors
+                            due to duplicate field 'name' attributes, this instance does NOT submit its data.
+                            The instance on the Gear tab is passed `submit=true` and is the single source of
+                            truth for form data. UI synchronization is handled in actor-sheet.ts.
+                        -->
+                        {{> "systems/avant/templates/actor/expertise-points-section"}}
                         <!-- 2x2 Grid for Ability Groups -->
                         <div class="skills-abilities-grid">
                             <!-- Might Skills -->
@@ -369,26 +378,35 @@
 
                 <!-- Gear Tab -->
                 <div class="tab" data-group="sheet" data-tab="gear">
+                    <!--
+                        NOTE ON DUPLICATE PARTIALS:
+                        This partial is the single source of truth for Expertise Points form data.
+                        It is passed `submit=true` which enables the 'name' attributes on its inputs.
+                        The instance on the Skills tab omits this parameter and does not submit data.
+                        UI synchronization is handled in actor-sheet.ts.
+                    -->
+                    {{> "systems/avant/templates/actor/expertise-points-section" submit=true}}
+
                     <!-- Weapons Section -->
-                    {{> "systems/avant/templates/shared/partials/items-section" 
-                        title="Weapons" 
-                        itemType="weapon" 
-                        items=cardLayouts.weapon 
-                        cssClass="weapon-cards"}}
+                    {{> "systems/avant/templates/shared/partials/items-section"
+                    title="Weapons"
+                    itemType="weapon"
+                    items=cardLayouts.weapon
+                    cssClass="weapon-cards"}}
 
                     <!-- Armor Section -->
-                    {{> "systems/avant/templates/shared/partials/items-section" 
-                        title="Armor" 
-                        itemType="armor" 
-                        items=cardLayouts.armor 
-                        cssClass="armor-cards"}}
+                    {{> "systems/avant/templates/shared/partials/items-section"
+                    title="Armor"
+                    itemType="armor"
+                    items=cardLayouts.armor
+                    cssClass="armor-cards"}}
 
                     <!-- Equipment & Gear Section -->
-                    {{> "systems/avant/templates/shared/partials/items-section" 
-                        title="Equipment & Gear" 
-                        itemType="gear" 
-                        items=cardLayouts.gear 
-                        cssClass="gear-cards"}}
+                    {{> "systems/avant/templates/shared/partials/items-section"
+                    title="Equipment & Gear"
+                    itemType="gear"
+                    items=cardLayouts.gear
+                    cssClass="gear-cards"}}
                 </div>
 
                 <!-- Actions Tab (Unified) -->
@@ -398,11 +416,11 @@
 
                 <!-- Features Tab -->
                 <div class="tab" data-group="sheet" data-tab="features">
-                    {{> "systems/avant/templates/shared/partials/items-section" 
-                        title="Features" 
-                        itemType="feature" 
-                        items=cardLayouts.feature 
-                        cssClass="feature-cards"}}
+                    {{> "systems/avant/templates/shared/partials/items-section"
+                    title="Features"
+                    itemType="feature"
+                    items=cardLayouts.feature
+                    cssClass="feature-cards"}}
                 </div>
 
                 <!-- Talents & Augments Tab -->
@@ -411,18 +429,18 @@
                     {{> "systems/avant/templates/actor/power-points-section"}}
 
                     <!-- Talents Section -->
-                    {{> "systems/avant/templates/shared/partials/items-section" 
-                        title="Talents" 
-                        itemType="talent" 
-                        items=cardLayouts.talent 
-                        cssClass="talent-cards"}}
+                    {{> "systems/avant/templates/shared/partials/items-section"
+                    title="Talents"
+                    itemType="talent"
+                    items=cardLayouts.talent
+                    cssClass="talent-cards"}}
 
                     <!-- Augments Section -->
-                    {{> "systems/avant/templates/shared/partials/items-section" 
-                        title="Augments" 
-                        itemType="augment" 
-                        items=cardLayouts.augment 
-                        cssClass="augment-cards"}}
+                    {{> "systems/avant/templates/shared/partials/items-section"
+                    title="Augments"
+                    itemType="augment"
+                    items=cardLayouts.augment
+                    cssClass="augment-cards"}}
                 </div>
             </section>
         </main>

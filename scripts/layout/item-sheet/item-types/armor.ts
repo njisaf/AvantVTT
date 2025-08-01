@@ -113,6 +113,8 @@ export function body(item: LayoutItemData): Field[] {
         // 2. Description (full width)
         commonFields.description(system.description, 'armor'),
 
+        commonFields.expertise(system.expertise, 'armor'),
+
         // 3. Ability and modifier
         // commonFields.ability(system.ability, 'armor'),
 

@@ -1403,6 +1403,7 @@ export function createAvantItemSheet() {
                         }
                     }
 
+                    console.log('AvantItemSheet | Final Processed Data:', processedData);
                     return processedData || {};
                 } else {
                     const errorMessage = extractionResult.success ? 'Form extraction returned failure' : extractionResult.error;

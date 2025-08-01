@@ -28,6 +28,8 @@ export interface ItemTemplateData {
     isFeature: boolean;
     /** Whether this is an action item */
     isAction: boolean;
+
+    expertise?: number;
 }
 
 /**
@@ -106,6 +108,7 @@ export function prepareTemplateData(item: unknown): ItemTemplateData | null {
     const system = itemObj.system || {};
     const flags = itemObj.flags || {};
     const itemType = itemObj.type || 'unknown';
+    const expertise = system.expertise;
 
     return {
         item: item,
@@ -115,7 +118,8 @@ export function prepareTemplateData(item: unknown): ItemTemplateData | null {
         isWeapon: itemType === 'weapon',
         isArmor: itemType === 'armor',
         isFeature: itemType === 'feature',
-        isAction: itemType === 'action'
+        isAction: itemType === 'action',
+        expertise: expertise
     };
 }
 
