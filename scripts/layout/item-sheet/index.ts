@@ -6,7 +6,7 @@
  */
 
 import type { Field } from '../shared/types';
-import type { LayoutItemData } from '../shared/types';
+import type { LayoutItemData, WeaponSystemData, ArmorSystemData, GearSystemData } from '../shared/types';
 
 // Import all item type layout modules
 import * as talent from './item-types/talent';
@@ -97,6 +97,22 @@ export function getBodyLayout(item: LayoutItemData): Field[] {
     }
 
     try {
+        console.log('GetBodyLayout | Item data received:', JSON.parse(JSON.stringify(item)));
+
+        if (item.type === 'weapon' || item.type === 'armor' || item.type === 'gear') {
+            const system = item.system as WeaponSystemData | ArmorSystemData | GearSystemData;
+            if (typeof system.expertise === 'undefined') {
+                const itemCopyWithDefault = {
+                    ...item,
+                    system: {
+                        ...item.system,
+                        expertise: 0
+                    }
+                };
+                return module.body(itemCopyWithDefault);
+            }
+        }
+        
         return module.body(item);
     } catch (error) {
         console.error(`Error generating body layout for ${item.type}:`, error);
@@ -167,4 +183,4 @@ export function validateRegistry(): { valid: boolean; errors: string[] } {
 }
 
 // Export the registry for testing purposes
-export { registry as _registry }; 
+export { registry as _registry };

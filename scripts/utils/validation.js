@@ -17,6 +17,7 @@ import {
     validateActorSkills,
     validateHealthData,
     validatePowerPointsData,
+    validateExpertisePointsData,
     validateUsesData,
     isValidDocumentId,
     sanitizeHtml
@@ -90,6 +91,11 @@ export class ValidationUtils {
         // Validate power points using pure function
         if (data.system.powerPoints) {
             data.system.powerPoints = validatePowerPointsData(data.system.powerPoints);
+        }
+        
+        // Validate expertise points using pure function
+        if (data.system.expertisePoints) {
+            data.system.expertisePoints = validateExpertisePointsData(data.system.expertisePoints);
         }
         
         logger.debug(`ValidationUtils | Actor validation complete - type: ${data.type}`);
@@ -281,6 +287,11 @@ export class ValidationUtils {
             // Convert uses fields using pure function
             if (processedData.system.uses) {
                 processedData.system.uses = validateUsesData(processedData.system.uses);
+            }
+            
+            // Convert expertisePoints fields using pure function
+            if (processedData.system.expertisePoints) {
+                processedData.system.expertisePoints = validateExpertisePointsData(processedData.system.expertisePoints);
             }
             
             // Handle weapon/armor specific integer fields using pure functions

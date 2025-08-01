@@ -1660,8 +1660,8 @@ form.avant.theme-dark {
     resize: vertical;
   }
 
-  // Power Points Section in Talents Tab
-  .power-points-section {
+  // Points Section - Shared styles for Power Points and Expertise Points
+  .points-section {
     background: var(--theme-bg-secondary, $bg-secondary);
     border: 2px solid var(--theme-accent-primary, $accent-cyan);
     border-radius: 0;
@@ -1679,14 +1679,26 @@ form.avant.theme-dark {
     }
   }
 
-  .power-points-tiles {
+  // Apply shared styles to both power points and expertise points sections
+  .power-points-section,
+  .expertise-points-section {
+    @extend .points-section;
+  }
+
+  .points-tiles {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: $spacing-lg;
     justify-items: center;
   }
 
-  .power-point-tile {
+  // Apply shared styles to both power points and expertise points tiles containers
+  .power-points-tiles,
+  .expertise-points-tiles {
+    @extend .points-tiles;
+  }
+
+  .point-tile {
     background: var(--theme-bg-tertiary, $bg-tertiary);
     border: 2px solid var(--theme-border-primary, $border-primary);
     border-bottom: 4px solid var(--theme-accent-primary, $accent-cyan);
@@ -1709,7 +1721,13 @@ form.avant.theme-dark {
     }
   }
 
-  .power-point-input {
+  // Apply shared styles to both power points and expertise points tiles
+  .power-point-tile,
+  .expertise-point-tile {
+    @extend .point-tile;
+  }
+
+  .point-input {
     background: var(--theme-bg-primary, $bg-primary);
     border: 2px solid var(--theme-border-primary, $border-primary);
     color: var(--theme-text-primary, $text-primary);
@@ -1725,6 +1743,12 @@ form.avant.theme-dark {
       outline: none;
       box-shadow: inset 0 0 10px rgba(0, 224, 220, 0.3);
     }
+  }
+
+  // Apply shared styles to both power points and expertise points inputs
+  .power-point-input,
+  .expertise-point-input {
+    @extend .point-input;
   }
 
   // Hide original resource sections that are now in sidebar or moved

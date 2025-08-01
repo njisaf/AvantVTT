@@ -1,0 +1,69 @@
+{{!-- 
+    EXPERTISE POINTS SECTION PARTIAL TEMPLATE
+    
+    PURPOSE: Provides UI for tracking Expertise Points on the Talents & Augments tab
+    TEMPLATE TYPE: Handlebars Partial (*.hbs)
+    
+    INTEGRATION NOTES:
+    - Included in actor-sheet.html via {{> "systems/avant/templates/actor/expertise-points-section"}}
+    - Must be registered in initialization-manager.ts templatePaths array to be found
+    
+    DATA BINDING:
+    - This partial is used in multiple tabs, which can cause form data conflicts.
+    - To prevent this, the `name` attribute is only rendered if `submit=true` is passed to the partial.
+    - The `data-field` attribute is used by Javascript to synchronize the UI between the two instances.
+    - `data-dtype="Number"` ensures FoundryVTT treats values as numbers.
+    - min="0" prevents negative values in the UI
+    
+    STYLING:
+    - Uses .expertise-points-section, .expertise-point-tile, .expertise-point-input CSS classes
+    - SCSS styles are already compiled in avant.css - no CSS changes needed
+    - Theme system automatically applies dark/light mode styling
+    
+    FUTURE ENHANCEMENTS (Stage 4):
+    - Roll/spend buttons will be added to individual augment rows, not here
+    - This section is purely for tracking current EP values
+    - EP spending logic handled via chat cards and row controls
+--}}
+
+<section class="expertise-points-section">
+  <h3>Expertise Points</h3>
+
+  <div class="expertise-points-tiles">
+    {{!-- Total Expertise Points - the active pool --}}
+    <div class="expertise-point-tile">
+      <label>Total</label>
+      <input class="expertise-point-input"
+             type="number"
+             {{#if submit}}name="system.expertisePoints.total"{{/if}}
+             data-field="total"
+             value="{{system.expertisePoints.total}}"
+             data-dtype="Number"
+             min="0">
+    </div>
+
+    {{!-- Spent Expertise Points - total capacity --}}
+    <div class="expertise-point-tile">
+      <label>Spent</label>
+      <input class="expertise-point-input"
+             type="number"
+             {{#if submit}}name="system.expertisePoints.spent"{{/if}}
+             data-field="spent"
+             value="{{system.expertisePoints.spent}}"
+             data-dtype="Number"
+             min="0">
+    </div>
+
+    {{!-- Remaining - maximum EP that can be spent --}}
+    <div class="expertise-point-tile">
+      <label>Remaining</label>
+      <input class="expertise-point-input"
+             type="number"
+             {{#if submit}}name="system.expertisePoints.remaining"{{/if}}
+             data-field="remaining"
+             value="{{system.expertisePoints.remaining}}"
+             data-dtype="Number"
+             min="0">
+    </div>
+  </div>
+</section>

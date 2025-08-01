@@ -98,7 +98,8 @@ export interface WeaponSystemData extends BaseItemSystemData {
     threshold: number;
     quantity: number;
     equipped: boolean;
-    // Note: the template uses 'damageDie' but the code expects 'damage' 
+    expertise?: number;
+    // Note: the template uses 'damageDie' but the code expects 'damage'
     damage?: string;
 }
 
@@ -116,6 +117,7 @@ export interface ArmorSystemData extends BaseItemSystemData {
     quantity: number;
     equipped: boolean;
     properties: string;
+    expertise?: number;
     // Note: the template uses 'threshold' but the code expects 'armorClass'
     armorClass?: number;
 }
@@ -134,6 +136,7 @@ export interface GearSystemData extends BaseItemSystemData {
         value: number;
         max: number;
     };
+    expertise?: number;
 }
 
 /**

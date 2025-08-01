@@ -233,6 +233,7 @@
       "threshold": 11,
       "quantity": 1,
       "equipped": false,
+      "expertise": 0,
       "traits": []
     },
     "armor": {
@@ -247,6 +248,7 @@
       "quantity": 1,
       "equipped": false,
       "properties": "",
+      "expertise": 0,
       "traits": []
     },
     "gear": {
@@ -261,6 +263,7 @@
         "value": 0,
         "max": 0
       },
+      "expertise": 0,
       "traits": []
     },
     "trait": {

@@ -648,6 +648,7 @@ export class FoundryInitializationHelper {
                 // CRITICAL: Every partial referenced in templates MUST be listed here
                 "systems/avant/templates/actor/row-talent-augment.hbs",      // Talent/Augment row component
                 "systems/avant/templates/actor/power-points-section.hbs",    // Power Points tracking UI (Phase 3F)
+                "systems/avant/templates/actor/expertise-points-section.hbs", // Expertise Points tracking UI
 
                 // Phase 2-5 Component Library - Form field partials
                 "systems/avant/templates/shared/partials/form-row.hbs",

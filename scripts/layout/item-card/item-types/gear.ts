@@ -40,7 +40,7 @@ export function getGearCardLayout(item: any): CardSection {
             img: item.img,
             title: item.name,
             itemId: item._id,
-            class: 'gear-header'
+            class: 'item-header gear-header'
         }),
 
         // Weight display
@@ -51,14 +51,14 @@ export function getGearCardLayout(item: any): CardSection {
             class: 'gear-weight'
         })),
 
-        // Category and rarity
-        when(!!(system.category || system.rarity), () => field({
-            type: 'gear-category',
-            name: 'category',
-            category: system.category,
-            rarity: system.rarity,
-            class: 'gear-category'
-        })),
+        // // Category and rarity
+        // when(!!(system.category || system.rarity), () => field({
+        //     type: 'gear-category',
+        //     name: 'category',
+        //     category: system.category,
+        //     rarity: system.rarity,
+        //     class: 'gear-category'
+        // })),
 
         // Uses (if consumable)
         when(!!(system.uses && system.uses.max > 0), () => field({

@@ -397,6 +397,12 @@ export class AvantWeaponData extends foundry.abstract.DataModel {
                 initial: "",
                 blank: true
             }),
+            expertise: new fields.NumberField({
+                required: true,
+                initial: 0,
+                integer: true,
+                min: 0
+            }),
             // Trait assignment for weapons
             traits: new fields.ArrayField(new fields.StringField({
                 required: false,
@@ -485,6 +491,12 @@ export class AvantArmorData extends foundry.abstract.DataModel {
                 initial: "",
                 blank: true
             }),
+            expertise: new fields.NumberField({
+                required: true,
+                initial: 0,
+                integer: true,
+                min: 0
+            }),
             // Trait assignment for armor
             traits: new fields.ArrayField(new fields.StringField({
                 required: false,
@@ -569,6 +581,12 @@ export class AvantGearData extends foundry.abstract.DataModel {
                     integer: true,
                     min: 0
                 })
+            }),
+            expertise: new fields.NumberField({
+                required: true,
+                initial: 0,
+                integer: true,
+                min: 0
             }),
             // Trait assignment for gear
             traits: new fields.ArrayField(new fields.StringField({

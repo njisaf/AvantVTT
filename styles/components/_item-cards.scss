@@ -437,6 +437,60 @@ $accent-color: var(--theme-accent, #63b3ed) !default;
   }
 }
 
+// Common item header styling for weapon, armor, and gear
+.item-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2rem;
+}
+
+.item-header .item-image {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.item-header .item-image img {
+  width: 24px;
+  height: 24px;
+  object-fit: cover;
+}
+
+.item-header .item-name {
+  flex: 1;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--theme-text-primary, #f7fafc);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.item-header .item-name:hover {
+  color: var(--theme-accent, #63b3ed);
+}
+
+// Ensure backward compatibility with existing selectors
+.weapon-header,
+.armor-header,
+.gear-header {
+  @extend .item-header;
+}
+
+.weapon-header .item-name,
+.armor-header .item-name,
+.gear-header .item-name {
+  @extend .item-name;
+}
+
 // Responsive Design
 @media (max-width: 768px) {
   .avant .item-card {

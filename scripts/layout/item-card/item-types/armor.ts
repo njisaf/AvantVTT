@@ -40,7 +40,7 @@ export function getArmorCardLayout(item: any): CardSection {
             img: item.img,
             title: item.name,
             itemId: item._id,
-            class: 'armor-header'
+            class: 'item-header armor-header'
         }),
 
         // AC and threshold display
@@ -52,14 +52,20 @@ export function getArmorCardLayout(item: any): CardSection {
             class: 'armor-protection-info'
         })),
 
-        // Armor type and properties
-        when(!!(system.armorType || system.properties), () => field({
-            type: 'armor-properties',
-            name: 'properties',
-            armorType: system.armorType,
-            properties: system.properties,
-            class: 'armor-properties'
-        })),
+        // // Armor type and properties
+        // when(!!(system.armorType || system.properties), () => field({
+        //     type: 'armor-properties',
+        //     name: 'properties',
+        //     armorType: system.armorType,
+        //     properties: system.properties,
+        //     class: 'armor-properties'
+        // })),
+        field({
+            type: 'armor-description',
+            name: 'description',
+            value: system.description,
+            class: 'armor-description'
+        }),
         
         // Traits display
         when(item.displayTraits && item.displayTraits.length > 0, () => field({
@@ -70,13 +76,13 @@ export function getArmorCardLayout(item: any): CardSection {
             class: 'trait-chips'
         })),
 
-        // Weight and other details
-        when(!!system.weight, () => field({
-            type: 'armor-details',
-            name: 'details',
-            weight: system.weight,
-            class: 'armor-details'
-        }))
+        // // Weight and other details
+        // when(!!system.weight, () => field({
+        //     type: 'armor-details',
+        //     name: 'details',
+        //     weight: system.weight,
+        //     class: 'armor-details'
+        // }))
     ]);
 
     // Right section: Edit and delete buttons

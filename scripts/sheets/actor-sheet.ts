@@ -170,8 +170,7 @@ export function createAvantActorSheet() {
             // Form handling configuration
             form: {
                 submitOnChange: true,  // Auto-submit on field changes
-                closeOnSubmit: false // Keep sheet open after submission
-                // Use default ApplicationV2 form handler instead of custom one
+                closeOnSubmit: false     // Keep sheet open after submission
             },
 
             // 🎯 CRITICAL: All ApplicationV2 actions must be registered here
@@ -231,8 +230,6 @@ export function createAvantActorSheet() {
          */
         static get defaultOptions() {
             const options = super.defaultOptions;
-            console.log('🔍 ACTOR SHEET DEBUG | defaultOptions called, template path:', 'systems/avant/templates/actor-sheet.html');
-            console.log('🔍 ACTOR SHEET DEBUG | PARTS configuration:', AvantActorSheet.PARTS);
             return options;
         }
 
@@ -298,29 +295,16 @@ export function createAvantActorSheet() {
          * @override
          */
         async _prepareContext(options: any): Promise<any> {
-            console.log('🔍 ACTOR SHEET DEBUG | _prepareContext called with options:', options);
-            console.log('🔍 ACTOR SHEET DEBUG | Document exists:', !!this.document);
-            console.log('🔍 ACTOR SHEET DEBUG | Document ID:', this.document?.id);
-            console.log('🔍 ACTOR SHEET DEBUG | Document name:', this.document?.name);
-
             // Get base ApplicationV2 context
-            console.log('🔍 ACTOR SHEET DEBUG | Getting base context from super._prepareContext()...');
             const context = await super._prepareContext(options);
-            console.log('🔍 ACTOR SHEET DEBUG | Base context received:', context);
-            console.log('🔍 ACTOR SHEET DEBUG | Base context keys:', Object.keys(context || {}));
 
             // CRITICAL FIX: Ensure TraitProvider is ready before preparing context
             // This prevents race conditions where traits are rendered before their
             // display data (colors, icons) is available.
             const game = (globalThis as any).game;
-            console.log('🔍 ACTOR SHEET DEBUG | Game exists:', !!game);
-            console.log('🔍 ACTOR SHEET DEBUG | game.avant exists:', !!game?.avant);
-            console.log('🔍 ACTOR SHEET DEBUG | initializationManager exists:', !!game?.avant?.initializationManager);
 
             if (game?.avant?.initializationManager) {
-                console.log('🔍 ACTOR SHEET DEBUG | Waiting for traitProvider service...');
                 await game.avant.initializationManager.waitForService('traitProvider');
-                console.log('🔍 ACTOR SHEET DEBUG | TraitProvider service ready');
             }
 
             // Extract actor data for processing
@@ -377,7 +361,6 @@ export function createAvantActorSheet() {
             context.items = organizeItemsByType(itemsArray);
 
             // Prepare card layouts for each item type
-            console.log('🔍 ACTOR SHEET DEBUG | Preparing card layouts for items...');
             context.cardLayouts = {};
 
             // // Generate card layouts for each item type
@@ -390,16 +373,12 @@ export function createAvantActorSheet() {
             //         context.cardLayouts[itemType] = [];
             //     }
             // }
-            // console.log('🔍 ACTOR SHEET DEBUG | Card layouts prepared successfully');
 
             // Add comprehensive display data to items (traits, descriptions, requirements, etc.)
             // IMPORTANT: This must happen BEFORE card layouts are prepared
-            console.log('🔍 ACTOR SHEET DEBUG | Adding trait display data to items...');
             await this._addTraitDisplayDataToItems(context.items);
-            console.log('🔍 ACTOR SHEET DEBUG | Trait display data added successfully');
 
             // Prepare card layouts for each item type
-            console.log('🔍 ACTOR SHEET DEBUG | Preparing card layouts for items...');
             context.cardLayouts = {};
 
             // Generate card layouts for each item type
@@ -412,24 +391,12 @@ export function createAvantActorSheet() {
                     context.cardLayouts[itemType] = [];
                 }
             }
-            console.log('🔍 ACTOR SHEET DEBUG | Card layouts prepared successfully');
 
             // Prepare unified actions for the Actions tab
-            console.log('🔍 ACTOR SHEET DEBUG | Preparing unified actions...');
             context.unifiedActions = await this._prepareUnifiedActions();
-            console.log('🔍 ACTOR SHEET DEBUG | Unified actions prepared:', context.unifiedActions.length);
 
             // Add system configuration data
             context.config = (globalThis as any).CONFIG?.AVANT || {};
-            console.log('🔍 ACTOR SHEET DEBUG | Config added:', !!context.config);
-
-            console.log('🔍 ACTOR SHEET DEBUG | Final context keys:', Object.keys(context || {}));
-            console.log('🔍 ACTOR SHEET DEBUG | Final context.actor exists:', !!context.actor);
-            console.log('🔍 ACTOR SHEET DEBUG | Final context.system exists:', !!context.system);
-            console.log('🔍 ACTOR SHEET DEBUG | Final context.items exists:', !!context.items);
-            console.log('🔍 ACTOR SHEET DEBUG | Final context.editable:', context.editable);
-            console.log('🔍 ACTOR SHEET DEBUG | Final context.cssClass:', context.cssClass);
-            console.log('🔍 ACTOR SHEET DEBUG | Returning context from _prepareContext()');
 
             // Store context for use in action handlers
             this.context = context;
@@ -450,18 +417,13 @@ export function createAvantActorSheet() {
          * @override
          */
         async _onRender(context: any, options: any): Promise<void> {
-            console.log('🔍 ACTOR SHEET DEBUG | _onRender called with context:', context);
-            console.log('🔍 ACTOR SHEET DEBUG | _onRender options:', options);
-            console.log('🔍 ACTOR SHEET DEBUG | Template elements in DOM:', this.element?.querySelectorAll('*').length || 0);
-
             // Complete base ApplicationV2 rendering first
-            console.log('🔍 ACTOR SHEET DEBUG | Calling super._onRender()...');
             await super._onRender(context, options);
-            console.log('🔍 ACTOR SHEET DEBUG | super._onRender() completed');
 
             // Initialize custom functionality that ApplicationV2 doesn't handle automatically
             this._initializeTabs();    // Manual tab management for Avant sheets
             this._ensureItemStyling(); // Ensure proper item display styling
+            this._synchronizeExpertiseInputs(); // 🎯 Synchronize expertise point inputs across tabs
         }
 
         /**
@@ -904,19 +866,7 @@ export function createAvantActorSheet() {
          * @param {any} options - Configuration options for the sheet
          */
         constructor(options: any = {}) {
-            console.log('🔍 ACTOR SHEET DEBUG | Constructor called with options:', options);
-            console.log('🔍 ACTOR SHEET DEBUG | Document in constructor:', options.document?.name || 'undefined');
             super(options);
-            
-            // 🚨 DEBUG ApplicationV2 Form Configuration
-            console.log('🔍 FORM CONFIG DEBUG | DEFAULT_OPTIONS.tag:', (this.constructor as any).DEFAULT_OPTIONS?.tag);
-            console.log('🔍 FORM CONFIG DEBUG | DEFAULT_OPTIONS.form:', (this.constructor as any).DEFAULT_OPTIONS?.form);
-            console.log('🔍 FORM CONFIG DEBUG | Form handler reference:', (this.constructor as any).DEFAULT_OPTIONS?.form?.handler);
-            console.log('🔍 FORM CONFIG DEBUG | submitOnChange:', (this.constructor as any).DEFAULT_OPTIONS?.form?.submitOnChange);
-            console.log('🔍 FORM CONFIG DEBUG | _handleFormSubmission exists?', typeof (this.constructor as any)._handleFormSubmission);
-            console.log('🔍 FORM CONFIG DEBUG | Handler function name:', (this.constructor as any).DEFAULT_OPTIONS?.form?.handler?.name);
-            
-            console.log('🔍 ACTOR SHEET DEBUG | Constructor completed, this.document exists:', !!this.document);
         }
 
         /**
@@ -1292,7 +1242,6 @@ export function createAvantActorSheet() {
          * @this {AvantActorSheet} The ApplicationV2 instance (bound automatically)
          */
         static async _onEditItem(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
-            console.log('🎯 Avant | _onEditItem triggered!', { event, target });
             event.preventDefault();
 
             // FIXED: In ApplicationV2, 'this' is bound to the sheet instance
@@ -1312,8 +1261,6 @@ export function createAvantActorSheet() {
                 logger.warn('AvantActorSheet | Item not found:', itemId);
                 return;
             }
-
-            console.log('🎯 Avant | Opening item sheet for:', item.name);
             // Open the item sheet
             item.sheet.render(true);
         }
@@ -1482,7 +1429,6 @@ export function createAvantActorSheet() {
          * @this {AvantActorSheet} The ApplicationV2 instance (bound automatically)
          */
         static async _onUseTalent(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
-            console.log('🎯 Avant | _onUseTalent triggered!', { event, target });
             event.preventDefault();
 
             const sheet = this;
@@ -1503,7 +1449,6 @@ export function createAvantActorSheet() {
             }
 
             try {
-                console.log('🎯 Avant | Posting talent feature card for:', item.name);
 
                 // 🎵 PLAY TALENT SOUND - Provides audio feedback for talent usage
                 // This plays a distinctive sound when talent cards are posted to chat
@@ -1528,7 +1473,6 @@ export function createAvantActorSheet() {
                 const result = await postFeatureCard(item, sheet.document, traitProvider);
 
                 if (result.success) {
-                    console.log('🎯 Avant | Posted talent card successfully:', result.messageId);
                     logger.log(`AvantActorSheet | Posted talent card for: ${item.name}`);
                 } else {
                     console.error('🎯 Avant | Talent card posting failed:', result.error);
@@ -1550,7 +1494,6 @@ export function createAvantActorSheet() {
          * @this {AvantActorSheet} The ApplicationV2 instance (bound automatically)
          */
         static async _onTestTalent(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
-            console.log('🎯 Avant | _onTestTalent triggered! SUCCESS!', { event, target });
             alert('Test talent action worked!');
         }
 
@@ -1561,7 +1504,6 @@ export function createAvantActorSheet() {
          * @this {AvantActorSheet} The ApplicationV2 instance (bound automatically)
          */
         static async _onRollTalent(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
-            console.log('🎯 Avant | _onRollTalent triggered!', { event, target });
             alert('Roll Talent Action Triggered!');
             event.preventDefault();
         }
@@ -1602,7 +1544,6 @@ export function createAvantActorSheet() {
          * @this {AvantActorSheet} The ApplicationV2 instance (bound automatically)
          */
         static async _onUseAugment(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
-            console.log('🎯 Avant | _onUseAugment triggered!', { event, target });
             event.preventDefault();
 
             const sheet = this;
@@ -1623,7 +1564,6 @@ export function createAvantActorSheet() {
             }
 
             try {
-                console.log('🎯 Avant | Posting augment feature card for:', item.name);
 
                 // 🎵 PLAY AUGMENT SOUND - Provides audio feedback for augment usage
                 // This plays a distinctive sound when augment cards are posted to chat
@@ -1668,7 +1608,6 @@ export function createAvantActorSheet() {
          * @this {AvantActorSheet} The ApplicationV2 instance (bound automatically)
          */
         static async _onUseWeapon(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
-            console.log('🎯 Avant | _onUseWeapon triggered!', { event, target });
             event.preventDefault();
 
             const sheet = this;
@@ -1689,7 +1628,6 @@ export function createAvantActorSheet() {
             }
 
             try {
-                console.log('🎯 Avant | Posting weapon feature card for:', item.name);
 
                 // Import required modules
                 const { postFeatureCard } = await import('../logic/chat/feature-card-builder.js');
@@ -1702,7 +1640,6 @@ export function createAvantActorSheet() {
                 const result = await postFeatureCard(item, sheet.document, traitProvider);
 
                 if (result.success) {
-                    console.log('🎯 Avant | Posted weapon card successfully:', result.messageId);
                     logger.log(`AvantActorSheet | Posted weapon card for: ${item.name}`);
                 } else {
                     console.error('🎯 Avant | Weapon card posting failed:', result.error);
@@ -1724,7 +1661,6 @@ export function createAvantActorSheet() {
          * @this {AvantActorSheet} The ApplicationV2 instance (bound automatically)
          */
         static async _onUseArmor(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
-            console.log('🎯 Avant | _onUseArmor triggered!', { event, target });
             event.preventDefault();
 
             const sheet = this;
@@ -1745,7 +1681,6 @@ export function createAvantActorSheet() {
             }
 
             try {
-                console.log('🎯 Avant | Posting armor feature card for:', item.name);
 
                 // Import required modules
                 const { postFeatureCard } = await import('../logic/chat/feature-card-builder.js');
@@ -1758,7 +1693,6 @@ export function createAvantActorSheet() {
                 const result = await postFeatureCard(item, sheet.document, traitProvider);
 
                 if (result.success) {
-                    console.log('🎯 Avant | Posted armor card successfully:', result.messageId);
                     logger.log(`AvantActorSheet | Posted armor card for: ${item.name}`);
                 } else {
                     console.error('🎯 Avant | Armor card posting failed:', result.error);
@@ -1780,7 +1714,6 @@ export function createAvantActorSheet() {
          * @this {AvantActorSheet} The ApplicationV2 instance (bound automatically)
          */
         static async _onUseGear(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
-            console.log('🎯 Avant | _onUseGear triggered!', { event, target });
             event.preventDefault();
 
             const sheet = this;
@@ -1801,7 +1734,6 @@ export function createAvantActorSheet() {
             }
 
             try {
-                console.log('🎯 Avant | Posting gear feature card for:', item.name);
 
                 // Import required modules
                 const { postFeatureCard } = await import('../logic/chat/feature-card-builder.js');
@@ -1814,7 +1746,6 @@ export function createAvantActorSheet() {
                 const result = await postFeatureCard(item, sheet.document, traitProvider);
 
                 if (result.success) {
-                    console.log('🎯 Avant | Posted gear card successfully:', result.messageId);
                     logger.log(`AvantActorSheet | Posted gear card for: ${item.name}`);
                 } else {
                     console.error('🎯 Avant | Gear card posting failed:', result.error);
@@ -1836,7 +1767,6 @@ export function createAvantActorSheet() {
          * @this {AvantActorSheet} The ApplicationV2 instance (bound automatically)
          */
         static async _onUseFeature(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
-            console.log('🎯 Avant | _onUseFeature triggered!', { event, target });
             event.preventDefault();
 
             const sheet = this;
@@ -1857,7 +1787,6 @@ export function createAvantActorSheet() {
             }
 
             try {
-                console.log('🎯 Avant | Posting feature feature card for:', item.name);
 
                 // Import required modules
                 const { postFeatureCard } = await import('../logic/chat/feature-card-builder.js');
@@ -1870,7 +1799,6 @@ export function createAvantActorSheet() {
                 const result = await postFeatureCard(item, sheet.document, traitProvider);
 
                 if (result.success) {
-                    console.log('🎯 Avant | Posted feature card successfully:', result.messageId);
                     logger.log(`AvantActorSheet | Posted feature card for: ${item.name}`);
                 } else {
                     console.error('🎯 Avant | Feature card posting failed:', result.error);
@@ -1915,7 +1843,6 @@ export function createAvantActorSheet() {
          * @this {AvantActorSheet} The ApplicationV2 instance (bound automatically)
          */
         static async _onSpendAugmentPP(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
-            console.log('🔋 Avant | _onSpendAugmentPP triggered!', { event, target });
             event.preventDefault();
 
             const sheet = this;
@@ -1952,7 +1879,6 @@ export function createAvantActorSheet() {
             button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
             try {
-                console.log('🔋 Avant | Processing PP spend for:', item.name, 'Cost:', ppCost);
 
                 // 🎵 PLAY SPEND SOUND - Provides audio feedback for PP spending
                 // This plays a distinctive sound when power points are spent
@@ -2001,7 +1927,6 @@ export function createAvantActorSheet() {
                 );
 
                 if (cardResult.success) {
-                    console.log('🔋 Avant | Augment card posted with spent PP confirmation');
                 } else {
                     logger.warn('Avant | Failed to post augment card after PP spend:', cardResult.error);
                 }
@@ -2023,65 +1948,11 @@ export function createAvantActorSheet() {
          * @param formData - Processed form data
          * @returns Promise<void>
          */
-        static async _handleFormSubmission(event: Event, form: HTMLFormElement, formData: any): Promise<void> {
-            console.log('🚀 CUSTOM HANDLER DEBUG | *** CUSTOM HANDLER CALLED SUCCESSFULLY ***');
-            console.log('🚀 CUSTOM HANDLER DEBUG | Event:', event);
-            console.log('🚀 CUSTOM HANDLER DEBUG | Form element:', form);
-            console.log('🚀 CUSTOM HANDLER DEBUG | FormData received:', formData);
-            console.log('🚀 CUSTOM HANDLER DEBUG | FormData type:', typeof formData);
-            console.log('🚀 CUSTOM HANDLER DEBUG | FormData.object:', formData?.object);
-            console.log('🚀 CUSTOM HANDLER DEBUG | Event type:', event?.type);
-
-            // Find the sheet instance via the ApplicationV2 way
-            const appElement = form.closest('.app') as any;
-            if (!appElement?.app) {
-                console.log('🔧 FORM DEBUG | No app element found');
-                return;
-            }
-
-            const sheet = appElement.app as AvantActorSheet;
-            console.log('🔧 FORM DEBUG | Found sheet:', !!sheet);
-            console.log('🔧 FORM DEBUG | Sheet document:', !!sheet?.document);
-
-            if (!sheet?.document) {
-                logger.warn('AvantActorSheet | No document available for form submission');
-                console.log('🔧 FORM DEBUG | No document - returning');
-                return;
-            }
-
-            try {
-                // 🎯 CRITICAL: In ApplicationV2, formData should contain the processed form data
-                // The formData.object contains the actual data to update
-                if (!formData || !formData.object) {
-                    logger.warn('AvantActorSheet | No form data to process');
-                    console.log('🔧 FORM DEBUG | No form data.object - returning');
-                    return;
-                }
-
-                console.log('🔧 FORM DEBUG | Updating document with data:', formData.object);
-                // Process and update the actor with the form data
-                await sheet.document.update(formData.object);
-                console.log('🔧 FORM DEBUG | Document update completed successfully');
-
-                // Log successful update for debugging
-                logger.debug('AvantActorSheet | Actor updated successfully:', sheet.document.name);
-
-            } catch (error) {
-                logger.error('AvantActorSheet | Form submission failed:', error);
-                console.log('🔧 FORM DEBUG | Form submission error:', error);
-
-                // Show user-friendly error message
-                const ui = (globalThis as any).ui;
-                if (ui?.notifications) {
-                    ui.notifications.error('Failed to save character data. Please try again.');
-                }
-
-                // Re-throw to ensure proper error handling upstream
-                throw error;
-            }
-        }
-
-        // 🚨 REMOVED _onSubmitForm - ApplicationV2 should use custom handler only
+        // This method is intentionally left blank. By removing the _prepareSubmitData override,
+        // we are restoring FoundryVTT's default form handling. This is now safe because
+        // the root cause of the data corruption—duplicate 'name' attributes in the HTML—has
+        // been fixed in the templates themselves. Default handling is more robust and less
+        // likely to conflict with future FoundryVTT updates.
 
         /**
          * Initialize ApplicationV2 options for the actor sheet
@@ -2089,9 +1960,7 @@ export function createAvantActorSheet() {
          * @returns Initialized options
          */
         static _initializeApplicationOptions(options: Partial<any>): any {
-            console.log('🔧 Avant | Actor sheet initializing with DEFAULT_OPTIONS.actions:', this.DEFAULT_OPTIONS.actions);
             const result = super._initializeApplicationOptions(options);
-            console.log('🔧 Avant | Actor sheet initialized with final options:', result);
             return result;
         }
 
@@ -2102,12 +1971,57 @@ export function createAvantActorSheet() {
          * @this {AvantActorSheet} The ApplicationV2 instance (bound automatically)
          */
         static async _onTestAction(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
-            console.log('🎯 Avant | TEST ACTION TRIGGERED! SUCCESS!', { event, target });
             alert('TEST ACTION WORKED! This proves ApplicationV2 actions are functioning.');
             event.preventDefault();
         }
-    }
 
+        /**
+         * 🎯 EXPERTISE POINTS UI SYNCHRONIZATION
+         *
+         * PROBLEM: The expertise points partial is included on both the "Skills" and "Gear" tabs.
+         * While only one instance has `name` attributes for form submission, the UI must
+         * remain synchronized. When a user changes a value on one tab, the corresponding
+         * input on the other tab must update instantly.
+         *
+         * SOLUTION: This method attaches an 'input' event listener to all expertise point
+         * inputs, identified by their `data-field` attribute (e.g., `data-field="total"`).
+         * When any of these inputs change, the event handler reads its `data-field` and
+         * new `value`, then finds all other inputs with the same `data-field` and updates
+         * their values to match.
+         *
+         * This ensures a seamless user experience, as both sections always reflect the
+         * same data, regardless of which one is used for form submission.
+         *
+         * @private
+         */
+        private _synchronizeExpertiseInputs(): void {
+            const expertiseInputs = this.element.querySelectorAll(
+                'input[data-field="total"], input[data-field="spent"], input[data-field="remaining"]'
+            ) as NodeListOf<HTMLInputElement>;
+
+            expertiseInputs.forEach((input: HTMLInputElement) => {
+                input.addEventListener('input', (event: Event) => {
+                    const currentInput = event.currentTarget as HTMLInputElement;
+                    const field = currentInput.dataset.field;
+                    const value = currentInput.value;
+
+                    if (!field) return;
+
+                    // Find all other inputs with the same data-field and update their value
+                    const otherInputs = this.element.querySelectorAll(
+                        `input[data-field="${field}"]`
+                    ) as NodeListOf<HTMLInputElement>;
+                    
+                    otherInputs.forEach((otherInput: HTMLInputElement) => {
+                        if (otherInput !== currentInput) {
+                            otherInput.value = value;
+                        }
+                    });
+                });
+            });
+        }
+    }
+ 
     return AvantActorSheet;
 }
 
