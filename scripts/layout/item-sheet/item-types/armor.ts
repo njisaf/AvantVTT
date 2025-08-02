@@ -116,7 +116,7 @@ export function body(item: LayoutItemData): Field[] {
         commonFields.expertise(system.expertise, 'armor'),
 
         // 3. Ability and modifier
-        // commonFields.ability(system.ability, 'armor'),
+        commonFields.ability(system.ability, 'armor'),
 
         // when(system.modifier !== undefined, () => field({
         //     type: 'number',

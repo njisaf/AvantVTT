@@ -130,6 +130,7 @@ export interface GearSystemData extends BaseItemSystemData {
     cost: number;
     quantity: number;
     rarity: 'common' | 'uncommon' | 'rare' | 'legendary';
+    ability: 'might' | 'grace' | 'intellect' | 'focus';
     category: string;
     isConsumable: boolean;
     uses: {

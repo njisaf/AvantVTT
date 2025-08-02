@@ -13,7 +13,7 @@ Context:
             data-action="rollCombinedAction" 
             data-action-id="{{../action.id}}"
             data-button="{{button}}"
-            title="{{#if (eq button "attack")}}Attack: {{../action.name}} (2d10+Level+{{../action.system.ability}}+Weapon){{else if (eq button "damage")}}Damage: {{../action.name}} ({{../action.system.damageDie}}){{else if (eq button "armor")}}Armor: {{../action.name}}{{else if (eq button "use")}}Use: {{../action.name}}{{/if}}"
+            title="{{#if (eq button "attack")}}Attack: {{../action.name}} (2d10+Level+Ability+EP){{else if (eq button "damage")}}Damage: {{../action.name}} ({{../action.system.damageDie}}){{else if (eq button "armor")}}Armor: {{../action.name}} (2d10+Level+Ability+EP){{else if (eq button "use")}}Use Gear: {{../action.name}} (2d10+Level+Ability+EP){{/if}}"
             aria-label="{{#if (eq button "attack")}}Attack {{../action.name}}{{else if (eq button "damage")}}Damage {{../action.name}}{{else if (eq button "armor")}}Armor {{../action.name}}{{else if (eq button "use")}}Use {{../action.name}}{{/if}}">
         {{#if (eq button "attack")}}
         <i class="fas fa-dice-d20" aria-hidden="true"></i>
@@ -22,7 +22,7 @@ Context:
         {{else if (eq button "armor")}}
         <i class="fas fa-shield-alt" aria-hidden="true"></i>
         {{else if (eq button "use")}}
-        <i class="fas fa-play" aria-hidden="true"></i>
+        <i class="fas fa-wrench" aria-hidden="true"></i>
         {{/if}}
     </button>
     {{/each}}
