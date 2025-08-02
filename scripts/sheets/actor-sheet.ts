@@ -33,7 +33,6 @@ import {
     prepareItemData,
     prepareWeaponAttackRoll,
     prepareWeaponDamageRoll,
-    prepareArmorRoll,
     extractItemIdFromElement,
     type SkillAbilityMap
 } from '../logic/actor-sheet-utils.ts';
@@ -186,6 +185,8 @@ export function createAvantActorSheet() {
                 rollAttack: AvantActorSheet._onRollAttack,
                 rollDamage: AvantActorSheet._onRollDamage,
                 rollArmor: AvantActorSheet._onRollArmor,
+
+                rollGear: AvantActorSheet._onRollGear,
 
                 // 📦 Item Management Actions
                 createItem: AvantActorSheet._onCreateItem,
@@ -1107,53 +1108,75 @@ export function createAvantActorSheet() {
          */
         static async _onRollArmor(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
             event.preventDefault();
-
-            // FIXED: In ApplicationV2, 'this' is bound to the sheet instance
+        
             const sheet = this;
             if (!sheet?.document) return;
-
+        
             const itemId = extractItemIdFromElement(target);
             if (!itemId) {
                 logger.warn('AvantActorSheet | No item ID for armor roll');
                 return;
             }
-
-
+        
             const item = sheet.document.items.get(itemId);
             if (!item) {
                 FoundryUI.notify('Armor not found', 'warn');
                 return;
             }
-
+        
             try {
-                // Use pure function to prepare armor roll
-                const rollData = prepareArmorRoll(item, sheet.document.system);
-
-                if (!rollData) {
-                    FoundryUI.notify('Invalid armor roll data', 'warn');
-                    return;
-                }
-
-                // Create and execute the roll
-                const Roll = (globalThis as any).Roll;
-                const roll = new Roll(rollData.rollExpression, rollData.rollData);
-                await roll.evaluate();
-
-                // Send to chat
-                const ChatMessage = (globalThis as any).ChatMessage;
-                await roll.toMessage({
-                    speaker: ChatMessage.getSpeaker({ actor: sheet.document }),
-                    flavor: `${item.name} Armor`,
-                    rollMode: (globalThis as any).game.settings.get('core', 'rollMode')
+                const { buildArmorRoll } = await import('../logic/rolls-utils.js');
+        
+                const rollPayload = buildArmorRoll(item, sheet.document, {
+                    speaker: (globalThis as any).ChatMessage.getSpeaker({ actor: sheet.document })
                 });
-
-                logger.log(`AvantActorSheet | Armor roll executed for ${item.name}: ${roll.total}`);
+        
+                await rollPayload.sendToChat();
+        
+                logger.log(`AvantActorSheet | Executed ${item.name} armor roll`);
             } catch (error) {
                 logger.error('AvantActorSheet | Armor roll failed:', error);
-                FoundryUI.notify('Armor roll failed', 'error');
+                FoundryUI.notify(`Failed to roll ${item.name} armor`, 'error');
             }
         }
 
+        /**
+         * Handle gear rolls.
+         * @param {Event} event - The originating click event.
+         * @param {HTMLElement} target - The target element.
+         * @this {AvantActorSheet} The ApplicationV2 instance.
+         */
+        static async _onRollGear(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
+            event.preventDefault();
+            const sheet = this;
+            if (!sheet?.document) return;
+
+            const itemId = extractItemIdFromElement(target);
+            if (!itemId) {
+                logger.warn('AvantActorSheet | No item ID for gear roll');
+                return;
+            }
+
+            const item = sheet.document.items.get(itemId);
+            if (!item) {
+                FoundryUI.notify('Gear not found', 'warn');
+                return;
+            }
+
+            try {
+                const { buildGearRoll } = await import('../logic/rolls-utils.js');
+                const rollPayload = buildGearRoll(item, sheet.document, {
+                    speaker: (globalThis as any).ChatMessage.getSpeaker({ actor: sheet.document })
+                });
+
+                await rollPayload.sendToChat();
+                logger.log(`AvantActorSheet | Executed ${item.name} gear roll`);
+            } catch (error) {
+                logger.error('AvantActorSheet | Gear roll failed:', error);
+                FoundryUI.notify(`Failed to roll ${item.name} gear`, 'error');
+            }
+        }
+        
         /**
          * Handle unified action rolls
          * @param event - The originating click event

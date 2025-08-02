@@ -492,11 +492,13 @@ export function buildWeaponAttackRoll(
   const abilityMod = actorData.system?.abilities?.[weaponAbility]?.modifier || 0;
   const weaponModifier = weaponItem.system?.modifier || 0;
   const level = actorData.system?.level || 1;
+  const expertise = weaponItem.system?.expertise || 0;
 
   const modifiers: RollModifier[] = [
     { label: 'Level', value: level },
     { label: `${weaponAbility.charAt(0).toUpperCase() + weaponAbility.slice(1)}`, value: abilityMod },
-    { label: 'Weapon', value: weaponModifier }
+    { label: 'Weapon', value: weaponModifier },
+    { label: 'Expertise', value: expertise }
   ];
 
   const mergedOptions: RollOptions = {
@@ -556,13 +558,13 @@ export function buildArmorRoll(
 ): RollPayload {
   const armorAbility = armorItem.system?.ability || 'grace';
   const abilityMod = actorData.system?.abilities?.[armorAbility]?.modifier || 0;
-  const armorModifier = armorItem.system?.modifier || 0;
   const level = actorData.system?.level || 1;
+  const expertise = armorItem.system?.expertise || 0;
 
   const modifiers: RollModifier[] = [
     { label: 'Level', value: level },
     { label: 'Ability', value: abilityMod },
-    { label: 'Armor', value: armorModifier }
+    { label: 'Expertise', value: expertise }
   ];
 
   const mergedOptions: RollOptions = {
@@ -574,8 +576,36 @@ export function buildArmorRoll(
 }
 
 /**
+ * Builds a gear roll payload
+ * @spec 02.3.gear-roll
+ */
+export function buildGearRoll(
+  gearItem: any,
+  actorData: any,
+  options: RollOptions = {}
+): RollPayload {
+  const gearAbility = gearItem.system?.ability || 'might';
+  const abilityMod = actorData.system?.abilities?.[gearAbility]?.modifier || 0;
+  const level = actorData.system?.level || 1;
+  const expertise = gearItem.system?.expertise || 0;
+
+  const modifiers: RollModifier[] = [
+    { label: 'Level', value: level },
+    { label: `${gearAbility.charAt(0).toUpperCase() + gearAbility.slice(1)}`, value: abilityMod },
+    { label: 'Expertise', value: expertise }
+  ];
+
+  const mergedOptions: RollOptions = {
+    flavor: `${gearItem.name} Roll`,
+    ...options
+  };
+
+  return buildRollPayload('2d10', modifiers, mergedOptions);
+}
+
+/**
  * Builds a generic roll payload from a dataset
- * 
+ *
  * @param dataset - Dataset containing roll information
  * @param options - Additional roll options
  * @returns Roll payload for generic roll

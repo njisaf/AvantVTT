@@ -236,18 +236,7 @@ export function rollCombinedAction(
 
             case 'gear':
                 if (button === 'use') {
-                    // For gear items, we'll use the generic useAction handler
-                    if (sheet.constructor._onUseAction) {
-                        sheet.constructor._onUseAction.call(sheet, mockEvent, mockTarget);
-                    } else {
-                        // Fallback to a simple chat message
-                        const chatData = {
-                            user: (globalThis as any).game.user?.id,
-                            speaker: { actor: actor.id, alias: actor.name },
-                            content: `<p><strong>${actor.name}</strong> uses <em>${action.name}</em></p>`
-                        };
-                        (globalThis as any).ChatMessage.create(chatData);
-                    }
+                    sheet.constructor._onRollGear.call(sheet, mockEvent, mockTarget);
                 } else {
                     return { success: false, error: `Unknown gear button: ${button}` };
                 }

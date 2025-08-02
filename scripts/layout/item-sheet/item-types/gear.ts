@@ -48,6 +48,8 @@ export function body(item: LayoutItemData): Field[] {
 
         commonFields.expertise(system.expertise, 'gear'),
 
+        commonFields.ability(system.ability, 'gear'),
+
         // 3. Traits last (full width)
         commonFields.traits(system.traits, 'gear')
     ]);
