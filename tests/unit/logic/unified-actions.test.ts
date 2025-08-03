@@ -39,6 +39,7 @@ interface MockActor {
         get: (id: string) => MockItem | undefined;
     };
     createEmbeddedDocuments: (type: string, data: any[]) => Promise<MockItem[]>;
+    system: any;
 }
 
 // Helper function to create mock items
@@ -69,7 +70,16 @@ function createMockActor(id: string, name: string, items: MockItem[] = []): Mock
             find: (predicate: (item: MockItem) => boolean) => items.find(predicate),
             get: (id: string) => itemsMap.get(id)
         }),
-        createEmbeddedDocuments: jest.fn()
+        createEmbeddedDocuments: jest.fn(),
+        system: {
+            level: 1,
+            abilities: {
+                might: { modifier: 0 },
+                grace: { modifier: 0 },
+                intellect: { modifier: 0 },
+                focus: { modifier: 0 }
+            }
+        }
     };
 }
 
@@ -120,48 +130,54 @@ describe('Unified Actions Logic', () => {
     });
 
     describe('createGearAction', () => {
-        it('should create gear action for weapon', () => {
+        const mockActor = createMockActor('actor1', 'Test Actor');
+        mockActor.system = {
+            level: 5,
+            abilities: {
+                might: { modifier: 3 },
+                grace: { modifier: 2 },
+            },
+        };
+
+        it('should create gear action for weapon and compute threshold', () => {
             const weapon = createMockItem('weapon1', 'Longsword', 'weapon', {
                 damageDie: '1d8',
-                threshold: 2
+                ability: 'might',
+                expertise: 2,
             });
 
-            const action = createGearAction(weapon as any);
+            const action = createGearAction(weapon as any, mockActor as any);
 
-            expect(action).toEqual({
-                id: 'gear-weapon1',
-                name: 'Longsword',
-                source: 'weapon',
-                sourceItemId: 'weapon1',
-                buttons: ['attack', 'damage'],
-                system: { damageDie: '1d8', threshold: 2 },
-                displayData: weapon
-            });
+            expect(action.system.threshold).toBe(21); // 11 + 5 (level) + 3 (might) + 2 (expertise)
+            expect(action.name).toBe('Longsword');
+            expect(action.source).toBe('weapon');
         });
 
-        it('should create gear action for armor', () => {
+        it('should create gear action for armor and compute threshold', () => {
             const armor = createMockItem('armor1', 'Chainmail', 'armor', {
                 armorClass: 3,
-                threshold: 1
+                ability: 'grace',
+                expertise: 1,
             });
 
-            const action = createGearAction(armor as any);
+            const action = createGearAction(armor as any, mockActor as any);
 
-            expect(action).toEqual({
-                id: 'gear-armor1',
-                name: 'Chainmail',
-                source: 'armor',
-                sourceItemId: 'armor1',
-                buttons: ['armor'],
-                system: { armorClass: 3, threshold: 1 },
-                displayData: armor
-            });
+            expect(action.system.threshold).toBe(19); // 11 + 5 (level) + 2 (grace) + 1 (expertise)
+            expect(action.name).toBe('Chainmail')
+            expect(action.source).toBe('armor')
         });
 
         it('should handle unnamed items', () => {
             const gear = createMockItem('gear1', '', 'gear');
-            const action = createGearAction(gear as any);
+            const action = createGearAction(gear as any, mockActor as any);
             expect(action.name).toBe('Unnamed Item');
+        });
+
+        it('should not add threshold to non-weapon/armor gear', () => {
+            const gear = createMockItem('gear1', 'Rope', 'gear', { cost: 5 });
+            const action = createGearAction(gear as any, mockActor as any);
+            expect(action.system.threshold).toBeUndefined();
+            expect(action.system.cost).toBe(5);
         });
     });
 
@@ -200,6 +216,8 @@ describe('Unified Actions Logic', () => {
             const action = createMockItem('action1', 'Dodge', 'action');
             
             const actor = createMockActor('actor1', 'Test Actor', [weapon, armor, gear, action]);
+            actor.system.level = 1;
+            actor.system.abilities.might.mod = 0;
 
             const result = combineActionSources(actor as any);
 

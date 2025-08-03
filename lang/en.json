@@ -8,11 +8,13 @@
     "items": "Items",
     "attributes": "Attributes",
     "description": "Description"
-  },
-  "AVANT": {
-    "accessibilitySettings": {
-      "title": "Avant Accessibility Settings"
     },
+    "AVANT": {
+      "AttackThreshold": "Attack Threshold",
+      "DefenseThreshold": "Defense Threshold",
+      "accessibilitySettings": {
+        "title": "Avant Accessibility Settings"
+      },
     "ImageUpload": {
       "clickToChange": "Click to change {alt}"
     },

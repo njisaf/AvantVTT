@@ -5,6 +5,8 @@
  * @author Avant Development Team
  */
 
+import { computeThreshold } from './rolls-utils.js';
+
 // Types for FoundryVTT documents
 type Actor = any;
 type Item = any;
@@ -82,16 +84,29 @@ export function getGearActionButtons(item: Item): string[] {
 /**
  * Create a combined action from a gear item
  * @param item - The source gear item
+ * @param actor - The actor that owns the item
  * @returns Combined action representation
  */
-export function createGearAction(item: Item): CombinedAction {
+export function createGearAction(item: Item, actor: Actor): CombinedAction {
+    const system = { ...item.system };
+
+    if (item.type === 'weapon' || item.type === 'armor') {
+        const defaultAbility = item.type === 'weapon' ? 'might' : 'grace';
+        const ability = item.system?.ability || defaultAbility;
+        const abilityMod = actor.system?.abilities?.[ability]?.modifier || 0;
+        const level = actor.system?.level || 1;
+        const expertise = item.system?.expertise || 0;
+        
+        system.threshold = computeThreshold(level, abilityMod, expertise);
+    }
+    
     return {
         id: `gear-${item.id}`,
         name: item.name || 'Unnamed Item',
         source: item.type as 'weapon' | 'armor' | 'gear',
         sourceItemId: item.id,
         buttons: getGearActionButtons(item),
-        system: item.system,
+        system,
         displayData: item
     };
 }
@@ -132,7 +147,7 @@ export function combineActionSources(
         // Process gear items if enabled
         if (config.includeGearActions) {
             const gearItems = items.filter(isGearActionSource);
-            const gearActions = gearItems.map(createGearAction);
+            const gearActions = gearItems.map(item => createGearAction(item, actor));
             
             if (config.groupBySource) {
                 // Group by source type

@@ -6,8 +6,8 @@
         <div class="sidebar-section">
             <h4>Defense Threshold</h4>
             <div class="stat-tiles-row">
-                <div class="stat-tile">
-                    <input type="text" name="system.defenseThreshold" value="{{system.defenseThreshold}}" data-dtype="Number" class="stat-tile-input"/>
+                <div class="sidebar-stat-tile">
+                    <input type="text" name="system.defenseThreshold" value="{{system.defenseThreshold}}" data-dtype="Number" class="sidebar-input"/>
                     <span class="stat-tile-label">Defense</span>
                 </div>
             </div>
@@ -17,16 +17,16 @@
         <div class="sidebar-section">
             <h4>Hit Points</h4>
             <div class="stat-tiles-row">
-                <div class="stat-tile">
-                    <input type="text" name="system.health.value" value="{{system.health.value}}" data-dtype="Number" class="stat-tile-input"/>
+                <div class="sidebar-stat-tile">
+                    <input type="text" name="system.health.value" value="{{system.health.value}}" data-dtype="Number" class="sidebar-input"/>
                     <span class="stat-tile-label">Current</span>
                 </div>
-                <div class="stat-tile">
-                    <input type="text" name="system.health.max" value="{{system.health.max}}" data-dtype="Number" class="stat-tile-input"/>
+                <div class="sidebar-stat-tile">
+                    <input type="text" name="system.health.max" value="{{system.health.max}}" data-dtype="Number" class="sidebar-input"/>
                     <span class="stat-tile-label">Max</span>
                 </div>
-                <div class="stat-tile">
-                    <input type="text" name="system.health.temp" value="{{system.health.temp}}" data-dtype="Number" class="stat-tile-input"/>
+                <div class="sidebar-stat-tile">
+                    <input type="text" name="system.health.temp" value="{{system.health.temp}}" data-dtype="Number" class="sidebar-input"/>
                     <span class="stat-tile-label">Temp</span>
                 </div>
             </div>
@@ -40,7 +40,7 @@
                 <div class="sidebar-ability">
                     <label>Might</label>
                     <div class="ability-input-row">
-                        <input type="text" name="system.abilities.might.modifier" value="{{system.abilities.might.modifier}}" data-dtype="Number" class="ability-modifier-input"/>
+                        <input type="text" name="system.abilities.might.modifier" value="{{system.abilities.might.modifier}}" data-dtype="Number" class="sidebar-input ability-modifier-input"/>
                         <button type="button" class="ability-roll-btn rollable" data-action="rollAbility" data-ability="might" title="Click: Might Check (2d10+Level+Modifier)">
                             {{#if (gt abilityTotalModifiers.might 0)}}+{{/if}}{{abilityTotalModifiers.might}}
                         </button>
@@ -49,7 +49,7 @@
                 <div class="sidebar-ability">
                     <label>Grace</label>
                     <div class="ability-input-row">
-                        <input type="text" name="system.abilities.grace.modifier" value="{{system.abilities.grace.modifier}}" data-dtype="Number" class="ability-modifier-input"/>
+                        <input type="text" name="system.abilities.grace.modifier" value="{{system.abilities.grace.modifier}}" data-dtype="Number" class="sidebar-input ability-modifier-input"/>
                         <button type="button" class="ability-roll-btn rollable" data-action="rollAbility" data-ability="grace" title="Click: Grace Check (2d10+Level+Modifier)">
                             {{#if (gt abilityTotalModifiers.grace 0)}}+{{/if}}{{abilityTotalModifiers.grace}}
                         </button>
@@ -58,7 +58,7 @@
                 <div class="sidebar-ability">
                     <label>Intellect</label>
                     <div class="ability-input-row">
-                        <input type="text" name="system.abilities.intellect.modifier" value="{{system.abilities.intellect.modifier}}" data-dtype="Number" class="ability-modifier-input"/>
+                        <input type="text" name="system.abilities.intellect.modifier" value="{{system.abilities.intellect.modifier}}" data-dtype="Number" class="sidebar-input ability-modifier-input"/>
                         <button type="button" class="ability-roll-btn rollable" data-action="rollAbility" data-ability="intellect" title="Click: Intellect Check (2d10+Level+Modifier)">
                             {{#if (gt abilityTotalModifiers.intellect 0)}}+{{/if}}{{abilityTotalModifiers.intellect}}
                         </button>
@@ -67,7 +67,7 @@
                 <div class="sidebar-ability">
                     <label>Focus</label>
                     <div class="ability-input-row">
-                        <input type="text" name="system.abilities.focus.modifier" value="{{system.abilities.focus.modifier}}" data-dtype="Number" class="ability-modifier-input"/>
+                        <input type="text" name="system.abilities.focus.modifier" value="{{system.abilities.focus.modifier}}" data-dtype="Number" class="sidebar-input ability-modifier-input"/>
                         <button type="button" class="ability-roll-btn rollable" data-action="rollAbility" data-ability="focus" title="Click: Focus Check (2d10+Level+Modifier)">
                             {{#if (gt abilityTotalModifiers.focus 0)}}+{{/if}}{{abilityTotalModifiers.focus}}
                         </button>
