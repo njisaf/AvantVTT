@@ -477,7 +477,8 @@ form.avant.theme-dark {
 
   // Character Name - More compact
   .charname {
-    margin: 0;
+    margin: 0 !important;
+    padding-bottom: 0 !important;
     @include orbitron-header(18px, 900); // Reduced from 24px
     letter-spacing: 1px; // Reduced from 2px
     text-shadow: 0 0 5px var(--theme-accent-primary, $accent-cyan);
@@ -548,34 +549,28 @@ form.avant.theme-dark {
     margin-bottom: 8px; // Reduced from 10px to 8px
   }
 
-  .stat-tile {
+  .sidebar-stat-tile {
     flex: 1;
     background: var(--theme-bg-tertiary, $bg-tertiary);
     border: 1px solid var(--theme-border-primary, $border-primary);
-    border-bottom: 3px solid var(--theme-accent-primary, $accent-cyan);
-    padding: 6px 6px; // Reduced from 8px to 6px
+    padding: 6px;
     text-align: center;
     display: flex;
     flex-direction: column;
-    gap: 2px; // Reduced from 4px to 2px
+    gap: 2px;
     @include transition-standard;
-
-    &.readonly {
-      border-bottom-color: var(--theme-accent-secondary, $aqua-muted);
-
-      .stat-tile-value {
-        @include exo-body(14px, 700);
-        line-height: 1;
-        background: var(--theme-bg-primary, $bg-primary);
-        border: 1px solid var(--theme-border-primary, $border-primary);
-        padding: 6px $spacing-xs;
-        border-radius: 0;
-        text-align: center;
-      }
-    }
   }
 
-  .stat-tile-input {
+  .sidebar-stat-tile-label {
+    @include orbitron-header(10px, 600);
+    letter-spacing: 0.5px;
+    color: var(--theme-text-secondary, $text-secondary);
+    line-height: 1;
+    display: block;
+    margin-top: 5px;
+  }
+
+  .sidebar-input {
     background: var(--theme-bg-primary, $bg-primary);
     border: 1px solid var(--theme-border-primary, $border-primary);
     color: var(--theme-text-primary, $text-primary);
@@ -591,13 +586,6 @@ form.avant.theme-dark {
       outline: none;
       box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
     }
-  }
-
-  .stat-tile-label {
-    @include orbitron-header(8px, 600);
-    letter-spacing: 0.5px;
-    color: var(--theme-text-secondary, $text-secondary);
-    line-height: 1;
   }
 
   // Legacy stat-row styles (keeping for compatibility)
@@ -663,10 +651,10 @@ form.avant.theme-dark {
 
     label {
       display: block;
-      @include orbitron-header(10px, 600); // Increased from 8px as requested
+      @include orbitron-header(10px, 600);
       letter-spacing: 0.5px;
       color: var(--theme-text-secondary, $text-secondary);
-      margin-bottom: 4px; // Reduced back from 6px to 4px
+      margin-bottom: 4px;
     }
 
     input:not(.ability-modifier-input) {
@@ -697,22 +685,9 @@ form.avant.theme-dark {
   }
 
   .ability-modifier-input {
-    background: var(--theme-bg-primary, $bg-primary);
-    border: 1px solid var(--theme-border-primary, $border-primary);
-    color: var(--theme-text-primary, $text-primary);
-    @include exo-body(14px, 600);
-    padding: 4px 6px;
-    border-radius: 0;
-    text-align: center;
-    width: 40px; // Fixed small width for 1-2 digits
+    @extend .sidebar-input;
+    width: 40px;
     flex-shrink: 0;
-    @include transition-standard;
-
-    &:focus {
-      border-color: var(--theme-accent-primary, $accent-cyan);
-      outline: none;
-      box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
-    }
   }
 
   .ability-roll-btn {

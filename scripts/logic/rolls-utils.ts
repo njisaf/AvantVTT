@@ -604,6 +604,18 @@ export function buildGearRoll(
 }
 
 /**
+ * Compute Attack/Defense threshold.
+ * @param level The actor's level.
+ * @param abilityMod The relevant ability modifier.
+ * @param expertise Any expertise bonus.
+ * @returns The computed threshold value.
+ * @spec 02.2.round-resolution
+ */
+export function computeThreshold(level: number, abilityMod: number, expertise = 0): number {
+  return 11 + level + abilityMod + expertise;
+}
+
+/**
  * Builds a generic roll payload from a dataset
  *
  * @param dataset - Dataset containing roll information

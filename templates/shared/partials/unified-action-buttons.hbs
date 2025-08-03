@@ -9,21 +9,26 @@ Context:
 
 <div class="action-buttons">
     {{#each action.buttons as |button|}}
-    <button type="button" class="action-btn {{button}}-btn" 
-            data-action="rollCombinedAction" 
-            data-action-id="{{../action.id}}"
-            data-button="{{button}}"
-            title="{{#if (eq button "attack")}}Attack: {{../action.name}} (2d10+Level+Ability+EP){{else if (eq button "damage")}}Damage: {{../action.name}} ({{../action.system.damageDie}}){{else if (eq button "armor")}}Armor: {{../action.name}} (2d10+Level+Ability+EP){{else if (eq button "use")}}Use Gear: {{../action.name}} (2d10+Level+Ability+EP){{/if}}"
-            aria-label="{{#if (eq button "attack")}}Attack {{../action.name}}{{else if (eq button "damage")}}Damage {{../action.name}}{{else if (eq button "armor")}}Armor {{../action.name}}{{else if (eq button "use")}}Use {{../action.name}}{{/if}}">
-        {{#if (eq button "attack")}}
-        <i class="fas fa-dice-d20" aria-hidden="true"></i>
-        {{else if (eq button "damage")}}
-        <i class="fas fa-dice-six" aria-hidden="true"></i>
-        {{else if (eq button "armor")}}
-        <i class="fas fa-shield-alt" aria-hidden="true"></i>
-        {{else if (eq button "use")}}
-        <i class="fas fa-wrench" aria-hidden="true"></i>
+    <div class="action-button-row">
+        <button type="button" class="action-btn {{button.type}}-btn"
+                data-action="rollCombinedAction"
+                data-action-id="{{../action.id}}"
+                data-button="{{button.type}}"
+                title="{{#if (eq button.type "attack")}}Attack: {{../action.name}} (2d10+Level+Ability+EP){{else if (eq button.type "damage")}}Damage: {{../action.name}} ({{../action.system.damageDie}}){{else if (eq button.type "armor")}}Armor: {{../action.name}} (2d10+Level+Ability+EP){{else if (eq button.type "use")}}Use Gear: {{../action.name}} (2d10+Level+Ability+EP){{/if}}"
+                aria-label="{{#if (eq button.type "attack")}}Attack {{../action.name}}{{else if (eq button.type "damage")}}Damage {{../action.name}}{{else if (eq button.type "armor")}}Armor {{../action.name}}{{else if (eq button.type "use")}}Use {{../action.name}}{{/if}}">
+            {{#if (eq button.type "attack")}}
+            <i class="fas fa-dice-d20" aria-hidden="true"></i>
+            {{else if (eq button.type "damage")}}
+            <i class="fas fa-dice-six" aria-hidden="true"></i>
+            {{else if (eq button.type "armor")}}
+            <i class="fas fa-shield-alt" aria-hidden="true"></i>
+            {{else if (eq button.type "use")}}
+            <i class="fas fa-wrench" aria-hidden="true"></i>
+            {{/if}}
+        </button>
+        {{#if button.total}}
+        <span class="roll-summary" aria-live="polite">{{button.total}}</span>
         {{/if}}
-    </button>
+    </div>
     {{/each}}
 </div>

@@ -3,6 +3,36 @@
  * Styles for the unified actions system that combines gear and standalone actions
  * Updated to match talent/augment icon-only styling for consistency
  */
+.unified-action-item .stat-tile {
+  // --- Stat Tile Refactor ---
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 148px;
+  height: 38px;
+  flex-shrink: 0;
+  background-color: var(--avant-stat-tile-bg, #2a2a2a);
+  border: 1px solid grey; // Using magenta for $accent-edge as requested.
+  border-radius: 4px;
+  padding: 4px;
+  text-align: center;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none !important;
+
+  &--threshold {
+    --threshold-bg: rgba(33, 150, 243, 0.15);
+    --threshold-border: rgba(33, 150, 243, 0.5);
+    --threshold-text: #82c6ff;
+    background-color: var(--threshold-bg);
+    border: 1px solid var(--threshold-border);
+    border-bottom: 1px solid var(--threshold-border) !important;
+
+    .stat-value {
+      color: var(--threshold-text);
+    }
+  }
+}
 
 .unified-actions-list {
   display: flex;
@@ -14,7 +44,7 @@
 
 .unified-action-item {
   display: grid;
-  grid-template-columns: 32px 1fr auto; // Consistent 32px left column like talent/augment
+  grid-template-columns: 75px 1fr auto; // Consistent 32px left column like talent/augment
   grid-template-areas: "buttons content controls";
   gap: 12px;
   padding: 8px 12px; // Match talent/augment padding
@@ -50,14 +80,31 @@
 
 // Left column: Action buttons (consistent with .row-control)
 .avant .action-buttons {
-  grid-area: buttons;
-  display: flex;
-  flex-direction: column; // Stack buttons vertically like talent/augment
-  align-items: center;
-  justify-content: flex-start;
-  width: 32px; // Consistent width
-  padding-top: 2px; // Match talent/augment padding
-  gap: 4px; // Space between stacked buttons
+ grid-area: buttons;
+ display: flex;
+ flex-direction: column; // Stack buttons vertically like talent/augment
+ align-items: center;
+ justify-content: flex-start;
+ width: 75px; // Increased width for summary
+ padding-top: 2px; // Match talent/augment padding
+ gap: 4px; // Space between stacked buttons
+}
+
+.action-button-row {
+ display: flex;
+ align-items: center;
+ justify-content: flex-start;
+ width: 100%;
+ gap: 10px;
+}
+
+.roll-summary {
+ font-size: 0.8rem;
+ font-family: var(--font-mono);
+ min-width: 3ch;
+ text-align: right;
+ color: var(--text-secondary);
+ white-space: nowrap;
 }
 
 // Icon-only action buttons (consistent with .chat-roll-btn)
@@ -109,7 +156,6 @@
   overflow: hidden;
   min-width: 0; // Allow text to wrap
 }
-
 .action-header {
   display: flex;
   align-items: center;
@@ -146,31 +192,22 @@
   flex-wrap: wrap;
 }
 
-.stat-tile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
-  padding: 2px 4px;
-  border-radius: 2px;
-  background: var(--avant-stat-tile-bg, #333);
-  min-width: 32px;
-}
 
 .stat-value {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--avant-text-primary, #fff);
   line-height: 1;
+  padding-bottom: 3px;
 }
 
 .stat-label {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 400;
   color: var(--avant-text-secondary, #aaa);
   text-transform: uppercase;
-  letter-spacing: 0.3px;
-  line-height: 1;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
 }
 
 .action-description {
@@ -212,7 +249,6 @@
     outline: 2px solid var(--theme-accent-primary, #00E0DC);
     outline-offset: 2px;
   }
-
   &.edit-btn:hover {
     color: var(--theme-accent-secondary, #4CE2E1);
     background: rgba(76, 226, 225, 0.1);
@@ -229,7 +265,6 @@
   padding: 40px 20px;
   color: var(--avant-text-secondary, #aaa);
   font-style: italic;
-
   p {
     margin: 0;
     font-size: 14px;
@@ -265,5 +300,19 @@
 
   .action-btn {
     border-width: 2px;
+  }
+}
+
+// Light Mode Theme for Stat Tiles
+@media (prefers-color-scheme: light) {
+  .stat-tile {
+    background-color: #f1f1f1;
+    border-color: #e040fb;
+
+    &--threshold {
+      --threshold-bg: #e3f2fd;
+      --threshold-border: #90caf9;
+      --threshold-text: #1565c0; // WCAG AA compliant on light blue
+    }
   }
 }
