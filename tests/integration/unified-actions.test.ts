@@ -83,28 +83,38 @@ describe('Unified Actions Integration Tests', () => {
             expect(result.success).toBe(true);
             expect(result.data).toBeDefined();
             
-            if (result.success) {
+            if (result.success && result.data) {
                 const actions = result.data;
                 expect(actions.length).toBe(3); // weapon, armor, action
                 
                 // Check weapon action
                 const weaponAction = actions.find(a => a.source === 'weapon');
                 expect(weaponAction).toBeDefined();
-                expect(weaponAction?.name).toBe('Plasma Rifle');
-                expect(weaponAction?.buttons).toContain('attack');
-                expect(weaponAction?.buttons).toContain('damage');
-                
+                if (weaponAction) {
+                    expect(weaponAction.name).toBe('Plasma Rifle');
+                    expect(weaponAction.buttons.map(b => b.type)).toContain('attack');
+                    expect(weaponAction.buttons.map(b => b.type)).toContain('damage');
+                    const attackButton = weaponAction.buttons.find(b => b.type === 'attack');
+                    expect(attackButton?.total).toBe('+11');
+                }
+
                 // Check armor action
                 const armorAction = actions.find(a => a.source === 'armor');
                 expect(armorAction).toBeDefined();
-                expect(armorAction?.name).toBe('Combat Vest');
-                expect(armorAction?.buttons).toContain('armor');
-                
+                if (armorAction) {
+                    expect(armorAction.name).toBe('Combat Vest');
+                    expect(armorAction.buttons.map(b => b.type)).toContain('armor');
+                    const armorButton = armorAction.buttons.find(b => b.type === 'armor');
+                    expect(armorButton?.total).toBe('+11');
+                }
+
                 // Check standalone action
                 const standaloneAction = actions.find(a => a.source === 'action');
                 expect(standaloneAction).toBeDefined();
-                expect(standaloneAction?.name).toBe('Tactical Sprint');
-                expect(standaloneAction?.buttons).toContain('use');
+                if (standaloneAction) {
+                    expect(standaloneAction.name).toBe('Tactical Sprint');
+                    expect(standaloneAction.buttons.map(b => b.type)).toContain('use');
+                }
             }
         });
 
@@ -123,7 +133,7 @@ describe('Unified Actions Integration Tests', () => {
             
             expect(result.success).toBe(true);
             
-            if (result.success) {
+            if (result.success && result.data) {
                 const actions = result.data;
                 const sourceOrder = actions.map(a => a.source);
                 
@@ -215,7 +225,7 @@ describe('Unified Actions Integration Tests', () => {
             
             expect(result.success).toBe(true);
             
-            if (result.success) {
+            if (result.success && result.data) {
                 const actions = result.data;
                 expect(actions.every(a => a.source !== 'weapon')).toBe(true);
                 expect(actions.every(a => a.source !== 'armor')).toBe(true);
@@ -233,7 +243,7 @@ describe('Unified Actions Integration Tests', () => {
             
             expect(result.success).toBe(true);
             
-            if (result.success) {
+            if (result.success && result.data) {
                 const actions = result.data;
                 const names = actions.map(a => a.name);
                 const sortedNames = [...names].sort();
@@ -248,9 +258,9 @@ describe('Unified Actions Integration Tests', () => {
             
             expect(result.success).toBe(true);
             
-            if (result.success) {
+            if (result.success && result.data) {
                 const weaponAction = result.data.find(a => a.source === 'weapon');
-                expect(weaponAction?.buttons).toEqual(['attack', 'damage']);
+                expect(weaponAction?.buttons.map(b => b.type)).toEqual(['attack', 'damage']);
             }
         });
 
@@ -259,9 +269,9 @@ describe('Unified Actions Integration Tests', () => {
             
             expect(result.success).toBe(true);
             
-            if (result.success) {
+            if (result.success && result.data) {
                 const armorAction = result.data.find(a => a.source === 'armor');
-                expect(armorAction?.buttons).toEqual(['armor']);
+                expect(armorAction?.buttons.map(b => b.type)).toEqual(['armor']);
             }
         });
 
@@ -270,9 +280,9 @@ describe('Unified Actions Integration Tests', () => {
             
             expect(result.success).toBe(true);
             
-            if (result.success) {
+            if (result.success && result.data) {
                 const standaloneAction = result.data.find(a => a.source === 'action');
-                expect(standaloneAction?.buttons).toEqual(['use']);
+                expect(standaloneAction?.buttons.map(b => b.type)).toEqual(['use']);
             }
         });
     });

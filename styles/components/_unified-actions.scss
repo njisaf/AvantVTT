@@ -44,7 +44,7 @@
 
 .unified-action-item {
   display: grid;
-  grid-template-columns: 32px 1fr auto; // Consistent 32px left column like talent/augment
+  grid-template-columns: 75px 1fr auto; // Consistent 32px left column like talent/augment
   grid-template-areas: "buttons content controls";
   gap: 12px;
   padding: 8px 12px; // Match talent/augment padding
@@ -80,14 +80,31 @@
 
 // Left column: Action buttons (consistent with .row-control)
 .avant .action-buttons {
-  grid-area: buttons;
-  display: flex;
-  flex-direction: column; // Stack buttons vertically like talent/augment
-  align-items: center;
-  justify-content: flex-start;
-  width: 32px; // Consistent width
-  padding-top: 2px; // Match talent/augment padding
-  gap: 4px; // Space between stacked buttons
+ grid-area: buttons;
+ display: flex;
+ flex-direction: column; // Stack buttons vertically like talent/augment
+ align-items: center;
+ justify-content: flex-start;
+ width: 75px; // Increased width for summary
+ padding-top: 2px; // Match talent/augment padding
+ gap: 4px; // Space between stacked buttons
+}
+
+.action-button-row {
+ display: flex;
+ align-items: center;
+ justify-content: flex-start;
+ width: 100%;
+ gap: 10px;
+}
+
+.roll-summary {
+ font-size: 0.8rem;
+ font-family: var(--font-mono);
+ min-width: 3ch;
+ text-align: right;
+ color: var(--text-secondary);
+ white-space: nowrap;
 }
 
 // Icon-only action buttons (consistent with .chat-roll-btn)
@@ -181,7 +198,7 @@
   font-weight: 600;
   color: var(--avant-text-primary, #fff);
   line-height: 1;
-  padding-top: 3px;
+  padding-bottom: 3px;
 }
 
 .stat-label {

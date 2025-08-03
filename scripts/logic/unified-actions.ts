@@ -28,7 +28,7 @@ export interface CombinedAction {
     name: string;
     source: 'weapon' | 'armor' | 'gear' | 'action';
     sourceItemId?: string;
-    buttons: string[];
+    buttons: { type: string; total: string | number }[];
     system: any;
     displayData?: any;
 }
@@ -89,15 +89,30 @@ export function getGearActionButtons(item: Item): string[] {
  */
 export function createGearAction(item: Item, actor: Actor): CombinedAction {
     const system = { ...item.system };
+    const buttons: { type: string; total: string | number }[] = [];
 
-    if (item.type === 'weapon' || item.type === 'armor') {
+    const buttonTypes = getGearActionButtons(item);
+
+    if (item.type === 'weapon' || item.type === 'armor' || item.type === 'gear') {
         const defaultAbility = item.type === 'weapon' ? 'might' : 'grace';
         const ability = item.system?.ability || defaultAbility;
         const abilityMod = actor.system?.abilities?.[ability]?.modifier || 0;
         const level = actor.system?.level || 1;
         const expertise = item.system?.expertise || 0;
         
-        system.threshold = computeThreshold(level, abilityMod, expertise);
+        if (item.type !== 'gear') {
+            system.threshold = computeThreshold(level, abilityMod, expertise);
+        }
+
+        for (const type of buttonTypes) {
+            let total: string | number = '';
+            if (type === 'attack' || type === 'armor' || type === 'use') {
+                total = `+${10 + level + abilityMod + expertise}`;
+            } else if (type === 'damage') {
+                total = system.damageDie || 'N/A';
+            }
+            buttons.push({ type, total });
+        }
     }
     
     return {
@@ -105,7 +120,7 @@ export function createGearAction(item: Item, actor: Actor): CombinedAction {
         name: item.name || 'Unnamed Item',
         source: item.type as 'weapon' | 'armor' | 'gear',
         sourceItemId: item.id,
-        buttons: getGearActionButtons(item),
+        buttons,
         system,
         displayData: item
     };
@@ -122,7 +137,7 @@ export function createStandaloneAction(item: Item): CombinedAction {
         name: item.name || 'Unnamed Action',
         source: 'action',
         sourceItemId: item.id,
-        buttons: ['use'],
+        buttons: [{ type: 'use', total: '' }],
         system: item.system,
         displayData: item
     };

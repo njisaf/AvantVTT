@@ -151,6 +151,10 @@ describe('Unified Actions Logic', () => {
             expect(action.system.threshold).toBe(21); // 11 + 5 (level) + 3 (might) + 2 (expertise)
             expect(action.name).toBe('Longsword');
             expect(action.source).toBe('weapon');
+            expect(action.buttons).toEqual([
+                { type: 'attack', total: '+20' },
+                { type: 'damage', total: '1d8' }
+            ]);
         });
 
         it('should create gear action for armor and compute threshold', () => {
@@ -176,7 +180,7 @@ describe('Unified Actions Logic', () => {
         it('should not add threshold to non-weapon/armor gear', () => {
             const gear = createMockItem('gear1', 'Rope', 'gear', { cost: 5 });
             const action = createGearAction(gear as any, mockActor as any);
-            expect(action.system.threshold).toBeUndefined();
+            expect(action.system.threshold).toBe(undefined);
             expect(action.system.cost).toBe(5);
         });
     });
@@ -195,7 +199,7 @@ describe('Unified Actions Logic', () => {
                 name: 'Power Strike',
                 source: 'action',
                 sourceItemId: 'action1',
-                buttons: ['use'],
+                buttons: [{ type: 'use', total: '' }],
                 system: { apCost: 2, description: 'A powerful strike' },
                 displayData: actionItem
             });

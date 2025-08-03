@@ -4035,7 +4035,7 @@
   align-items: center;
   justify-content: center;
   width: 148px;
-  height: 48px;
+  height: 38px;
   flex-shrink: 0;
   background-color: var(--avant-stat-tile-bg, #2a2a2a);
   border: 1px solid grey;
@@ -4067,7 +4067,7 @@
 
 .unified-action-item {
   display: grid;
-  grid-template-columns: 32px 1fr auto;
+  grid-template-columns: 75px 1fr auto;
   grid-template-areas: "buttons content controls";
   gap: 12px;
   padding: 8px 12px;
@@ -4101,9 +4101,26 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  width: 32px;
+  width: 75px;
   padding-top: 2px;
   gap: 4px;
+}
+
+.action-button-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  gap: 10px;
+}
+
+.roll-summary {
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  min-width: 3ch;
+  text-align: right;
+  color: var(--text-secondary);
+  white-space: nowrap;
 }
 
 .action-btn {
@@ -4188,6 +4205,7 @@
   font-weight: 600;
   color: var(--avant-text-primary, #fff);
   line-height: 1;
+  padding-bottom: 3px;
 }
 
 .stat-label {
@@ -5306,7 +5324,8 @@ form.avant.theme-dark *::after {
   flex-shrink: 0;
 }
 .avant .charname {
-  margin: 0;
+  margin: 0 !important;
+  padding-bottom: 0 !important;
   font-family: var(--theme-font-display, "Orbitron", monospace);
   font-size: 18px;
   font-weight: 900;
@@ -5402,7 +5421,7 @@ form.avant.theme-dark *::after {
   color: var(--theme-text-secondary, #BFBFBF);
   line-height: 1;
   display: block;
-  margin-bottom: 4px;
+  margin-top: 5px;
 }
 .avant .sidebar-input, .avant .ability-modifier-input {
   background: var(--theme-bg-primary, #1C1C1C);

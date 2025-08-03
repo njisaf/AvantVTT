@@ -477,7 +477,8 @@ form.avant.theme-dark {
 
   // Character Name - More compact
   .charname {
-    margin: 0;
+    margin: 0 !important;
+    padding-bottom: 0 !important;
     @include orbitron-header(18px, 900); // Reduced from 24px
     letter-spacing: 1px; // Reduced from 2px
     text-shadow: 0 0 5px var(--theme-accent-primary, $accent-cyan);
