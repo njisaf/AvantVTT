@@ -1,0 +1,22 @@
+// Force number input stepper arrows to be visible.
+// FoundryVTT's core CSS hides them by default, but they are useful for numeric
+// stats that are frequently incremented or decremented.
+
+// By combining the attribute selector with the class, we gain enough
+// specificity to override Foundry's base styles reliably.
+
+/* Element — Firefox & modern browsers */
+body.game .app input[type="number"].show-stepper,
+input[type="number"].show-stepper {
+  -moz-appearance: number-input !important;   // Firefox
+  appearance: auto !important;                // Spec-generic
+}
+
+/* Pseudo-elements — Chrome/Safari */
+body.game .app input[type="number"].show-stepper::-webkit-inner-spin-button,
+body.game .app input[type="number"].show-stepper::-webkit-outer-spin-button,
+input[type="number"].show-stepper::-webkit-inner-spin-button,
+input[type="number"].show-stepper::-webkit-outer-spin-button {
+  -webkit-appearance: auto !important; // Revert to the user agent's default style
+  opacity: 1 !important; // Ensure it's not transparent
+}

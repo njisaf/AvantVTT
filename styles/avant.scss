@@ -15,6 +15,9 @@
 @use 'components/foundry-overrides';
 @use 'themes/base';
 @use 'themes/dark';
+@use 'utilities/variables';
+@use 'utilities/utils';
+@use 'utilities/mixins';
 
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -448,7 +451,7 @@ form.avant.theme-dark {
     color: var(--theme-text-primary, $text-primary);
     @include orbitron-header(12px, 700);
     text-align: center;
-    padding: $spacing-xs $spacing-sm;
+    padding: $spacing-xs 0 $spacing-xs $spacing-sm;
     border-radius: 0;
     @include transition-standard;
     width: 50px;

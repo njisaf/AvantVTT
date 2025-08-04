@@ -4456,6 +4456,73 @@
  * The original dark cyberpunk aesthetic - maintains current design
  * Compatible with FoundryVTT v12 and v13
  */
+/**
+ * Avant VTT - Base Theme Structure
+ * Defines the core theme variables and structure for extensibility
+ * Compatible with FoundryVTT v12 and v13
+ */
+/* Element — Firefox & modern browsers */
+body.game .app input[type=number].show-stepper,
+input[type=number].show-stepper {
+  -moz-appearance: number-input !important;
+  appearance: auto !important;
+}
+
+/* Pseudo-elements — Chrome/Safari */
+body.game .app input[type=number].show-stepper::-webkit-inner-spin-button,
+body.game .app input[type=number].show-stepper::-webkit-outer-spin-button,
+input[type=number].show-stepper::-webkit-inner-spin-button,
+input[type=number].show-stepper::-webkit-outer-spin-button {
+  -webkit-appearance: auto !important;
+  opacity: 1 !important;
+}
+
+/**
+ * Avant VTT - Base Theme Structure
+ * Defines the core theme variables and structure for extensibility
+ * Compatible with FoundryVTT v12 and v13
+ */
+/**
+ * @fileoverview SCSS Mixins
+ * @description Reusable mixins for common styling patterns
+ * @version 2.0.0
+ * @author Avant Development Team
+ */
+/* ==================================================
+   LAYOUT MIXINS
+   ================================================== */
+/* ==================================================
+   TYPOGRAPHY MIXINS
+   ================================================== */
+/* ==================================================
+   BUTTON MIXINS
+   ================================================== */
+/* ==================================================
+   FORM MIXINS
+   ================================================== */
+/* ==================================================
+   CARD MIXINS
+   ================================================== */
+/* ==================================================
+   RESPONSIVE MIXINS
+   ================================================== */
+/* ==================================================
+   UTILITY MIXINS
+   ================================================== */
+/* ==================================================
+   ANIMATION MIXINS
+   ================================================== */
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+@keyframes slideUp {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
 .avant.theme-dark,
 .avant.theme-dark.themed {
   --theme-bg-primary: #1C1C1C;
@@ -5294,7 +5361,7 @@ form.avant.theme-dark *::after {
   letter-spacing: 1px;
   color: var(--theme-accent-primary, #00E0DC);
   text-align: center;
-  padding: 4px 8px;
+  padding: 4px 0 4px 8px;
   border-radius: 0;
   transition: all 0.3s ease;
   width: 50px;
