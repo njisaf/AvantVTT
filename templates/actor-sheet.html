@@ -12,13 +12,13 @@
         <div class="header-stats">
             <div class="header-stat">
                 <span class="header-stat-label">Level</span>
-                <input type="text" name="system.level" value="{{system.level}}" data-dtype="Number"
-                    class="header-stat-input" />
+                <input type="number" name="system.level" value="{{system.level}}" data-dtype="Number" min="1" max="20"
+                    class="header-stat-input show-stepper" />
             </div>
             <div class="header-stat">
                 <span class="header-stat-label">Fortune</span>
-                <input type="text" name="system.fortunePoints" value="{{system.fortunePoints}}" data-dtype="Number"
-                    min="0" max="5" class="header-stat-input" />
+                <input type="number" name="system.fortunePoints" value="{{system.fortunePoints}}" data-dtype="Number"
+                    min="0" class="header-stat-input show-stepper" />
             </div>
         </div>
     </header>
