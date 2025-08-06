@@ -3,7 +3,7 @@
     <!-- Fixed Header with Character Name and Avatar -->
     <header class="sheet-header">
         <img class="profile-img" src="{{#if actor.img}}{{actor.img}}{{else}}icons/svg/mystery-man.svg{{/if}}"
-            data-edit="img" title="{{actor.name}}" />
+            data-edit="img" data-action="editImage" title="{{actor.name}}" role="button" aria-label="Change portrait" />
         <div class="header-fields">
             <h1 class="charname"><input name="name" type="text" value="{{actor.name}}" placeholder="Character Name" />
             </h1>

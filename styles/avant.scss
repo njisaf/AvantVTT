@@ -1107,7 +1107,7 @@ form.avant.theme-dark {
   .skills-attribute-section {
     background: var(--theme-bg-tertiary, $bg-tertiary);
     border: 1px solid var(--theme-border-primary, $border-primary);
-    border-left: 4px solid var(--theme-accent-primary, $accent-cyan);
+    border-left: 2px solid var(--theme-accent-primary, $accent-cyan);
     padding: $spacing-sm; // Reduced from 15px
     border-radius: 0;
   }
@@ -1151,7 +1151,7 @@ form.avant.theme-dark {
 
     &:hover {
       background: var(--theme-bg-secondary, $bg-secondary);
-      border-color: var(--theme-accent-primary, $accent-cyan);
+      // border-color: var(--theme-accent-primary, $accent-cyan);
     }
 
     &::before {
@@ -1160,7 +1160,7 @@ form.avant.theme-dark {
       left: 0;
       right: 0;
       bottom: 0;
-      height: 3px;
+      height: 1px;
       background: var(--theme-gradient-accent, $gradient-accent);
       transform: scaleX(0);
       transition: transform 0.3s ease;

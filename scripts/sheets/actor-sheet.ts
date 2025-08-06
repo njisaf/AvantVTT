@@ -193,6 +193,9 @@ export function createAvantActorSheet() {
                 editItem: AvantActorSheet._onEditItem,
                 deleteItem: AvantActorSheet._onDeleteItem,
 
+                // 🖼️ Image Editing (Actor portrait, generic image-upload partial)
+                editImage: AvantActorSheet._onEditImage,
+
                 // 💬 Chat Integration Actions
                 postChatCard: AvantActorSheet._onPostChatCard,
                 useAction: AvantActorSheet._onUseAction,
@@ -895,6 +898,92 @@ export function createAvantActorSheet() {
         // =================================================================================
         // These static methods are mapped to data-action attributes in the template.
         // ApplicationV2 automatically binds 'this' to the sheet instance when called.
+
+        /**
+         * Open a FilePicker to edit an image, updating the document and the clicked <img> src.
+         * Supports both actor portrait and shared image-upload partials.
+         * @param event The triggering event
+         * @param target The clicked element (expected to be an <img> with data-edit="img")
+         * @this {AvantActorSheet}
+         */
+        static async _onEditImage(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
+            event.preventDefault();
+            const sheet = this;
+            if (!sheet?.document) return;
+
+            try {
+                // Determine current path from actor document if available, else from target src
+                const currentPath = (sheet.document.img as string) || (target as HTMLImageElement).getAttribute('src') || '';
+
+                // Foundry V13+: use namespaced FilePicker to avoid deprecation warnings.
+                const foundryNS = (globalThis as any).foundry;
+                const FilePickerNS =
+                    foundryNS?.applications?.apps?.FilePicker?.implementation
+                    || foundryNS?.applications?.apps?.FilePicker; // safety fallback if implementation is directly the class
+
+                // If the namespaced constructor exists, prefer it
+                if (typeof FilePickerNS === 'function') {
+                    const fp = new FilePickerNS({
+                        type: "image",
+                        current: currentPath,
+                        callback: async (path: string) => {
+                            if (sheet.document && typeof sheet.document.update === 'function') {
+                                await sheet.document.update({ img: path });
+                            }
+                            if (target && (target as HTMLImageElement).src !== undefined) {
+                                (target as HTMLImageElement).src = path;
+                            }
+                        }
+                    });
+                    if (typeof fp.browse === 'function') {
+                        await fp.browse();
+                        return;
+                    }
+                }
+
+                // Back-compat fallback for environments still exposing global FilePicker (V13 supports but warns)
+                const GlobalFilePicker = (globalThis as any).FilePicker;
+                if (GlobalFilePicker && typeof GlobalFilePicker === 'function') {
+                    const fp = new GlobalFilePicker({
+                        type: "image",
+                        current: currentPath,
+                        callback: async (path: string) => {
+                            if (sheet.document && typeof sheet.document.update === 'function') {
+                                await sheet.document.update({ img: path });
+                            }
+                            if (target && (target as HTMLImageElement).src !== undefined) {
+                                (target as HTMLImageElement).src = path;
+                            }
+                        }
+                    });
+                    if (typeof fp.browse === 'function') {
+                        await fp.browse();
+                        return;
+                    }
+                }
+
+                // Static browse fallback (rare; provided for maximum compatibility)
+                const StaticPicker =
+                    FilePickerNS && typeof FilePickerNS.browse === 'function' ? FilePickerNS :
+                    GlobalFilePicker && typeof GlobalFilePicker.browse === 'function' ? GlobalFilePicker :
+                    null;
+
+                if (StaticPicker) {
+                    const result = await StaticPicker.browse("image", currentPath);
+                    const chosen = Array.isArray(result.files) && result.files.length ? result.files[0] : '';
+                    if (chosen) {
+                        await sheet.document.update({ img: chosen });
+                        (target as HTMLImageElement).src = chosen;
+                    }
+                    return;
+                }
+
+                FoundryUI.notify('FilePicker API unavailable (V13+ expected)', 'warn');
+            } catch (err) {
+                logger.error('AvantActorSheet | editImage failed:', err);
+                FoundryUI.notify('Failed to edit image', 'error');
+            }
+        }
 
 
 

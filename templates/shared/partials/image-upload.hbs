@@ -10,12 +10,16 @@ class="profile-img"}} # optional extra classes
 
 Required: src, alt
 Optional: size (defaults to 64), class
+
+Note (Foundry V13+): interactive image fields must declare data-action to bind to ApplicationV2 actions.
+We pair data-edit="img" with data-action="editImage" so sheet classes can delegate to FilePicker via
+DEFAULT_OPTIONS.actions.editImage.
 --}}
 
 <div class="image-upload {{class}}">
   <img class="image-upload__img" src="{{#if src}}{{src}}{{else}}icons/svg/mystery-man.svg{{/if}}"
     width="{{#if size}}{{size}}{{else}}64{{/if}}" height="{{#if size}}{{size}}{{else}}64{{/if}}" alt="{{alt}}"
-    data-edit="img">
+    data-edit="img" data-action="editImage" role="button" aria-label="Change image">
   <div class="image-upload__overlay" aria-hidden="true">
     <i class="fa-solid fa-pen"></i>
   </div>

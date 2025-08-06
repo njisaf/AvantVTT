@@ -1,8 +1,11 @@
 /**
  * @fileoverview Actor Sheet Roll Integration Tests
  * @description Integration tests for the actor sheet roll functionality using the Role Utility Framework
- * @version 1.0.0
+ * @version 1.1.0
  * @author Avant Development Team
+ *
+ * Note: Includes a regression test for image editing behavior on Actor Sheet:
+ * - Ensures clicking an img[data-edit="img"][data-action="editImage"] invokes FilePicker and updates actor + DOM
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
@@ -48,9 +51,9 @@ describe('Actor Sheet Roll Integration', () => {
     };
 
     // Setup FoundryVTT globals
-    (globalThis as any).Roll = vi.fn(() => mockRoll);
-    (globalThis as any).ChatMessage = mockChatMessage;
-    (globalThis as any).ui = {
+    globalThis.Roll = vi.fn(() => mockRoll);
+    globalThis.ChatMessage = mockChatMessage;
+    globalThis.ui = {
       notifications: {
         error: vi.fn()
       }
@@ -82,10 +85,10 @@ describe('Actor Sheet Roll Integration', () => {
 
   afterEach(() => {
     // Clean up globals
-    delete (globalThis as any).Roll;
-    delete (globalThis as any).ChatMessage;
-    delete (globalThis as any).ui;
-    delete (globalThis as any).logger;
+    delete globalThis.Roll;
+    delete globalThis.ChatMessage;
+    delete globalThis.ui;
+    delete globalThis.logger;
     
     // Reset mocks
     vi.clearAllMocks();
@@ -232,6 +235,93 @@ describe('Actor Sheet Roll Integration', () => {
   });
 });
 
+describe('Actor Sheet Image Editing Integration', () => {
+  let SheetClass;
+  let sheet;
+  let fakeActor;
+
+  beforeEach(async () => {
+    // DOM representing header with profile image (matches templates/actor-sheet.html lines 4-7)
+    document.body.innerHTML = `
+      <div class="avant sheet actor">
+        <header class="sheet-header">
+          <img class="profile-img" src="icons/svg/mystery-man.svg" data-edit="img" data-action="editImage" />
+        </header>
+      </div>
+    `;
+
+    // Minimal Foundry globals
+    (globalThis).ui = { notifications: { info: vi.fn(), warn: vi.fn(), error: vi.fn() } };
+    (globalThis).game = { user: { id: 'U1' } };
+
+    // Mock actor document and sheet
+    fakeActor = {
+      id: 'A1',
+      name: 'Tester',
+      img: 'icons/svg/mystery-man.svg',
+      system: {},
+      items: new Map(),
+      toObject: () => ({ system: {}, flags: {} }),
+      isOwner: true,
+      update: vi.fn(async (data) => { if (data?.img) fakeActor.img = data.img; })
+    };
+
+    // Create class from TS module factory
+    const mod = await import('../../../scripts/sheets/actor-sheet.ts');
+    SheetClass = mod.createAvantActorSheet();
+    sheet = new SheetClass();
+    sheet.document = fakeActor;
+    sheet.element = document.body;
+  });
+
+  afterEach(() => {
+    document.body.innerHTML = '';
+    vi.clearAllMocks();
+    delete (globalThis).FilePicker;
+    delete (globalThis).ui;
+    delete (globalThis).game;
+  });
+
+  it('clicking profile image triggers FilePicker via editImage action and updates actor + DOM (constructor path)', async () => {
+    // New API path: constructor with callback + browse()
+    const browseSpy = vi.fn(async function () {
+      // simulate user selecting a file which triggers callback
+      if (this.opts?.callback) await this.opts.callback('icons/svg/new-portrait.svg');
+    });
+
+    (globalThis).FilePicker = function FilePickerMock(opts) {
+      this.opts = opts;
+      this.browse = browseSpy;
+    };
+
+    const imgEl = document.querySelector('.profile-img');
+    const ev = new Event('click');
+
+    // Dispatch action as ApplicationV2 would do
+    await SheetClass.DEFAULT_OPTIONS.actions.editImage.call(sheet, ev, imgEl);
+
+    expect(browseSpy).toHaveBeenCalledTimes(1);
+    expect(fakeActor.update).toHaveBeenCalledWith({ img: 'icons/svg/new-portrait.svg' });
+    expect(imgEl.getAttribute('src')).toBe('icons/svg/new-portrait.svg');
+  });
+
+  it('falls back to FilePicker.browse static API when constructor is unavailable', async () => {
+    // Remove constructor behavior; provide static browse instead
+    (globalThis).FilePicker = {
+      browse: vi.fn(async (_type, _current) => ({ files: ['icons/svg/static-picked.svg'] }))
+    };
+
+    const imgEl = document.querySelector('.profile-img');
+    const ev = new Event('click');
+
+    await SheetClass.DEFAULT_OPTIONS.actions.editImage.call(sheet, ev, imgEl);
+
+    expect((globalThis).FilePicker.browse).toHaveBeenCalled();
+    expect(fakeActor.update).toHaveBeenCalledWith({ img: 'icons/svg/static-picked.svg' });
+    expect(imgEl.getAttribute('src')).toBe('icons/svg/static-picked.svg');
+  });
+});
+
 describe('Roll Payload Chat Integration', () => {
   let mockRoll;
   let mockChatMessage;
@@ -249,14 +339,14 @@ describe('Roll Payload Chat Integration', () => {
     };
 
     // Setup FoundryVTT globals
-    (globalThis as any).Roll = vi.fn(() => mockRoll);
-    (globalThis as any).ChatMessage = mockChatMessage;
+    globalThis.Roll = vi.fn(() => mockRoll);
+    globalThis.ChatMessage = mockChatMessage;
   });
 
   afterEach(() => {
     // Clean up globals
-    delete (globalThis as any).Roll;
-    delete (globalThis as any).ChatMessage;
+    delete globalThis.Roll;
+    delete globalThis.ChatMessage;
     
     // Reset mocks
     vi.clearAllMocks();
@@ -279,7 +369,7 @@ describe('Roll Payload Chat Integration', () => {
     await payload.sendToChat();
     
     // Verify Roll was created with correct formula
-    expect((globalThis as any).Roll).toHaveBeenCalledWith('2d10 + 5', {});
+    expect(globalThis.Roll).toHaveBeenCalledWith('2d10 + 5', {});
     
     // Verify roll was evaluated
     expect(mockRoll.evaluate).toHaveBeenCalled();
