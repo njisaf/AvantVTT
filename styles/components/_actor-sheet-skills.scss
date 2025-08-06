@@ -1,0 +1,81 @@
+/**
+ * Actor Sheet - Skills styles
+ * Aligns skill input and roll button sizes and adds subtle hover color hint.
+ *
+ * Scope: templates/actor-sheet.html Skills tab (.skills-attributes-grid)
+ */
+
+/* Container list ensures consistent spacing between tiles */
+.skills-attributes-grid .skills-attribute-list {
+  display: grid;
+  gap: 0.6rem 0.8rem;
+}
+
+/* Each skill tile: label full width, then input + button on one row */
+.skills-attributes-grid .skill-tile {
+  display: grid;
+  /* Keep label dominant; do not over-expand input width.
+     Use intrinsic content widths while maintaining alignment. */
+  grid-template-columns: max-content max-content; /* label is separate row; input stays compact */
+  grid-auto-rows: auto;
+  column-gap: 0.8rem;
+  row-gap: 0.4rem;
+  align-items: center;
+
+  > label {
+    grid-column: 1 / -1;
+    font-weight: 600;              /* emphasize label dominance */
+    letter-spacing: 0.02em;
+    color: var(--color-text, #ddd);
+  }
+
+  > input[type="text"] {
+    /* Compact control sized for up to three digits */
+    height: 28px;
+    width: 3ch;                    /* visually compact, holds up to 3 digits */
+    min-width: 3ch;
+    max-width: 4ch;                /* allow slight wiggle */
+    text-align: center;
+
+    padding: 0 0.4rem;
+    border: 1px solid var(--color-border, #8a8a8a50);
+    border-radius: 4px;
+    background: var(--color-control-bg, #ffffff0d);
+    color: var(--color-text, #ddd);
+  }
+
+  > .skill-roll {
+    /* Match input height; compact width similar to a small control */
+    height: 28px;
+    min-width: 42px;
+    padding: 0 0.4rem;
+    border: 1px solid var(--color-border, #8a8a8a50);
+    border-radius: 4px;
+    background: var(--color-control-bg, #2b2b2b); /* slightly contrast for button */
+    color: var(--color-text, #ddd);
+    line-height: 26px; /* height - 2px border */
+    text-align: center;
+    cursor: pointer;
+
+    appearance: none;
+    -webkit-appearance: none;
+
+    /* Subtle like sheet-tabs hover */
+    transition: color 120ms ease, border-color 120ms ease, background-color 120ms ease, box-shadow 120ms ease;
+  }
+
+  /* Hover: mimic sheet-tabs .item feel (subtle accent on text, light tint) */
+  > .skill-roll:hover,
+  > .skill-roll:focus-visible {
+    color: var(--tabs-hover, #7aa2ff);
+    border-color: color-mix(in srgb, var(--tabs-hover, #7aa2ff) 35%, transparent);
+    background-color: color-mix(in srgb, var(--tabs-hover, #7aa2ff) 10%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--tabs-hover, #7aa2ff) 25%, transparent) inset;
+    outline: none;
+  }
+}
+
+/* Optional: define the tabs hover color token if not provided elsewhere */
+:root {
+  --tabs-hover: var(--color-accent, #7aa2ff);
+}

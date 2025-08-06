@@ -254,13 +254,13 @@ describe('Layout System Helpers', () => {
             });
         });
         
-        describe('ability', () => {
-            it('should return select field with ability options', () => {
-                const result = commonFields.ability('grace', 'weapon');
+        describe('attribute', () => {
+            it('should return select field with attribute options', () => {
+                const result = commonFields.attribute('grace', 'weapon');
                 
                 expect(result).toBeTruthy();
                 expect(result.type).toBe('select');
-                expect(result.name).toBe('system.ability');
+                expect(result.name).toBe('system.attribute');
                 expect(result.value).toBe('grace');
                 expect(result.label).toBe('Ability');
                 expect(result.options).toHaveLength(4);
@@ -268,12 +268,12 @@ describe('Layout System Helpers', () => {
                 expect(result.options[1]).toEqual({ value: 'grace', label: 'Grace' });
                 expect(result.options[2]).toEqual({ value: 'intellect', label: 'Intellect' });
                 expect(result.options[3]).toEqual({ value: 'focus', label: 'Focus' });
-                expect(result.hint).toBe('Primary ability for weapon calculations');
-                expect(result.class).toBe('weapon-ability');
+                expect(result.hint).toBe('Primary attribute for weapon calculations');
+                expect(result.class).toBe('weapon-attribute');
             });
             
             it('should return null when value is undefined', () => {
-                const result = commonFields.ability(undefined, 'weapon');
+                const result = commonFields.attribute(undefined, 'weapon');
                 
                 expect(result).toBeNull();
             });

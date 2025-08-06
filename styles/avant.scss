@@ -13,6 +13,7 @@
 @use 'components/item-cards';
 @use 'components/unified-actions';
 @use 'components/foundry-overrides';
+@use 'components/actor-sheet-skills';
 @use 'themes/base';
 @use 'themes/dark';
 @use 'utilities/variables';
@@ -227,7 +228,7 @@ form.avant.theme-dark {
       @include form-input-base;
     }
 
-    button:not(.ability-roll-btn):not(.skill-roll):not(.rollable) {
+    button:not(.attribute-roll-btn):not(.skill-roll):not(.rollable) {
       @include button-base;
     }
   }
@@ -637,15 +638,15 @@ form.avant.theme-dark {
     text-align: center;
   }
 
-  // Abilities in Sidebar - Updated layout
-  .sidebar-abilities {
+  // Attributes in Sidebar - Updated layout
+  .sidebar-attributes {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 6px; // Further reduced from 8px to 6px
     margin-bottom: 8px; // Further reduced from 15px to 8px
   }
 
-  .sidebar-ability {
+  .sidebar-attribute {
     background: var(--theme-bg-tertiary, $bg-tertiary);
     padding: 6px; // Further reduced from 8px to 6px
     border: 1px solid var(--theme-border-primary, $border-primary);
@@ -660,7 +661,7 @@ form.avant.theme-dark {
       margin-bottom: 4px;
     }
 
-    input:not(.ability-modifier-input) {
+    input:not(.attribute-modifier-input) {
       background: var(--theme-bg-primary, $bg-primary);
       border: 1px solid var(--theme-border-primary, $border-primary);
       color: var(--theme-text-primary, $text-primary);
@@ -679,21 +680,21 @@ form.avant.theme-dark {
     }
   }
 
-  // New ability input row layout
-  .ability-input-row {
+  // New attribute input row layout
+  .attribute-input-row {
     display: flex;
     gap: 2px; // Reduced from 4px to 2px
     align-items: center;
     justify-content: space-between;
   }
 
-  .ability-modifier-input {
+  .attribute-modifier-input {
     @extend .sidebar-input;
     width: 40px;
     flex-shrink: 0;
   }
 
-  .ability-roll-btn {
+  .attribute-roll-btn {
     background: transparent !important;
     color: var(--theme-accent-primary, $accent-cyan);
     padding: 4px 2px !important;
@@ -1096,14 +1097,14 @@ form.avant.theme-dark {
   }
 
   // Skills Section - 2x2 Grid Layout (like Attributes)
-  .skills-abilities-grid {
+  .skills-attributes-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: $spacing-md; // Reduced from 20px
     margin-top: $spacing-md; // Reduced from 20px
   }
 
-  .skills-ability-section {
+  .skills-attribute-section {
     background: var(--theme-bg-tertiary, $bg-tertiary);
     border: 1px solid var(--theme-border-primary, $border-primary);
     border-left: 4px solid var(--theme-accent-primary, $accent-cyan);
@@ -1111,7 +1112,7 @@ form.avant.theme-dark {
     border-radius: 0;
   }
 
-  .skills-ability-header {
+  .skills-attribute-header {
     @include orbitron-header(12px, 700); // Reduced from 14px
     letter-spacing: 1px;
     margin: 0 0 $spacing-sm 0; // Reduced from 15px
@@ -1130,7 +1131,7 @@ form.avant.theme-dark {
     }
   }
 
-  .skills-ability-list {
+  .skills-attribute-list {
     display: flex;
     flex-direction: column;
     gap: $spacing-xs; // Reduced from 8px
@@ -1732,7 +1733,7 @@ form.avant.theme-dark {
   // Hide original resource sections that are now in sidebar or moved
   .resource-row,
   .defense-hp-section,
-  .abilities-section {
+  .attributes-section {
     display: none;
   }
 
@@ -2366,7 +2367,7 @@ form.avant.theme-dark {
     }
 
     // Responsive adjustments for compressed skills grid
-    .skills-abilities-grid {
+    .skills-attributes-grid {
       grid-template-columns: 1fr;
       gap: 10px; // Reduced from 15px
     }
@@ -2388,7 +2389,7 @@ form.avant.theme-dark {
       margin-left: 200px;
     }
 
-    .sidebar-abilities {
+    .sidebar-attributes {
       grid-template-columns: 1fr;
     }
 

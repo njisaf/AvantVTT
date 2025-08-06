@@ -11,9 +11,9 @@ import {
     validateString,
     validateActorType,
     validateItemType,
-    validateAbilities,
+    validateAttributes,
     validateSkills,
-    validateActorAbilities,
+    validateActorAttributes,
     validateActorSkills,
     validateHealthData,
     validatePowerPointsData,
@@ -73,9 +73,9 @@ export class ValidationUtils {
             data.system.fortunePoints = validateNumber(data.system.fortunePoints, 3);
         }
         
-        // Validate abilities using pure function
-        if (data.system.abilities) {
-            data.system.abilities = validateActorAbilities(data.system.abilities);
+        // Validate attributes using pure function
+        if (data.system.attributes) {
+            data.system.attributes = validateActorAttributes(data.system.attributes);
         }
         
         // Validate skills using pure function
@@ -130,8 +130,8 @@ export class ValidationUtils {
         // Type-specific validation using pure functions
         switch (data.type) {
             case "action":
-                if (!data.system.ability) {
-                    data.system.ability = "might";
+                if (!data.system.attribute) {
+                    data.system.attribute = "might";
                 }
                 if (data.system.difficulty !== undefined) {
                     data.system.difficulty = validateNumber(data.system.difficulty, 11);
@@ -169,8 +169,8 @@ export class ValidationUtils {
                 break;
                 
             case "weapon":
-                if (!data.system.ability) {
-                    data.system.ability = "might";
+                if (!data.system.attribute) {
+                    data.system.attribute = "might";
                 }
                 if (data.system.modifier !== undefined) {
                     data.system.modifier = validateNumber(data.system.modifier, 0);
@@ -193,8 +193,8 @@ export class ValidationUtils {
                 break;
                 
             case "armor":
-                if (!data.system.ability) {
-                    data.system.ability = "grace";
+                if (!data.system.attribute) {
+                    data.system.attribute = "grace";
                 }
                 if (data.system.modifier !== undefined) {
                     data.system.modifier = validateNumber(data.system.modifier, 0);
@@ -350,13 +350,13 @@ export class ValidationUtils {
     }
 
     /**
-     * Validate ability modifier values
+     * Validate attribute modifier values
      * @static
-     * @param {Object} abilities - Abilities object to validate
-     * @returns {Object} Validated abilities
+     * @param {Object} attributes - Attributes object to validate
+     * @returns {Object} Validated attributes
      */
-    static validateAbilities(abilities) {
-        return validateAbilities(abilities);
+    static validateAttributes(attributes) {
+        return validateAttributes(attributes);
     }
 
     /**

@@ -94,20 +94,20 @@ export function createGearAction(item: Item, actor: Actor): CombinedAction {
     const buttonTypes = getGearActionButtons(item);
 
     if (item.type === 'weapon' || item.type === 'armor' || item.type === 'gear') {
-        const defaultAbility = item.type === 'weapon' ? 'might' : 'grace';
-        const ability = item.system?.ability || defaultAbility;
-        const abilityMod = actor.system?.abilities?.[ability]?.modifier || 0;
+        const defaultAttribute = item.type === 'weapon' ? 'might' : 'grace';
+        const attribute = item.system?.attribute || defaultAttribute;
+        const attributeMod = actor.system?.attributes?.[attribute]?.modifier || 0;
         const level = actor.system?.level || 1;
         const expertise = item.system?.expertise || 0;
         
         if (item.type !== 'gear') {
-            system.threshold = computeThreshold(level, abilityMod, expertise);
+            system.threshold = computeThreshold(level, attributeMod, expertise);
         }
 
         for (const type of buttonTypes) {
             let total: string | number = '';
             if (type === 'attack' || type === 'armor' || type === 'use') {
-                total = `+${10 + level + abilityMod + expertise}`;
+                total = `+${10 + level + attributeMod + expertise}`;
             } else if (type === 'damage') {
                 total = system.damageDie || 'N/A';
             }

@@ -48,8 +48,8 @@ export abstract class AvantActorSheetBase extends ActorSheet {
   }
 
   /** 
-   * Type-safe ability access with validation
-   * Returns the actor's abilities or empty object if none exist
+   * Type-safe attribute access with validation
+   * Returns the actor's attributes or empty object if none exist
    */
   protected getAbilities(): Record<string, unknown> {
     const system = this.actor.system as any;

@@ -114,12 +114,12 @@ export interface RollErrorHandling {
 /**
  * Common roll types supported by the system
  */
-export type RollType = 'ability' | 'skill' | 'weapon-attack' | 'weapon-damage' | 'armor' | 'generic';
+export type RollType = 'attribute' | 'skill' | 'weapon-attack' | 'weapon-damage' | 'armor' | 'generic';
 
 /**
  * Modifier categories for organization
  */
-export type ModifierCategory = 'ability' | 'level' | 'gear' | 'situational' | 'feat' | 'condition';
+export type ModifierCategory = 'attribute' | 'level' | 'gear' | 'situational' | 'feat' | 'condition';
 
 /**
  * Chat message roll modes
@@ -176,8 +176,8 @@ export interface ActorRollConfig extends RollBuilderConfig {
   actor: any;
   /** Whether to include level modifier */
   includeLevel: boolean;
-  /** Whether to include ability modifiers */
-  includeAbility: boolean;
+  /** Whether to include attribute modifiers */
+  includeAttribute: boolean;
   /** Custom modifier sources */
   customModifiers?: string[];
 }

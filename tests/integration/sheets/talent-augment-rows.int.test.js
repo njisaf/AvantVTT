@@ -71,7 +71,7 @@ describe('Talent & Augment Row Layout Integration', () => {
             type: 'character',
             system: {
                 level: 3,
-                abilities: {
+                attributes: {
                     might: { modifier: 2 },
                     focus: { modifier: 1 }
                 }

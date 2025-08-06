@@ -4440,6 +4440,80 @@
 }
 
 /**
+ * Actor Sheet - Skills styles
+ * Aligns skill input and roll button sizes and adds subtle hover color hint.
+ *
+ * Scope: templates/actor-sheet.html Skills tab (.skills-attributes-grid)
+ */
+/* Container list ensures consistent spacing between tiles */
+.skills-attributes-grid .skills-attribute-list {
+  display: grid;
+  gap: 0.6rem 0.8rem;
+}
+
+/* Each skill tile: label full width, then input + button on one row */
+.skills-attributes-grid .skill-tile {
+  display: grid;
+  /* Keep label dominant; do not over-expand input width.
+     Use intrinsic content widths while maintaining alignment. */
+  grid-template-columns: max-content max-content; /* label is separate row; input stays compact */
+  grid-auto-rows: auto;
+  column-gap: 0.8rem;
+  row-gap: 0.4rem;
+  align-items: center;
+  /* Hover: mimic sheet-tabs .item feel (subtle accent on text, light tint) */
+}
+.skills-attributes-grid .skill-tile > label {
+  grid-column: 1/-1;
+  font-weight: 600; /* emphasize label dominance */
+  letter-spacing: 0.02em;
+  color: var(--color-text, #ddd);
+}
+.skills-attributes-grid .skill-tile > input[type=text] {
+  /* Compact control sized for up to three digits */
+  height: 28px;
+  width: 3ch; /* visually compact, holds up to 3 digits */
+  min-width: 3ch;
+  max-width: 4ch; /* allow slight wiggle */
+  text-align: center;
+  padding: 0 0.4rem;
+  border: 1px solid var(--color-border, rgba(138, 138, 138, 0.3137254902));
+  border-radius: 4px;
+  background: var(--color-control-bg, rgba(255, 255, 255, 0.0509803922));
+  color: var(--color-text, #ddd);
+}
+.skills-attributes-grid .skill-tile > .skill-roll {
+  /* Match input height; compact width similar to a small control */
+  height: 28px;
+  min-width: 42px;
+  padding: 0 0.4rem;
+  border: 1px solid var(--color-border, rgba(138, 138, 138, 0.3137254902));
+  border-radius: 4px;
+  background: var(--color-control-bg, #2b2b2b); /* slightly contrast for button */
+  color: var(--color-text, #ddd);
+  line-height: 26px; /* height - 2px border */
+  text-align: center;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  /* Subtle like sheet-tabs hover */
+  transition: color 120ms ease, border-color 120ms ease, background-color 120ms ease, box-shadow 120ms ease;
+}
+.skills-attributes-grid .skill-tile > .skill-roll:hover,
+.skills-attributes-grid .skill-tile > .skill-roll:focus-visible {
+  color: var(--tabs-hover, #7aa2ff);
+  border-color: color-mix(in srgb, var(--tabs-hover, #7aa2ff) 35%, transparent);
+  background-color: color-mix(in srgb, var(--tabs-hover, #7aa2ff) 10%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--tabs-hover, #7aa2ff) 25%, transparent) inset;
+  outline: none;
+}
+
+/* Optional: define the tabs hover color token if not provided elsewhere */
+:root {
+  --tabs-hover: var(--color-accent, #7aa2ff);
+}
+
+/**
  * @fileoverview Chat Card Component Styles
  * @version 1.0.0 - Phase 3: TypeScript Conversion & UX Polish
  * @description SCSS styling for talent and augment chat cards with accessibility and responsive design
@@ -5131,11 +5205,11 @@ form.avant.theme-dark *::after {
   outline: none;
   box-shadow: inset 0 0 10px var(--theme-shadow-primary, rgba(0, 224, 220, 0.2));
 }
-.avant .sheet-body button:not(.ability-roll-btn):not(.skill-roll):not(.rollable),
-.avant .sheet-content button:not(.ability-roll-btn):not(.skill-roll):not(.rollable),
-.avant .tab button:not(.ability-roll-btn):not(.skill-roll):not(.rollable),
-.avant .form-group button:not(.ability-roll-btn):not(.skill-roll):not(.rollable),
-.avant .form-fields button:not(.ability-roll-btn):not(.skill-roll):not(.rollable) {
+.avant .sheet-body button:not(.attribute-roll-btn):not(.skill-roll):not(.rollable),
+.avant .sheet-content button:not(.attribute-roll-btn):not(.skill-roll):not(.rollable),
+.avant .tab button:not(.attribute-roll-btn):not(.skill-roll):not(.rollable),
+.avant .form-group button:not(.attribute-roll-btn):not(.skill-roll):not(.rollable),
+.avant .form-fields button:not(.attribute-roll-btn):not(.skill-roll):not(.rollable) {
   background: var(--theme-bg-tertiary, #333333);
   border: 1px solid var(--theme-accent-primary, #00E0DC);
   color: var(--theme-accent-primary, #00E0DC);
@@ -5147,11 +5221,11 @@ form.avant.theme-dark *::after {
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
-.avant .sheet-body button:not(.ability-roll-btn):not(.skill-roll):not(.rollable):hover,
-.avant .sheet-content button:not(.ability-roll-btn):not(.skill-roll):not(.rollable):hover,
-.avant .tab button:not(.ability-roll-btn):not(.skill-roll):not(.rollable):hover,
-.avant .form-group button:not(.ability-roll-btn):not(.skill-roll):not(.rollable):hover,
-.avant .form-fields button:not(.ability-roll-btn):not(.skill-roll):not(.rollable):hover {
+.avant .sheet-body button:not(.attribute-roll-btn):not(.skill-roll):not(.rollable):hover,
+.avant .sheet-content button:not(.attribute-roll-btn):not(.skill-roll):not(.rollable):hover,
+.avant .tab button:not(.attribute-roll-btn):not(.skill-roll):not(.rollable):hover,
+.avant .form-group button:not(.attribute-roll-btn):not(.skill-roll):not(.rollable):hover,
+.avant .form-fields button:not(.attribute-roll-btn):not(.skill-roll):not(.rollable):hover {
   background: var(--theme-accent-primary, #00E0DC);
   color: var(--theme-bg-primary, #1C1C1C);
   box-shadow: var(--theme-shadow-accent, 0 0 15px rgba(0, 224, 220, 0.5));
@@ -5490,7 +5564,7 @@ form.avant.theme-dark *::after {
   display: block;
   margin-top: 5px;
 }
-.avant .sidebar-input, .avant .ability-modifier-input {
+.avant .sidebar-input, .avant .attribute-modifier-input {
   background: var(--theme-bg-primary, #1C1C1C);
   border: 1px solid var(--theme-border-primary, #404040);
   color: var(--theme-text-primary, #FFFFFF);
@@ -5504,7 +5578,7 @@ form.avant.theme-dark *::after {
   text-align: center;
   transition: all 0.3s ease;
 }
-.avant .sidebar-input:focus, .avant .ability-modifier-input:focus {
+.avant .sidebar-input:focus, .avant .attribute-modifier-input:focus {
   border-color: var(--theme-accent-primary, #00E0DC);
   outline: none;
   box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
@@ -5560,20 +5634,20 @@ form.avant.theme-dark *::after {
   width: 50px;
   text-align: center;
 }
-.avant .sidebar-abilities {
+.avant .sidebar-attributes {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6px;
   margin-bottom: 8px;
 }
-.avant .sidebar-ability {
+.avant .sidebar-attribute {
   background: var(--theme-bg-tertiary, #333333);
   padding: 6px;
   border: 1px solid var(--theme-border-primary, #404040);
   text-align: center;
   transition: all 0.3s ease;
 }
-.avant .sidebar-ability label {
+.avant .sidebar-attribute label {
   display: block;
   font-family: var(--theme-font-display, "Orbitron", monospace);
   font-size: 10px;
@@ -5585,7 +5659,7 @@ form.avant.theme-dark *::after {
   color: var(--theme-text-secondary, #BFBFBF);
   margin-bottom: 4px;
 }
-.avant .sidebar-ability input:not(.ability-modifier-input) {
+.avant .sidebar-attribute input:not(.attribute-modifier-input) {
   background: var(--theme-bg-primary, #1C1C1C);
   border: 1px solid var(--theme-border-primary, #404040);
   color: var(--theme-text-primary, #FFFFFF);
@@ -5599,22 +5673,22 @@ form.avant.theme-dark *::after {
   text-align: center;
   transition: all 0.3s ease;
 }
-.avant .sidebar-ability input:not(.ability-modifier-input):focus {
+.avant .sidebar-attribute input:not(.attribute-modifier-input):focus {
   border-color: var(--theme-accent-primary, #00E0DC);
   outline: none;
   box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
 }
-.avant .ability-input-row {
+.avant .attribute-input-row {
   display: flex;
   gap: 2px;
   align-items: center;
   justify-content: space-between;
 }
-.avant .ability-modifier-input {
+.avant .attribute-modifier-input {
   width: 40px;
   flex-shrink: 0;
 }
-.avant .ability-roll-btn {
+.avant .attribute-roll-btn {
   background: transparent !important;
   color: var(--theme-accent-primary, #00E0DC);
   padding: 4px 2px !important;
@@ -5637,13 +5711,13 @@ form.avant.theme-dark *::after {
   color: var(--theme-accent-primary, #00E0DC);
   letter-spacing: 0.5px;
 }
-.avant .ability-roll-btn:hover {
+.avant .attribute-roll-btn:hover {
   color: var(--theme-bg-primary, #1C1C1C);
   background: var(--theme-accent-primary, #00E0DC) !important;
   box-shadow: 0 0 8px rgba(0, 224, 220, 0.4);
   border-radius: 2px;
 }
-.avant .ability-roll-btn:focus {
+.avant .attribute-roll-btn:focus {
   outline: none;
   box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
 }
@@ -6056,20 +6130,20 @@ form.avant.theme-dark *::after {
 .avant .trait-configuration .trait-preview .trait-chip--preview i {
   font-size: 10px;
 }
-.avant .skills-abilities-grid {
+.avant .skills-attributes-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
   margin-top: 12px;
 }
-.avant .skills-ability-section {
+.avant .skills-attribute-section {
   background: var(--theme-bg-tertiary, #333333);
   border: 1px solid var(--theme-border-primary, #404040);
   border-left: 4px solid var(--theme-accent-primary, #00E0DC);
   padding: 8px;
   border-radius: 0;
 }
-.avant .skills-ability-header {
+.avant .skills-attribute-header {
   font-family: var(--theme-font-display, "Orbitron", monospace);
   font-size: 12px;
   font-weight: 700;
@@ -6082,7 +6156,7 @@ form.avant.theme-dark *::after {
   border-bottom: 1px solid var(--theme-border-primary, #404040);
   position: relative;
 }
-.avant .skills-ability-header::after {
+.avant .skills-attribute-header::after {
   content: "";
   position: absolute;
   bottom: 0;
@@ -6091,7 +6165,7 @@ form.avant.theme-dark *::after {
   height: 2px;
   background: var(--theme-gradient-accent, linear-gradient(135deg, #00E0DC 0%, #4CE2E1 100%));
 }
-.avant .skills-ability-list {
+.avant .skills-attribute-list {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -6736,7 +6810,7 @@ form.avant.theme-dark *::after {
 }
 .avant .resource-row,
 .avant .defense-hp-section,
-.avant .abilities-section {
+.avant .attributes-section {
   display: none;
 }
 .avant .combat-item {
@@ -7390,7 +7464,7 @@ form.avant.theme-dark *::after {
     padding: 10px 16px;
     font-size: 10px;
   }
-  .avant .skills-abilities-grid {
+  .avant .skills-attributes-grid {
     grid-template-columns: 1fr;
     gap: 10px;
   }
@@ -7406,7 +7480,7 @@ form.avant.theme-dark *::after {
   .avant .main-content {
     margin-left: 200px;
   }
-  .avant .sidebar-abilities {
+  .avant .sidebar-attributes {
     grid-template-columns: 1fr;
   }
   .avant .sheet-tabs {

@@ -459,10 +459,10 @@ class=field.class}}
   {{#if field.range}}<span class="item-range">{{field.range}}</span>{{/if}}
 </div>
 
-{{else if (eq field.type "weapon-ability")}}
-{{!-- Weapon ability display --}}
-<div class="weapon-ability">
-  {{#if field.ability}}<span class="item-ability">{{field.ability}}</span>{{/if}}
+{{else if (eq field.type "weapon-attribute")}}
+{{!-- Weapon attribute display --}}
+<div class="weapon-attribute">
+  {{#if field.attribute}}<span class="item-attribute">{{field.attribute}}</span>{{/if}}
 </div>
 
 {{else if (eq field.type "weapon-description")}}

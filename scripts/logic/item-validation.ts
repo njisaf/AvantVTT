@@ -34,10 +34,10 @@ export const RARITY_VALUES = ['common', 'uncommon', 'rare', 'epic', 'legendary',
 export type RarityValue = typeof RARITY_VALUES[number];
 
 /**
- * Valid ability values for items
+ * Valid attribute values for items
  */
-export const ABILITY_VALUES = ['might', 'grace', 'intellect', 'focus'] as const;
-export type AbilityValue = typeof ABILITY_VALUES[number];
+export const ATTRIBUTE_VALUES = ['might', 'grace', 'intellect', 'focus'] as const;
+export type AttributeValue = typeof ATTRIBUTE_VALUES[number];
 
 /**
  * Valid augment type values
@@ -228,9 +228,9 @@ export function validateRarity(
 }
 
 /**
- * Validates that an ability value is from the allowed set
+ * Validates that an attribute value is from the allowed set
  */
-export function validateAbility(
+export function validateAttribute(
   value: string | undefined | null,
   options: ValidationOptions = {}
 ): ValidationResult {
@@ -243,14 +243,14 @@ export function validateAbility(
   if (!value) {
     if (options.required) {
       result.isValid = false;
-      result.errors.push('Ability is required.');
+      result.errors.push('Attribute is required.');
     }
     return result;
   }
 
-  if (!ABILITY_VALUES.includes(value as AbilityValue)) {
+  if (!ATTRIBUTE_VALUES.includes(value as AttributeValue)) {
     result.isValid = false;
-    result.errors.push(`Ability must be one of: ${ABILITY_VALUES.join(', ')}.`);
+    result.errors.push(`Attribute must be one of: ${ATTRIBUTE_VALUES.join(', ')}.`);
   }
 
   return result;
@@ -517,11 +517,11 @@ function validateAugmentFields(itemData: any): ValidationResult {
 function validateWeaponFields(itemData: any): ValidationResult {
   const result: ValidationResult = { isValid: true, errors: [], warnings: [] };
 
-  // Ability validation
-  if (itemData.system?.ability) {
-    const abilityValidation = validateAbility(itemData.system.ability);
-    result.errors.push(...abilityValidation.errors);
-    if (!abilityValidation.isValid) result.isValid = false;
+  // Attribute validation
+  if (itemData.system?.attribute) {
+    const attributeValidation = validateAttribute(itemData.system.attribute);
+    result.errors.push(...attributeValidation.errors);
+    if (!attributeValidation.isValid) result.isValid = false;
   }
 
   // Modifier validation
@@ -540,11 +540,11 @@ function validateWeaponFields(itemData: any): ValidationResult {
 function validateArmorFields(itemData: any): ValidationResult {
   const result: ValidationResult = { isValid: true, errors: [], warnings: [] };
 
-  // Ability validation
-  if (itemData.system?.ability) {
-    const abilityValidation = validateAbility(itemData.system.ability);
-    result.errors.push(...abilityValidation.errors);
-    if (!abilityValidation.isValid) result.isValid = false;
+  // Attribute validation
+  if (itemData.system?.attribute) {
+    const attributeValidation = validateAttribute(itemData.system.attribute);
+    result.errors.push(...attributeValidation.errors);
+    if (!attributeValidation.isValid) result.isValid = false;
   }
 
   // Armor Class validation

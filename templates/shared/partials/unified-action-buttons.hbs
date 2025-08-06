@@ -14,7 +14,7 @@ Context:
                 data-action="rollCombinedAction"
                 data-action-id="{{../action.id}}"
                 data-button="{{button.type}}"
-                title="{{#if (eq button.type "attack")}}Attack: {{../action.name}} (2d10+Level+Ability+EP){{else if (eq button.type "damage")}}Damage: {{../action.name}} ({{../action.system.damageDie}}){{else if (eq button.type "armor")}}Armor: {{../action.name}} (2d10+Level+Ability+EP){{else if (eq button.type "use")}}Use Gear: {{../action.name}} (2d10+Level+Ability+EP){{/if}}"
+                title="{{#if (eq button.type "attack")}}Attack: {{../action.name}} (2d10+Level+Attribute+EP){{else if (eq button.type "damage")}}Damage: {{../action.name}} ({{../action.system.damageDie}}){{else if (eq button.type "armor")}}Armor: {{../action.name}} (2d10+Level+Attribute+EP){{else if (eq button.type "use")}}Use Gear: {{../action.name}} (2d10+Level+Attribute+EP){{/if}}"
                 aria-label="{{#if (eq button.type "attack")}}Attack {{../action.name}}{{else if (eq button.type "damage")}}Damage {{../action.name}}{{else if (eq button.type "armor")}}Armor {{../action.name}}{{else if (eq button.type "use")}}Use {{../action.name}}{{/if}}">
             {{#if (eq button.type "attack")}}
             <i class="fas fa-dice-d20" aria-hidden="true"></i>

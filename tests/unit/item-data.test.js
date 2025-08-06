@@ -37,7 +37,7 @@ describe('Item Data Models', () => {
       test('should have ability choices constraint', () => {
         const schema = AvantActionData.defineSchema();
         
-        expect(schema.ability.choices)
+        expect(schema.attribute.choices)
           .toBeArray()
           .toIncludeAllMembers(['might', 'grace', 'intellect', 'focus']);
       });
@@ -209,7 +209,7 @@ describe('Item Data Models', () => {
       test('should have ability choices constraint', () => {
         const schema = AvantWeaponData.defineSchema();
         
-        expect(schema.ability.choices)
+        expect(schema.attribute.choices)
           .toBeArray()
           .toIncludeAllMembers(['might', 'grace', 'intellect', 'focus']);
       });
@@ -266,7 +266,7 @@ describe('Item Data Models', () => {
       test('should have ability choices constraint', () => {
         const schema = AvantArmorData.defineSchema();
         
-        expect(schema.ability.choices)
+        expect(schema.attribute.choices)
           .toBeArray()
           .toIncludeAllMembers(['might', 'grace', 'intellect', 'focus']);
       });
@@ -359,9 +359,9 @@ describe('Item Data Models', () => {
       
       const expectedAbilities = ['might', 'grace', 'intellect', 'focus'];
       
-      expect(actionSchema.ability.choices).toEqual(expectedAbilities);
-      expect(weaponSchema.ability.choices).toEqual(expectedAbilities);
-      expect(armorSchema.ability.choices).toEqual(expectedAbilities);
+      expect(actionSchema.attribute.choices).toEqual(expectedAbilities);
+      expect(weaponSchema.attribute.choices).toEqual(expectedAbilities);
+      expect(armorSchema.attribute.choices).toEqual(expectedAbilities);
     });
 
     test('should have consistent threshold constraints', () => {

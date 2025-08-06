@@ -13,7 +13,7 @@ import { FoundryUI } from '../../../scripts/types/adapters/foundry-ui';
 // Mock dependencies
 jest.unstable_mockModule('@/logic/actor-sheet-utils', () => ({
     extractItemIdFromElement: jest.fn(),
-    calculateAbilityTotalModifiers: jest.fn(() => ({})),
+    calculateAttributeTotalModifiers: jest.fn(() => ({})),
     calculateSkillTotalModifiers: jest.fn(() => ({})),
     getAbilityModifier: jest.fn(() => 0),
     getSkillModifier: jest.fn(() => 0)
@@ -61,7 +61,7 @@ describe('Actor Sheet Chat Integration (Phase 4)', () => {
             toObject: jest.fn(() => ({
                 system: {
                     level: 3,
-                    abilities: {},
+                    attributes: {},
                     skills: {},
                     powerPoints: { value: 10, max: 15 }
                 },

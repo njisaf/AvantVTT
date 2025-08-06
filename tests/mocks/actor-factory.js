@@ -17,7 +17,7 @@ export function createMockActor(options = {}) {
         getRollData: function() {
             return {
                 level: this.system.level,
-                abilities: this.system.abilities
+                attributes: this.system.attributes
             };
         },
         update: function() { return Promise.resolve(this); },
@@ -31,7 +31,7 @@ export function createMockActor(options = {}) {
         type: 'character',
         system: {
             level: 1,
-            abilities: {
+            attributes: {
                 might: { modifier: 0 },
                 agility: { modifier: 0 },
                 intellect: { modifier: 0 }

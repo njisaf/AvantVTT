@@ -129,14 +129,14 @@ export function extractD10Results(roll) {
  * Extracts static modifiers (non-dice numbers) from a completed roll.
  * 
  * This function looks through all the terms in a roll and finds numeric
- * terms (like ability modifiers, skill bonuses, etc.) and adds them up
+ * terms (like attribute modifiers, skill bonuses, etc.) and adds them up
  * to get the total static modifier that was applied to the roll.
  * 
  * @param {Object|null} roll - The completed roll object to extract from
  * @returns {number} The sum of all static numeric modifiers in the roll
  * 
  * @example
- * // Roll with +3 ability mod and +2 skill bonus
+ * // Roll with +3 attribute mod and +2 skill bonus
  * const roll = {
  *   terms: [
  *     { constructor: { name: 'Die' }, faces: 10 },

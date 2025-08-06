@@ -81,8 +81,8 @@ export interface AugmentData {
  * Actions represent special abilities that can be performed.
  */
 export interface ActionData {
-  /** Primary ability used for this action */
-  ability: 'might' | 'grace' | 'intellect' | 'focus';
+  /** Primary attribute used for this action */
+  attribute: 'might' | 'grace' | 'intellect' | 'focus';
   /** Action type (attack, skill, special) */
   actionType: 'attack' | 'skill' | 'special';
   /** Target type (self, single, area, etc.) */

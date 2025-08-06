@@ -26,7 +26,7 @@ export interface BaseItemSystemData {
  * Action item system data
  */
 export interface ActionSystemData extends BaseItemSystemData {
-    ability: 'might' | 'grace' | 'intellect' | 'focus';
+    attribute: 'might' | 'grace' | 'intellect' | 'focus';
     difficulty: number;
     apCost: number;
     ppCost: number;
@@ -91,7 +91,7 @@ export interface WeaponSystemData extends BaseItemSystemData {
     range: string;
     weight: number;
     cost: number;
-    ability: 'might' | 'grace' | 'intellect' | 'focus';
+    attribute: 'might' | 'grace' | 'intellect' | 'focus';
     modifier: number;
     damageDie: string;
     properties: string;
@@ -109,7 +109,7 @@ export interface WeaponSystemData extends BaseItemSystemData {
 export interface ArmorSystemData extends BaseItemSystemData {
     weight: number;
     cost: number;
-    ability: 'might' | 'grace' | 'intellect' | 'focus';
+    attribute: 'might' | 'grace' | 'intellect' | 'focus';
     modifier: number;
     threshold: number;
     damageReduction: number;
@@ -130,7 +130,7 @@ export interface GearSystemData extends BaseItemSystemData {
     cost: number;
     quantity: number;
     rarity: 'common' | 'uncommon' | 'rare' | 'legendary';
-    ability: 'might' | 'grace' | 'intellect' | 'focus';
+    attribute: 'might' | 'grace' | 'intellect' | 'focus';
     category: string;
     isConsumable: boolean;
     uses: {

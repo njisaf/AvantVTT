@@ -32,7 +32,7 @@ export interface StaticModifiers {
  * Individual modifier component
  */
 export interface ModifierBreakdown {
-  /** Source of the modifier (level, ability, etc.) */
+  /** Source of the modifier (level, attribute, etc.) */
   source: string;
   /** Numeric value of the modifier */
   value: number;

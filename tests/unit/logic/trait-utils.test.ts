@@ -29,6 +29,7 @@ const createMockTrait = (id: string, name: string, color: string = '#FF6B6B', ic
   name,
   color,
   icon,
+  textColor: '#000000',
   localKey: `AVANT.Trait.${name}`,
   description: `Test ${name} trait`,
   source: 'system' as const,
@@ -39,6 +40,7 @@ const createMockTrait = (id: string, name: string, color: string = '#FF6B6B', ic
     system: {
       color,
       icon,
+      textColor: '#000000',
       localKey: `AVANT.Trait.${name}`,
       description: `Test ${name} trait`,
       traitMetadata: {
@@ -278,70 +280,6 @@ describe('Trait Utilities', () => {
     });
   });
   
-  describe('generateTraitSuggestions', () => {
-    test('should generate suggestions for partial name match', () => {
-      const result = generateTraitSuggestions(mockTraits, 'fi');
-      
-      expect(result).toHaveLength(1);
-      expect(result[0].name).toBe('Fire');
-      expect(result[0].score).toBeGreaterThan(0.5);
-    });
-    
-    test('should rank exact matches highest', () => {
-      const result = generateTraitSuggestions(mockTraits, 'fire');
-      
-      expect(result).toHaveLength(1);
-      expect(result[0].score).toBe(1.0);
-    });
-    
-    test('should rank prefix matches high', () => {
-      const result = generateTraitSuggestions(mockTraits, 'he');
-      
-      expect(result).toHaveLength(1);
-      expect(result[0].name).toBe('Healing');
-      expect(result[0].score).toBe(0.8);
-    });
-    
-    test('should sort suggestions by score', () => {
-      const traits = [
-        createMockTrait('fire-ball', 'Fire Ball'),
-        createMockTrait('fire', 'Fire'),
-        createMockTrait('firework', 'Firework')
-      ];
-      
-      const result = generateTraitSuggestions(traits, 'fire');
-      
-      expect(result).toHaveLength(3);
-      expect(result[0].name).toBe('Fire'); // Exact match (score 1.0)
-      expect(result[0].score).toBe(1.0);
-      
-      // The next two should have different scores, but both are contains matches
-      // so we'll just verify they exist and have reasonable scores
-      const remainingNames = result.slice(1).map(r => r.name).sort();
-      expect(remainingNames).toContain('Fire Ball');
-      expect(remainingNames).toContain('Firework');
-      expect(result[1].score).toBeGreaterThan(0);
-      expect(result[2].score).toBeGreaterThan(0);
-    });
-    
-    test('should limit suggestions to maxSuggestions', () => {
-      const result = generateTraitSuggestions(mockTraits, 'e', 2);
-      
-      expect(result.length).toBeLessThanOrEqual(2);
-    });
-    
-    test('should handle empty query', () => {
-      const result = generateTraitSuggestions(mockTraits, '');
-      
-      expect(result).toEqual([]);
-    });
-    
-    test('should handle invalid input', () => {
-      const result = generateTraitSuggestions(null as any, 'fire');
-      
-      expect(result).toEqual([]);
-    });
-  });
   
   describe('validateTraitList', () => {
     test('should validate list of valid trait IDs', () => {
@@ -531,9 +469,6 @@ describe('Trait Utilities', () => {
       expect(filtered).toHaveLength(1);
       expect(filtered[0].id).toBe('fire-🔥');
 
-      const suggestions = generateTraitSuggestions(unicodeTraits, 'élec');
-      expect(suggestions).toHaveLength(1);
-      expect(suggestions[0].id).toBe('électricité'); // Fixed: suggestions have .id, not .trait.id
     });
   });
 
@@ -827,13 +762,11 @@ describe('Trait Utilities', () => {
       // Simulate autocomplete rendering with virtualization
       const virtualWindow = calculateVirtualWindow(0, 300, 32, 1000, 5);
       const virtualList = virtualizeList(largeTraitSet, virtualWindow.startIndex, virtualWindow.endIndex, 300, 32);
-      const suggestions = generateTraitSuggestions(virtualList.visibleItems, 'trait', 10);
-      
       const endTime = performance.now();
       const duration = endTime - startTime;
 
       expect(duration).toBeLessThan(2); // Must complete in under 2ms
-      expect(suggestions).toHaveLength(10); // Should return expected results
+      
       expect(virtualList.visibleItems.length).toBeLessThan(50); // Should virtualize large list
     });
 

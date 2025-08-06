@@ -743,11 +743,11 @@ class AvantActor extends (globalThis as any).Actor {
 
         // Add commonly used roll data
         const systemData = this.system as any;
-        if (systemData.abilities) {
-            for (const [abilityName, abilityData] of Object.entries(systemData.abilities)) {
-                const ability = abilityData as any;
-                data[abilityName] = ability.modifier;
-                data[`${abilityName}Mod`] = ability.modifier;
+        if (systemData.attributes) {
+            for (const [attributeName, attributeData] of Object.entries(systemData.attributes)) {
+                const attribute = attributeData as any;
+                data[attributeName] = attribute.modifier;
+                data[`${attributeName}Mod`] = attribute.modifier;
             }
         }
 

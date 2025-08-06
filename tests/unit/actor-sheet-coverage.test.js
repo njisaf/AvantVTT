@@ -59,8 +59,8 @@ describe('Actor Sheet Coverage Tests', () => {
             preventDefault: jest.fn(),
             currentTarget: {
                 dataset: {
-                    rollType: 'ability',
-                    ability: 'might'
+                    rollType: 'attribute',
+                    attribute: 'might'
                 }
             }
         };
@@ -68,16 +68,16 @@ describe('Actor Sheet Coverage Tests', () => {
         // Exercise _onRoll method
         await expect(actorSheet._onRoll(mockEvent)).resolves.not.toThrow();
         
-        // Exercise _onAbilityRoll method
-        const abilityEvent = {
+        // Exercise _onAttributeRoll method
+        const attributeEvent = {
             preventDefault: jest.fn(),
             currentTarget: {
                 dataset: {
-                    ability: 'might'
+                    attribute: 'might'
                 }
             }
         };
-        await expect(actorSheet._onAbilityRoll(abilityEvent)).resolves.not.toThrow();
+        await expect(actorSheet._onAttributeRoll(attributeEvent)).resolves.not.toThrow();
     });
 
     test('should exercise skill roll method', async () => {

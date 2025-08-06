@@ -11,7 +11,7 @@ import type { LayoutItemData, ActionSystemData } from '../../shared/types';
 
 /**
  * Header layout for action items
- * Image and name side-by-side, then ability and difficulty
+ * Image and name side-by-side, then attribute and difficulty
  */
 export function header(item: LayoutItemData): Field[] {
     const system = item.system as ActionSystemData;
@@ -21,41 +21,7 @@ export function header(item: LayoutItemData): Field[] {
         sideBy(
             commonFields.image(item.img, 'action'),
             commonFields.name(item.name, 'action')
-        ),
-
-        // // Ability and difficulty side-by-side
-        // when(system.ability !== undefined && system.difficulty !== undefined, () => {
-        //     const abilityField = commonFields.ability(system.ability, 'action');
-        //     const difficultyField = field({
-        //         type: 'number',
-        //         name: 'system.difficulty',
-        //         value: system.difficulty,
-        //         label: 'Difficulty',
-        //         min: 1,
-        //         max: 10,
-        //         placeholder: '3',
-        //         hint: 'Difficulty rating for this action',
-        //         class: 'action-difficulty'
-        //     });
-        //     return sideBy(abilityField, difficultyField);
-        // }),
-
-        // // Fallback individual fields
-        // when(system.ability !== undefined && system.difficulty === undefined, () => 
-        //     commonFields.ability(system.ability, 'action')
-        // ),
-
-        // when(system.difficulty !== undefined && system.ability === undefined, () => field({
-        //     type: 'number',
-        //     name: 'system.difficulty',
-        //     value: system.difficulty,
-        //     label: 'Difficulty',
-        //     min: 1,
-        //     max: 10,
-        //     placeholder: '3',
-        //     hint: 'Difficulty rating for this action',
-        //     class: 'action-difficulty'
-        // }))
+        )
     ]);
 }
 

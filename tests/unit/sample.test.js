@@ -73,23 +73,23 @@ describe('Bootstrap Test Suite', () => {
     test('should demonstrate complex data validation', () => {
       const complexData = {
         skills: ['athletics', 'stealth', 'investigation'],
-        abilities: { strength: 10, dexterity: 14, intelligence: 12 },
+        attributes: { strength: 10, dexterity: 14, intelligence: 12 },
         metadata: { version: '0.1.2', system: 'avant' }
       };
 
       expect(complexData).toBeDefined();
       expect(typeof complexData).toBe('object');
-      expect(Object.keys(complexData)).toEqual(['skills', 'abilities', 'metadata']);
+      expect(Object.keys(complexData)).toEqual(['skills', 'attributes', 'metadata']);
 
       expect(complexData.skills).toBeDefined();
       expect(Array.isArray(complexData.skills)).toBe(true);
       expect(complexData.skills).toHaveLength(3);
       expect(complexData.skills).toContain('athletics');
 
-      expect(complexData.abilities).toBeDefined();
-      expect(typeof complexData.abilities).toBe('object');
-      expect(complexData.abilities).toHaveProperty('strength');
-      expect(complexData.abilities.strength).toBe(10);
+      expect(complexData.attributes).toBeDefined();
+      expect(typeof complexData.attributes).toBe('object');
+      expect(complexData.attributes).toHaveProperty('strength');
+      expect(complexData.attributes.strength).toBe(10);
     });
   });
 

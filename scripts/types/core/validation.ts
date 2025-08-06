@@ -64,7 +64,7 @@ export interface ValidationConfig {
  * Result of validating actor abilities data
  */
 export interface ValidatedActorAbilities {
-  [abilityName: string]: {
+  [attributeName: string]: {
     value?: number;
     mod?: number;
     [key: string]: unknown;

@@ -6,8 +6,8 @@
 
 // Actor-related types
 export type {
-  Ability,
-  Abilities,
+  Attribute,
+  Attributes,
   Skill,
   Skills,
   CharacterStats,
@@ -33,7 +33,7 @@ export type {
 export type {
   SheetDataContext,
   ActorSheetContext,
-  SkillsByAbility,
+  SkillsByAttribute,
   SkillEntry,
   ItemSheetContext,
   SheetEventData,

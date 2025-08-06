@@ -195,21 +195,21 @@ export const commonFields = {
     })),
 
     /**
-     * Standard ability selector
+     * Standard attribute selector
      */
-    ability: (value: string | undefined, itemType: string) => when(value !== undefined, () => field({
+    attribute: (value: string | undefined, itemType: string) => when(value !== undefined, () => field({
         type: 'select',
-        name: 'system.ability',
+        name: 'system.attribute',
         value: value || 'might',
-        label: 'Ability',
+        label: 'Attribute',
         options: [
             { value: 'might', label: 'Might' },
             { value: 'grace', label: 'Grace' },
             { value: 'intellect', label: 'Intellect' },
             { value: 'focus', label: 'Focus' }
         ],
-        hint: `Primary ability for ${itemType} calculations`,
-        class: `${itemType}-ability`
+        hint: `Primary attribute for ${itemType} calculations`,
+        class: `${itemType}-attribute`
     })),
 
     /**

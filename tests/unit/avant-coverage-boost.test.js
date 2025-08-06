@@ -58,7 +58,7 @@ describe('Avant.js Coverage Boost', () => {
         test('should handle getRollData with complete system data', () => {
             const actor = {
                 system: {
-                    abilities: {
+                    attributes: {
                         str: { modifier: 2 },
                         dex: { modifier: -1 }
                     },
@@ -74,10 +74,10 @@ describe('Avant.js Coverage Boost', () => {
                     const data = {}; // Super call result
 
                     // Add commonly used roll data
-                    if (this.system.abilities) {
-                        for (const [abilityName, abilityData] of Object.entries(this.system.abilities)) {
-                            data[abilityName] = abilityData.modifier;
-                            data[`${abilityName}Mod`] = abilityData.modifier;
+                    if (this.system.attributes) {
+                        for (const [attributeName, attributeData] of Object.entries(this.system.attributes)) {
+                            data[attributeName] = attributeData.modifier;
+                            data[`${attributeName}Mod`] = attributeData.modifier;
                         }
                     }
 
@@ -116,10 +116,10 @@ describe('Avant.js Coverage Boost', () => {
                     const data = {}; // Super call result
 
                     // Add commonly used roll data
-                    if (this.system.abilities) {
-                        for (const [abilityName, abilityData] of Object.entries(this.system.abilities)) {
-                            data[abilityName] = abilityData.modifier;
-                            data[`${abilityName}Mod`] = abilityData.modifier;
+                    if (this.system.attributes) {
+                        for (const [attributeName, attributeData] of Object.entries(this.system.attributes)) {
+                            data[attributeName] = attributeData.modifier;
+                            data[`${attributeName}Mod`] = attributeData.modifier;
                         }
                     }
 

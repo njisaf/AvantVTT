@@ -6,14 +6,14 @@
  */
 
 import type { ItemType, ItemData } from '../types/domain/item';
-import type { ActorData, Ability, Abilities, Skills } from '../types/domain/actor';
+import type { ActorData, Attribute, Attributes, Skills } from '../types/domain/actor';
 import type { ValidationResult } from '../types/core/validation';
 
 /**
- * Interface for skill ability mapping
+ * Interface for skill attribute mapping
  */
-export interface SkillAbilityMap {
-  [skillName: string]: keyof Abilities;
+export interface SkillAttributeMap {
+  [skillName: string]: keyof Attributes;
 }
 
 /**
@@ -27,10 +27,10 @@ export interface OrganizedSkill {
 }
 
 /**
- * Interface for organized skills by ability
+ * Interface for organized skills by attribute
  */
-export interface SkillsByAbility {
-  [abilityName: string]: OrganizedSkill[];
+export interface SkillsByAttribute {
+  [attributeName: string]: OrganizedSkill[];
 }
 
 /**
@@ -76,12 +76,12 @@ export interface RollConfiguration {
 }
 
 /**
- * Validation result for ability roll data
+ * Validation result for attribute roll data
  */
-export interface AbilityRollValidation {
+export interface AttributeRollValidation {
   valid: boolean;
   level?: number;
-  abilityMod?: number;
+  attributeMod?: number;
   error?: string;
 }
 
@@ -91,46 +91,46 @@ export interface AbilityRollValidation {
 export interface SkillRollValidation {
   valid: boolean;
   level?: number;
-  abilityMod?: number;
+  attributeMod?: number;
   skillMod?: number;
   error?: string;
 }
 
 /**
- * Calculates ability total modifiers for display
- * 
- * This function combines character level with ability modifier to show
- * the total modifier used in ability checks. In the Avant system,
- * ability checks use 2d10 + Level + Ability Modifier.
- * 
- * @param abilities - The character's abilities object (using modifier field)
+ * Calculates attribute total modifiers for display
+ *
+ * This function combines character level with attribute modifier to show
+ * the total modifier used in attribute checks. In the Avant system,
+ * attribute checks use 2d10 + Level + Attribute Modifier.
+ *
+ * @param attributes - The character's attributes object (using modifier field)
  * @param level - The character's level
- * @returns Object with ability names as keys and total modifiers as values
- * 
+ * @returns Object with attribute names as keys and total modifiers as values
+ *
  * @example
  * ```typescript
  * // Character with level 3 and +2 might modifier
- * const totals = calculateAbilityTotalModifiers(
- *     { might: { modifier: 2 }, grace: { modifier: 1 } }, 
+ * const totals = calculateAttributeTotalModifiers(
+ *     { might: { modifier: 2 }, grace: { modifier: 1 } },
  *     3
  * );
  * // Result: { might: 5, grace: 4 } (level + modifier for each)
  * ```
  */
-export function calculateAbilityTotalModifiers(
-  abilities: Partial<Abilities>, 
+export function calculateAttributeTotalModifiers(
+  attributes: Partial<Attributes>,
   level: number
 ): Record<string, number> {
-    if (!abilities || typeof abilities !== 'object') {
+    if (!attributes || typeof attributes !== 'object') {
         return {};
     }
     
     const result: Record<string, number> = {};
     const characterLevel = Number(level) || 1;
     
-    for (const [abilityName, abilityData] of Object.entries(abilities)) {
-        const abilityMod = abilityData?.modifier || 0;
-        result[abilityName] = characterLevel + abilityMod;
+    for (const [attributeName, attributeData] of Object.entries(attributes)) {
+        const attributeMod = attributeData?.modifier || 0;
+        result[attributeName] = characterLevel + attributeMod;
     }
     
     return result;
@@ -139,16 +139,16 @@ export function calculateAbilityTotalModifiers(
 /**
  * Calculates skill total modifiers for display
  * 
- * This function combines character level, relevant ability modifier, and
+ * This function combines character level, relevant attribute modifier, and
  * skill value to show the total modifier for skill checks. In Avant,
- * skill checks use 2d10 + Level + Ability Modifier + Skill Value.
- * 
+ * skill checks use 2d10 + Level + Attribute Modifier + Skill Value.
+ *
  * @param skills - The character's skills object
- * @param abilities - The character's abilities object (using modifier field)
- * @param skillAbilityMap - Mapping of skills to their governing abilities
+ * @param attributes - The character's attributes object (using modifier field)
+ * @param skillAttributeMap - Mapping of skills to their governing attributes
  * @param level - The character's level
  * @returns Object with skill names as keys and total modifiers as values
- * 
+ *
  * @example
  * ```typescript
  * // Character with level 2, +1 might modifier, and 3 athletics skill
@@ -158,26 +158,26 @@ export function calculateAbilityTotalModifiers(
  *     { athletics: 'might' },
  *     2
  * );
- * // Result: { athletics: 6 } (2 level + 1 ability + 3 skill = 6)
+ * // Result: { athletics: 6 } (2 level + 1 attribute + 3 skill = 6)
  * ```
  */
 export function calculateSkillTotalModifiers(
-  skills: Partial<Skills>, 
-  abilities: Partial<Abilities>, 
-  skillAbilityMap: SkillAbilityMap, 
+  skills: Partial<Skills>,
+  attributes: Partial<Attributes>,
+  skillAttributeMap: SkillAttributeMap,
   level: number
 ): Record<string, number> {
-    if (!skills || !abilities || !skillAbilityMap) {
+    if (!skills || !attributes || !skillAttributeMap) {
         return {};
     }
     
     const result: Record<string, number> = {};
     const characterLevel = Number(level) || 1;
     
-    for (const [skillName, abilityName] of Object.entries(skillAbilityMap)) {
+    for (const [skillName, attributeName] of Object.entries(skillAttributeMap)) {
         const skillValue = (skills as any)[skillName] || 0;
-        const abilityMod = abilities[abilityName]?.modifier || 0;
-        result[skillName] = characterLevel + abilityMod + skillValue;
+        const attributeMod = attributes[attributeName]?.modifier || 0;
+        result[skillName] = characterLevel + attributeMod + skillValue;
     }
     
     return result;
@@ -211,23 +211,23 @@ export function calculatePowerPointLimit(maxPowerPoints: number): number {
 }
 
 /**
- * Organizes skills by their governing abilities for display
- * 
+ * Organizes skills by their governing attributes for display
+ *
  * This function takes the raw skills data and organizes it into groups
- * based on which ability governs each skill. This makes it easier to
+ * based on which attribute governs each skill. This makes it easier to
  * display skills in organized sections on the character sheet.
- * Now works with simplified ability structure (modifier field only).
- * 
+ * Now works with simplified attribute structure (modifier field only).
+ *
  * @param skills - The character's skills object
- * @param abilities - The character's abilities object (modifier field only)
- * @param skillAbilityMap - Mapping of skills to their governing abilities
+ * @param attributes - The character's attributes object (modifier field only)
+ * @param skillAttributeMap - Mapping of skills to their governing attributes
  * @param level - The character's level
- * @returns Object with ability names as keys and arrays of skill objects as values
- * 
+ * @returns Object with attribute names as keys and arrays of skill objects as values
+ *
  * @example
  * ```typescript
- * // Organizing skills by ability
- * const organized = organizeSkillsByAbility(
+ * // Organizing skills by attribute
+ * const organized = organizeSkillsByAttribute(
  *     { athletics: 2, stealth: 1 },
  *     { might: { modifier: 1 }, grace: { modifier: 2 } },
  *     { athletics: 'might', stealth: 'grace' },
@@ -239,44 +239,44 @@ export function calculatePowerPointLimit(maxPowerPoints: number): number {
  * // }
  * ```
  */
-export function organizeSkillsByAbility(
-  skills: Partial<Skills>, 
-  abilities: Partial<Abilities>, 
-  skillAbilityMap: SkillAbilityMap, 
+export function organizeSkillsByAttribute(
+  skills: Partial<Skills>,
+  attributes: Partial<Attributes>,
+  skillAttributeMap: SkillAttributeMap,
   level: number
-): SkillsByAbility {
-    if (!skills || !abilities || !skillAbilityMap) {
+): SkillsByAttribute {
+    if (!skills || !attributes || !skillAttributeMap) {
         return {};
     }
     
-    const result: SkillsByAbility = {};
+    const result: SkillsByAttribute = {};
     const characterLevel = Number(level) || 1;
     
-    // Initialize arrays for each ability
-    for (const abilityName of Object.keys(abilities)) {
-        result[abilityName] = [];
+    // Initialize arrays for each attribute
+    for (const attributeName of Object.keys(attributes)) {
+        result[attributeName] = [];
     }
     
-    // Organize skills into ability groups
-    for (const [skillName, abilityName] of Object.entries(skillAbilityMap)) {
-        if (!result[abilityName]) {
-            result[abilityName] = [];
+    // Organize skills into attribute groups
+    for (const [skillName, attributeName] of Object.entries(skillAttributeMap)) {
+        if (!result[attributeName]) {
+            result[attributeName] = [];
         }
         
         const skillValue = (skills as any)[skillName] || 0;
-        const abilityMod = abilities[abilityName]?.modifier || 0;
+        const attributeMod = attributes[attributeName]?.modifier || 0;
         
-        result[abilityName].push({
+        result[attributeName].push({
             name: skillName,
             label: skillName.charAt(0).toUpperCase() + skillName.slice(1),
             value: skillValue,
-            totalModifier: characterLevel + abilityMod + skillValue
+            totalModifier: characterLevel + attributeMod + skillValue
         });
     }
     
-    // Sort skills alphabetically within each ability group
-    for (const abilityName of Object.keys(result)) {
-        result[abilityName].sort((a, b) => a.label.localeCompare(b.label));
+    // Sort skills alphabetically within each attribute group
+    for (const attributeName of Object.keys(result)) {
+        result[attributeName].sort((a, b) => a.label.localeCompare(b.label));
     }
     
     return result;
@@ -334,39 +334,39 @@ export function organizeItemsByType(items: any[]): ItemsByType {
 }
 
 /**
- * Validates ability roll data
- * 
+ * Validates attribute roll data
+ *
  * This function checks if the provided data is sufficient to perform
- * an ability roll in the Avant system. Now works with simplified 
- * ability structure (modifier field only).
- * 
- * @param abilityName - Name of the ability to roll
- * @param abilityData - The ability's data object (with modifier field)
+ * an attribute roll in the Avant system. Now works with simplified
+ * attribute structure (modifier field only).
+ *
+ * @param attributeName - Name of the attribute to roll
+ * @param attributeData - The attribute's data object (with modifier field)
  * @param level - Character level
  * @returns Object with valid boolean and error message, plus roll data if valid
- * 
+ *
  * @example
  * ```typescript
- * // Valid ability roll
- * const result = validateAbilityRollData('might', { modifier: 2 }, 3);
- * // Result: { valid: true, level: 3, abilityMod: 2 }
- * 
- * // Invalid ability roll (missing data)
- * const invalid = validateAbilityRollData('missing', null, 3);
- * // Result: { valid: false, error: "Invalid ability data" }
+ * // Valid attribute roll
+ * const result = validateAttributeRollData('might', { modifier: 2 }, 3);
+ * // Result: { valid: true, level: 3, attributeMod: 2 }
+ *
+ * // Invalid attribute roll (missing data)
+ * const invalid = validateAttributeRollData('missing', null, 3);
+ * // Result: { valid: false, error: "Invalid attribute data" }
  * ```
  */
-export function validateAbilityRollData(
-  abilityName: string, 
-  abilityData: Ability | null | undefined, 
+export function validateAttributeRollData(
+  attributeName: string,
+  attributeData: Attribute | null | undefined,
   level: number
-): AbilityRollValidation {
-    if (!abilityName || typeof abilityName !== 'string') {
-        return { valid: false, error: "No ability name specified" };
+): AttributeRollValidation {
+    if (!attributeName || typeof attributeName !== 'string') {
+        return { valid: false, error: "No attribute name specified" };
     }
     
-    if (!abilityData || typeof abilityData !== 'object') {
-        return { valid: false, error: "Invalid ability data" };
+    if (!attributeData || typeof attributeData !== 'object') {
+        return { valid: false, error: "Invalid attribute data" };
     }
     
     const characterLevel = Number(level);
@@ -374,12 +374,12 @@ export function validateAbilityRollData(
         return { valid: false, error: "Invalid character level" };
     }
     
-    const abilityMod = Number(abilityData.modifier) || 0;
+    const attributeMod = Number(attributeData.modifier) || 0;
     
-    return { 
-        valid: true, 
+    return {
+        valid: true,
         level: characterLevel,
-        abilityMod: abilityMod
+        attributeMod: attributeMod
     };
 }
 
@@ -388,25 +388,25 @@ export function validateAbilityRollData(
  * 
  * This function checks if the provided data is sufficient to perform
  * a skill roll in the Avant system. Now works with simplified
- * ability structure (modifier field only).
- * 
+ * attribute structure (modifier field only).
+ *
  * @param skillName - Name of the skill to roll
  * @param skillValue - The skill's value
- * @param abilityData - The governing ability's data object (with modifier field)
+ * @param attributeData - The governing attribute's data object (with modifier field)
  * @param level - Character level
  * @returns Object with valid boolean and error message, plus roll data if valid
- * 
+ *
  * @example
  * ```typescript
  * // Valid skill roll
  * const result = validateSkillRollData('athletics', 3, { modifier: 1 }, 2);
- * // Result: { valid: true, level: 2, abilityMod: 1, skillMod: 3 }
+ * // Result: { valid: true, level: 2, attributeMod: 1, skillMod: 3 }
  * ```
  */
 export function validateSkillRollData(
-  skillName: string, 
-  skillValue: number | undefined, 
-  abilityData: Ability | null | undefined, 
+  skillName: string,
+  skillValue: number | undefined,
+  attributeData: Attribute | null | undefined,
   level: number
 ): SkillRollValidation {
     if (!skillName || typeof skillName !== 'string') {
@@ -418,8 +418,8 @@ export function validateSkillRollData(
         return { valid: false, error: "Invalid skill value" };
     }
     
-    if (!abilityData || typeof abilityData !== 'object') {
-        return { valid: false, error: "Invalid ability data for skill" };
+    if (!attributeData || typeof attributeData !== 'object') {
+        return { valid: false, error: "Invalid attribute data for skill" };
     }
     
     const characterLevel = Number(level);
@@ -427,12 +427,12 @@ export function validateSkillRollData(
         return { valid: false, error: "Invalid character level" };
     }
     
-    const abilityMod = Number(abilityData.modifier) || 0;
+    const attributeMod = Number(attributeData.modifier) || 0;
     
-    return { 
-        valid: true, 
+    return {
+        valid: true,
         level: characterLevel,
-        abilityMod: abilityMod,
+        attributeMod: attributeMod,
         skillMod: skillMod
     };
 }
@@ -487,8 +487,8 @@ export function prepareItemData(itemType: string, dataset?: Record<string, unkno
         (itemData.system as any).category = data.category;
     }
     
-    if (itemType === "action" && !(itemData.system as any).ability) {
-        (itemData.system as any).ability = "might";
+    if (itemType === "action" && !(itemData.system as any).attribute) {
+        (itemData.system as any).attribute = "might";
     }
     
     if (itemType === "augment" && !(itemData.system as any).augmentType) {
@@ -671,9 +671,9 @@ export function validatePowerPointUsage(powerPoints: any, cost: number): { valid
  * Prepares weapon attack roll data
  * 
  * This function extracts weapon and actor data to create the roll expression
- * and roll data needed for a weapon attack. Uses the weapon's ability and
- * modifier along with the character's level and relevant ability modifier.
- * Now works with simplified ability structure (modifier field only).
+ * and roll data needed for a weapon attack. Uses the weapon's attribute and
+ * modifier along with the character's level and relevant attribute modifier.
+ * Now works with simplified attribute structure (modifier field only).
  * 
  * @param weapon - The weapon item data
  * @param actor - The actor data
@@ -684,8 +684,8 @@ export function validatePowerPointUsage(powerPoints: any, cost: number): { valid
  * // Weapon attack preparation
  * const rollConfig = prepareWeaponAttackRoll(weapon, actor);
  * // Result: {
- * //   rollExpression: "2d10 + @level + @abilityMod + @weaponMod",
- * //   rollData: { level: 3, abilityMod: 2, weaponMod: 1 },
+ * //   rollExpression: "2d10 + @level + @attributeMod + @weaponMod",
+ * //   rollData: { level: 3, attributeMod: 2, weaponMod: 1 },
  * //   flavor: "Iron Sword Attack"
  * // }
  * ```
@@ -698,16 +698,16 @@ export function prepareWeaponAttackRoll(weapon: unknown, actor: unknown): RollCo
     const weaponObj = weapon as any;
     const actorObj = actor as any;
     
-    const weaponAbility = weaponObj.system?.ability || 'might';
-    const abilityMod = actorObj.system?.abilities?.[weaponAbility]?.modifier || 0;
+    const weaponAttribute = weaponObj.system?.attribute || 'might';
+    const attributeMod = actorObj.system?.attributes?.[weaponAttribute]?.modifier || 0;
     const weaponModifier = weaponObj.system?.modifier || 0;
     const level = actorObj.system?.level || 1;
     
     return {
-        rollExpression: '2d10 + @level + @abilityMod + @weaponMod',
+        rollExpression: '2d10 + @level + @attributeMod + @weaponMod',
         rollData: {
             level: level,
-            abilityMod: abilityMod,
+            attributeMod: attributeMod,
             weaponMod: weaponModifier
         },
         flavor: `${weaponObj.name} Attack`
@@ -718,9 +718,9 @@ export function prepareWeaponAttackRoll(weapon: unknown, actor: unknown): RollCo
  * Prepares weapon damage roll data
  * 
  * This function creates the roll configuration for weapon damage using
- * the weapon's damage die and the character's relevant ability modifier.
+ * the weapon's damage die and the character's relevant attribute modifier.
  * Includes damage type in the flavor text if available.
- * Now works with simplified ability structure (modifier field only).
+ * Now works with simplified attribute structure (modifier field only).
  * 
  * @param weapon - The weapon item data
  * @param actor - The actor data
@@ -731,8 +731,8 @@ export function prepareWeaponAttackRoll(weapon: unknown, actor: unknown): RollCo
  * // Weapon damage preparation
  * const rollConfig = prepareWeaponDamageRoll(weapon, actor);
  * // Result: {
- * //   rollExpression: "1d8 + @abilityMod",
- * //   rollData: { abilityMod: 2 },
+ * //   rollExpression: "1d8 + @attributeMod",
+ * //   rollData: { attributeMod: 2 },
  * //   flavor: "Iron Sword Damage (slashing)"
  * // }
  * ```
@@ -746,17 +746,17 @@ export function prepareWeaponDamageRoll(weapon: unknown, actor: unknown): RollCo
     const actorObj = actor as any;
     
     const damageRoll = weaponObj.system?.damageDie || "1d6";
-    const weaponAbility = weaponObj.system?.ability || 'might';
-    const abilityMod = actorObj.system?.abilities?.[weaponAbility]?.modifier || 0;
+    const weaponAttribute = weaponObj.system?.attribute || 'might';
+    const attributeMod = actorObj.system?.attributes?.[weaponAttribute]?.modifier || 0;
     const damageType = weaponObj.system?.damageType || "";
     
-    const flavorText = damageType ? 
-        `${weaponObj.name} Damage (${damageType})` : 
+    const flavorText = damageType ?
+        `${weaponObj.name} Damage (${damageType})` :
         `${weaponObj.name} Damage`;
     
     return {
-        rollExpression: `${damageRoll} + @abilityMod`,
-        rollData: { abilityMod: abilityMod },
+        rollExpression: `${damageRoll} + @attributeMod`,
+        rollData: { attributeMod: attributeMod },
         flavor: flavorText
     };
 }
@@ -765,9 +765,9 @@ export function prepareWeaponDamageRoll(weapon: unknown, actor: unknown): RollCo
  * Prepares armor roll data
  * 
  * This function creates the roll configuration for armor checks using
- * the armor's ability (usually grace) and modifier along with the
- * character's level and relevant ability modifier.
- * Now works with simplified ability structure (modifier field only).
+ * the armor's attribute (usually grace) and modifier along with the
+ * character's level and relevant attribute modifier.
+ * Now works with simplified attribute structure (modifier field only).
  * 
  * @param armor - The armor item data
  * @param actor - The actor data
@@ -778,8 +778,8 @@ export function prepareWeaponDamageRoll(weapon: unknown, actor: unknown): RollCo
  * // Armor roll preparation
  * const rollConfig = prepareArmorRoll(armor, actor);
  * // Result: {
- * //   rollExpression: "2d10 + @level + @abilityMod + @armorMod",
- * //   rollData: { level: 2, abilityMod: 3, armorMod: 1 },
+ * //   rollExpression: "2d10 + @level + @attributeMod + @armorMod",
+ * //   rollData: { level: 2, attributeMod: 3, armorMod: 1 },
  * //   flavor: "Leather Armor Armor Check"
  * // }
  * ```
@@ -792,16 +792,16 @@ export function prepareArmorRoll(armor: unknown, actor: unknown): RollConfigurat
     const armorObj = armor as any;
     const actorObj = actor as any;
     
-    const armorAbility = armorObj.system?.ability || 'grace';
-    const abilityMod = actorObj.system?.abilities?.[armorAbility]?.modifier || 0;
+    const armorAttribute = armorObj.system?.attribute || 'grace';
+    const attributeMod = actorObj.system?.attributes?.[armorAttribute]?.modifier || 0;
     const armorModifier = armorObj.system?.modifier || 0;
     const level = actorObj.system?.level || 1;
     
     return {
-        rollExpression: '2d10 + @level + @abilityMod + @armorMod',
+        rollExpression: '2d10 + @level + @attributeMod + @armorMod',
         rollData: {
             level: level,
-            abilityMod: abilityMod,
+            attributeMod: attributeMod,
             armorMod: armorModifier
         },
         flavor: `${armorObj.name} Armor Check`
@@ -1114,35 +1114,35 @@ export function calculateTraitOverflow(traits: unknown, maxVisible: number = 4):
  * 
  * This function creates properly formatted flavor text for rolls by
  * capitalizing the first letter of names and optionally including
- * governing ability information for skills.
- * 
- * @param name - The base name (ability, skill, etc.)
+ * governing attribute information for skills.
+ *
+ * @param name - The base name (attribute, skill, etc.)
  * @param action - The action being performed
- * @param governingAbility - Optional governing ability for skills
+ * @param governingAttribute - Optional governing attribute for skills
  * @returns Formatted flavor text
- * 
+ *
  * @example
  * ```typescript
- * // Simple ability check
+ * // Simple attribute check
  * const flavor = formatFlavorText('might', 'Check');
  * // Result: "Might Check"
- * 
- * // Skill check with governing ability
+ *
+ * // Skill check with governing attribute
  * const flavor = formatFlavorText('athletics', 'Check', 'might');
  * // Result: "Athletics Check (Might)"
  * ```
  */
-export function formatFlavorText(name: string, action: string = '', governingAbility: string = ''): string {
+export function formatFlavorText(name: string, action: string = '', governingAttribute: string = ''): string {
     const capitalizedName = name.charAt(0).toUpperCase() + name.slice(1);
     
     if (!action) {
         return capitalizedName;
     }
     
-    if (governingAbility) {
-        const capitalizedAbility = governingAbility.charAt(0).toUpperCase() + governingAbility.slice(1);
-        return `${capitalizedName} ${action} (${capitalizedAbility})`;
+    if (governingAttribute) {
+        const capitalizedAttribute = governingAttribute.charAt(0).toUpperCase() + governingAttribute.slice(1);
+        return `${capitalizedName} ${action} (${capitalizedAttribute})`;
     }
     
     return `${capitalizedName} ${action}`;
-} 
+}

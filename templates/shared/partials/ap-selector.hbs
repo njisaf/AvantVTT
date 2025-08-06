@@ -1,26 +1,26 @@
 {{!--
-AP Selector Component - Universal Item Sheet Architecture
-
-Provides visual clickable dots for setting Action Point costs (1-3).
-Part of the Stage 2 universal item sheet refactor.
-
-Usage:
-{{> "systems/avant/templates/shared/partials/ap-selector"
-name="system.apCost"
-value=system.apCost
-label="AP"
-hint="Action Point cost for this ability"
-max=3
-class="custom-class"
-}}
-
-Required: name
-Optional: value, label (defaults to "AP"), hint, max (defaults to 3), class
-
-CRITICAL IMPLEMENTATION NOTE (January 2025):
-Uses 'avantOr' helper instead of 'or' to avoid FoundryVTT v13 helper conflicts.
-FoundryVTT's built-in 'or' helper returns boolean values, breaking the math.
-Our 'avantOr' helper returns actual values needed for range calculations.
+  AP Selector Component - Universal Item Sheet Architecture
+  
+  Provides visual clickable dots for setting Action Point costs (1-3).
+  Part of the Stage 2 universal item sheet refactor.
+  
+  Usage:
+  {{> "systems/avant/templates/shared/partials/ap-selector"
+  name="system.apCost"
+  value=system.apCost
+  label="AP"
+  hint="Action Point cost for this attribute"
+  max=3
+  class="custom-class"
+  }}
+  
+  Required: name
+  Optional: value, label (defaults to "AP"), hint, max (defaults to 3), class
+  
+  CRITICAL IMPLEMENTATION NOTE (January 2025):
+  Uses 'avantOr' helper instead of 'or' to avoid FoundryVTT v13 helper conflicts.
+  FoundryVTT's built-in 'or' helper returns boolean values, breaking the math.
+  Our 'avantOr' helper returns actual values needed for range calculations.
 --}}
 
 <div class="form-group form-group--ap-selector {{#if class}}{{class}}{{/if}}">

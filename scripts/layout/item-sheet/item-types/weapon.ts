@@ -73,10 +73,10 @@ export function header(item: LayoutItemData): Field[] {
     ]);
 }
 
-/**
- * Body layout for weapon items
- * Order: damage/modifier side-by-side, description, ability/weight side-by-side, cost, traits
- */
+    /**
+     * Body layout for weapon items
+     * Order: damage/modifier side-by-side, description, ability/weight side-by-side, cost, traits
+     */
 export function body(item: LayoutItemData): Field[] {
     const system = item.system as WeaponSystemData;
 
@@ -109,7 +109,7 @@ export function body(item: LayoutItemData): Field[] {
 
         commonFields.expertise(system.expertise, 'weapon'),
 
-        commonFields.ability(system.ability, 'weapon'),
+        commonFields.attribute(system.attribute, 'weapon'),
 
         // // Fallback: individual fields if one is missing
         // when(system.damageDie !== undefined && system.modifier === undefined, () => field({
@@ -137,9 +137,9 @@ export function body(item: LayoutItemData): Field[] {
         // 2. Description (full width)
         commonFields.description(system.description, 'weapon'),
 
-        // // 3. Ability and weight side-by-side
+        // // 3. Attribute and weight side-by-side
         // sideBy(
-        //     commonFields.ability(system.ability, 'weapon'),
+        //     commonFields.attribute(system.attribute, 'weapon'),
         //     commonFields.weight(system.weight, 'weapon')
         // ),
 
