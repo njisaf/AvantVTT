@@ -44,7 +44,7 @@ describe('Layout System Central Builder', () => {
         system: {
             damage: '1d8',
             modifier: 2,
-            ability: 'might',
+            attribute: 'might',
             weight: 3.0,
             cost: 150,
             description: 'A test weapon',
@@ -183,11 +183,11 @@ describe('Layout System Central Builder', () => {
             expect(damageField).toBeTruthy();
             expect(damageField.type).toBe('text');
             
-            // Should have ability field
-            const abilityField = result.find(f => f.name === 'system.ability');
-            expect(abilityField).toBeTruthy();
-            expect(abilityField.type).toBe('select');
-            expect(abilityField.value).toBe('might');
+            // Should have attribute field
+            const attributeField = result.find(f => f.name === 'system.attribute');
+            expect(attributeField).toBeTruthy();
+            expect(attributeField.type).toBe('select');
+            expect(attributeField.value).toBe('might');
             
             // Should have weight and cost fields
             const weightField = result.find(f => f.name === 'system.weight');

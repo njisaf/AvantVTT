@@ -324,7 +324,7 @@ describe('normaliseDoc Pure Function', () => {
                 sort: 0,
                 type: 'character',
                 system: {
-                    abilities: {
+                    attributes: {
                         might: { value: 15, mod: 2 },
                         grace: { value: 14, mod: 2 }
                     },
@@ -337,7 +337,7 @@ describe('normaliseDoc Pure Function', () => {
             expect(result).toEqual({
                 name: 'Hero',
                 system: {
-                    abilities: {
+                    attributes: {
                         grace: { mod: 2, value: 14 },
                         might: { mod: 2, value: 15 }
                     },

@@ -102,7 +102,7 @@ export const DEFAULT_TRAIT_SEEDS: TraitSeedData[] = [
       localKey: "AVANT.Trait.Stealth",
       description: "Represents stealth, concealment, and sneaking abilities",
       traitMetadata: {
-        categories: ["skill", "ability"],
+        categories: ["skill", "attribute"],
         tags: ["stealth", "hidden", "sneak", "concealment"],
         appliesToActors: true,
         appliesToItems: true

@@ -9,9 +9,9 @@
 // Note: Using any types for FoundryVTT API as official types are not available
 
 /**
- * Interface for ability data structure
+ * Interface for attribute data structure
  */
-export interface AbilityData {
+export interface AttributeData {
     modifier: number;
 }
 
@@ -127,7 +127,7 @@ export interface AvantActorSystemData {
     vocation: string;
     background: string;
     languages: string;
-    abilities: Record<string, AbilityData>;
+    attributes: Record<string, AttributeData>;
     skills: SkillsData;
     character: CharacterDetailsData;
     health: HealthData;
@@ -159,7 +159,7 @@ export class AvantActorData extends (foundry as any).abstract.DataModel {
     declare vocation: string;
     declare background: string;
     declare languages: string;
-    declare abilities: Record<string, AbilityData>;
+    declare attributes: Record<string, AttributeData>;
     declare skills: SkillsData;
     declare character: CharacterDetailsData;
     declare health: HealthData;
@@ -195,8 +195,8 @@ export class AvantActorData extends (foundry as any).abstract.DataModel {
             background: new fields.StringField({ required: true, initial: "", blank: true }),
             languages: new fields.StringField({ required: true, initial: "", blank: true }),
             
-            // Core Abilities - Direct modifiers (not D&D-style scores)
-            abilities: new fields.SchemaField({
+            // Core Attributes - Direct modifiers (not D&D-style scores)
+            attributes: new fields.SchemaField({
                 might: new fields.SchemaField({
                     modifier: new fields.NumberField({ required: true, initial: 0, integer: true })
                 }),
@@ -307,11 +307,11 @@ export class AvantActorData extends (foundry as any).abstract.DataModel {
     }
     
     /**
-     * Map skills to their governing abilities
+     * Map skills to their governing attributes
      * @static
-     * @returns {Object} Mapping of skill names to ability names
+     * @returns {Object} Mapping of skill names to attribute names
      */
-    static getSkillAbilities(): Record<string, string> {
+    static getSkillAttributes(): Record<string, string> {
         return {
             'debate': 'intellect',
             'inspect': 'intellect',
@@ -329,28 +329,28 @@ export class AvantActorData extends (foundry as any).abstract.DataModel {
     }
     
     /**
-     * Get the ability that governs a specific skill
+     * Get the attribute that governs a specific skill
      * @static
      * @param {string} skillName - The name of the skill
-     * @returns {string|null} The governing ability name or null if not found
+     * @returns {string|null} The governing attribute name or null if not found
      */
-    static getSkillAbility(skillName: string): string | null {
-        const skillAbilities = this.getSkillAbilities();
-        return skillAbilities[skillName] || null;
+    static getSkillAttribute(skillName: string): string | null {
+        const skillAttributes = this.getSkillAttributes();
+        return skillAttributes[skillName] || null;
     }
     
     /**
-     * Get all skills governed by a specific ability
+     * Get all skills governed by a specific attribute
      * @static
-     * @param {string} abilityName - The name of the ability
-     * @returns {Array<string>} Array of skill names governed by this ability
+     * @param {string} attributeName - The name of the attribute
+     * @returns {Array<string>} Array of skill names governed by this attribute
      */
-    static getAbilitySkills(abilityName: string): string[] {
-        const skillAbilities = this.getSkillAbilities();
+    static getAttributeSkills(attributeName: string): string[] {
+        const skillAttributes = this.getSkillAttributes();
         const skills: string[] = [];
         
-        for (const [skill, ability] of Object.entries(skillAbilities)) {
-            if (ability === abilityName) {
+        for (const [skill, attribute] of Object.entries(skillAttributes)) {
+            if (attribute === attributeName) {
                 skills.push(skill);
             }
         }
@@ -365,11 +365,11 @@ export class AvantActorData extends (foundry as any).abstract.DataModel {
     prepareDerivedData(): void {
         // Note: DataModel doesn't have prepareDerivedData, so no super call needed
         
-        // No need to calculate ability modifiers - they are direct values now
+        // No need to calculate attribute modifiers - they are direct values now
         
-        // Calculate defense values (base 11 + tier + ability modifier)
-        for (const [abilityName, abilityData] of Object.entries(this.abilities)) {
-            this.defense[abilityName as keyof DefenseData] = 11 + this.tier + (abilityData.modifier || 0);
+        // Calculate defense values (base 11 + tier + attribute modifier)
+        for (const [attributeName, attributeData] of Object.entries(this.attributes)) {
+            this.defense[attributeName as keyof DefenseData] = 11 + this.tier + (attributeData.modifier || 0);
         }
         
         // Ensure current health doesn't exceed max (only constraint we keep)
@@ -388,7 +388,7 @@ export class AvantActorData extends (foundry as any).abstract.DataModel {
         this.expertisePoints.remaining = Math.max(0, this.expertisePoints.total - this.expertisePoints.spent);
         
         // Calculate encumbrance max based on might modifier + base value
-        const mightModifier = this.abilities.might?.modifier || 0;
+        const mightModifier = this.attributes.might?.modifier || 0;
         const baseEncumbrance = 100; // Base carrying capacity
         this.physical.encumbrance.max = baseEncumbrance + (mightModifier * 10); // Simple encumbrance calculation
     }

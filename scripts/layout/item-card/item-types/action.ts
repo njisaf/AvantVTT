@@ -31,7 +31,7 @@ export function getActionCardLayout(item: any): CardSection {
         })
     ];
 
-    // Center section: Action name, ability, difficulty, costs, description
+    // Center section: Action name, attribute, difficulty, costs, description
     const centerFields = filterFields([
         // Action name
         field({
@@ -42,12 +42,12 @@ export function getActionCardLayout(item: any): CardSection {
             class: 'action-name'
         }),
 
-        // Ability display
-        when(!!system.ability, () => field({
-            type: 'action-ability',
-            name: 'ability',
-            ability: system.ability,
-            class: 'action-ability'
+        // Attribute display
+        when(!!system.attribute, () => field({
+            type: 'action-attribute',
+            name: 'attribute',
+            attribute: system.attribute,
+            class: 'action-attribute'
         })),
 
         // Difficulty display

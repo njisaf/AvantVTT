@@ -6,30 +6,30 @@
  */
 
 /**
- * Represents a single ability score in the game.
- * Abilities like Might, Grace, Intellect, and Focus define character capabilities.
+ * Represents a single attribute score in the game.
+ * Attributes like Might, Grace, Intellect, and Focus define character capabilities.
  * Now uses only the modifier field for direct user input.
  */
-export interface Ability {
-  /** The ability modifier (user-defined, no calculation) */
+export interface Attribute {
+  /** The attribute modifier (user-defined, no calculation) */
   modifier: number;
-  /** Display label for the ability */
+  /** Display label for the attribute */
   label?: string;
 }
 
 /**
- * Complete set of ability scores for a character.
- * The four core abilities that define character capabilities.
+ * Complete set of attribute scores for a character.
+ * The four core attributes that define character capabilities.
  */
-export interface Abilities {
+export interface Attributes {
   /** Physical strength and power */
-  might: Ability;
+  might: Attribute;
   /** Agility, dexterity, and speed */
-  grace: Ability;
+  grace: Attribute;
   /** Reasoning, knowledge, and mental acuity */
-  intellect: Ability;
+  intellect: Attribute;
   /** Willpower, perception, and mental discipline */
-  focus: Ability;
+  focus: Attribute;
 }
 
 /**
@@ -41,8 +41,8 @@ export interface Skill {
   value: number;
   /** Display label for the skill */
   label?: string;
-  /** Which ability this skill is based on */
-  ability?: 'might' | 'grace' | 'intellect' | 'focus';
+  /** Which attribute this skill is based on */
+  attribute?: 'might' | 'grace' | 'intellect' | 'focus';
 }
 
 /**
@@ -116,7 +116,7 @@ export interface ExpertisePointStats {
 }
 
 /**
- * Character statistics derived from abilities and other factors.
+ * Character statistics derived from attributes and other factors.
  * These are now direct user input values instead of calculated values.
  */
 export interface CharacterStats {
@@ -124,7 +124,7 @@ export interface CharacterStats {
   health: HealthStats;
   /** Power point statistics */
   powerPoints: PowerPointStats;
-  /** Defense threshold (user-defined, not calculated from abilities) */
+  /** Defense threshold (user-defined, not calculated from attributes) */
   defenseThreshold: number;
   /** Character tier (0-6, representing power level) */
   tier?: number;
@@ -145,8 +145,8 @@ export interface ActorData {
   type: 'character' | 'npc' | 'vehicle';
   /** Character level */
   level: number;
-  /** Core ability scores (now simplified to modifiers only) */
-  abilities: Abilities;
+  /** Core attribute scores (now simplified to modifiers only) */
+  attributes: Attributes;
   /** Learned skills */
   skills: Skills;
   /** Character statistics (now user-defined) */

@@ -13,40 +13,47 @@
  * @since Phase 1 - Item Sheet Unification
  */
 
-// Import centralized image upload styles
-@import 'image-upload';
+/* Image Upload base styles are centralized via avant.scss:
+   Ensure styles/avant.scss contains:
+   @use "components/image-upload";
+   Do not import here to avoid duplicate compilation. */
 
 // ============================================================================
 // ITEM SHEET BASE STYLES
 // ============================================================================
 
 .item-sheet {
-    // Base container using CSS Grid for layout
+    /* Grid-first container */
+    --item-grid-gap-x: var(--space-md, 12px);
+    --item-grid-gap-y: var(--space-md, 12px);
+    --item-border-color: var(--theme-border-primary, #555);
+    --item-section-bg: var(--theme-bg-secondary, #333);
+
     display: grid;
     grid-template-rows: auto auto 1fr;
     grid-template-areas:
         "header"
         "tabs"
         "body";
-    gap: var(--space-md, 12px);
+    gap: var(--item-grid-gap-y);
 
-    // Container properties
+    /* Container properties */
     min-height: 400px;
     width: 100%;
     padding: var(--space-lg, 16px);
 
-    // Theme integration
+    /* Theme integration */
     background: var(--color-background-primary, #ffffff);
     color: var(--color-text-primary, #000000);
-    border: 1px solid var(--color-border-primary, #cccccc);
+    border: 1px solid var(--item-border-color);
     border-radius: var(--border-radius-md, 6px);
 
-    // Typography
+    /* Typography */
     font-family: var(--font-primary, 'Exo 2', sans-serif);
     font-size: var(--font-size-base, 14px);
     line-height: var(--line-height-base, 1.4);
 
-    // Focus management for accessibility
+    /* Focus management for accessibility */
     &:focus-within {
         outline: 2px solid var(--color-focus, #00E0DC);
         outline-offset: 2px;
@@ -113,53 +120,40 @@
 // HEADER STYLES - Clean 20-80 Layout for Image + Name
 // ============================================================================
 
+/* Keep as-is; already scoped to .item-sheet and safe for actor sheets */
 .item-sheet .sheet-header {
     grid-area: header;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: var(--space-sm, 8px) !important;
+    display: grid !important;
+    grid-auto-rows: min-content !important;
+    row-gap: var(--item-grid-gap-y) !important;
     padding: var(--space-md, 12px);
     background: var(--theme-bg-secondary, #2A2A2A);
-    border-bottom: 1px solid var(--theme-border-primary, #404040);
+    border-bottom: 1px solid var(--item-border-color);
 
-    // Row container for image + name in 20-80 layout
     .row-container {
-        display: flex !important;
-        flex-direction: row !important;
-        align-items: flex-start !important;
-        gap: var(--space-md, 12px) !important;
-        width: 100% !important;
-
-        // Image upload section (20% width)
-        .form-group--image-upload {
-            flex: 0 0 20% !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-        }
-
-        // Name field section (80% width)
-        .form-group--text-field {
-            flex: 1 1 80% !important;
-            display: flex !important;
-            flex-direction: column !important;
+        // Remove padding from name field for header
+        > [class*="-name-field"] {
+            padding: 0 !important;
         }
     }
+    
+    .row-container:not(.header-main) {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        column-gap: var(--item-grid-gap-x) !important;
+        width: 100% !important;
 
-    // Responsive behavior
-    @media (max-width: 480px) {
-        gap: var(--space-xs, 4px) !important;
-        padding: var(--space-sm, 8px);
-
-        .row-container {
-            flex-direction: column !important;
-
-            .form-group--image-upload,
-            .form-group--text-field {
-                flex: 1 1 auto !important;
-                width: 100% !important;
-            }
+        > * {
+            min-width: 0 !important;
         }
+        .form-group { margin-bottom: 0 !important; }
+        &.full-width .form-group { grid-column: 1 / -1 !important; }
+    }
+
+    @media (max-width: 600px) {
+        row-gap: var(--space-sm, 8px) !important;
+        padding: var(--space-sm, 8px);
+        .row-container:not(.header-main) > * { grid-column: 1 / -1 !important; }
     }
 }
 
@@ -200,17 +194,19 @@
             justify-content: center !important;
             align-items: center !important;
 
+            /* Base .image-upload styles (positioning, cursor, object-fit, overlay)
+               come from components/_image-upload.scss. Only item-header-specific
+               accents are declared here. */
             .image-upload {
-                position: relative !important;
-
+                /* Item header prefers a fixed 64x64 presentation */
                 .image-upload__img {
                     width: 64px !important;
                     height: 64px !important;
+                    /* Neon accent border unique to item headers */
                     border: 2px solid var(--theme-accent-primary, #00e0dc) !important;
-                    cursor: pointer !important;
-                    border-radius: 4px !important;
-                    object-fit: cover !important;
-                    transition: all 0.3s ease !important;
+                    /* Align radius with component token for consistency */
+                    border-radius: var(--avant-radius-sm, 6px) !important;
+                    transition: box-shadow 0.3s ease, border-color 0.3s ease !important;
 
                     &:hover {
                         border-color: var(--theme-accent-secondary, #4ce2e1) !important;
@@ -219,27 +215,14 @@
                 }
 
                 .image-upload__overlay {
-                    position: absolute !important;
-                    top: 0 !important;
-                    left: 0 !important;
-                    right: 0 !important;
-                    bottom: 0 !important;
+                    /* Only override what differs visually for item header */
                     background: rgba(0, 0, 0, 0.7) !important;
-                    display: flex !important;
-                    align-items: center !important;
-                    justify-content: center !important;
-                    opacity: 0 !important;
-                    transition: opacity 0.3s ease !important;
-                    border-radius: 4px !important;
+                    border-radius: var(--avant-radius-sm, 6px) !important;
 
                     i {
                         color: var(--theme-accent-primary, #00e0dc) !important;
                         font-size: 16px !important;
                     }
-                }
-
-                &:hover .image-upload__overlay {
-                    opacity: 1 !important;
                 }
             }
         }
@@ -301,131 +284,34 @@
 // ============================================================================
 
 .item-sheet .sheet-header .header-main {
-    display: flex !important;
-    flex-direction: row !important;
+    /* 12-col grid for 20/80 split */
+    display: grid !important;
+    grid-template-columns: repeat(12, 1fr) !important;
+    column-gap: var(--item-grid-gap-x) !important;
     align-items: center !important;
-    gap: var(--space-md, 12px) !important;
     width: 100% !important;
 
-    // Image section - 20% width (fixed)
     .item-icon,
     .form-group--image-upload {
-        flex: 0 0 20% !important;
-        max-width: 20% !important;
+        grid-column: span 3 !important; /* ≈25% */
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-
-        // Image upload component styling
-        .image-upload {
-            width: 48px !important;
-            height: 48px !important;
-            position: relative !important;
-            cursor: pointer !important;
-
-            &__img {
-                width: 48px !important;
-                height: 48px !important;
-                border-radius: var(--border-radius-md, 6px) !important;
-                border: 2px solid var(--theme-border-secondary, #555) !important;
-                object-fit: cover !important;
-                transition: border-color 0.2s ease !important;
-
-                &:hover {
-                    border-color: var(--theme-accent-primary, #00E0DC) !important;
-                }
-
-                &:focus {
-                    outline: 2px solid var(--theme-accent-primary, #00E0DC) !important;
-                    outline-offset: 2px !important;
-                }
-            }
-
-            &__overlay {
-                position: absolute !important;
-                top: 0 !important;
-                left: 0 !important;
-                right: 0 !important;
-                bottom: 0 !important;
-                background: rgba(0, 0, 0, 0.5) !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                opacity: 0 !important;
-                transition: opacity 0.2s ease !important;
-                border-radius: var(--border-radius-md, 6px) !important;
-
-                i {
-                    color: var(--theme-accent-primary, #00E0DC) !important;
-                    font-size: 16px !important;
-                }
-            }
-
-            &:hover &__overlay {
-                opacity: 1 !important;
-            }
-        }
     }
 
-    // Name section - 80% width (flexible)
     .item-name-field,
     .form-group--text-field {
-        flex: 1 1 80% !important;
-        max-width: 80% !important;
+        grid-column: span 9 !important; /* ≈75% */
         min-width: 0 !important;
-
-        // Form group styling
-        .form-label {
-            font-family: var(--theme-font-display, "Orbitron", monospace) !important;
-            font-size: 10px !important;
-            font-weight: 600 !important;
-            color: var(--theme-text-secondary, #BFBFBF) !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.5px !important;
-            margin-bottom: 4px !important;
-        }
-
-        .form-input {
-            width: 100% !important;
-            background: var(--theme-bg-tertiary, #333) !important;
-            border: 1px solid var(--theme-border-primary, #555) !important;
-            border-radius: var(--border-radius-sm, 4px) !important;
-            color: var(--theme-text-primary, #FFF) !important;
-            font-family: var(--theme-font-primary, "Exo 2", sans-serif) !important;
-            font-size: 14px !important;
-            padding: 8px !important;
-            transition: border-color 0.2s ease !important;
-
-            &:focus {
-                outline: none !important;
-                border-color: var(--theme-accent-primary, #00E0DC) !important;
-                box-shadow: 0 0 8px rgba(0, 224, 220, 0.3) !important;
-            }
-
-            &::placeholder {
-                color: var(--theme-text-muted, #888) !important;
-                opacity: 0.7 !important;
-            }
-        }
     }
 
-    // Responsive behavior for mobile
-    @media (max-width: 480px) {
-        flex-direction: column !important;
-        gap: var(--space-sm, 8px) !important;
-
+    @media (max-width: 600px) {
+        row-gap: var(--space-sm, 8px) !important;
         .item-icon,
         .form-group--image-upload,
         .item-name-field,
         .form-group--text-field {
-            flex: none !important;
-            max-width: 100% !important;
-            width: 100% !important;
-        }
-
-        .item-icon,
-        .form-group--image-upload {
-            align-self: center !important;
+            grid-column: 1 / -1 !important;
         }
     }
 }
@@ -434,163 +320,12 @@
 // ROW CONTAINER STYLES - Other Rows in Header
 // ============================================================================
 
-.item-sheet .sheet-header .row-container:not(.header-main) {
-    display: flex !important;
-    flex-direction: row !important;
-    gap: var(--space-md, 12px) !important;
-    align-items: center !important;
-    width: 100% !important;
+/* Converted above: see .item-sheet .sheet-header block where :not(.header-main) is defined as grid */
 
-    // Child elements are equal width by default
-    >* {
-        flex: 1 1 0 !important;
-        min-width: 0 !important;
-    }
 
-    // Form groups inside row containers
-    .form-group {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: stretch !important;
-        justify-content: flex-start !important;
-        margin-bottom: 0 !important;
-        flex: 1 1 0 !important;
-        min-width: 0 !important;
-    }
 
-    // Responsive behavior - stack on mobile
-    @media (max-width: 480px) {
-        flex-direction: column !important;
-        gap: var(--space-sm, 8px) !important;
 
-        >* {
-            flex: none !important;
-            width: 100% !important;
-        }
 
-        .form-group {
-            margin-bottom: var(--space-sm, 8px) !important;
-        }
-    }
-}
-
-// Fallback for any row-container not in header
-.row-container {
-    display: flex;
-    gap: var(--space-md, 12px);
-    align-items: center;
-
-    >* {
-        flex: 1 1 0;
-        min-width: 0;
-    }
-
-    // Form groups inside any row container should also follow the same pattern
-    .form-group {
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        justify-content: flex-start;
-        margin-bottom: 0;
-        flex: 1 1 0;
-        min-width: 0;
-    }
-
-    .form-group--image-upload {
-        flex: 0 0 auto;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .form-group--text-field {
-        flex: 1;
-        min-width: 0;
-    }
-}
-
-// Header main row - special case with fixed icon width  
-.item-sheet .sheet-header .header-main {
-    display: flex !important;
-    flex-direction: row !important;
-    gap: var(--space-md, 12px) !important;
-    align-items: center !important;
-
-    // Icon has fixed width, name takes remaining space
-    .item-icon,
-    .form-group--image-upload {
-        flex: 0 0 48px !important; // Fixed width for icon
-    }
-
-    .item-name-field,
-    .form-group--text-field {
-        flex: 1 !important;
-        min-width: 0 !important;
-    }
-
-    @media (max-width: 480px) {
-        gap: var(--space-sm, 8px) !important;
-    }
-}
-
-// Legacy profile image styles
-.item-sheet__image {
-    flex-shrink: 0;
-
-    .item-sheet__profile-img {
-        width: 64px;
-        height: 64px;
-        border-radius: var(--border-radius-md, 6px);
-        border: 2px solid var(--color-border-secondary, #dddddd);
-        object-fit: cover;
-        cursor: pointer;
-        transition: border-color 0.2s ease;
-
-        &:hover {
-            border-color: var(--color-primary, #00E0DC);
-        }
-
-        &:focus {
-            outline: 2px solid var(--color-focus, #00E0DC);
-            outline-offset: 2px;
-        }
-    }
-}
-
-.item-sheet__name-field {
-    flex: 1;
-    min-width: 0; // Allow shrinking
-}
-
-.item-sheet__name {
-    margin: 0;
-
-    input {
-        width: 100%;
-        background: transparent;
-        border: none;
-        border-bottom: 2px solid var(--color-border-primary, #cccccc);
-        padding: var(--space-xs, 4px) 0;
-        font-family: var(--font-display, 'Orbitron', monospace);
-        font-size: var(--font-size-lg, 18px);
-        font-weight: 600;
-        color: var(--color-text-primary, #000000);
-        transition: border-color 0.2s ease;
-
-        &:focus {
-            outline: none;
-            border-bottom-color: var(--color-primary, #00E0DC);
-        }
-
-        &::placeholder {
-            color: var(--color-text-muted, #666666);
-            opacity: 0.7;
-        }
-
-        &:invalid {
-            border-bottom-color: var(--color-error, #ff4444);
-        }
-    }
-}
 
 // ============================================================================
 // AP SELECTOR WIDGET STYLES
@@ -703,27 +438,26 @@
 // TAB NAVIGATION STYLES - Merged ApplicationV2 and Base Styles
 // ============================================================================
 
-.item-sheet__tabs,
-.sheet-tabs {
+/* Scoped to item-sheet to avoid leaking to actor sheets */
+.item-sheet .item-sheet__tabs,
+.item-sheet .sheet-tabs {
     grid-area: tabs;
     display: flex;
-    border-bottom: 2px solid var(--color-border-primary, #cccccc);
-    margin-bottom: var(--space-md, 12px);
     background: var(--theme-bg-secondary, #333) !important;
-    border-bottom: 1px solid var(--theme-border-primary, #555) !important;
+    border-bottom: 1px solid var(--item-border-color) !important;
     min-height: 36px !important;
     flex-shrink: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
 
-    // Hide tabs area when not needed
     &:empty {
         display: none;
     }
 }
 
-.item-sheet__tab,
-.sheet-tabs .item {
+/* Scoped to item-sheet */
+.item-sheet .item-sheet__tab,
+.item-sheet .sheet-tabs .item {
     background: transparent !important;
     border: none !important;
     padding: 8px 16px !important;
@@ -741,24 +475,20 @@
     text-decoration: none !important;
     height: 36px !important;
 
-    // Icon styling
     i {
         font-size: var(--font-size-xs, 10px);
     }
 
-    // Hover state
     &:hover {
         background: rgba(0, 224, 220, 0.1) !important;
         color: var(--theme-accent-primary, #00e0dc) !important;
     }
 
-    // Focus state
     &:focus {
         outline: 2px solid var(--color-focus, #00E0DC);
         outline-offset: 2px;
     }
 
-    // Active state
     &--active,
     &.active {
         background: var(--theme-bg-primary, #2a2a2a) !important;
@@ -776,31 +506,59 @@
 // BODY CONTENT STYLES - Merged ApplicationV2 and Base Styles
 // ============================================================================
 
-.item-sheet__body,
-.sheet-body {
+/* Scoped to item-sheet */
+.item-sheet .item-sheet__body,
+.item-sheet .sheet-body {
     grid-area: body;
-    overflow-y: auto;
-    min-height: 0; // Allow grid shrinking
     background: var(--theme-bg-primary, #2a2a2a) !important;
     border: none !important;
     min-height: 200px !important;
-    display: block !important;
-    flex: 1 !important;
-    padding: 0 !important;
+
+    display: grid !important;
+    grid-template-columns: repeat(12, 1fr) !important;
+    gap: var(--item-grid-gap-y) var(--item-grid-gap-x) !important;
+    padding: var(--space-md, 12px) !important;
     overflow-y: auto !important;
 
-    // Individual tab panels - Critical for ApplicationV2 tab functionality
     .tab {
         background: var(--theme-bg-primary, #2a2a2a) !important;
         border: none !important;
         min-height: 150px !important;
-        display: none !important; // Hide all tabs by default
+        display: none !important;
         padding: 15px !important;
         margin: 0 !important;
 
-        // Only show the active tab
         &.active {
             display: block !important;
+        }
+    }
+
+    .row-container {
+        display: contents;
+    }
+
+    .row-container.field-container > .form-group {
+        grid-column: 1 / -1 !important;
+    }
+
+    .row-container.side-by-side {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        column-gap: var(--item-grid-gap-x) !important;
+        
+        > .form-group {
+            margin-bottom: 0 !important;
+        }
+    }
+
+    .row-container.full-width > .form-group {
+        grid-column: 1 / -1 !important;
+        margin-bottom: var(--item-grid-gap-y) !important;
+    }
+
+    @media (max-width: 600px) {
+        .row-container.side-by-side > .form-group {
+            grid-column: 1 / -1 !important;
         }
     }
 }
@@ -809,194 +567,11 @@
 // UNIVERSAL SHEET BODY STYLES - Stage 2 Refactor with ApplicationV2 Integration
 // ============================================================================
 
+/* Remove global .sheet-body layout so actor sheets are unaffected by item-sheet refactor */
 .sheet-body {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm, 8px);
-    padding: var(--space-md, 12px);
-    flex: 1;
-    overflow-y: auto;
-
-    // Row containers inside sheet body
-    .row-container {
-        display: flex;
-        gap: var(--space-md, 12px);
-        align-items: flex-start; // Align to top for better field alignment
-        width: 100%;
-
-        // Regular row containers - equal width children
-        &:not(.full-width) {
-            >* {
-                flex: 1 1 0;
-                min-width: 0; // Prevent overflow
-            }
-
-            .form-group {
-                margin-bottom: 0; // Remove spacing within rows
-                flex: 1 1 0;
-                min-width: 0;
-            }
-        }
-
-        // Full-width containers for description and traits
-        &.full-width {
-            .form-group {
-                width: 100%;
-                margin-bottom: 0;
-            }
-        }
-
-        // Responsive behavior - stack on mobile
-        @media (max-width: 480px) {
-            flex-direction: column;
-            gap: var(--space-sm, 8px);
-
-            >* {
-                flex: none !important;
-                width: 100%;
-            }
-
-            .form-group {
-                margin-bottom: var(--space-sm, 8px);
-            }
-        }
-    }
-
-    // Enhanced spacing for full-width elements
-    .row-container.full-width {
-        margin-bottom: var(--space-md, 12px);
-
-        &:last-child {
-            margin-bottom: 0;
-        }
-    }
-
-    // Field containers for individual fields (preserves order from layout system)
-    .row-container.field-container {
-        width: 100%;
-        // If the field container only has one child, it takes full width
-        &:has(> *:only-child) {
-            .form-group {
-                max-width: 100%;
-            }
-        }
-
-        // Add some spacing between field containers
-        margin-bottom: var(--space-sm, 8px);
-
-        &:last-child {
-            margin-bottom: 0;
-        }
-    }
-
-    // Side-by-side field containers (two fields in one row)
-    .row-container.side-by-side {
-        display: flex;
-        gap: var(--space-md, 12px);
-        align-items: flex-start;
-        width: 100%;
-        margin-bottom: var(--space-sm, 8px);
-
-        // Each field in a side-by-side container takes equal space
-        >.form-group {
-            flex: 1 1 50%;
-            min-width: 0;
-        }
-
-        // Responsive: stack vertically on small screens
-        @media (max-width: 480px) {
-            flex-direction: column;
-            gap: var(--space-sm, 8px);
-
-            >.form-group {
-                flex: 1 1 100%;
-            }
-        }
-
-        &:last-child {
-            margin-bottom: 0;
-        }
-    }
-
-    // Form groups within sheet body - Merged ApplicationV2 and Base Styles
-    .form-group {
-        display: flex;
-        flex-direction: column;
-        gap: var(--space-xs, 4px);
-        background: transparent !important;
-        border: none !important;
-        min-height: auto !important;
-        display: block !important;
-        margin-bottom: 15px !important;
-        padding: 0 !important;
-
-        // Ensure proper label styling
-        .form-label,
-        label {
-            font-family: var(--theme-font-display, 'Orbitron', monospace) !important;
-            font-size: 10px !important;
-            font-weight: 600 !important;
-            color: var(--theme-text-secondary, #aaa) !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.5px !important;
-            display: block !important;
-            margin-bottom: 4px !important;
-            padding: 0 !important;
-            border: none !important;
-        }
-
-        // Input styling consistency - Merged ApplicationV2 and Base Styles
-        .form-input,
-        .form-textarea,
-        .form-select,
-        input,
-        textarea,
-        select {
-            background: var(--theme-bg-tertiary, #444) !important;
-            border: 1px solid var(--theme-border-primary, #555) !important;
-            color: var(--theme-text-primary, #ffffff) !important;
-            font-size: 12px !important;
-            display: block !important;
-            width: 100% !important;
-            padding: 8px !important;
-            min-height: auto !important;
-            border-radius: var(--border-radius-sm, 4px);
-            font-family: var(--font-primary, 'Exo 2', sans-serif);
-            transition: border-color 0.2s ease;
-
-            &:focus {
-                border-color: var(--theme-accent-primary, #00e0dc) !important;
-                outline: none !important;
-                box-shadow: 0 0 8px rgba(0, 224, 220, 0.3) !important;
-            }
-
-            &:invalid {
-                border-color: var(--color-error, #ff4444);
-            }
-        }
-
-        // Textarea specific styling
-        .form-textarea,
-        textarea {
-            min-height: 80px !important;
-            resize: vertical !important;
-            line-height: 1.4;
-        }
-
-        // Checkbox styling
-        .form-checkbox {
-            width: auto;
-            margin-right: var(--space-xs, 4px);
-        }
-
-        // Hint text styling
-        .form-hint {
-            font-size: var(--font-size-xs, 10px);
-            color: var(--color-text-muted, #888888);
-            font-style: italic;
-        }
-    }
+    /* intentionally left without layout overrides; actor sheets manage their own layout */
 }
+
 
 // ============================================================================
 // TRAIT CHIP SYSTEM STYLES - Merged and Deduplicated

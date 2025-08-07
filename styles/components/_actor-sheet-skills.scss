@@ -1,0 +1,79 @@
+/**
+ * Actor Sheet - Skills styles
+ * Layout: single row, three cells [Label | Input | Button]
+ * Only the .skill-roll button has hover styles (copied from tab items).
+ */
+
+/* Container list ensures consistent spacing between tiles */
+.skills-attributes-grid .skills-attribute-list {
+  display: grid;
+  gap: 0.6rem 0.8rem;
+}
+
+/* Each skill tile: single row, three cells:
+   [ Label (dominant, flexible) | Input (fills its grid) | Button (compact) ] */
+.skills-attributes-grid .skill-tile {
+  display: grid;
+  grid-template-columns: 1fr 1fr max-content; /* input fills its grid area */
+  align-items: center;
+  column-gap: 0.8rem;
+}
+
+/* Cell 1: dominant label */
+.skills-attributes-grid .skill-tile > label {
+  grid-column: 1 / 2;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  color: var(--color-text, #ddd);
+  margin: 0;
+}
+
+/* Cell 2: numeric input fills its grid area */
+.skills-attributes-grid .skill-tile > input[type="text"],
+.skills-attributes-grid .skill-tile > input[type="number"] {
+  grid-column: 2 / 3;
+  height: 28px;
+  width: 100%;                 /* fill its grid completely */
+  box-sizing: border-box;      /* include padding/border in width */
+  text-align: center;
+  padding: 0 0.4rem;
+  border: 1px solid var(--color-border, #8a8a8a50);
+  border-radius: 4px;
+  background: var(--color-control-bg, #1f1f1f);
+  color: var(--color-text, #ddd);
+}
+
+/* Cell 3: roll button */
+.skills-attributes-grid .skill-tile > .skill-roll {
+  grid-column: 3 / 4;
+  height: 28px;
+  min-width: 42px;
+  padding: 0 0.4rem;
+  border: 1px solid var(--color-border, #8a8a8a50);
+  border-radius: 4px;
+  background: var(--color-control-bg, #2b2b2b);
+  color: var(--color-text, #ddd);
+  line-height: 26px;
+  text-align: center;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease;
+}
+
+/* Copy hover from sheet-tabs .item — apply ONLY to the button */
+.skills-attributes-grid .skill-tile > .skill-roll:hover,
+.skills-attributes-grid .skill-tile > .skill-roll:focus-visible {
+  color: var(--tabs-hover, #7aa2ff);
+  background-color: var(--tabs-hover-bg, transparent);
+  border-color: var(--tabs-hover-border, currentColor);
+  outline: none;
+}
+
+/* Optional: tokens mirroring sheet-tabs .item hover */
+:root {
+  --tabs-hover: var(--color-accent, #7aa2ff);
+  --tabs-hover-bg: transparent;
+  --tabs-hover-border: currentColor;
+}

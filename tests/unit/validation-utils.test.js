@@ -73,11 +73,11 @@ describe('ValidationUtils', () => {
       expect(result.system.fortunePoints).toBe(3); // default
     });
 
-    test('should validate abilities structure', () => {
+    test('should validate attributes structure', () => {
       const data = {
         type: 'character',
         system: {
-          abilities: {
+          attributes: {
             might: { value: '12', mod: 2.7 },
             grace: { value: 'invalid' },
             intellect: { value: 8, mod: 'bad' }
@@ -87,16 +87,16 @@ describe('ValidationUtils', () => {
       
       const result = ValidationUtils.validateActorData(data);
       
-      expect(result.system.abilities)
+      expect(result.system.attributes)
         .toBeObject()
         .toContainKeys(['might', 'grace', 'intellect']);
       
-      expect(result.system.abilities.might)
+      expect(result.system.attributes.might)
         .toContainEntry(['value', 12])
         .toContainEntry(['mod', 2]);
       
-      expect(result.system.abilities.grace.value).toBe(10); // default
-      expect(result.system.abilities.intellect.mod).toBe(0); // default
+      expect(result.system.attributes.grace.value).toBe(10); // default
+      expect(result.system.attributes.intellect.mod).toBe(0); // default
     });
 
     test('should validate skills structure', () => {
@@ -181,11 +181,11 @@ describe('ValidationUtils', () => {
       const result = ValidationUtils.validateItemData(data);
       
       expect(result.system)
-        .toContainKey('ability')
+        .toContainKey('attribute')
         .toContainEntry(['difficulty', 13])
         .toContainEntry(['powerPointCost', 0]); // invalid -> default
       
-      expect(result.system.ability).toBe('might'); // default
+      expect(result.system.attribute).toBe('might'); // default
     });
 
     test('should validate weapon items', () => {
@@ -203,10 +203,10 @@ describe('ValidationUtils', () => {
       const result = ValidationUtils.validateItemData(data);
       
       expect(result.system)
-        .toContainKeys(['ability', 'modifier', 'damageDie', 'threshold', 'weight', 'cost', 'quantity']);
+        .toContainKeys(['attribute', 'modifier', 'damageDie', 'threshold', 'weight', 'cost', 'quantity']);
       
       expect(result.system)
-        .toContainEntry(['ability', 'might'])
+        .toContainEntry(['attribute', 'might'])
         .toContainEntry(['modifier', 2])
         .toContainEntry(['damageDie', '1d6'])
         .toContainEntry(['threshold', 11]) // invalid -> default
@@ -278,14 +278,14 @@ describe('ValidationUtils', () => {
   });
 
   describe('Complex Data Structure Validation', () => {
-    test('should validate abilities structure completely', () => {
-      const abilities = {
+    test('should validate attributes structure completely', () => {
+      const attributes = {
         might: { modifier: 2 },
         grace: { modifier: 'bad' },
         intellect: { modifier: 'invalid' }
       };
       
-      const result = ValidationUtils.validateAbilities(abilities);
+      const result = ValidationUtils.validateAttributes(attributes);
       
       expect(result)
         .toBeObject()
@@ -298,7 +298,7 @@ describe('ValidationUtils', () => {
       
       expect(result.grace.modifier).toBe(0); // invalid -> default
       expect(result.intellect.modifier).toBe(0); // invalid -> default
-      expect(result.focus.modifier).toBe(0); // default ability
+      expect(result.focus.modifier).toBe(0); // default attribute
     });
 
     test('should validate skills structure completely', () => {
@@ -326,7 +326,7 @@ describe('ValidationUtils', () => {
       const formData = {
         'system.difficulty': '15',
         'system.powerPointCost': '3',
-        'system.ability': 'grace'
+        'system.attribute': 'grace'
       };
       
       const result = ValidationUtils.processFormData(formData, 'action');
@@ -339,7 +339,7 @@ describe('ValidationUtils', () => {
         .toBeObject()
         .toContainEntry(['difficulty', 15])
         .toContainEntry(['powerPointCost', 3])
-        .toContainEntry(['ability', 'grace']);
+        .toContainEntry(['attribute', 'grace']);
     });
   });
 
@@ -382,7 +382,7 @@ describe('ValidationUtils', () => {
     test('should handle completely empty data structures', () => {
       expect(ValidationUtils.validateActorData({})).toBeObject();
       expect(ValidationUtils.validateItemData({})).toBeObject();
-      expect(ValidationUtils.validateAbilities({})).toBeObject();
+      expect(ValidationUtils.validateAttributes({})).toBeObject();
       expect(ValidationUtils.validateSkills({})).toBeObject();
     });
 
@@ -398,24 +398,24 @@ describe('ValidationUtils', () => {
         type: 'character',
         system: {
           level: 5,
-          abilities: { might: { value: 15, mod: 1 } },
+          attributes: { might: { value: 15, mod: 1 } },
           health: { value: 25, max: 30, temp: 5 }
-        }
-      };
-      
-      const result = ValidationUtils.validateActorData(validActor);
-      
-      expect(result)
-        .toContainEntry(['type', 'character'])
-        .toContainKeys(['system']);
-      
-      expect(result.system)
-        .toContainEntry(['level', 5])
-        .toContainKeys(['abilities', 'health']);
-      
-      expect(result.system.abilities.might)
-        .toContainEntry(['value', 15])
-        .toContainEntry(['mod', 1]);
+       }
+     };
+     
+     const result = ValidationUtils.validateActorData(validActor);
+     
+     expect(result)
+       .toContainEntry(['type', 'character'])
+       .toContainKeys(['system']);
+     
+     expect(result.system)
+       .toContainEntry(['level', 5])
+       .toContainKeys(['attributes', 'health']);
+     
+     expect(result.system.attributes.might)
+       .toContainEntry(['value', 15])
+       .toContainEntry(['mod', 1]);
       
       expect(result.system.health)
         .toContainEntry(['value', 25])

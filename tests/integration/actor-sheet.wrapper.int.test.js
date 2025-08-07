@@ -31,7 +31,7 @@ describe('Actor Sheet Wrapper Integration', () => {
         expect(data.system).toBeDefined();
         
         // Verify that calculated values are added by delegation
-        expect(data.abilityTotalModifiers).toBeDefined();
+        expect(data.attributeTotalModifiers).toBeDefined();
         expect(data.skillTotalModifiers).toBeDefined();
     });
 

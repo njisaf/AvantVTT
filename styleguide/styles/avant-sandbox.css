@@ -2313,123 +2313,34 @@
  * @version 1.0.0 - Phase 1 Skeleton + ApplicationV2 Integration
  * @since Phase 1 - Item Sheet Unification
  */
-/**
- * Image Upload Component Styles
- * 
- * Centralized styling for the unified image upload component.
- * Used across actor sheets, item sheets, and other forms.
- * 
- * @author Avant VTT Team  
- * @version 2.0.0
- * @since Phase 2 - Image Upload Unification
- */
-.form-group--image-upload .image-upload {
-  position: relative;
-  display: inline-block;
-  cursor: pointer;
-  border-radius: var(--form-border-radius);
-  overflow: hidden;
-  transition: all 0.2s ease;
-}
-.form-group--image-upload .image-upload:hover {
-  transform: scale(1.05);
-}
-.form-group--image-upload .image-upload:hover .image-upload__overlay {
-  opacity: 1;
-}
-.form-group--image-upload .image-upload:focus-within {
-  outline: var(--form-focus-ring-width) solid var(--form-input-focus);
-  outline-offset: 2px;
-}
-.form-group--image-upload .image-upload__img {
-  display: block;
-  border-radius: var(--form-border-radius);
-  border: var(--form-border-width) solid var(--form-input-border);
-}
-.form-group--image-upload .image-upload__img:focus {
-  outline: none;
-}
-.form-group--image-upload .image-upload__overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  border-radius: var(--form-border-radius);
-  pointer-events: none;
-}
-.form-group--image-upload .image-upload__overlay i {
-  color: white;
-  font-size: 1.25rem;
-}
-
-.image-upload {
-  position: relative;
-  display: inline-block;
-  cursor: pointer;
-  border-radius: var(--form-border-radius, 0.25rem);
-  overflow: hidden;
-  transition: all 0.2s ease;
-}
-.image-upload:hover {
-  transform: scale(1.05);
-}
-.image-upload:hover .image-upload__overlay {
-  opacity: 1;
-}
-.image-upload:focus-within {
-  outline: 2px solid var(--form-input-focus, #00E0DC);
-  outline-offset: 2px;
-}
-.image-upload__img {
-  display: block;
-  border-radius: var(--form-border-radius, 0.25rem);
-  border: 1px solid var(--form-input-border, #dee2e6);
-}
-.image-upload__img:focus {
-  outline: none;
-}
-.image-upload__overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  border-radius: var(--form-border-radius, 0.25rem);
-  pointer-events: none;
-}
-.image-upload__overlay i {
-  color: white;
-  font-size: 1.25rem;
-}
-
+/* Image Upload base styles are centralized via avant.scss:
+   Ensure styles/avant.scss contains:
+   @use "components/image-upload";
+   Do not import here to avoid duplicate compilation. */
 .item-sheet {
+  /* Grid-first container */
+  --item-grid-gap-x: var(--space-md, 12px);
+  --item-grid-gap-y: var(--space-md, 12px);
+  --item-border-color: var(--theme-border-primary, #555);
+  --item-section-bg: var(--theme-bg-secondary, #333);
   display: grid;
   grid-template-rows: auto auto 1fr;
   grid-template-areas: "header" "tabs" "body";
-  gap: var(--space-md, 12px);
+  gap: var(--item-grid-gap-y);
+  /* Container properties */
   min-height: 400px;
   width: 100%;
   padding: var(--space-lg, 16px);
+  /* Theme integration */
   background: var(--color-background-primary, #ffffff);
   color: var(--color-text-primary, #000000);
-  border: 1px solid var(--color-border-primary, #cccccc);
+  border: 1px solid var(--item-border-color);
   border-radius: var(--border-radius-md, 6px);
+  /* Typography */
   font-family: var(--font-primary, "Exo 2", sans-serif);
   font-size: var(--font-size-base, 14px);
   line-height: var(--line-height-base, 1.4);
+  /* Focus management for accessibility */
 }
 .item-sheet:focus-within {
   outline: 2px solid var(--color-focus, #00E0DC);
@@ -2473,45 +2384,41 @@
   border-bottom-color: var(--theme-accent-primary, #00e0dc) !important;
 }
 
+/* Keep as-is; already scoped to .item-sheet and safe for actor sheets */
 .item-sheet .sheet-header {
   grid-area: header;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: var(--space-sm, 8px) !important;
+  display: grid !important;
+  grid-auto-rows: min-content !important;
+  row-gap: var(--item-grid-gap-y) !important;
   padding: var(--space-md, 12px);
   background: var(--theme-bg-secondary, #2A2A2A);
-  border-bottom: 1px solid var(--theme-border-primary, #404040);
+  border-bottom: 1px solid var(--item-border-color);
 }
-.item-sheet .sheet-header .row-container {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: flex-start !important;
-  gap: var(--space-md, 12px) !important;
+.item-sheet .sheet-header .row-container > [class*=-name-field] {
+  padding: 0 !important;
+}
+.item-sheet .sheet-header .row-container:not(.header-main) {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  column-gap: var(--item-grid-gap-x) !important;
   width: 100% !important;
 }
-.item-sheet .sheet-header .row-container .form-group--image-upload {
-  flex: 0 0 20% !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+.item-sheet .sheet-header .row-container:not(.header-main) > * {
+  min-width: 0 !important;
 }
-.item-sheet .sheet-header .row-container .form-group--text-field {
-  flex: 1 1 80% !important;
-  display: flex !important;
-  flex-direction: column !important;
+.item-sheet .sheet-header .row-container:not(.header-main) .form-group {
+  margin-bottom: 0 !important;
 }
-@media (max-width: 480px) {
+.item-sheet .sheet-header .row-container:not(.header-main).full-width .form-group {
+  grid-column: 1/-1 !important;
+}
+@media (max-width: 600px) {
   .item-sheet .sheet-header {
-    gap: var(--space-xs, 4px) !important;
+    row-gap: var(--space-sm, 8px) !important;
     padding: var(--space-sm, 8px);
   }
-  .item-sheet .sheet-header .row-container {
-    flex-direction: column !important;
-  }
-  .item-sheet .sheet-header .row-container .form-group--image-upload,
-  .item-sheet .sheet-header .row-container .form-group--text-field {
-    flex: 1 1 auto !important;
-    width: 100% !important;
+  .item-sheet .sheet-header .row-container:not(.header-main) > * {
+    grid-column: 1/-1 !important;
   }
 }
 
@@ -2553,13 +2460,16 @@
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
+  /* Base .image-upload styles (positioning, cursor, object-fit, overlay)
+     come from components/_image-upload.scss. Only item-header-specific
+     accents are declared here. */
 }
 .application.sheet.avant.item .sheet-header .row-container .form-group--image-upload .image-upload,
 .avant.application.sheet.item .sheet-header .row-container .form-group--image-upload .image-upload,
 .item-sheet.avant.application.sheet .sheet-header .row-container .form-group--image-upload .image-upload,
 .avant.item-sheet .sheet-header .row-container .form-group--image-upload .image-upload,
 .item-sheet.avant .sheet-header .row-container .form-group--image-upload .image-upload {
-  position: relative !important;
+  /* Item header prefers a fixed 64x64 presentation */
 }
 .application.sheet.avant.item .sheet-header .row-container .form-group--image-upload .image-upload .image-upload__img,
 .avant.application.sheet.item .sheet-header .row-container .form-group--image-upload .image-upload .image-upload__img,
@@ -2568,11 +2478,11 @@
 .item-sheet.avant .sheet-header .row-container .form-group--image-upload .image-upload .image-upload__img {
   width: 64px !important;
   height: 64px !important;
+  /* Neon accent border unique to item headers */
   border: 2px solid var(--theme-accent-primary, #00e0dc) !important;
-  cursor: pointer !important;
-  border-radius: 4px !important;
-  object-fit: cover !important;
-  transition: all 0.3s ease !important;
+  /* Align radius with component token for consistency */
+  border-radius: var(--avant-radius-sm, 6px) !important;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease !important;
 }
 .application.sheet.avant.item .sheet-header .row-container .form-group--image-upload .image-upload .image-upload__img:hover,
 .avant.application.sheet.item .sheet-header .row-container .form-group--image-upload .image-upload .image-upload__img:hover,
@@ -2587,18 +2497,9 @@
 .item-sheet.avant.application.sheet .sheet-header .row-container .form-group--image-upload .image-upload .image-upload__overlay,
 .avant.item-sheet .sheet-header .row-container .form-group--image-upload .image-upload .image-upload__overlay,
 .item-sheet.avant .sheet-header .row-container .form-group--image-upload .image-upload .image-upload__overlay {
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
+  /* Only override what differs visually for item header */
   background: rgba(0, 0, 0, 0.7) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  opacity: 0 !important;
-  transition: opacity 0.3s ease !important;
-  border-radius: 4px !important;
+  border-radius: var(--avant-radius-sm, 6px) !important;
 }
 .application.sheet.avant.item .sheet-header .row-container .form-group--image-upload .image-upload .image-upload__overlay i,
 .avant.application.sheet.item .sheet-header .row-container .form-group--image-upload .image-upload .image-upload__overlay i,
@@ -2607,13 +2508,6 @@
 .item-sheet.avant .sheet-header .row-container .form-group--image-upload .image-upload .image-upload__overlay i {
   color: var(--theme-accent-primary, #00e0dc) !important;
   font-size: 16px !important;
-}
-.application.sheet.avant.item .sheet-header .row-container .form-group--image-upload .image-upload:hover .image-upload__overlay,
-.avant.application.sheet.item .sheet-header .row-container .form-group--image-upload .image-upload:hover .image-upload__overlay,
-.item-sheet.avant.application.sheet .sheet-header .row-container .form-group--image-upload .image-upload:hover .image-upload__overlay,
-.avant.item-sheet .sheet-header .row-container .form-group--image-upload .image-upload:hover .image-upload__overlay,
-.item-sheet.avant .sheet-header .row-container .form-group--image-upload .image-upload:hover .image-upload__overlay {
-  opacity: 1 !important;
 }
 .application.sheet.avant.item .sheet-header .row-container .form-group--text-field,
 .avant.application.sheet.item .sheet-header .row-container .form-group--text-field,
@@ -2683,264 +2577,38 @@
 }
 
 .item-sheet .sheet-header .header-main {
-  display: flex !important;
-  flex-direction: row !important;
+  /* 12-col grid for 20/80 split */
+  display: grid !important;
+  grid-template-columns: repeat(12, 1fr) !important;
+  column-gap: var(--item-grid-gap-x) !important;
   align-items: center !important;
-  gap: var(--space-md, 12px) !important;
   width: 100% !important;
 }
 .item-sheet .sheet-header .header-main .item-icon,
 .item-sheet .sheet-header .header-main .form-group--image-upload {
-  flex: 0 0 20% !important;
-  max-width: 20% !important;
+  grid-column: span 3 !important; /* ≈25% */
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-}
-.item-sheet .sheet-header .header-main .item-icon .image-upload,
-.item-sheet .sheet-header .header-main .form-group--image-upload .image-upload {
-  width: 48px !important;
-  height: 48px !important;
-  position: relative !important;
-  cursor: pointer !important;
-}
-.item-sheet .sheet-header .header-main .item-icon .image-upload__img,
-.item-sheet .sheet-header .header-main .form-group--image-upload .image-upload__img {
-  width: 48px !important;
-  height: 48px !important;
-  border-radius: var(--border-radius-md, 6px) !important;
-  border: 2px solid var(--theme-border-secondary, #555) !important;
-  object-fit: cover !important;
-  transition: border-color 0.2s ease !important;
-}
-.item-sheet .sheet-header .header-main .item-icon .image-upload__img:hover,
-.item-sheet .sheet-header .header-main .form-group--image-upload .image-upload__img:hover {
-  border-color: var(--theme-accent-primary, #00E0DC) !important;
-}
-.item-sheet .sheet-header .header-main .item-icon .image-upload__img:focus,
-.item-sheet .sheet-header .header-main .form-group--image-upload .image-upload__img:focus {
-  outline: 2px solid var(--theme-accent-primary, #00E0DC) !important;
-  outline-offset: 2px !important;
-}
-.item-sheet .sheet-header .header-main .item-icon .image-upload__overlay,
-.item-sheet .sheet-header .header-main .form-group--image-upload .image-upload__overlay {
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  background: rgba(0, 0, 0, 0.5) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  opacity: 0 !important;
-  transition: opacity 0.2s ease !important;
-  border-radius: var(--border-radius-md, 6px) !important;
-}
-.item-sheet .sheet-header .header-main .item-icon .image-upload__overlay i,
-.item-sheet .sheet-header .header-main .form-group--image-upload .image-upload__overlay i {
-  color: var(--theme-accent-primary, #00E0DC) !important;
-  font-size: 16px !important;
-}
-.item-sheet .sheet-header .header-main .item-icon .image-upload:hover .item-sheet .sheet-header .header-main .item-icon .image-upload__overlay,
-.item-sheet .sheet-header .header-main .item-icon .image-upload:hover .item-sheet .sheet-header .header-main .form-group--image-upload .image-upload__overlay,
-.item-sheet .sheet-header .header-main .form-group--image-upload .image-upload:hover .item-sheet .sheet-header .header-main .item-icon .image-upload__overlay,
-.item-sheet .sheet-header .header-main .form-group--image-upload .image-upload:hover .item-sheet .sheet-header .header-main .form-group--image-upload .image-upload__overlay {
-  opacity: 1 !important;
 }
 .item-sheet .sheet-header .header-main .item-name-field,
 .item-sheet .sheet-header .header-main .form-group--text-field {
-  flex: 1 1 80% !important;
-  max-width: 80% !important;
+  grid-column: span 9 !important; /* ≈75% */
   min-width: 0 !important;
 }
-.item-sheet .sheet-header .header-main .item-name-field .form-label,
-.item-sheet .sheet-header .header-main .form-group--text-field .form-label {
-  font-family: var(--theme-font-display, "Orbitron", monospace) !important;
-  font-size: 10px !important;
-  font-weight: 600 !important;
-  color: var(--theme-text-secondary, #BFBFBF) !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.5px !important;
-  margin-bottom: 4px !important;
-}
-.item-sheet .sheet-header .header-main .item-name-field .form-input,
-.item-sheet .sheet-header .header-main .form-group--text-field .form-input {
-  width: 100% !important;
-  background: var(--theme-bg-tertiary, #333) !important;
-  border: 1px solid var(--theme-border-primary, #555) !important;
-  border-radius: var(--border-radius-sm, 4px) !important;
-  color: var(--theme-text-primary, #FFF) !important;
-  font-family: var(--theme-font-primary, "Exo 2", sans-serif) !important;
-  font-size: 14px !important;
-  padding: 8px !important;
-  transition: border-color 0.2s ease !important;
-}
-.item-sheet .sheet-header .header-main .item-name-field .form-input:focus,
-.item-sheet .sheet-header .header-main .form-group--text-field .form-input:focus {
-  outline: none !important;
-  border-color: var(--theme-accent-primary, #00E0DC) !important;
-  box-shadow: 0 0 8px rgba(0, 224, 220, 0.3) !important;
-}
-.item-sheet .sheet-header .header-main .item-name-field .form-input::placeholder,
-.item-sheet .sheet-header .header-main .form-group--text-field .form-input::placeholder {
-  color: var(--theme-text-muted, #888) !important;
-  opacity: 0.7 !important;
-}
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .item-sheet .sheet-header .header-main {
-    flex-direction: column !important;
-    gap: var(--space-sm, 8px) !important;
+    row-gap: var(--space-sm, 8px) !important;
   }
   .item-sheet .sheet-header .header-main .item-icon,
   .item-sheet .sheet-header .header-main .form-group--image-upload,
   .item-sheet .sheet-header .header-main .item-name-field,
   .item-sheet .sheet-header .header-main .form-group--text-field {
-    flex: none !important;
-    max-width: 100% !important;
-    width: 100% !important;
-  }
-  .item-sheet .sheet-header .header-main .item-icon,
-  .item-sheet .sheet-header .header-main .form-group--image-upload {
-    align-self: center !important;
+    grid-column: 1/-1 !important;
   }
 }
 
-.item-sheet .sheet-header .row-container:not(.header-main) {
-  display: flex !important;
-  flex-direction: row !important;
-  gap: var(--space-md, 12px) !important;
-  align-items: center !important;
-  width: 100% !important;
-}
-.item-sheet .sheet-header .row-container:not(.header-main) > * {
-  flex: 1 1 0 !important;
-  min-width: 0 !important;
-}
-.item-sheet .sheet-header .row-container:not(.header-main) .form-group {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: stretch !important;
-  justify-content: flex-start !important;
-  margin-bottom: 0 !important;
-  flex: 1 1 0 !important;
-  min-width: 0 !important;
-}
-@media (max-width: 480px) {
-  .item-sheet .sheet-header .row-container:not(.header-main) {
-    flex-direction: column !important;
-    gap: var(--space-sm, 8px) !important;
-  }
-  .item-sheet .sheet-header .row-container:not(.header-main) > * {
-    flex: none !important;
-    width: 100% !important;
-  }
-  .item-sheet .sheet-header .row-container:not(.header-main) .form-group {
-    margin-bottom: var(--space-sm, 8px) !important;
-  }
-}
-
-.row-container {
-  display: flex;
-  gap: var(--space-md, 12px);
-  align-items: center;
-}
-.row-container > * {
-  flex: 1 1 0;
-  min-width: 0;
-}
-.row-container .form-group {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: flex-start;
-  margin-bottom: 0;
-  flex: 1 1 0;
-  min-width: 0;
-}
-.row-container .form-group--image-upload {
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-}
-.row-container .form-group--text-field {
-  flex: 1;
-  min-width: 0;
-}
-
-.item-sheet .sheet-header .header-main {
-  display: flex !important;
-  flex-direction: row !important;
-  gap: var(--space-md, 12px) !important;
-  align-items: center !important;
-}
-.item-sheet .sheet-header .header-main .item-icon,
-.item-sheet .sheet-header .header-main .form-group--image-upload {
-  flex: 0 0 48px !important;
-}
-.item-sheet .sheet-header .header-main .item-name-field,
-.item-sheet .sheet-header .header-main .form-group--text-field {
-  flex: 1 !important;
-  min-width: 0 !important;
-}
-@media (max-width: 480px) {
-  .item-sheet .sheet-header .header-main {
-    gap: var(--space-sm, 8px) !important;
-  }
-}
-
-.item-sheet__image {
-  flex-shrink: 0;
-}
-.item-sheet__image .item-sheet__profile-img {
-  width: 64px;
-  height: 64px;
-  border-radius: var(--border-radius-md, 6px);
-  border: 2px solid var(--color-border-secondary, #dddddd);
-  object-fit: cover;
-  cursor: pointer;
-  transition: border-color 0.2s ease;
-}
-.item-sheet__image .item-sheet__profile-img:hover {
-  border-color: var(--color-primary, #00E0DC);
-}
-.item-sheet__image .item-sheet__profile-img:focus {
-  outline: 2px solid var(--color-focus, #00E0DC);
-  outline-offset: 2px;
-}
-
-.item-sheet__name-field {
-  flex: 1;
-  min-width: 0;
-}
-
-.item-sheet__name {
-  margin: 0;
-}
-.item-sheet__name input {
-  width: 100%;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid var(--color-border-primary, #cccccc);
-  padding: var(--space-xs, 4px) 0;
-  font-family: var(--font-display, "Orbitron", monospace);
-  font-size: var(--font-size-lg, 18px);
-  font-weight: 600;
-  color: var(--color-text-primary, #000000);
-  transition: border-color 0.2s ease;
-}
-.item-sheet__name input:focus {
-  outline: none;
-  border-bottom-color: var(--color-primary, #00E0DC);
-}
-.item-sheet__name input::placeholder {
-  color: var(--color-text-muted, #666666);
-  opacity: 0.7;
-}
-.item-sheet__name input:invalid {
-  border-bottom-color: var(--color-error, #ff4444);
-}
-
+/* Converted above: see .item-sheet .sheet-header block where :not(.header-main) is defined as grid */
 .item-sheet__ap-selector {
   display: flex;
   align-items: center;
@@ -3021,26 +2689,26 @@
   border-color: var(--color-error, #ff4444);
 }
 
-.item-sheet__tabs,
-.sheet-tabs {
+/* Scoped to item-sheet to avoid leaking to actor sheets */
+.item-sheet .item-sheet__tabs,
+.item-sheet .sheet-tabs {
   grid-area: tabs;
   display: flex;
-  border-bottom: 2px solid var(--color-border-primary, #cccccc);
-  margin-bottom: var(--space-md, 12px);
   background: var(--theme-bg-secondary, #333) !important;
-  border-bottom: 1px solid var(--theme-border-primary, #555) !important;
+  border-bottom: 1px solid var(--item-border-color) !important;
   min-height: 36px !important;
   flex-shrink: 0 !important;
   margin: 0 !important;
   padding: 0 !important;
 }
-.item-sheet__tabs:empty,
-.sheet-tabs:empty {
+.item-sheet .item-sheet__tabs:empty,
+.item-sheet .sheet-tabs:empty {
   display: none;
 }
 
-.item-sheet__tab,
-.sheet-tabs .item {
+/* Scoped to item-sheet */
+.item-sheet .item-sheet__tab,
+.item-sheet .sheet-tabs .item {
   background: transparent !important;
   border: none !important;
   padding: 8px 16px !important;
@@ -3058,49 +2726,49 @@
   text-decoration: none !important;
   height: 36px !important;
 }
-.item-sheet__tab i,
-.sheet-tabs .item i {
+.item-sheet .item-sheet__tab i,
+.item-sheet .sheet-tabs .item i {
   font-size: var(--font-size-xs, 10px);
 }
-.item-sheet__tab:hover,
-.sheet-tabs .item:hover {
+.item-sheet .item-sheet__tab:hover,
+.item-sheet .sheet-tabs .item:hover {
   background: rgba(0, 224, 220, 0.1) !important;
   color: var(--theme-accent-primary, #00e0dc) !important;
 }
-.item-sheet__tab:focus,
-.sheet-tabs .item:focus {
+.item-sheet .item-sheet__tab:focus,
+.item-sheet .sheet-tabs .item:focus {
   outline: 2px solid var(--color-focus, #00E0DC);
   outline-offset: 2px;
 }
-.item-sheet__tab--active, .item-sheet__tab.active,
-.sheet-tabs .item--active,
-.sheet-tabs .item.active {
+.item-sheet .item-sheet__tab--active, .item-sheet .item-sheet__tab.active,
+.item-sheet .sheet-tabs .item--active,
+.item-sheet .sheet-tabs .item.active {
   background: var(--theme-bg-primary, #2a2a2a) !important;
   color: var(--theme-text-primary, #ffffff) !important;
   border-bottom-color: var(--theme-accent-primary, #00e0dc) !important;
   font-weight: 600;
 }
-.item-sheet__tab--active i, .item-sheet__tab.active i,
-.sheet-tabs .item--active i,
-.sheet-tabs .item.active i {
+.item-sheet .item-sheet__tab--active i, .item-sheet .item-sheet__tab.active i,
+.item-sheet .sheet-tabs .item--active i,
+.item-sheet .sheet-tabs .item.active i {
   color: var(--color-primary, #00E0DC);
 }
 
-.item-sheet__body,
-.sheet-body {
+/* Scoped to item-sheet */
+.item-sheet .item-sheet__body,
+.item-sheet .sheet-body {
   grid-area: body;
-  overflow-y: auto;
-  min-height: 0;
   background: var(--theme-bg-primary, #2a2a2a) !important;
   border: none !important;
   min-height: 200px !important;
-  display: block !important;
-  flex: 1 !important;
-  padding: 0 !important;
+  display: grid !important;
+  grid-template-columns: repeat(12, 1fr) !important;
+  gap: var(--item-grid-gap-y) var(--item-grid-gap-x) !important;
+  padding: var(--space-md, 12px) !important;
   overflow-y: auto !important;
 }
-.item-sheet__body .tab,
-.sheet-body .tab {
+.item-sheet .item-sheet__body .tab,
+.item-sheet .sheet-body .tab {
   background: var(--theme-bg-primary, #2a2a2a) !important;
   border: none !important;
   min-height: 150px !important;
@@ -3108,164 +2776,43 @@
   padding: 15px !important;
   margin: 0 !important;
 }
-.item-sheet__body .tab.active,
-.sheet-body .tab.active {
+.item-sheet .item-sheet__body .tab.active,
+.item-sheet .sheet-body .tab.active {
   display: block !important;
+}
+.item-sheet .item-sheet__body .row-container,
+.item-sheet .sheet-body .row-container {
+  display: contents;
+}
+.item-sheet .item-sheet__body .row-container.field-container > .form-group,
+.item-sheet .sheet-body .row-container.field-container > .form-group {
+  grid-column: 1/-1 !important;
+}
+.item-sheet .item-sheet__body .row-container.side-by-side,
+.item-sheet .sheet-body .row-container.side-by-side {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  column-gap: var(--item-grid-gap-x) !important;
+}
+.item-sheet .item-sheet__body .row-container.side-by-side > .form-group,
+.item-sheet .sheet-body .row-container.side-by-side > .form-group {
+  margin-bottom: 0 !important;
+}
+.item-sheet .item-sheet__body .row-container.full-width > .form-group,
+.item-sheet .sheet-body .row-container.full-width > .form-group {
+  grid-column: 1/-1 !important;
+  margin-bottom: var(--item-grid-gap-y) !important;
+}
+@media (max-width: 600px) {
+  .item-sheet .item-sheet__body .row-container.side-by-side > .form-group,
+  .item-sheet .sheet-body .row-container.side-by-side > .form-group {
+    grid-column: 1/-1 !important;
+  }
 }
 
+/* Remove global .sheet-body layout so actor sheets are unaffected by item-sheet refactor */
 .sheet-body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm, 8px);
-  padding: var(--space-md, 12px);
-  flex: 1;
-  overflow-y: auto;
-}
-.sheet-body .row-container {
-  display: flex;
-  gap: var(--space-md, 12px);
-  align-items: flex-start;
-  width: 100%;
-}
-.sheet-body .row-container:not(.full-width) > * {
-  flex: 1 1 0;
-  min-width: 0;
-}
-.sheet-body .row-container:not(.full-width) .form-group {
-  margin-bottom: 0;
-  flex: 1 1 0;
-  min-width: 0;
-}
-.sheet-body .row-container.full-width .form-group {
-  width: 100%;
-  margin-bottom: 0;
-}
-@media (max-width: 480px) {
-  .sheet-body .row-container {
-    flex-direction: column;
-    gap: var(--space-sm, 8px);
-  }
-  .sheet-body .row-container > * {
-    flex: none !important;
-    width: 100%;
-  }
-  .sheet-body .row-container .form-group {
-    margin-bottom: var(--space-sm, 8px);
-  }
-}
-.sheet-body .row-container.full-width {
-  margin-bottom: var(--space-md, 12px);
-}
-.sheet-body .row-container.full-width:last-child {
-  margin-bottom: 0;
-}
-.sheet-body .row-container.field-container {
-  width: 100%;
-  margin-bottom: var(--space-sm, 8px);
-}
-.sheet-body .row-container.field-container:has(> *:only-child) .form-group {
-  max-width: 100%;
-}
-.sheet-body .row-container.field-container:last-child {
-  margin-bottom: 0;
-}
-.sheet-body .row-container.side-by-side {
-  display: flex;
-  gap: var(--space-md, 12px);
-  align-items: flex-start;
-  width: 100%;
-  margin-bottom: var(--space-sm, 8px);
-}
-.sheet-body .row-container.side-by-side > .form-group {
-  flex: 1 1 50%;
-  min-width: 0;
-}
-@media (max-width: 480px) {
-  .sheet-body .row-container.side-by-side {
-    flex-direction: column;
-    gap: var(--space-sm, 8px);
-  }
-  .sheet-body .row-container.side-by-side > .form-group {
-    flex: 1 1 100%;
-  }
-}
-.sheet-body .row-container.side-by-side:last-child {
-  margin-bottom: 0;
-}
-.sheet-body .form-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs, 4px);
-  background: transparent !important;
-  border: none !important;
-  min-height: auto !important;
-  display: block !important;
-  margin-bottom: 15px !important;
-  padding: 0 !important;
-}
-.sheet-body .form-group .form-label,
-.sheet-body .form-group label {
-  font-family: var(--theme-font-display, "Orbitron", monospace) !important;
-  font-size: 10px !important;
-  font-weight: 600 !important;
-  color: var(--theme-text-secondary, #aaa) !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.5px !important;
-  display: block !important;
-  margin-bottom: 4px !important;
-  padding: 0 !important;
-  border: none !important;
-}
-.sheet-body .form-group .form-input,
-.sheet-body .form-group .form-textarea,
-.sheet-body .form-group .form-select,
-.sheet-body .form-group input,
-.sheet-body .form-group textarea,
-.sheet-body .form-group select {
-  background: var(--theme-bg-tertiary, #444) !important;
-  border: 1px solid var(--theme-border-primary, #555) !important;
-  color: var(--theme-text-primary, #ffffff) !important;
-  font-size: 12px !important;
-  display: block !important;
-  width: 100% !important;
-  padding: 8px !important;
-  min-height: auto !important;
-  border-radius: var(--border-radius-sm, 4px);
-  font-family: var(--font-primary, "Exo 2", sans-serif);
-  transition: border-color 0.2s ease;
-}
-.sheet-body .form-group .form-input:focus,
-.sheet-body .form-group .form-textarea:focus,
-.sheet-body .form-group .form-select:focus,
-.sheet-body .form-group input:focus,
-.sheet-body .form-group textarea:focus,
-.sheet-body .form-group select:focus {
-  border-color: var(--theme-accent-primary, #00e0dc) !important;
-  outline: none !important;
-  box-shadow: 0 0 8px rgba(0, 224, 220, 0.3) !important;
-}
-.sheet-body .form-group .form-input:invalid,
-.sheet-body .form-group .form-textarea:invalid,
-.sheet-body .form-group .form-select:invalid,
-.sheet-body .form-group input:invalid,
-.sheet-body .form-group textarea:invalid,
-.sheet-body .form-group select:invalid {
-  border-color: var(--color-error, #ff4444);
-}
-.sheet-body .form-group .form-textarea,
-.sheet-body .form-group textarea {
-  min-height: 80px !important;
-  resize: vertical !important;
-  line-height: 1.4;
-}
-.sheet-body .form-group .form-checkbox {
-  width: auto;
-  margin-right: var(--space-xs, 4px);
-}
-.sheet-body .form-group .form-hint {
-  font-size: var(--font-size-xs, 10px);
-  color: var(--color-text-muted, #888888);
-  font-style: italic;
+  /* intentionally left without layout overrides; actor sheets manage their own layout */
 }
 
 .trait-chip-input {
@@ -4086,7 +3633,7 @@
   border-left-color: #ff6b6b;
 }
 .unified-action-item.armor-action {
-  border-left-color: #4ecdc4;
+  border-left-color: #128e1f;
 }
 .unified-action-item.gear-action {
   border-left-color: #ffe66d;
@@ -4437,6 +3984,183 @@
   flex-direction: column !important;
   height: 100% !important;
   min-height: 100% !important;
+}
+
+/**
+ * Actor Sheet - Skills styles
+ * Layout: single row, three cells [Label | Input | Button]
+ * Only the .skill-roll button has hover styles (copied from tab items).
+ */
+/* Container list ensures consistent spacing between tiles */
+.skills-attributes-grid .skills-attribute-list {
+  display: grid;
+  gap: 0.6rem 0.8rem;
+}
+
+/* Each skill tile: single row, three cells:
+   [ Label (dominant, flexible) | Input (fills its grid) | Button (compact) ] */
+.skills-attributes-grid .skill-tile {
+  display: grid;
+  grid-template-columns: 1fr 1fr max-content; /* input fills its grid area */
+  align-items: center;
+  column-gap: 0.8rem;
+}
+
+/* Cell 1: dominant label */
+.skills-attributes-grid .skill-tile > label {
+  grid-column: 1/2;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  color: var(--color-text, #ddd);
+  margin: 0;
+}
+
+/* Cell 2: numeric input fills its grid area */
+.skills-attributes-grid .skill-tile > input[type=text],
+.skills-attributes-grid .skill-tile > input[type=number] {
+  grid-column: 2/3;
+  height: 28px;
+  width: 100%; /* fill its grid completely */
+  box-sizing: border-box; /* include padding/border in width */
+  text-align: center;
+  padding: 0 0.4rem;
+  border: 1px solid var(--color-border, rgba(138, 138, 138, 0.3137254902));
+  border-radius: 4px;
+  background: var(--color-control-bg, #1f1f1f);
+  color: var(--color-text, #ddd);
+}
+
+/* Cell 3: roll button */
+.skills-attributes-grid .skill-tile > .skill-roll {
+  grid-column: 3/4;
+  height: 28px;
+  min-width: 42px;
+  padding: 0 0.4rem;
+  border: 1px solid var(--color-border, rgba(138, 138, 138, 0.3137254902));
+  border-radius: 4px;
+  background: var(--color-control-bg, #2b2b2b);
+  color: var(--color-text, #ddd);
+  line-height: 26px;
+  text-align: center;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease;
+}
+
+/* Copy hover from sheet-tabs .item — apply ONLY to the button */
+.skills-attributes-grid .skill-tile > .skill-roll:hover,
+.skills-attributes-grid .skill-tile > .skill-roll:focus-visible {
+  color: var(--tabs-hover, #7aa2ff);
+  background-color: var(--tabs-hover-bg, transparent);
+  border-color: var(--tabs-hover-border, currentColor);
+  outline: none;
+}
+
+/* Optional: tokens mirroring sheet-tabs .item hover */
+:root {
+  --tabs-hover: var(--color-accent, #7aa2ff);
+  --tabs-hover-bg: transparent;
+  --tabs-hover-border: currentColor;
+}
+
+/**
+ * Image Upload Component (unified)
+ * Provides consistent styling and interactions for image upload controls used by
+ * both Actor and Item sheets via the shared partial:
+ *   "systems/avant/templates/shared/partials/image-upload"
+ *
+ * Contract:
+ * - Root element: .image-upload (container)
+ * - Image element: .image-upload__img (interactive target)
+ * - Overlay: .image-upload__overlay (pen icon, appears on hover/focus)
+ *
+ * Accessibility:
+ * - The template sets role="button" and aria-label on the img.
+ * - We surface a clear focus-visible outline and hover affordance.
+ */
+/* Size tokens (fallbacks align with design tokens if present) */
+.image-upload {
+  position: relative;
+  display: inline-block;
+  /* The container can be sized by caller; otherwise, the img uses explicit width/height attrs. */
+  line-height: 0; /* remove extra whitespace gaps */
+  border-radius: var(--avant-radius-sm, 6px);
+  /* Hover/focus affordance handled via overlay; keep pointer to hint interactivity */
+  cursor: pointer;
+  /* Optional utility sizes (caller can also use size parameter in partial) */
+}
+.image-upload.image-upload--32 {
+  width: 32px;
+  height: 32px;
+}
+.image-upload.image-upload--48 {
+  width: 48px;
+  height: 48px;
+}
+.image-upload.image-upload--64 {
+  width: 64px;
+  height: 64px;
+}
+.image-upload.image-upload--96 {
+  width: 96px;
+  height: 96px;
+}
+
+.image-upload__img {
+  display: block;
+  /* When width/height attributes are provided on img (from partial), object-fit ensures cover behavior */
+  object-fit: cover;
+  border-radius: var(--avant-radius-sm, 6px);
+  box-shadow: var(--avant-shadow-sm, 0 0 0 1px rgba(0, 0, 0, 0.06));
+  /* Keyboard focus ring (when image is focusable through role/button behavior) */
+}
+.image-upload__img:focus-visible {
+  outline: 2px solid var(--avant-focus, #6ea8ff);
+  outline-offset: 2px;
+}
+
+.image-upload__overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: var(--avant-radius-sm, 6px);
+  opacity: 0;
+  transition: opacity 140ms ease-in-out;
+  pointer-events: none; /* overlay is purely visual */
+}
+
+.image-upload:hover .image-upload__overlay,
+.image-upload:focus-within .image-upload__overlay {
+  opacity: 1;
+}
+
+/* TEMPORARY COMPATIBILITY ALIASES — DO NOT RELY ON LONG-TERM
+   Purpose: prevent regressions where legacy classnames are targeted by tests or ad‑hoc CSS.
+   These ensure visual parity while templates migrate to the shared image-upload component.
+
+   Removal conditions (delete this block when ALL are true):
+   1) No templates in the Avant system render <img> elements with .profile-img or .item-sheet__profile-img.
+   2) Test suite (unit + integration) contains no selectors referencing .profile-img or .item-sheet__profile-img.
+   3) Manual audit confirms no downstream theme overrides or modules depend on these legacy selectors.
+   4) One full release cycle has shipped with the unified component in production and no regressions reported.
+
+   Action to remove:
+   - Search the repo for /\.profile-img|\.item-sheet__profile-img/ to confirm zero usages.
+   - Remove this alias block and update any lingering tests/selectors to target .image-upload / .image-upload__img.
+*/
+.profile-img,
+.item-sheet__profile-img {
+  display: block;
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: var(--avant-radius-sm, 6px);
+  box-shadow: var(--avant-shadow-sm, 0 0 0 1px rgba(0, 0, 0, 0.06));
 }
 
 /**
@@ -5131,11 +4855,11 @@ form.avant.theme-dark *::after {
   outline: none;
   box-shadow: inset 0 0 10px var(--theme-shadow-primary, rgba(0, 224, 220, 0.2));
 }
-.avant .sheet-body button:not(.ability-roll-btn):not(.skill-roll):not(.rollable),
-.avant .sheet-content button:not(.ability-roll-btn):not(.skill-roll):not(.rollable),
-.avant .tab button:not(.ability-roll-btn):not(.skill-roll):not(.rollable),
-.avant .form-group button:not(.ability-roll-btn):not(.skill-roll):not(.rollable),
-.avant .form-fields button:not(.ability-roll-btn):not(.skill-roll):not(.rollable) {
+.avant .sheet-body button:not(.attribute-roll-btn):not(.skill-roll):not(.rollable),
+.avant .sheet-content button:not(.attribute-roll-btn):not(.skill-roll):not(.rollable),
+.avant .tab button:not(.attribute-roll-btn):not(.skill-roll):not(.rollable),
+.avant .form-group button:not(.attribute-roll-btn):not(.skill-roll):not(.rollable),
+.avant .form-fields button:not(.attribute-roll-btn):not(.skill-roll):not(.rollable) {
   background: var(--theme-bg-tertiary, #333333);
   border: 1px solid var(--theme-accent-primary, #00E0DC);
   color: var(--theme-accent-primary, #00E0DC);
@@ -5147,11 +4871,11 @@ form.avant.theme-dark *::after {
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
-.avant .sheet-body button:not(.ability-roll-btn):not(.skill-roll):not(.rollable):hover,
-.avant .sheet-content button:not(.ability-roll-btn):not(.skill-roll):not(.rollable):hover,
-.avant .tab button:not(.ability-roll-btn):not(.skill-roll):not(.rollable):hover,
-.avant .form-group button:not(.ability-roll-btn):not(.skill-roll):not(.rollable):hover,
-.avant .form-fields button:not(.ability-roll-btn):not(.skill-roll):not(.rollable):hover {
+.avant .sheet-body button:not(.attribute-roll-btn):not(.skill-roll):not(.rollable):hover,
+.avant .sheet-content button:not(.attribute-roll-btn):not(.skill-roll):not(.rollable):hover,
+.avant .tab button:not(.attribute-roll-btn):not(.skill-roll):not(.rollable):hover,
+.avant .form-group button:not(.attribute-roll-btn):not(.skill-roll):not(.rollable):hover,
+.avant .form-fields button:not(.attribute-roll-btn):not(.skill-roll):not(.rollable):hover {
   background: var(--theme-accent-primary, #00E0DC);
   color: var(--theme-bg-primary, #1C1C1C);
   box-shadow: var(--theme-shadow-accent, 0 0 15px rgba(0, 224, 220, 0.5));
@@ -5167,7 +4891,6 @@ form.avant.theme-dark *::after {
   text-transform: uppercase;
   letter-spacing: 1px;
   color: var(--theme-accent-primary, #00E0DC);
-  border-bottom: 1px solid var(--theme-border-primary, #404040);
   padding-bottom: 8px;
   margin-bottom: 12px;
 }
@@ -5490,7 +5213,7 @@ form.avant.theme-dark *::after {
   display: block;
   margin-top: 5px;
 }
-.avant .sidebar-input, .avant .ability-modifier-input {
+.avant .sidebar-input, .avant .attribute-modifier-input {
   background: var(--theme-bg-primary, #1C1C1C);
   border: 1px solid var(--theme-border-primary, #404040);
   color: var(--theme-text-primary, #FFFFFF);
@@ -5504,7 +5227,7 @@ form.avant.theme-dark *::after {
   text-align: center;
   transition: all 0.3s ease;
 }
-.avant .sidebar-input:focus, .avant .ability-modifier-input:focus {
+.avant .sidebar-input:focus, .avant .attribute-modifier-input:focus {
   border-color: var(--theme-accent-primary, #00E0DC);
   outline: none;
   box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
@@ -5560,20 +5283,20 @@ form.avant.theme-dark *::after {
   width: 50px;
   text-align: center;
 }
-.avant .sidebar-abilities {
+.avant .sidebar-attributes {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6px;
   margin-bottom: 8px;
 }
-.avant .sidebar-ability {
+.avant .sidebar-attribute {
   background: var(--theme-bg-tertiary, #333333);
   padding: 6px;
   border: 1px solid var(--theme-border-primary, #404040);
   text-align: center;
   transition: all 0.3s ease;
 }
-.avant .sidebar-ability label {
+.avant .sidebar-attribute label {
   display: block;
   font-family: var(--theme-font-display, "Orbitron", monospace);
   font-size: 10px;
@@ -5585,7 +5308,7 @@ form.avant.theme-dark *::after {
   color: var(--theme-text-secondary, #BFBFBF);
   margin-bottom: 4px;
 }
-.avant .sidebar-ability input:not(.ability-modifier-input) {
+.avant .sidebar-attribute input:not(.attribute-modifier-input) {
   background: var(--theme-bg-primary, #1C1C1C);
   border: 1px solid var(--theme-border-primary, #404040);
   color: var(--theme-text-primary, #FFFFFF);
@@ -5599,22 +5322,22 @@ form.avant.theme-dark *::after {
   text-align: center;
   transition: all 0.3s ease;
 }
-.avant .sidebar-ability input:not(.ability-modifier-input):focus {
+.avant .sidebar-attribute input:not(.attribute-modifier-input):focus {
   border-color: var(--theme-accent-primary, #00E0DC);
   outline: none;
   box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
 }
-.avant .ability-input-row {
+.avant .attribute-input-row {
   display: flex;
   gap: 2px;
   align-items: center;
   justify-content: space-between;
 }
-.avant .ability-modifier-input {
+.avant .attribute-modifier-input {
   width: 40px;
   flex-shrink: 0;
 }
-.avant .ability-roll-btn {
+.avant .attribute-roll-btn {
   background: transparent !important;
   color: var(--theme-accent-primary, #00E0DC);
   padding: 4px 2px !important;
@@ -5637,13 +5360,13 @@ form.avant.theme-dark *::after {
   color: var(--theme-accent-primary, #00E0DC);
   letter-spacing: 0.5px;
 }
-.avant .ability-roll-btn:hover {
+.avant .attribute-roll-btn:hover {
   color: var(--theme-bg-primary, #1C1C1C);
   background: var(--theme-accent-primary, #00E0DC) !important;
   box-shadow: 0 0 8px rgba(0, 224, 220, 0.4);
   border-radius: 2px;
 }
-.avant .ability-roll-btn:focus {
+.avant .attribute-roll-btn:focus {
   outline: none;
   box-shadow: inset 0 0 5px rgba(0, 224, 220, 0.2);
 }
@@ -6056,20 +5779,20 @@ form.avant.theme-dark *::after {
 .avant .trait-configuration .trait-preview .trait-chip--preview i {
   font-size: 10px;
 }
-.avant .skills-abilities-grid {
+.avant .skills-attributes-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
   margin-top: 12px;
 }
-.avant .skills-ability-section {
+.avant .skills-attribute-section {
   background: var(--theme-bg-tertiary, #333333);
   border: 1px solid var(--theme-border-primary, #404040);
-  border-left: 4px solid var(--theme-accent-primary, #00E0DC);
+  border-left: 2px solid var(--theme-accent-primary, #00E0DC);
   padding: 8px;
   border-radius: 0;
 }
-.avant .skills-ability-header {
+.avant .skills-attribute-header {
   font-family: var(--theme-font-display, "Orbitron", monospace);
   font-size: 12px;
   font-weight: 700;
@@ -6082,7 +5805,7 @@ form.avant.theme-dark *::after {
   border-bottom: 1px solid var(--theme-border-primary, #404040);
   position: relative;
 }
-.avant .skills-ability-header::after {
+.avant .skills-attribute-header::after {
   content: "";
   position: absolute;
   bottom: 0;
@@ -6091,7 +5814,7 @@ form.avant.theme-dark *::after {
   height: 2px;
   background: var(--theme-gradient-accent, linear-gradient(135deg, #00E0DC 0%, #4CE2E1 100%));
 }
-.avant .skills-ability-list {
+.avant .skills-attribute-list {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -6110,7 +5833,6 @@ form.avant.theme-dark *::after {
 }
 .avant .skill-tile:hover {
   background: var(--theme-bg-secondary, #2A2A2A);
-  border-color: var(--theme-accent-primary, #00E0DC);
 }
 .avant .skill-tile::before {
   content: "";
@@ -6118,7 +5840,7 @@ form.avant.theme-dark *::after {
   left: 0;
   right: 0;
   bottom: 0;
-  height: 3px;
+  height: 1px;
   background: var(--theme-gradient-accent, linear-gradient(135deg, #00E0DC 0%, #4CE2E1 100%));
   transform: scaleX(0);
   transition: transform 0.3s ease;
@@ -6736,7 +6458,7 @@ form.avant.theme-dark *::after {
 }
 .avant .resource-row,
 .avant .defense-hp-section,
-.avant .abilities-section {
+.avant .attributes-section {
   display: none;
 }
 .avant .combat-item {
@@ -7390,7 +7112,7 @@ form.avant.theme-dark *::after {
     padding: 10px 16px;
     font-size: 10px;
   }
-  .avant .skills-abilities-grid {
+  .avant .skills-attributes-grid {
     grid-template-columns: 1fr;
     gap: 10px;
   }
@@ -7406,7 +7128,7 @@ form.avant.theme-dark *::after {
   .avant .main-content {
     margin-left: 200px;
   }
-  .avant .sidebar-abilities {
+  .avant .sidebar-attributes {
     grid-template-columns: 1fr;
   }
   .avant .sheet-tabs {

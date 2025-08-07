@@ -1,13 +1,14 @@
 import { describe, test, expect, beforeEach, jest } from '@jest/globals';
-import { AvantActorSheet } from '../../../scripts/sheets/actor-sheet';
-import { getInitializationManager } from '@/utils/initialization-manager';
+import { createAvantActorSheet } from '../../../scripts/sheets/actor-sheet';
+const AvantActorSheet = createAvantActorSheet();
+import { getInitializationManager } from '../../../scripts/utils/initialization-manager';
 
 // Mock dependencies
 jest.unstable_mockModule('@/utils/initialization-manager', () => ({
   getInitializationManager: jest.fn(),
 }));
 
-jest.mock('../../../scripts/logic/chat/trait-resolver', () => ({
+jest.mock('../../../scripts/logic/chat/trait-resolver.ts', () => ({
   itemHasTraits: jest.fn(),
   createTraitHtmlForChat: jest.fn(),
 }));
@@ -21,7 +22,7 @@ jest.mock('../../../scripts/logic/actor-sheet-utils', () => ({
 import { extractCombatItemId, prepareWeaponAttackRoll, prepareWeaponDamageRoll } from '../../../scripts/logic/actor-sheet-utils';
 
 describe('Combat Rolls with Trait Display', () => {
-    let sheet: AvantActorSheet;
+    let sheet: any;
     let mockActor: any;
     let mockItem: any;
     let mockRoll: any;
@@ -39,7 +40,7 @@ describe('Combat Rolls with Trait Display', () => {
             name: 'Fire Sword',
             system: {
                 traits: ['fire', 'magic'],
-                ability: 'might',
+                attribute: 'might',
                 modifier: 2,
                 damageDie: '1d8',
                 damageType: 'slashing'
@@ -50,7 +51,7 @@ describe('Combat Rolls with Trait Display', () => {
         mockActor = {
             system: {
                 level: 3,
-                abilities: {
+                attributes: {
                     might: { modifier: 2 }
                 }
             },
@@ -93,8 +94,8 @@ describe('Combat Rolls with Trait Display', () => {
     test('should include trait display in weapon attack rolls', async () => {
         (extractCombatItemId as jest.Mock).mockReturnValue('test-weapon-id');
         (prepareWeaponAttackRoll as jest.Mock).mockReturnValue({
-            rollExpression: '2d10 + @level + @abilityMod + @weaponMod',
-            rollData: { level: 3, abilityMod: 2, weaponMod: 2 },
+            rollExpression: '2d10 + @level + @attributeMod + @weaponMod',
+            rollData: { level: 3, attributeMod: 2, weaponMod: 2 },
             flavor: 'Fire Sword Attack'
         });
         (itemHasTraits as jest.Mock).mockReturnValue(true);
@@ -117,8 +118,8 @@ describe('Combat Rolls with Trait Display', () => {
     test('should include trait display in weapon damage rolls', async () => {
         (extractCombatItemId as jest.Mock).mockReturnValue('test-weapon-id');
         (prepareWeaponDamageRoll as jest.Mock).mockReturnValue({
-            rollExpression: '1d8 + @abilityMod',
-            rollData: { abilityMod: 2 },
+            rollExpression: '1d8 + @attributeMod',
+            rollData: { attributeMod: 2 },
             flavor: 'Fire Sword Damage (slashing)'
         });
         (itemHasTraits as jest.Mock).mockReturnValue(true);

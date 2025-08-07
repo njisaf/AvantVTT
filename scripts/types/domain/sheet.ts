@@ -22,23 +22,23 @@ export interface SheetDataContext {
  * Actor sheet specific context data
  */
 export interface ActorSheetContext extends SheetDataContext {
-  /** Total modifiers for abilities */
-  abilityTotalModifiers: Record<string, number>;
+  /** Total modifiers for attributes */
+  attributeTotalModifiers: Record<string, number>;
   /** Total modifiers for skills */
   skillTotalModifiers: Record<string, number>;
-  /** Skills organized by ability */
-  skillsByAbility: Record<string, SkillsByAbility>;
+  /** Skills organized by attribute */
+  skillsByAttribute: Record<string, SkillsByAttribute>;
   /** Items organized by type */
   items: Record<string, unknown[]>;
 }
 
 /**
- * Skills grouped by their governing ability
+ * Skills grouped by their governing attribute
  */
-export interface SkillsByAbility {
-  /** The governing ability name */
-  ability: string;
-  /** List of skills under this ability */
+export interface SkillsByAttribute {
+  /** The governing attribute name */
+  attribute: string;
+  /** List of skills under this attribute */
   skills: SkillEntry[];
 }
 
@@ -52,7 +52,7 @@ export interface SkillEntry {
   name: string;
   /** Skill value */
   value: number;
-  /** Total modifier including ability */
+  /** Total modifier including attribute */
   totalModifier: number;
 }
 
@@ -102,8 +102,8 @@ export interface RollValidationResult {
   error?: string;
   /** Validated level value */
   level?: number;
-  /** Validated ability modifier */
-  abilityMod?: number;
+  /** Validated attribute modifier */
+  attributeMod?: number;
   /** Validated skill modifier */
   skillMod?: number;
 }

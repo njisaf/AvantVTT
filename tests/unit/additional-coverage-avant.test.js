@@ -5,7 +5,7 @@
 
 import { jest } from '@jest/globals';
 import '../env/foundry-shim.js';
-import { createMockActor, createMockActorWithAbilities } from '../mocks/actor-factory.js';
+import { createMockActor, createMockActorWithAttributes } from '../mocks/actor-factory.js';
 import { createMockItem, createMockItemWithActor } from '../mocks/item-factory.js';
 import { resetFoundryGlobals } from '../env/reset-foundry.js';
 
@@ -69,10 +69,10 @@ describe('Avant System Additional Coverage', () => {
             }).not.toThrow();
         });
 
-        test('should generate roll data with abilities', () => {
+        test('should generate roll data with attributes', () => {
             const actor = createMockActor({
                 system: {
-                    abilities: {
+                    attributes: {
                         might: { modifier: 2 },
                         grace: { modifier: 1 }
                     },
@@ -101,7 +101,7 @@ describe('Avant System Additional Coverage', () => {
             }
         });
 
-        test('should handle missing abilities in getRollData', () => {
+        test('should handle missing attributes in getRollData', () => {
             const actor = createMockActor({ system: { level: 1 } });
             
             if (AvantActor && typeof AvantActor.prototype.getRollData === 'function') {
@@ -292,7 +292,7 @@ describe('Additional Coverage Tests for Stage 3(b)', () => {
             // Create a mock actor instance with minimal system data
             const mockActor = {
                 system: {
-                    abilities: {
+                    attributes: {
                         might: { modifier: 2 }
                     },
                     skills: {

@@ -79,7 +79,7 @@ This document summarizes the core mechanics, rolling rules, and data conventions
 - **Tabs:**
   - Core, Combat, Gear, Skills, Actions, Features, Talents & Powers.
 - **Skills Section:**
-  - Skills are grouped by their associated ability.
+  - Skills are grouped by their associated attribute.
   - Each skill displays its value and can be rolled (if roll button present).
 
 ---

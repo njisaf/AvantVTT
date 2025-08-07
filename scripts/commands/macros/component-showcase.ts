@@ -25,7 +25,7 @@ interface ComponentShowcaseData {
   
   // Select field examples
   sampleRarity: string;
-  sampleAbility: string;
+  sampleAttribute: string;
   
   // Checkbox examples
   sampleCheckboxTrue: boolean;
@@ -90,7 +90,7 @@ const RARITY_OPTIONS = [
   { value: 'artifact', label: 'Artifact' }
 ];
 
-const ABILITY_OPTIONS = [
+const ATTRIBUTE_OPTIONS = [
   { value: 'might', label: 'Might' },
   { value: 'grace', label: 'Grace' },
   { value: 'intellect', label: 'Intellect' },
@@ -111,7 +111,7 @@ function getSampleData(): ComponentShowcaseData {
     sampleNumberWithMax: 95,
     
     sampleRarity: 'rare',
-    sampleAbility: 'might',
+    sampleAttribute: 'might',
     
     sampleCheckboxTrue: true,
     sampleCheckboxFalse: false,
@@ -222,13 +222,13 @@ async function renderComponentShowcase(): Promise<string> {
             hint="Choose item rarity level"
         }}
         
-        {{> shared/partials/select-field 
-            name="sample.ability"
-            value="${sampleData.sampleAbility}"
-            label="Ability Selection"
-            options=abilityOptions
+        {{> shared/partials/select-field
+            name="sample.attribute"
+            value="${sampleData.sampleAttribute}"
+            label="Attribute Selection"
+            options=attributeOptions
             required=true
-            hint="Required ability selection"
+            hint="Required attribute selection"
         }}
       </div>
     </section>
@@ -352,7 +352,7 @@ async function renderComponentShowcase(): Promise<string> {
     ...sampleData,
     sampleTraits: SAMPLE_TRAITS,
     rarityOptions: RARITY_OPTIONS,
-    abilityOptions: ABILITY_OPTIONS
+    attributeOptions: ATTRIBUTE_OPTIONS
   };
 
   return (foundry as any).applications.handlebars.renderTemplate(showcaseTemplate, templateData);

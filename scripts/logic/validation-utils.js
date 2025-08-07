@@ -139,18 +139,18 @@ export function validateItemType(itemType) {
 }
 
 /**
- * Validates ability modifier values with bounds checking
- * 
- * This function validates ability data objects and ensures modifiers
+ * Validates attribute modifier values with bounds checking
+ *
+ * This function validates attribute data objects and ensures modifiers
  * are within reasonable bounds (-10 to +10). It creates a complete
- * abilities object with all four core abilities.
+ * attributes object with all four core attributes.
  * 
- * @param {Object} abilities - The abilities object to validate
- * @returns {Object} Validated abilities with all core abilities
+ * @param {Object} attributes - The attributes object to validate
+ * @returns {Object} Validated attributes with all core attributes
  * 
  * @example
- * // Valid abilities
- * const abilities = validateAbilities({
+ * // Valid attributes
+ * const attributes = validateAttributes({
  *     might: { modifier: 3 },
  *     grace: { modifier: -1 }
  * });
@@ -161,27 +161,27 @@ export function validateItemType(itemType) {
  * //   focus: { modifier: 0 }
  * // }
  */
-export function validateAbilities(abilities) {
-    if (!abilities || typeof abilities !== 'object') {
-        abilities = {};
+export function validateAttributes(attributes) {
+    if (!attributes || typeof attributes !== 'object') {
+        attributes = {};
     }
     
-    const validatedAbilities = {};
-    const defaultAbilities = ['might', 'grace', 'intellect', 'focus'];
+    const validatedAttributes = {};
+    const defaultAttributes = ['might', 'grace', 'intellect', 'focus'];
     
-    for (const abilityName of defaultAbilities) {
-        if (abilities[abilityName] && typeof abilities[abilityName] === 'object') {
-            let modifier = validateNumber(abilities[abilityName].modifier, 0, true);
+    for (const attributeName of defaultAttributes) {
+        if (attributes[attributeName] && typeof attributes[attributeName] === 'object') {
+            let modifier = validateNumber(attributes[attributeName].modifier, 0, true);
             
-            // No bounds checking - allow free input for ability modifiers
+            // No bounds checking - allow free input for attribute modifiers
             
-            validatedAbilities[abilityName] = { modifier };
+            validatedAttributes[attributeName] = { modifier };
         } else {
-            validatedAbilities[abilityName] = { modifier: 0 };
+            validatedAttributes[attributeName] = { modifier: 0 };
         }
     }
     
-    return validatedAbilities;
+    return validatedAttributes;
 }
 
 /**
@@ -224,18 +224,18 @@ export function validateSkills(skills) {
 }
 
 /**
- * Validates ability data within actor system data
- * 
- * This function validates ability values and modifiers within an actor's
+ * Validates attribute data within actor system data
+ *
+ * This function validates attribute values and modifiers within an actor's
  * system data structure. It handles both 'value' and 'mod' properties
- * for each ability.
- * 
- * @param {Object} systemAbilities - The actor's abilities from system data
- * @returns {Object} Validated abilities data
- * 
+ * for each attribute.
+ *
+ * @param {Object} systemAttributes - The actor's attributes from system data
+ * @returns {Object} Validated attributes data
+ *
  * @example
- * // Actor abilities validation
- * const abilities = validateActorAbilities({
+ * // Actor attributes validation
+ * const attributes = validateActorAttributes({
  *     might: { value: 15, mod: 2 },
  *     grace: { value: "12", mod: "1" }
  * });
@@ -244,25 +244,25 @@ export function validateSkills(skills) {
  * //   grace: { value: 12, mod: 1 }
  * // }
  */
-export function validateActorAbilities(systemAbilities) {
-    if (!systemAbilities || typeof systemAbilities !== 'object') {
-        return systemAbilities;
+export function validateActorAttributes(systemAttributes) {
+    if (!systemAttributes || typeof systemAttributes !== 'object') {
+        return systemAttributes;
     }
     
     const validated = {};
     
-    for (const [abilityName, abilityData] of Object.entries(systemAbilities)) {
-        if (abilityData && typeof abilityData === 'object') {
-            validated[abilityName] = { ...abilityData };
+    for (const [attributeName, attributeData] of Object.entries(systemAttributes)) {
+        if (attributeData && typeof attributeData === 'object') {
+            validated[attributeName] = { ...attributeData };
             
-            if (abilityData.value !== undefined) {
-                validated[abilityName].value = validateNumber(abilityData.value, 10, true);
+            if (attributeData.value !== undefined) {
+                validated[attributeName].value = validateNumber(attributeData.value, 10, true);
             }
-            if (abilityData.mod !== undefined) {
-                validated[abilityName].mod = validateNumber(abilityData.mod, 0, true);
+            if (attributeData.mod !== undefined) {
+                validated[attributeName].mod = validateNumber(attributeData.mod, 0, true);
             }
         } else {
-            validated[abilityName] = abilityData;
+            validated[attributeName] = attributeData;
         }
     }
     

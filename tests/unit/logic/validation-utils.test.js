@@ -10,9 +10,9 @@ import {
     validateString,
     validateActorType,
     validateItemType,
-    validateAbilities,
+    validateAttributes,
     validateSkills,
-    validateActorAbilities,
+    validateActorAttributes,
     validateActorSkills,
     validateHealthData,
     validatePowerPointsData,
@@ -133,8 +133,8 @@ describe('Validation Utils Pure Functions', () => {
         });
     });
 
-    describe('validateAbilities', () => {
-        test('should validate complete abilities object', () => {
+    describe('validateAttributes', () => {
+        test('should validate complete attributes object', () => {
             const input = {
                 might: { modifier: 3 },
                 grace: { modifier: -1 },
@@ -142,7 +142,7 @@ describe('Validation Utils Pure Functions', () => {
                 focus: { modifier: 0 }
             };
             
-            const result = validateAbilities(input);
+            const result = validateAttributes(input);
             
             expect(result.might.modifier).toBe(3);
             expect(result.grace.modifier).toBe(-1);
@@ -150,12 +150,12 @@ describe('Validation Utils Pure Functions', () => {
             expect(result.focus.modifier).toBe(0);
         });
 
-        test('should fill missing abilities with default values', () => {
+        test('should fill missing attributes with default values', () => {
             const input = {
                 might: { modifier: 2 }
             };
             
-            const result = validateAbilities(input);
+            const result = validateAttributes(input);
             
             expect(result.might.modifier).toBe(2);
             expect(result.grace.modifier).toBe(0);
@@ -169,15 +169,15 @@ describe('Validation Utils Pure Functions', () => {
                 grace: { modifier: -15 }
             };
             
-            const result = validateAbilities(input);
+            const result = validateAttributes(input);
             
             expect(result.might.modifier).toBe(15);
             expect(result.grace.modifier).toBe(-15);
         });
 
         test('should handle null/undefined input', () => {
-            const result1 = validateAbilities(null);
-            const result2 = validateAbilities(undefined);
+            const result1 = validateAttributes(null);
+            const result2 = validateAttributes(undefined);
             
             expect(result1.might.modifier).toBe(0);
             expect(result1.grace.modifier).toBe(0);
@@ -191,7 +191,7 @@ describe('Validation Utils Pure Functions', () => {
                 grace: { modifier: "-1" }
             };
             
-            const result = validateAbilities(input);
+            const result = validateAttributes(input);
             
             expect(result.might.modifier).toBe(3);
             expect(result.grace.modifier).toBe(-1);
@@ -255,14 +255,14 @@ describe('Validation Utils Pure Functions', () => {
         });
     });
 
-    describe('validateActorAbilities', () => {
-        test('should validate ability values and modifiers', () => {
+    describe('validateActorAttributes', () => {
+        test('should validate attribute values and modifiers', () => {
             const input = {
                 might: { value: 15, mod: 2 },
                 grace: { value: "12", mod: "1" }
             };
             
-            const result = validateActorAbilities(input);
+            const result = validateActorAttributes(input);
             
             expect(result.might.value).toBe(15);
             expect(result.might.mod).toBe(2);
@@ -275,7 +275,7 @@ describe('Validation Utils Pure Functions', () => {
                 might: { value: 15, mod: 2, label: "Might" }
             };
             
-            const result = validateActorAbilities(input);
+            const result = validateActorAttributes(input);
             
             expect(result.might.value).toBe(15);
             expect(result.might.mod).toBe(2);
@@ -283,17 +283,17 @@ describe('Validation Utils Pure Functions', () => {
         });
 
         test('should handle null/undefined input', () => {
-            expect(validateActorAbilities(null)).toBeNull();
-            expect(validateActorAbilities(undefined)).toBeUndefined();
+            expect(validateActorAttributes(null)).toBeNull();
+            expect(validateActorAttributes(undefined)).toBeUndefined();
         });
 
-        test('should handle invalid ability data', () => {
+        test('should handle invalid attribute data', () => {
             const input = {
                 might: "not an object",
                 grace: { value: "invalid", mod: "also invalid" }
             };
             
-            const result = validateActorAbilities(input);
+            const result = validateActorAttributes(input);
             
             expect(result.might).toBe("not an object");
             expect(result.grace.value).toBe(10); // default

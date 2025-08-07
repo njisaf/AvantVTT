@@ -45,8 +45,8 @@ export interface ItemDisplayInfo {
     displayText: string;
     /** Damage information for weapons */
     damageInfo?: string;
-    /** Ability information */
-    abilityInfo?: string;
+    /** Attribute information */
+    attributeInfo?: string;
     /** Armor class information for armor */
     acInfo?: string;
     /** Category information for features */
@@ -208,7 +208,7 @@ export function calculateItemWeight(item: unknown): number {
  * const display = formatItemDisplay({
  *     name: 'Iron Sword',
  *     type: 'weapon',
- *     system: { damage: '1d8', damageType: 'slashing', ability: 'might' }
+ *     system: { damage: '1d8', damageType: 'slashing', attribute: 'might' }
  * });
  * // Result: { displayText: 'Iron Sword (1d8 slashing, might)', ... }
  * ```
@@ -233,7 +233,7 @@ export function formatItemDisplay(item: unknown): ItemDisplayInfo {
     if (type === 'weapon') {
         const damage = system.damageDie || system.damage || '';
         const damageType = system.damageType || '';
-        const ability = system.ability || '';
+        const attribute = system.attribute || '';
 
         const parts: string[] = [];
         if (damage && damageType) {
@@ -244,9 +244,9 @@ export function formatItemDisplay(item: unknown): ItemDisplayInfo {
             parts.push(damage);
         }
 
-        if (ability) {
-            result.abilityInfo = ability;
-            parts.push(ability);
+        if (attribute) {
+            result.attributeInfo = attribute;
+            parts.push(attribute);
         }
 
         if (parts.length > 0) {
@@ -254,7 +254,7 @@ export function formatItemDisplay(item: unknown): ItemDisplayInfo {
         }
     } else if (type === 'armor') {
         const ac = system.ac;
-        const ability = system.ability || '';
+        const attribute = system.attribute || '';
 
         const parts: string[] = [];
         if (ac !== undefined && ac !== null) {
@@ -262,9 +262,9 @@ export function formatItemDisplay(item: unknown): ItemDisplayInfo {
             parts.push(result.acInfo);
         }
 
-        if (ability) {
-            result.abilityInfo = ability;
-            parts.push(ability);
+        if (attribute) {
+            result.attributeInfo = attribute;
+            parts.push(attribute);
         }
 
         if (parts.length > 0) {

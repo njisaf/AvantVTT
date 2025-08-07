@@ -33,43 +33,43 @@
         </div>
 
 
-        <!-- Abilities -->
+        <!-- Attributes -->
         <div class="sidebar-section">
-            <h4>Abilities</h4>
-            <div class="sidebar-abilities">
-                <div class="sidebar-ability">
+            <h4>{{localize "avant.attributes"}}</h4>
+            <div class="sidebar-attributes">
+                <div class="sidebar-attribute">
                     <label>Might</label>
-                    <div class="ability-input-row">
-                        <input type="text" name="system.abilities.might.modifier" value="{{system.abilities.might.modifier}}" data-dtype="Number" class="sidebar-input ability-modifier-input"/>
-                        <button type="button" class="ability-roll-btn rollable" data-action="rollAbility" data-ability="might" title="Click: Might Check (2d10+Level+Modifier)">
-                            {{#if (gt abilityTotalModifiers.might 0)}}+{{/if}}{{abilityTotalModifiers.might}}
+                    <div class="attribute-input-row">
+                        <input type="text" name="system.attributes.might.modifier" value="{{system.attributes.might.modifier}}" data-dtype="Number" class="sidebar-input attribute-modifier-input"/>
+                        <button type="button" class="attribute-roll-btn rollable" data-action="rollAttribute" data-attribute="might" title="Click: Might Check (2d10+Level+Modifier)">
+                            {{#if (gt attributeTotalModifiers.might 0)}}+{{/if}}{{attributeTotalModifiers.might}}
                         </button>
                     </div>
                 </div>
-                <div class="sidebar-ability">
+                <div class="sidebar-attribute">
                     <label>Grace</label>
-                    <div class="ability-input-row">
-                        <input type="text" name="system.abilities.grace.modifier" value="{{system.abilities.grace.modifier}}" data-dtype="Number" class="sidebar-input ability-modifier-input"/>
-                        <button type="button" class="ability-roll-btn rollable" data-action="rollAbility" data-ability="grace" title="Click: Grace Check (2d10+Level+Modifier)">
-                            {{#if (gt abilityTotalModifiers.grace 0)}}+{{/if}}{{abilityTotalModifiers.grace}}
+                    <div class="attribute-input-row">
+                        <input type="text" name="system.attributes.grace.modifier" value="{{system.attributes.grace.modifier}}" data-dtype="Number" class="sidebar-input attribute-modifier-input"/>
+                        <button type="button" class="attribute-roll-btn rollable" data-action="rollAttribute" data-attribute="grace" title="Click: Grace Check (2d10+Level+Modifier)">
+                            {{#if (gt attributeTotalModifiers.grace 0)}}+{{/if}}{{attributeTotalModifiers.grace}}
                         </button>
                     </div>
                 </div>
-                <div class="sidebar-ability">
+                <div class="sidebar-attribute">
                     <label>Intellect</label>
-                    <div class="ability-input-row">
-                        <input type="text" name="system.abilities.intellect.modifier" value="{{system.abilities.intellect.modifier}}" data-dtype="Number" class="sidebar-input ability-modifier-input"/>
-                        <button type="button" class="ability-roll-btn rollable" data-action="rollAbility" data-ability="intellect" title="Click: Intellect Check (2d10+Level+Modifier)">
-                            {{#if (gt abilityTotalModifiers.intellect 0)}}+{{/if}}{{abilityTotalModifiers.intellect}}
+                    <div class="attribute-input-row">
+                        <input type="text" name="system.attributes.intellect.modifier" value="{{system.attributes.intellect.modifier}}" data-dtype="Number" class="sidebar-input attribute-modifier-input"/>
+                        <button type="button" class="attribute-roll-btn rollable" data-action="rollAttribute" data-attribute="intellect" title="Click: Intellect Check (2d10+Level+Modifier)">
+                            {{#if (gt attributeTotalModifiers.intellect 0)}}+{{/if}}{{attributeTotalModifiers.intellect}}
                         </button>
                     </div>
                 </div>
-                <div class="sidebar-ability">
+                <div class="sidebar-attribute">
                     <label>Focus</label>
-                    <div class="ability-input-row">
-                        <input type="text" name="system.abilities.focus.modifier" value="{{system.abilities.focus.modifier}}" data-dtype="Number" class="sidebar-input ability-modifier-input"/>
-                        <button type="button" class="ability-roll-btn rollable" data-action="rollAbility" data-ability="focus" title="Click: Focus Check (2d10+Level+Modifier)">
-                            {{#if (gt abilityTotalModifiers.focus 0)}}+{{/if}}{{abilityTotalModifiers.focus}}
+                    <div class="attribute-input-row">
+                        <input type="text" name="system.attributes.focus.modifier" value="{{system.attributes.focus.modifier}}" data-dtype="Number" class="sidebar-input attribute-modifier-input"/>
+                        <button type="button" class="attribute-roll-btn rollable" data-action="rollAttribute" data-attribute="focus" title="Click: Focus Check (2d10+Level+Modifier)">
+                            {{#if (gt attributeTotalModifiers.focus 0)}}+{{/if}}{{attributeTotalModifiers.focus}}
                         </button>
                     </div>
                 </div>

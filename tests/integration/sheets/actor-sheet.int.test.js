@@ -41,7 +41,7 @@ describe('AvantActorSheet Integration Tests', () => {
                 system: {
                     level: 2,
                     tier: 1,
-                    abilities: {
+                    attributes: {
                         might: { modifier: 2 },
                         grace: { modifier: 1 },
                         intellect: { modifier: 0 }
@@ -78,8 +78,8 @@ describe('AvantActorSheet Integration Tests', () => {
         // Create mock HTML element and wrap in jQuery for v13 compatibility
         const htmlElement = document.createElement('div');
         htmlElement.innerHTML = `
-            <div class="rollable" data-roll="2d10+@level" data-label="Ability Check">
-                Roll Ability
+            <div class="rollable" data-roll="2d10+@level" data-label="Attribute Check">
+                Roll Attribute
             </div>
         `;
         mockHtml = global.jQuery(htmlElement);
@@ -141,12 +141,12 @@ describe('AvantActorSheet Integration Tests', () => {
             expect(context.options).toBeDefined();
             
             // Calculated data that the sheet actually provides
-            expect(context.abilityTotalModifiers).toBeDefined();
+            expect(context.attributeTotalModifiers).toBeDefined();
             expect(context.skillTotalModifiers).toBeDefined();
             
             // Items organization that the sheet provides
             expect(context.items).toBeDefined();
-            expect(context.skillsByAbility).toBeDefined();
+            expect(context.skillsByAttribute).toBeDefined();
             
             // Remove defense expectations since they're not actually calculated
             // The sheet delegates to the template and underlying data for these values
@@ -156,19 +156,19 @@ describe('AvantActorSheet Integration Tests', () => {
             const context = await actorSheet.getData();
             
             // level (2) + ability modifier (2) = 4 for might
-            expect(context.abilityTotalModifiers.might).toBe(4);
-            expect(context.abilityTotalModifiers.grace).toBe(3);
-            expect(context.abilityTotalModifiers.intellect).toBe(2);
+            expect(context.attributeTotalModifiers.might).toBe(4);
+            expect(context.attributeTotalModifiers.grace).toBe(3);
+            expect(context.attributeTotalModifiers.intellect).toBe(2);
         });
 
-        test('should handle empty abilities and skills', async () => {
+        test('should handle empty attributes and skills', async () => {
             mockActor.toObject.mockReturnValue({
                 system: { level: 1 },
                 flags: {}
             });
             
             const context = await actorSheet.getData();
-            expect(context.abilityTotalModifiers).toBeDefined();
+            expect(context.attributeTotalModifiers).toBeDefined();
             expect(context.skillTotalModifiers).toBeDefined();
         });
     });
@@ -219,7 +219,7 @@ describe('AvantActorSheet Integration Tests', () => {
                 currentTarget: {
                     dataset: {
                         roll: '2d10+@level',
-                        label: 'Ability Check'
+                        label: 'Attribute Check'
                     }
                 }
             };
@@ -420,7 +420,7 @@ describe('AvantActorSheet Integration Tests', () => {
             // Verify essential context properties exist
             expect(context.system).toBeDefined();
             expect(context.items).toBeDefined();
-            expect(context.abilityTotalModifiers).toBeDefined();
+            expect(context.attributeTotalModifiers).toBeDefined();
             expect(context.skillTotalModifiers).toBeDefined();
             
             // Verify items context has all required categories
@@ -464,7 +464,7 @@ describe('AvantActorSheet Integration Tests', () => {
             const context = await actorSheet.getData();
             
             // Test calculated values integration with items
-            expect(context.abilityTotalModifiers.might).toBe(4); // level 2 + modifier 2
+            expect(context.attributeTotalModifiers.might).toBe(4); // level 2 + modifier 2
             
             // Remove defense expectations since they're not actually calculated by the sheet
             
@@ -522,11 +522,11 @@ describe('AvantActorSheet Integration Tests', () => {
         test('should use calculated values for display', async () => {
             const context = await actorSheet.getData();
             
-            // Verify calculation integration 
-            expect(typeof context.abilityTotalModifiers).toBe('object');
+            // Verify calculation integration
+            expect(typeof context.attributeTotalModifiers).toBe('object');
             expect(typeof context.skillTotalModifiers).toBe('object');
             expect(typeof context.items).toBe('object');
-            expect(typeof context.skillsByAbility).toBe('object');
+            expect(typeof context.skillsByAttribute).toBe('object');
             
             // Remove defense expectations since they're not calculated by the sheet
         });
@@ -546,7 +546,7 @@ describe('AvantActorSheet Integration Tests', () => {
             
             // Should still provide basic structure
             expect(context.system).toBeDefined();
-            expect(context.abilityTotalModifiers).toBeDefined();
+            expect(context.attributeTotalModifiers).toBeDefined();
             expect(context.skillTotalModifiers).toBeDefined();
             
             // Remove defense expectations since they're not calculated

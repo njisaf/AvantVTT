@@ -13,7 +13,7 @@ import {
   ValidationResult,
   ValidationOptions,
   RARITY_VALUES,
-  ABILITY_VALUES,
+  ATTRIBUTE_VALUES,
   validateRequiredString,
   validateStringLength,
   validateNumberRange,
@@ -21,7 +21,7 @@ import {
   validatePpCost,
   validateLevelRequirement,
   validateRarity,
-  validateAbility,
+  validateAttribute,
   validateUsesCounter,
   validateHexColor,
   validateFontAwesomeIcon,
@@ -210,16 +210,16 @@ describe('Item Validation Utilities', () => {
     });
   });
 
-  describe('validateAbility', () => {
-    test('should validate all defined ability values', () => {
-      ABILITY_VALUES.forEach(ability => {
-        const result = validateAbility(ability);
+  describe('validateAttribute', () => {
+    test('should validate all defined attribute values', () => {
+      ATTRIBUTE_VALUES.forEach(attribute => {
+        const result = validateAttribute(attribute);
         expect(result.isValid).toBe(true);
       });
     });
 
-    test('should invalidate undefined ability values', () => {
-      const result = validateAbility('invalid-ability');
+    test('should invalidate undefined attribute values', () => {
+      const result = validateAttribute('invalid-attribute');
       expect(result.isValid).toBe(false);
       expect(result.errors[0]).toContain('must be one of:');
     });

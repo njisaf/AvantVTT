@@ -174,7 +174,7 @@ describe('Item Sheet Utils - Pure Functions', () => {
                 type: 'weapon',
                 system: { 
                     damage: '1d8',
-                    ability: 'might',
+                    attribute: 'might',
                     damageType: 'slashing'
                 }
             };
@@ -186,7 +186,7 @@ describe('Item Sheet Utils - Pure Functions', () => {
                 type: 'weapon',
                 displayText: 'Iron Sword (1d8 slashing, might)',
                 damageInfo: '1d8 slashing',
-                abilityInfo: 'might'
+                attributeInfo: 'might'
             });
         });
 
@@ -196,7 +196,7 @@ describe('Item Sheet Utils - Pure Functions', () => {
                 type: 'armor',
                 system: { 
                     ac: 2,
-                    ability: 'grace'
+                    attribute: 'grace'
                 }
             };
 
@@ -207,7 +207,7 @@ describe('Item Sheet Utils - Pure Functions', () => {
                 type: 'armor',
                 displayText: 'Leather Armor (AC +2, grace)',
                 acInfo: 'AC +2',
-                abilityInfo: 'grace'
+                attributeInfo: 'grace'
             });
         });
 
@@ -269,8 +269,8 @@ describe('Item Sheet Utils - Pure Functions', () => {
 
         test('should handle nested properties', () => {
             const formData = {
-                'system.attributes.durability.value': '10',
-                'system.attributes.durability.max': '10'
+                'system.attributes.durattribute.value': '10',
+                'system.attributes.durattribute.max': '10'
             };
 
             const result = extractItemFormData(formData);
@@ -278,7 +278,7 @@ describe('Item Sheet Utils - Pure Functions', () => {
             expect(result).toEqual({
                 system: {
                     attributes: {
-                        durability: {
+                        durattribute: {
                             value: 10,
                             max: 10
                         }

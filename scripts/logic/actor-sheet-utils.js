@@ -43,8 +43,8 @@ export function prepareItemData(itemType, dataset) {
         itemData.system.category = data.category;
     }
     
-    if (itemType === "action" && !itemData.system.ability) {
-        itemData.system.ability = "might";
+    if (itemType === "action" && !itemData.system.attribute) {
+        itemData.system.attribute = "might";
     }
     
     if (itemType === "augment" && !itemData.system.augmentType) {
@@ -312,19 +312,19 @@ export function extractCombatItemId(element) {
  * 
  * This function creates properly formatted flavor text for rolls by
  * capitalizing the first letter of names and optionally including
- * governing ability information for skills.
+ * governing attribute information for skills.
  * 
- * @param {string} name - The base name (ability, skill, etc.)
+ * @param {string} name - The base name (attribute, skill, etc.)
  * @param {string} [action=''] - The action being performed
- * @param {string} [governingAbility] - Optional governing ability for skills
+ * @param {string} [governingAbility] - Optional governing attribute for skills
  * @returns {string} Formatted flavor text
  * 
  * @example
- * // Simple ability check
+ * // Simple attribute check
  * const flavor = formatFlavorText('might', 'Check');
  * // Result: "Might Check"
  * 
- * // Skill check with governing ability
+ * // Skill check with governing attribute
  * const flavor = formatFlavorText('athletics', 'Check', 'might');
  * // Result: "Athletics Check (Might)"
  */

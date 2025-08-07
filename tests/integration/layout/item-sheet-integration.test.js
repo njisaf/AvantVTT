@@ -36,7 +36,7 @@ describe('Layout System Integration with Item Sheet Utils', () => {
         system: {
             damage: '1d8',
             modifier: 2,
-            ability: 'might',
+            attribute: 'might',
             weight: 3.0,
             cost: 150,
             description: 'A test weapon',
@@ -196,12 +196,12 @@ describe('Layout System Integration with Item Sheet Utils', () => {
             expect(damageField.type).toBe('text');
             expect(damageField.class).toBe('weapon-damage');
             
-            // Should have ability field
-            const abilityField = result.find(f => f.name === 'system.ability');
-            expect(abilityField).toBeTruthy();
-            expect(abilityField.type).toBe('select');
-            expect(abilityField.value).toBe('might');
-            expect(abilityField.class).toBe('weapon-ability');
+            // Should have attribute field
+            const attributeField = result.find(f => f.name === 'system.attribute');
+            expect(attributeField).toBeTruthy();
+            expect(attributeField.type).toBe('select');
+            expect(attributeField.value).toBe('might');
+            expect(attributeField.class).toBe('weapon-attributes');
             
             // Should have weight and cost fields
             const weightField = result.find(f => f.name === 'system.weight');
@@ -266,19 +266,19 @@ describe('Layout System Integration with Item Sheet Utils', () => {
             const result = prepareItemBodyFields(mockWeaponItem, mockWeaponItem.system);
             const fieldNames = result.map(f => f.name);
             
-            // Verify order is: damage, modifier, description, ability, weight, cost, traits
+            // Verify order is: damage, modifier, description, attribute, weight, cost, traits
             const damageIndex = fieldNames.indexOf('system.damage');
             const modifierIndex = fieldNames.indexOf('system.modifier');
             const descIndex = fieldNames.indexOf('system.description');
-            const abilityIndex = fieldNames.indexOf('system.ability');
+            const attributeIndex = fieldNames.indexOf('system.attribute');
             const weightIndex = fieldNames.indexOf('system.weight');
             const costIndex = fieldNames.indexOf('system.cost');
             const traitsIndex = fieldNames.indexOf('system.traits');
             
             expect(damageIndex).toBeLessThan(modifierIndex);
             expect(modifierIndex).toBeLessThan(descIndex);
-            expect(descIndex).toBeLessThan(abilityIndex);
-            expect(abilityIndex).toBeLessThan(weightIndex);
+            expect(descIndex).toBeLessThan(attributeIndex);
+            expect(attributeIndex).toBeLessThan(weightIndex);
             expect(weightIndex).toBeLessThan(costIndex);
             expect(costIndex).toBeLessThan(traitsIndex);
         });

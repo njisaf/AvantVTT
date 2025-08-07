@@ -7,30 +7,30 @@ import { describe, test, expect, beforeEach } from '@jest/globals';
 
 // Import the functions we're testing
 import { 
-    calculateAbilityTotalModifiers,
+    calculateAttributeTotalModifiers,
     calculateSkillTotalModifiers,
     calculateDefenseValues,
     calculateDefenseThreshold,
     calculateRemainingExpertisePoints,
     calculatePowerPointLimit,
-    organizeSkillsByAbility,
+    organizeSkillsByAttribute,
     organizeItemsByType,
-    validateAbilityRollData,
+    validateAttributeRollData,
     validateSkillRollData
 } from '../../../scripts/logic/actor-sheet.js';
 
 describe('Actor Sheet Logic - Pure Functions', () => {
     
-    describe('calculateAbilityTotalModifiers', () => {
-        test('calculates correct total modifiers for abilities', () => {
-            const abilities = {
+    describe('calculateAttributeTotalModifiers', () => {
+        test('calculates correct total modifiers for attributes', () => {
+            const attributes = {
                 might: { modifier: 2 },
                 intellect: { modifier: -1 },
                 personality: { modifier: 0 }
             };
             const level = 3;
             
-            const result = calculateAbilityTotalModifiers(abilities, level);
+            const result = calculateAttributeTotalModifiers(attributes, level);
             
             expect(result).toEqual({
                 might: 5,        // 3 + 2 = 5
@@ -39,14 +39,14 @@ describe('Actor Sheet Logic - Pure Functions', () => {
             });
         });
 
-        test('handles missing ability modifiers', () => {
-            const abilities = {
+        test('handles missing attribute modifiers', () => {
+            const attributes = {
                 might: {},  // no modifier property
                 intellect: { modifier: 2 }
             };
             const level = 2;
             
-            const result = calculateAbilityTotalModifiers(abilities, level);
+            const result = calculateAttributeTotalModifiers(attributes, level);
             
             expect(result).toEqual({
                 might: 2,        // 2 + 0 = 2 (default)
@@ -55,17 +55,17 @@ describe('Actor Sheet Logic - Pure Functions', () => {
         });
 
         test('handles invalid input data', () => {
-            expect(calculateAbilityTotalModifiers(null, 3)).toEqual({});
-            expect(calculateAbilityTotalModifiers(undefined, 3)).toEqual({});
-            expect(calculateAbilityTotalModifiers({}, 3)).toEqual({});
+            expect(calculateAttributeTotalModifiers(null, 3)).toEqual({});
+            expect(calculateAttributeTotalModifiers(undefined, 3)).toEqual({});
+            expect(calculateAttributeTotalModifiers({}, 3)).toEqual({});
         });
 
         test('handles invalid level values', () => {
-            const abilities = { might: { modifier: 1 } };
+            const attributes = { might: { modifier: 1 } };
             
-            expect(calculateAbilityTotalModifiers(abilities, 0)).toEqual({ might: 2 }); // 1 default + 1 modifier
-            expect(calculateAbilityTotalModifiers(abilities, null)).toEqual({ might: 2 }); // 1 default + 1 modifier
-            expect(calculateAbilityTotalModifiers(abilities, 'invalid')).toEqual({ might: 2 }); // 1 default + 1 modifier
+            expect(calculateAttributeTotalModifiers(attributes, 0)).toEqual({ might: 2 }); // 1 default + 1 modifier
+            expect(calculateAttributeTotalModifiers(attributes, null)).toEqual({ might: 2 }); // 1 default + 1 modifier
+            expect(calculateAttributeTotalModifiers(attributes, 'invalid')).toEqual({ might: 2 }); // 1 default + 1 modifier
         });
     });
 
@@ -76,19 +76,19 @@ describe('Actor Sheet Logic - Pure Functions', () => {
                 stealth: 1,
                 arcana: 2
             };
-            const abilities = {
+            const attributes = {
                 might: { modifier: 2 },
                 agility: { modifier: 1 },
                 intellect: { modifier: 0 }
             };
-            const skillAbilityMap = {
+            const skillAttributeMap = {
                 athletics: 'might',
                 stealth: 'agility',
                 arcana: 'intellect'
             };
             const level = 2;
             
-            const result = calculateSkillTotalModifiers(skills, abilities, skillAbilityMap, level);
+            const result = calculateSkillTotalModifiers(skills, attributes, skillAttributeMap, level);
             
             expect(result).toEqual({
                 athletics: 7,  // 2 + 2 + 3 = 7
@@ -102,17 +102,17 @@ describe('Actor Sheet Logic - Pure Functions', () => {
                 athletics: 2
                 // stealth missing
             };
-            const abilities = {
+            const attributes = {
                 might: { modifier: 1 },
                 agility: { modifier: 1 }
             };
-            const skillAbilityMap = {
+            const skillAttributeMap = {
                 athletics: 'might',
                 stealth: 'agility'
             };
             const level = 3;
             
-            const result = calculateSkillTotalModifiers(skills, abilities, skillAbilityMap, level);
+            const result = calculateSkillTotalModifiers(skills, attributes, skillAttributeMap, level);
             
             expect(result).toEqual({
                 athletics: 6,  // 3 + 1 + 2 = 6
@@ -129,14 +129,14 @@ describe('Actor Sheet Logic - Pure Functions', () => {
 
     describe('calculateDefenseValues', () => {
         test('no longer calculates defense values - returns empty object', () => {
-            const abilities = {
+            const attributes = {
                 might: { modifier: 2 },
                 intellect: { modifier: -1 },
                 personality: { modifier: 1 }
             };
             const tier = 2;
             
-            const result = calculateDefenseValues(abilities, tier);
+            const result = calculateDefenseValues(attributes, tier);
             
             // Function now returns empty object since defense is user input
             expect(result).toEqual({});
@@ -197,14 +197,14 @@ describe('Actor Sheet Logic - Pure Functions', () => {
         });
     });
 
-    describe('organizeSkillsByAbility', () => {
-        test('organizes skills correctly by ability', () => {
+    describe('organizeSkillsByAttribute', () => {
+        test('organizes skills correctly by attribute', () => {
             const skills = { athletics: 2 };
-            const abilities = { might: { modifier: 1 } };
-            const skillAbilityMap = { athletics: 'might' };
+            const attributes = { might: { modifier: 1 } };
+            const skillAttributeMap = { athletics: 'might' };
             const level = 2;
             
-            const result = organizeSkillsByAbility(skills, abilities, skillAbilityMap, level);
+            const result = organizeSkillsByAttribute(skills, attributes, skillAttributeMap, level);
             
             expect(result.might[0]).toEqual({
                 name: 'athletics',
@@ -215,9 +215,9 @@ describe('Actor Sheet Logic - Pure Functions', () => {
         });
 
         test('handles invalid input data', () => {
-            expect(organizeSkillsByAbility(null, {}, {}, 1)).toEqual({});
-            expect(organizeSkillsByAbility({}, null, {}, 1)).toEqual({});
-            expect(organizeSkillsByAbility({}, {}, null, 1)).toEqual({});
+            expect(organizeSkillsByAttribute(null, {}, {}, 1)).toEqual({});
+            expect(organizeSkillsByAttribute({}, null, {}, 1)).toEqual({});
+            expect(organizeSkillsByAttribute({}, {}, null, 1)).toEqual({});
         });
     });
 
@@ -434,49 +434,49 @@ describe('Actor Sheet Logic - Pure Functions', () => {
         });
     });
 
-    describe('validateAbilityRollData', () => {
-        test('validates correct ability roll data', () => {
-            const result = validateAbilityRollData('might', { modifier: 2 }, 3);
+    describe('validateAttributeRollData', () => {
+        test('validates correct attribute roll data', () => {
+            const result = validateAttributeRollData('might', { modifier: 2 }, 3);
             expect(result.valid).toBe(true);
             expect(result.level).toBe(3);
-            expect(result.abilityMod).toBe(2);
+            expect(result.attributeMod).toBe(2);
         });
 
-        test('rejects invalid ability name', () => {
-            const result1 = validateAbilityRollData('', { modifier: 2 }, 3);
+        test('rejects invalid attribute name', () => {
+            const result1 = validateAttributeRollData('', { modifier: 2 }, 3);
             expect(result1.valid).toBe(false);
-            expect(result1.error).toBe("No ability name specified");
+            expect(result1.error).toBe("No attribute name specified");
             
-            const result2 = validateAbilityRollData(null, { modifier: 2 }, 3);
+            const result2 = validateAttributeRollData(null, { modifier: 2 }, 3);
             expect(result2.valid).toBe(false);
-            expect(result2.error).toBe("No ability name specified");
+            expect(result2.error).toBe("No attribute name specified");
         });
 
-        test('rejects invalid ability data', () => {
-            const result1 = validateAbilityRollData('might', null, 3);
+        test('rejects invalid attribute data', () => {
+            const result1 = validateAttributeRollData('might', null, 3);
             expect(result1.valid).toBe(false);
-            expect(result1.error).toBe("Invalid ability data");
+            expect(result1.error).toBe("Invalid attribute data");
             
-            const result2 = validateAbilityRollData('might', undefined, 3);
+            const result2 = validateAttributeRollData('might', undefined, 3);
             expect(result2.valid).toBe(false);
-            expect(result2.error).toBe("Invalid ability data");
+            expect(result2.error).toBe("Invalid attribute data");
         });
 
         test('rejects invalid level', () => {
-            const result1 = validateAbilityRollData('might', { modifier: 2 }, 0);
+            const result1 = validateAttributeRollData('might', { modifier: 2 }, 0);
             expect(result1.valid).toBe(false);
             expect(result1.error).toBe("Invalid character level");
             
-            const result2 = validateAbilityRollData('might', { modifier: 2 }, null);
+            const result2 = validateAttributeRollData('might', { modifier: 2 }, null);
             expect(result2.valid).toBe(false);
             expect(result2.error).toBe("Invalid character level");
         });
 
-        test('handles missing ability modifier', () => {
-            const result = validateAbilityRollData('might', {}, 3);
+        test('handles missing attribute modifier', () => {
+            const result = validateAttributeRollData('might', {}, 3);
             expect(result.valid).toBe(true);
             expect(result.level).toBe(3);
-            expect(result.abilityMod).toBe(0); // defaults to 0
+            expect(result.attributeMod).toBe(0); // defaults to 0
         });
     });
 
@@ -485,7 +485,7 @@ describe('Actor Sheet Logic - Pure Functions', () => {
             const result = validateSkillRollData('athletics', 3, { modifier: 1 }, 2);
             expect(result.valid).toBe(true);
             expect(result.level).toBe(2);
-            expect(result.abilityMod).toBe(1);
+            expect(result.attributeMod).toBe(1);
             expect(result.skillMod).toBe(3);
         });
 
@@ -509,10 +509,10 @@ describe('Actor Sheet Logic - Pure Functions', () => {
             expect(result2.error).toBe("Invalid skill value");
         });
 
-        test('rejects invalid ability data', () => {
+        test('rejects invalid attribute data', () => {
             const result = validateSkillRollData('athletics', 3, null, 2);
             expect(result.valid).toBe(false);
-            expect(result.error).toBe("Invalid ability data for skill");
+            expect(result.error).toBe("Invalid attribute data for skill");
         });
 
         test('rejects invalid level', () => {
@@ -521,11 +521,11 @@ describe('Actor Sheet Logic - Pure Functions', () => {
             expect(result.error).toBe("Invalid character level");
         });
 
-        test('handles missing ability modifier', () => {
+        test('handles missing attribute modifier', () => {
             const result = validateSkillRollData('athletics', 3, {}, 2);
             expect(result.valid).toBe(true);
             expect(result.level).toBe(2);
-            expect(result.abilityMod).toBe(0); // defaults to 0
+            expect(result.attributeMod).toBe(0); // defaults to 0
             expect(result.skillMod).toBe(3);
         });
     });

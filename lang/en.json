@@ -7,6 +7,8 @@
     "biography": "Biography",
     "items": "Items",
     "attributes": "Attributes",
+    "attribute": "Attribute",
+    "attributeMod": "Attribute Mod",
     "description": "Description"
     },
     "AVANT": {

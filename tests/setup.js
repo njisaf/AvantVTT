@@ -25,6 +25,26 @@ import './env/foundry-shim.js';
 // Import Jest for mock creation
 import { jest } from '@jest/globals';
 
+// Mock foundry.data.fields
+if (typeof global.foundry === 'undefined') {
+  global.foundry = {};
+}
+if (typeof global.foundry.data === 'undefined') {
+  global.foundry.data = {};
+}
+
+const fields = {
+    StringField: jest.fn().mockImplementation(options => ({ options })),
+ NumberField: jest.fn().mockImplementation(options => ({ options })),
+ BooleanField: jest.fn().mockImplementation(options => ({ options })),
+ HTMLField: jest.fn().mockImplementation(options => ({ options })),
+ ObjectField: jest.fn().mockImplementation(options => ({ options })),
+ SchemaField: jest.fn().mockImplementation(fields => ({ fields })),
+ ArrayField: jest.fn().mockImplementation(field => ({ field })),
+};
+
+global.foundry.data.fields = fields;
+
 // Import logger for global mocking
 import { logger } from '../scripts/utils/logger.js';
 

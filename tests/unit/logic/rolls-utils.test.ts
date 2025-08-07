@@ -10,7 +10,7 @@ describe('Rolls Utilities', () => {
             expect(computeThreshold(1, 2, 3)).toBe(17);
         });
 
-        it('should handle negative ability modifiers', () => {
+        it('should handle negative attribute modifiers', () => {
             expect(computeThreshold(5, -2, 1)).toBe(15);
         });
 

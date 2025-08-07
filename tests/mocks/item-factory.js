@@ -78,7 +78,7 @@ export function createMockItemWithActor(itemOptions = {}, actorOptions = {}) {
         name: 'Test Actor',
         system: {
             level: 1,
-            abilities: {
+            attributes: {
                 might: { modifier: 0 }
             }
         },

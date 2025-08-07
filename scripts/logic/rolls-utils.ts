@@ -327,11 +327,11 @@ export function measureRollPerformance<T>(
  * @example
  * ```typescript
  * const payload = buildRollPayload("2d10", [
- *   { label: "Ability", value: 3 },
+ *   { label: "Attribute", value: 3 },
  *   { label: "Level", value: 2 }
  * ]);
  * // payload.formula = "2d10 + 5"
- * // payload.tooltip = "2d10 +3 (Ability) +2 (Level)"
+ * // payload.tooltip = "2d10 +3 (Attribute) +2 (Level)"
  * await payload.sendToChat();
  * ```
  */
@@ -391,32 +391,32 @@ export function buildRollPayload(
 }
 
 /**
- * Builds ability roll payload from actor data
- * 
- * @param abilityName - Name of the ability to roll
+ * Builds attribute roll payload from actor data
+ *
+ * @param attributeName - Name of the attribute to roll
  * @param actorData - Actor document data
  * @param options - Additional roll options
- * @returns Roll payload for ability check
+ * @returns Roll payload for attribute check
  */
-export function buildAbilityRoll(
-  abilityName: string,
+export function buildAttributeRoll(
+  attributeName: string,
   actorData: any,
   options: RollOptions = {}
 ): RollPayload {
-  const ability = actorData.system?.abilities?.[abilityName];
-  if (!ability) {
-    throw new Error(`Ability '${abilityName}' not found on actor`);
+  const attribute = actorData.system?.attributes?.[attributeName];
+  if (!attribute) {
+    throw new Error(`Attribute '${attributeName}' not found on actor`);
   }
 
   const level = actorData.system?.level || 1;
 
   const modifiers: RollModifier[] = [
     { label: 'Level', value: level },
-    { label: 'Ability', value: ability.modifier || 0 }
+    { label: 'Attribute', value: attribute.modifier || 0 }
   ];
 
   const mergedOptions: RollOptions = {
-    flavor: `${abilityName.charAt(0).toUpperCase() + abilityName.slice(1)} Roll`,
+    flavor: `${attributeName.charAt(0).toUpperCase() + attributeName.slice(1)} Roll`,
     ...options
   };
 
@@ -425,7 +425,7 @@ export function buildAbilityRoll(
 
 /**
  * Builds skill roll payload from actor data
- * 
+ *
  * @param skillName - Name of the skill to roll
  * @param actorData - Actor document data
  * @param options - Additional roll options
@@ -441,10 +441,10 @@ export function buildSkillRoll(
     throw new Error(`Skill '${skillName}' not found on actor`);
   }
 
-  // Get the governing ability for this skill
-  const skillAbilityMap: Record<string, string> = {
+  // Get the governing attribute for this skill
+  const skillAttributeMap: Record<string, string> = {
     'debate': 'intellect',
-    'inspect': 'intellect', 
+    'inspect': 'intellect',
     'recall': 'intellect',
     'discern': 'focus',
     'intuit': 'focus',
@@ -457,13 +457,13 @@ export function buildSkillRoll(
     'surge': 'might'
   };
 
-  const governingAbility = skillAbilityMap[skillName] || 'intellect';
-  const abilityModifier = actorData.system?.abilities?.[governingAbility]?.modifier || 0;
+  const governingAttribute = skillAttributeMap[skillName] || 'intellect';
+  const attributeModifier = actorData.system?.attributes?.[governingAttribute]?.modifier || 0;
   const level = actorData.system?.level || 1;
 
   const modifiers: RollModifier[] = [
     { label: 'Level', value: level },
-    { label: 'Ability', value: abilityModifier },
+    { label: 'Attribute', value: attributeModifier },
     { label: 'Skill', value: skillValue }
   ];
 
@@ -488,15 +488,15 @@ export function buildWeaponAttackRoll(
   actorData: any,
   options: RollOptions = {}
 ): RollPayload {
-  const weaponAbility = weaponItem.system?.ability || 'might';
-  const abilityMod = actorData.system?.abilities?.[weaponAbility]?.modifier || 0;
+  const weaponAttribute = weaponItem.system?.attribute || 'might';
+  const attributeMod = actorData.system?.attributes?.[weaponAttribute]?.modifier || 0;
   const weaponModifier = weaponItem.system?.modifier || 0;
   const level = actorData.system?.level || 1;
   const expertise = weaponItem.system?.expertise || 0;
 
   const modifiers: RollModifier[] = [
     { label: 'Level', value: level },
-    { label: `${weaponAbility.charAt(0).toUpperCase() + weaponAbility.slice(1)}`, value: abilityMod },
+    { label: `${weaponAttribute.charAt(0).toUpperCase() + weaponAttribute.slice(1)}`, value: attributeMod },
     { label: 'Weapon', value: weaponModifier },
     { label: 'Expertise', value: expertise }
   ];
@@ -523,12 +523,12 @@ export function buildWeaponDamageRoll(
   options: RollOptions = {}
 ): RollPayload {
   const damageRoll = weaponItem.system?.damageDie || '1d6';
-  const weaponAbility = weaponItem.system?.ability || 'might';
-  const abilityMod = actorData.system?.abilities?.[weaponAbility]?.modifier || 0;
+  const weaponAttribute = weaponItem.system?.attribute || 'might';
+  const attributeMod = actorData.system?.attributes?.[weaponAttribute]?.modifier || 0;
   const damageType = weaponItem.system?.damageType || '';
 
   const modifiers: RollModifier[] = [
-    { label: 'Ability', value: abilityMod }
+    { label: 'Attribute', value: attributeMod }
   ];
 
   const flavorText = damageType ? 
@@ -556,14 +556,14 @@ export function buildArmorRoll(
   actorData: any,
   options: RollOptions = {}
 ): RollPayload {
-  const armorAbility = armorItem.system?.ability || 'grace';
-  const abilityMod = actorData.system?.abilities?.[armorAbility]?.modifier || 0;
+  const armorAttribute = armorItem.system?.attribute || 'grace';
+  const attributeMod = actorData.system?.attributes?.[armorAttribute]?.modifier || 0;
   const level = actorData.system?.level || 1;
   const expertise = armorItem.system?.expertise || 0;
 
   const modifiers: RollModifier[] = [
     { label: 'Level', value: level },
-    { label: 'Ability', value: abilityMod },
+    { label: 'Attribute', value: attributeMod },
     { label: 'Expertise', value: expertise }
   ];
 
@@ -584,14 +584,14 @@ export function buildGearRoll(
   actorData: any,
   options: RollOptions = {}
 ): RollPayload {
-  const gearAbility = gearItem.system?.ability || 'might';
-  const abilityMod = actorData.system?.abilities?.[gearAbility]?.modifier || 0;
+  const gearAttribute = gearItem.system?.attribute || 'might';
+  const attributeMod = actorData.system?.attributes?.[gearAttribute]?.modifier || 0;
   const level = actorData.system?.level || 1;
   const expertise = gearItem.system?.expertise || 0;
 
   const modifiers: RollModifier[] = [
     { label: 'Level', value: level },
-    { label: `${gearAbility.charAt(0).toUpperCase() + gearAbility.slice(1)}`, value: abilityMod },
+    { label: `${gearAttribute.charAt(0).toUpperCase() + gearAttribute.slice(1)}`, value: attributeMod },
     { label: 'Expertise', value: expertise }
   ];
 
@@ -606,13 +606,13 @@ export function buildGearRoll(
 /**
  * Compute Attack/Defense threshold.
  * @param level The actor's level.
- * @param abilityMod The relevant ability modifier.
+ * @param attributeMod The relevant attribute modifier.
  * @param expertise Any expertise bonus.
  * @returns The computed threshold value.
  * @spec 02.2.round-resolution
  */
-export function computeThreshold(level: number, abilityMod: number, expertise = 0): number {
-  return 11 + level + abilityMod + expertise;
+export function computeThreshold(level: number, attributeMod: number, expertise = 0): number {
+  return 11 + level + attributeMod + expertise;
 }
 
 /**

@@ -208,7 +208,7 @@ function generateMockData() {
       type: 'character',
       img: 'icons/svg/mystery-man.svg',
       system: {
-        abilities: {
+        attributes: {
           might: { value: 12 },
           grace: { value: 14 },
           intellect: { value: 16 },

@@ -77,7 +77,7 @@ describe('Actor Sheet - Talents & Augments QA Integration Tests', () => {
       system: {
         level: 3,
         health: { value: 25, max: 30 },
-        abilities: {
+        attributes: {
           might: { modifier: 2 },
           grace: { modifier: 1 },
           intellect: { modifier: 3 },

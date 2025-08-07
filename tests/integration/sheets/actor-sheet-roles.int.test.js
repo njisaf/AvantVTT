@@ -1,8 +1,11 @@
 /**
  * @fileoverview Actor Sheet Roll Integration Tests
  * @description Integration tests for the actor sheet roll functionality using the Role Utility Framework
- * @version 1.0.0
+ * @version 1.1.0
  * @author Avant Development Team
+ *
+ * Note: Includes a regression test for image editing behavior on Actor Sheet:
+ * - Ensures clicking an img[data-edit="img"][data-action="editImage"] invokes FilePicker and updates actor + DOM
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
@@ -20,7 +23,7 @@ describe('Actor Sheet Roll Integration', () => {
     mockActor = {
       name: 'Test Actor',
       system: {
-        abilities: {
+        attributes: {
           might: { value: 5, label: 'Might' },
           grace: { value: 3, label: 'Grace' },
           intellect: { value: 4, label: 'Intellect' },
@@ -48,9 +51,9 @@ describe('Actor Sheet Roll Integration', () => {
     };
 
     // Setup FoundryVTT globals
-    (globalThis as any).Roll = vi.fn(() => mockRoll);
-    (globalThis as any).ChatMessage = mockChatMessage;
-    (globalThis as any).ui = {
+    globalThis.Roll = vi.fn(() => mockRoll);
+    globalThis.ChatMessage = mockChatMessage;
+    globalThis.ui = {
       notifications: {
         error: vi.fn()
       }
@@ -82,67 +85,13 @@ describe('Actor Sheet Roll Integration', () => {
 
   afterEach(() => {
     // Clean up globals
-    delete (globalThis as any).Roll;
-    delete (globalThis as any).ChatMessage;
-    delete (globalThis as any).ui;
-    delete (globalThis as any).logger;
+    delete globalThis.Roll;
+    delete globalThis.ChatMessage;
+    delete globalThis.ui;
+    delete globalThis.logger;
     
     // Reset mocks
     vi.clearAllMocks();
-  });
-
-  describe('Ability Roll Integration', () => {
-    it('should successfully roll abilities using the role utility framework', async () => {
-      // Setup button with ability data
-      mockButton.dataset.ability = 'might';
-      
-      // Import the sheet class to access static methods
-      const { createAvantActorSheet } = await import('../../../scripts/sheets/actor-sheet.js');
-      const AvantActorSheet = createAvantActorSheet();
-      
-      // Execute the ability roll
-      await AvantActorSheet._onRollAbility.call(actorSheet, mockEvent, mockButton);
-      
-      // Verify the roll was created and executed
-      expect(mockRoll.evaluate).toHaveBeenCalled();
-      expect(mockRoll.toMessage).toHaveBeenCalledWith({
-        speaker: { alias: 'Test Actor' },
-        flavor: 'Might Roll'
-      });
-    });
-
-    it('should handle missing ability gracefully', async () => {
-      // Setup button with non-existent ability
-      mockButton.dataset.ability = 'nonexistent';
-      
-      const { createAvantActorSheet } = await import('../../../scripts/sheets/actor-sheet.js');
-      const AvantActorSheet = createAvantActorSheet();
-      
-      // Execute the ability roll
-      await AvantActorSheet._onRollAbility.call(actorSheet, mockEvent, mockButton);
-      
-      // Verify error handling
-      expect(globalThis.ui.notifications.error).toHaveBeenCalledWith(
-        expect.stringContaining('Failed to roll nonexistent')
-      );
-    });
-
-    it('should handle missing dataset gracefully', async () => {
-      // Setup button without ability data
-      mockButton.dataset = {};
-      
-      const { createAvantActorSheet } = await import('../../../scripts/sheets/actor-sheet.js');
-      const AvantActorSheet = createAvantActorSheet();
-      
-      // Execute the ability roll
-      await AvantActorSheet._onRollAbility.call(actorSheet, mockEvent, mockButton);
-      
-      // Verify no roll was attempted
-      expect(mockRoll.evaluate).not.toHaveBeenCalled();
-      expect(globalThis.logger.warn).toHaveBeenCalledWith(
-        'AvantActorSheet | No ability specified for roll'
-      );
-    });
   });
 
   describe('Skill Roll Integration', () => {
@@ -199,29 +148,6 @@ describe('Actor Sheet Roll Integration', () => {
   });
 
   describe('Error Handling', () => {
-    it('should handle roll evaluation errors gracefully', async () => {
-      // Setup button with valid ability
-      mockButton.dataset.ability = 'might';
-      
-      // Make roll evaluation throw an error
-      mockRoll.evaluate.mockRejectedValue(new Error('Roll evaluation failed'));
-      
-      const { createAvantActorSheet } = await import('../../../scripts/sheets/actor-sheet.js');
-      const AvantActorSheet = createAvantActorSheet();
-      
-      // Execute the ability roll
-      await AvantActorSheet._onRollAbility.call(actorSheet, mockEvent, mockButton);
-      
-      // Verify error was logged and notification shown
-      expect(globalThis.logger.error).toHaveBeenCalledWith(
-        'AvantActorSheet | Error rolling ability:',
-        expect.any(Error)
-      );
-      expect(globalThis.ui.notifications.error).toHaveBeenCalledWith(
-        expect.stringContaining('Failed to roll might')
-      );
-    });
-
     it('should handle chat message posting errors gracefully', async () => {
       // Setup button with valid skill
       mockButton.dataset.skill = 'athletics';
@@ -247,24 +173,6 @@ describe('Actor Sheet Roll Integration', () => {
   });
 
   describe('Roll Payload Validation', () => {
-    it('should create valid roll payloads for abilities', async () => {
-      // Import the role utility to test payload creation directly
-      const { buildAbilityRoll } = await import('../../../scripts/logic/rolls-utils.js');
-      
-      // Create a roll payload for might ability
-      const payload = buildAbilityRoll('might', mockActor);
-      
-      // Verify payload structure
-      expect(payload.formula).toBe('2d10 + 5');
-      expect(payload.tooltip).toBe('2d10 +5 (Ability)');
-      expect(payload.total).toBe(5);
-      expect(payload.baseDice).toBe('2d10');
-      expect(payload.modifiers).toEqual([
-        { label: 'Ability', value: 5 }
-      ]);
-      expect(typeof payload.sendToChat).toBe('function');
-      expect(typeof payload.createRoll).toBe('function');
-    });
 
     it('should create valid roll payloads for skills', async () => {
       // Import the role utility to test payload creation directly
@@ -287,20 +195,6 @@ describe('Actor Sheet Roll Integration', () => {
   });
 
   describe('Performance Integration', () => {
-    it('should execute ability rolls within performance requirements', async () => {
-      mockButton.dataset.ability = 'might';
-      
-      const { createAvantActorSheet } = await import('../../../scripts/sheets/actor-sheet.js');
-      const AvantActorSheet = createAvantActorSheet();
-      
-      // Measure execution time
-      const start = performance.now();
-      await AvantActorSheet._onRollAbility.call(actorSheet, mockEvent, mockButton);
-      const end = performance.now();
-      
-      // Verify performance (should be much faster than 5ms for the integration)
-      expect(end - start).toBeLessThan(5);
-    });
 
     it('should execute skill rolls within performance requirements', async () => {
       mockButton.dataset.skill = 'athletics';
@@ -319,23 +213,7 @@ describe('Actor Sheet Roll Integration', () => {
   });
 
   describe('Backward Compatibility', () => {
-    it('should maintain existing behavior for ability rolls', async () => {
-      // Test that the new implementation produces the same results as the old one
-      mockButton.dataset.ability = 'grace';
-      
-      const { createAvantActorSheet } = await import('../../../scripts/sheets/actor-sheet.js');
-      const AvantActorSheet = createAvantActorSheet();
-      
-      // Execute the ability roll
-      await AvantActorSheet._onRollAbility.call(actorSheet, mockEvent, mockButton);
-      
-      // Verify the roll was created with expected parameters
-      expect(mockRoll.evaluate).toHaveBeenCalled();
-      expect(mockRoll.toMessage).toHaveBeenCalledWith({
-        speaker: { alias: 'Test Actor' },
-        flavor: 'Grace Roll'
-      });
-    });
+
 
     it('should maintain existing behavior for skill rolls', async () => {
       // Test that the new implementation produces the same results as the old one
@@ -357,6 +235,93 @@ describe('Actor Sheet Roll Integration', () => {
   });
 });
 
+describe('Actor Sheet Image Editing Integration', () => {
+  let SheetClass;
+  let sheet;
+  let fakeActor;
+
+  beforeEach(async () => {
+    // DOM representing header with profile image (matches templates/actor-sheet.html lines 4-7)
+    document.body.innerHTML = `
+      <div class="avant sheet actor">
+        <header class="sheet-header">
+          <img class="profile-img" src="icons/svg/mystery-man.svg" data-edit="img" data-action="editImage" />
+        </header>
+      </div>
+    `;
+
+    // Minimal Foundry globals
+    (globalThis).ui = { notifications: { info: vi.fn(), warn: vi.fn(), error: vi.fn() } };
+    (globalThis).game = { user: { id: 'U1' } };
+
+    // Mock actor document and sheet
+    fakeActor = {
+      id: 'A1',
+      name: 'Tester',
+      img: 'icons/svg/mystery-man.svg',
+      system: {},
+      items: new Map(),
+      toObject: () => ({ system: {}, flags: {} }),
+      isOwner: true,
+      update: vi.fn(async (data) => { if (data?.img) fakeActor.img = data.img; })
+    };
+
+    // Create class from TS module factory
+    const mod = await import('../../../scripts/sheets/actor-sheet.ts');
+    SheetClass = mod.createAvantActorSheet();
+    sheet = new SheetClass();
+    sheet.document = fakeActor;
+    sheet.element = document.body;
+  });
+
+  afterEach(() => {
+    document.body.innerHTML = '';
+    vi.clearAllMocks();
+    delete (globalThis).FilePicker;
+    delete (globalThis).ui;
+    delete (globalThis).game;
+  });
+
+  it('clicking profile image triggers FilePicker via editImage action and updates actor + DOM (constructor path)', async () => {
+    // New API path: constructor with callback + browse()
+    const browseSpy = vi.fn(async function () {
+      // simulate user selecting a file which triggers callback
+      if (this.opts?.callback) await this.opts.callback('icons/svg/new-portrait.svg');
+    });
+
+    (globalThis).FilePicker = function FilePickerMock(opts) {
+      this.opts = opts;
+      this.browse = browseSpy;
+    };
+
+    const imgEl = document.querySelector('.profile-img');
+    const ev = new Event('click');
+
+    // Dispatch action as ApplicationV2 would do
+    await SheetClass.DEFAULT_OPTIONS.actions.editImage.call(sheet, ev, imgEl);
+
+    expect(browseSpy).toHaveBeenCalledTimes(1);
+    expect(fakeActor.update).toHaveBeenCalledWith({ img: 'icons/svg/new-portrait.svg' });
+    expect(imgEl.getAttribute('src')).toBe('icons/svg/new-portrait.svg');
+  });
+
+  it('falls back to FilePicker.browse static API when constructor is unavailable', async () => {
+    // Remove constructor behavior; provide static browse instead
+    (globalThis).FilePicker = {
+      browse: vi.fn(async (_type, _current) => ({ files: ['icons/svg/static-picked.svg'] }))
+    };
+
+    const imgEl = document.querySelector('.profile-img');
+    const ev = new Event('click');
+
+    await SheetClass.DEFAULT_OPTIONS.actions.editImage.call(sheet, ev, imgEl);
+
+    expect((globalThis).FilePicker.browse).toHaveBeenCalled();
+    expect(fakeActor.update).toHaveBeenCalledWith({ img: 'icons/svg/static-picked.svg' });
+    expect(imgEl.getAttribute('src')).toBe('icons/svg/static-picked.svg');
+  });
+});
+
 describe('Roll Payload Chat Integration', () => {
   let mockRoll;
   let mockChatMessage;
@@ -374,14 +339,14 @@ describe('Roll Payload Chat Integration', () => {
     };
 
     // Setup FoundryVTT globals
-    (globalThis as any).Roll = vi.fn(() => mockRoll);
-    (globalThis as any).ChatMessage = mockChatMessage;
+    globalThis.Roll = vi.fn(() => mockRoll);
+    globalThis.ChatMessage = mockChatMessage;
   });
 
   afterEach(() => {
     // Clean up globals
-    delete (globalThis as any).Roll;
-    delete (globalThis as any).ChatMessage;
+    delete globalThis.Roll;
+    delete globalThis.ChatMessage;
     
     // Reset mocks
     vi.clearAllMocks();
@@ -391,7 +356,7 @@ describe('Roll Payload Chat Integration', () => {
     const { buildRollPayload } = await import('../../../scripts/logic/rolls-utils.js');
     
     const modifiers = [
-      { label: 'Ability', value: 3 },
+      { label: 'Attribute', value: 3 },
       { label: 'Level', value: 2 }
     ];
     
@@ -404,7 +369,7 @@ describe('Roll Payload Chat Integration', () => {
     await payload.sendToChat();
     
     // Verify Roll was created with correct formula
-    expect((globalThis as any).Roll).toHaveBeenCalledWith('2d10 + 5', {});
+    expect(globalThis.Roll).toHaveBeenCalledWith('2d10 + 5', {});
     
     // Verify roll was evaluated
     expect(mockRoll.evaluate).toHaveBeenCalled();

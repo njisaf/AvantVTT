@@ -22,19 +22,19 @@
 import { AvantActorData } from '../data/actor-data.ts';
 import { logger } from '../utils/logger.js';
 import {
-    calculateAbilityTotalModifiers,
+    calculateAttributeTotalModifiers,
     calculateSkillTotalModifiers,
     calculatePowerPointLimit,
-    organizeSkillsByAbility,
+    organizeSkillsByAttribute,
     organizeItemsByType,
-    validateAbilityRollData,
+    validateAttributeRollData,
     validateSkillRollData,
     validatePowerPointUsage,
     prepareItemData,
     prepareWeaponAttackRoll,
     prepareWeaponDamageRoll,
     extractItemIdFromElement,
-    type SkillAbilityMap
+    type SkillAttributeMap
 } from '../logic/actor-sheet-utils.ts';
 import { itemHasTraits, createTraitHtmlForChat } from '../logic/chat/trait-resolver.ts';
 import { CardLayoutIntegration } from '../layout/item-card/integration-example.ts';
@@ -50,9 +50,9 @@ interface ActorSheetContext {
     actor: any;
     system: any;
     flags: any;
-    abilityTotalModifiers: Record<string, number>;
+    attributeTotalModifiers: Record<string, number>;
     skillTotalModifiers: Record<string, number>;
-    skillsByAbility: Record<string, any[]>;
+    skillsByAttribute: Record<string, any[]>;
     items: Record<string, any[]>;
     editable: boolean;
     owner: boolean;
@@ -179,7 +179,7 @@ export function createAvantActorSheet() {
                 testAction: AvantActorSheet._onTestAction,
 
                 // 🎲 Dice Rolling Actions
-                rollAbility: AvantActorSheet._onRollAbility,
+                rollAttribute: AvantActorSheet._onRollAttribute,
                 rollSkill: AvantActorSheet._onRollSkill,
                 rollPowerPoints: AvantActorSheet._onRollPowerPoints,
                 rollAttack: AvantActorSheet._onRollAttack,
@@ -192,6 +192,9 @@ export function createAvantActorSheet() {
                 createItem: AvantActorSheet._onCreateItem,
                 editItem: AvantActorSheet._onEditItem,
                 deleteItem: AvantActorSheet._onDeleteItem,
+
+                // 🖼️ Image Editing (Actor portrait, generic image-upload partial)
+                editImage: AvantActorSheet._onEditImage,
 
                 // 💬 Chat Integration Actions
                 postChatCard: AvantActorSheet._onPostChatCard,
@@ -328,12 +331,12 @@ export function createAvantActorSheet() {
 
             // Extract core data for calculations
             const level = actorData.system.level || 1;
-            const abilities = actorData.system.abilities || {};
+            const attributes = actorData.system.attributes || {};
             const skills = actorData.system.skills || {};
 
-            // Define skill-ability mapping for the Avant system
-            // This mapping determines which ability modifier applies to each skill
-            const skillAbilityMap: SkillAbilityMap = {
+            // Define skill-attribute mapping for the Avant system
+            // This mapping determines which attribute modifier applies to each skill
+            const skillAttributeMap: SkillAttributeMap = {
                 'debate': 'intellect' as const,
                 'inspect': 'intellect' as const,
                 'recall': 'intellect' as const,
@@ -350,12 +353,12 @@ export function createAvantActorSheet() {
 
             // Calculate derived values using pure functions from actor-sheet-utils
             // These functions are tested and handle edge cases properly
-            context.abilityTotalModifiers = calculateAbilityTotalModifiers(abilities, level);
-            context.skillTotalModifiers = calculateSkillTotalModifiers(skills, abilities, skillAbilityMap, level);
+            context.attributeTotalModifiers = calculateAttributeTotalModifiers(attributes, level);
+            context.skillTotalModifiers = calculateSkillTotalModifiers(skills, attributes, skillAttributeMap, level);
             context.powerPointLimit = calculatePowerPointLimit(actorData.system.powerPoints?.max || 10);
 
             // Organize data for template display
-            context.skillsByAbility = organizeSkillsByAbility(skills, abilities, skillAbilityMap, level);
+            context.skillsByAttribute = organizeSkillsByAttribute(skills, attributes, skillAttributeMap, level);
 
             // Organize items by type for template sections
             const itemsArray = Array.from(this.document.items.values());
@@ -897,55 +900,143 @@ export function createAvantActorSheet() {
         // ApplicationV2 automatically binds 'this' to the sheet instance when called.
 
         /**
-         * Handle ability rolls from sheet buttons
-         * 
-         * Rolls 2d10 + Level + Ability modifier using the proper rolls-utils system.
-         * The ability to roll is determined from the data-ability attribute on the clicked element.
-         * 
+         * Open a FilePicker to edit an image, updating the document and the clicked <img> src.
+         * Supports both actor portrait and shared image-upload partials.
+         * @param event The triggering event
+         * @param target The clicked element (expected to be an <img> with data-edit="img")
+         * @this {AvantActorSheet}
+         */
+        static async _onEditImage(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
+            event.preventDefault();
+            const sheet = this;
+            if (!sheet?.document) return;
+
+            try {
+                // Determine current path from actor document if available, else from target src
+                const currentPath = (sheet.document.img as string) || (target as HTMLImageElement).getAttribute('src') || '';
+
+                // Foundry V13+: use namespaced FilePicker to avoid deprecation warnings.
+                const foundryNS = (globalThis as any).foundry;
+                const FilePickerNS =
+                    foundryNS?.applications?.apps?.FilePicker?.implementation
+                    || foundryNS?.applications?.apps?.FilePicker; // safety fallback if implementation is directly the class
+
+                // If the namespaced constructor exists, prefer it
+                if (typeof FilePickerNS === 'function') {
+                    const fp = new FilePickerNS({
+                        type: "image",
+                        current: currentPath,
+                        callback: async (path: string) => {
+                            if (sheet.document && typeof sheet.document.update === 'function') {
+                                await sheet.document.update({ img: path });
+                            }
+                            if (target && (target as HTMLImageElement).src !== undefined) {
+                                (target as HTMLImageElement).src = path;
+                            }
+                        }
+                    });
+                    if (typeof fp.browse === 'function') {
+                        await fp.browse();
+                        return;
+                    }
+                }
+
+                // Back-compat fallback for environments still exposing global FilePicker (V13 supports but warns)
+                const GlobalFilePicker = (globalThis as any).FilePicker;
+                if (GlobalFilePicker && typeof GlobalFilePicker === 'function') {
+                    const fp = new GlobalFilePicker({
+                        type: "image",
+                        current: currentPath,
+                        callback: async (path: string) => {
+                            if (sheet.document && typeof sheet.document.update === 'function') {
+                                await sheet.document.update({ img: path });
+                            }
+                            if (target && (target as HTMLImageElement).src !== undefined) {
+                                (target as HTMLImageElement).src = path;
+                            }
+                        }
+                    });
+                    if (typeof fp.browse === 'function') {
+                        await fp.browse();
+                        return;
+                    }
+                }
+
+                // Static browse fallback (rare; provided for maximum compatibility)
+                const StaticPicker =
+                    FilePickerNS && typeof FilePickerNS.browse === 'function' ? FilePickerNS :
+                    GlobalFilePicker && typeof GlobalFilePicker.browse === 'function' ? GlobalFilePicker :
+                    null;
+
+                if (StaticPicker) {
+                    const result = await StaticPicker.browse("image", currentPath);
+                    const chosen = Array.isArray(result.files) && result.files.length ? result.files[0] : '';
+                    if (chosen) {
+                        await sheet.document.update({ img: chosen });
+                        (target as HTMLImageElement).src = chosen;
+                    }
+                    return;
+                }
+
+                FoundryUI.notify('FilePicker API unavailable (V13+ expected)', 'warn');
+            } catch (err) {
+                logger.error('AvantActorSheet | editImage failed:', err);
+                FoundryUI.notify('Failed to edit image', 'error');
+            }
+        }
+
+
+
+        /**
+         * Handle attribute rolls from sheet buttons
+         *
+         * Rolls 2d10 + Level + Attribute modifier using the proper rolls-utils system.
+         * The attribute to roll is determined from the data-attribute attribute on the clicked element.
+         *
          * @param {Event} event - The originating click event
-         * @param {HTMLElement} target - The clicked element with data-ability attribute
+         * @param {HTMLElement} target - The clicked element with data-attribute attribute
          * @this {AvantActorSheet} The sheet instance (bound automatically by ApplicationV2)
          * @static
          */
-        static async _onRollAbility(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
+        static async _onRollAttribute(this: AvantActorSheet, event: Event, target: HTMLElement): Promise<void> {
             event.preventDefault();
 
             // ApplicationV2 automatically binds 'this' to the sheet instance
             const sheet = this;
             if (!sheet?.document) return;
 
-            const abilityName = target.dataset.ability;
-            if (!abilityName) {
-                logger.warn('AvantActorSheet | No ability specified for roll');
+            const attributeName = target.dataset.attribute;
+            if (!attributeName) {
+                logger.warn('AvantActorSheet | No attribute specified for roll');
                 return;
             }
 
             try {
-                // 🎯 CRITICAL FIX: Use the proper rolls-utils system for ability rolls
-                // This ensures rolls include Level + Ability modifier as shown on the button
-                const { buildAbilityRoll } = await import('../logic/rolls-utils.js');
+                // 🎯 CRITICAL FIX: Use the proper rolls-utils system for attribute rolls
+                // This ensures rolls include Level + Attribute modifier as shown on the button
+                const { buildAttributeRoll } = await import('../logic/rolls-utils.js');
                 
                 // Build the roll payload with proper modifiers
-                const rollPayload = buildAbilityRoll(abilityName, sheet.document, {
+                const rollPayload = buildAttributeRoll(attributeName, sheet.document, {
                     speaker: (globalThis as any).ChatMessage.getSpeaker({ actor: sheet.document })
                 });
 
                 // Execute the roll and send to chat
                 await rollPayload.sendToChat();
 
-                logger.log(`AvantActorSheet | Executed ${abilityName} ability roll`);
+                logger.log(`AvantActorSheet | Executed ${attributeName} attribute roll`);
             } catch (error) {
-                logger.error('AvantActorSheet | Ability roll failed:', error);
-                FoundryUI.notify(`Failed to roll ${abilityName}`, 'error');
+                logger.error('AvantActorSheet | Attribute roll failed:', error);
+                FoundryUI.notify(`Failed to roll ${attributeName}`, 'error');
             }
         }
 
         /**
          * Handle skill rolls from sheet buttons
-         * 
-         * Rolls 2d10 + Level + Ability modifier + Skill modifier using the proper rolls-utils system.
+         *
+         * Rolls 2d10 + Level + Attribute modifier + Skill modifier using the proper rolls-utils system.
          * The skill to roll is determined from the data-skill attribute on the clicked element.
-         * 
+         *
          * @param {Event} event - The originating click event
          * @param {HTMLElement} target - The clicked element with data-skill attribute
          * @this {AvantActorSheet} The sheet instance (bound automatically by ApplicationV2)
@@ -966,7 +1057,7 @@ export function createAvantActorSheet() {
 
             try {
                 // 🎯 CRITICAL FIX: Use the proper rolls-utils system for skill rolls
-                // This ensures rolls include Level + Ability modifier + Skill modifier as shown on the button
+                // This ensures rolls include Level + Attribute modifier + Skill modifier as shown on the button
                 const { buildSkillRoll } = await import('../logic/rolls-utils.js');
                 
                 // Build the roll payload with proper modifiers
@@ -1049,7 +1140,7 @@ export function createAvantActorSheet() {
 
             try {
                 // 🎯 CRITICAL FIX: Use the proper rolls-utils system for weapon attack rolls
-                // This ensures rolls include Level + Ability modifier + Weapon modifier as shown on the button
+                // This ensures rolls include Level + Attribute modifier + Weapon modifier as shown on the button
                 const { buildWeaponAttackRoll } = await import('../logic/rolls-utils.js');
                 
                 // Build the roll payload with proper modifiers (2d10+level+ability+weapon)

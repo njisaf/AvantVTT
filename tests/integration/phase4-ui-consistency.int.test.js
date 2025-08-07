@@ -32,7 +32,7 @@ describe('Phase 4 UI Consistency', () => {
       id: 'test-actor',
       name: 'Test Character',
       type: 'character',
-      system: { abilities: {}, skills: {} }
+      system: { attributes: {}, skills: {} }
     };
 
     mockItem = {

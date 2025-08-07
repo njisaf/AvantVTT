@@ -54,10 +54,10 @@ export function getWeaponCardLayout(item: any): CardSection {
 
         // Properties and other details
         when(!!system.properties, () => field({
-            type: 'weapon-ability',
-            name: 'ability-modifier',
-            value: system.ability,
-            class: 'weapon-ability'
+            type: 'weapon-attribute',
+            name: 'attribute-modifier',
+            value: system.attribute,
+            class: 'weapon-attribute'
         })),
 
         field({

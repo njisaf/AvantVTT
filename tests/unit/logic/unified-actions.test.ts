@@ -73,7 +73,7 @@ function createMockActor(id: string, name: string, items: MockItem[] = []): Mock
         createEmbeddedDocuments: jest.fn(),
         system: {
             level: 1,
-            abilities: {
+            attributes: {
                 might: { modifier: 0 },
                 grace: { modifier: 0 },
                 intellect: { modifier: 0 },
@@ -133,7 +133,7 @@ describe('Unified Actions Logic', () => {
         const mockActor = createMockActor('actor1', 'Test Actor');
         mockActor.system = {
             level: 5,
-            abilities: {
+            attributes: {
                 might: { modifier: 3 },
                 grace: { modifier: 2 },
             },
@@ -142,7 +142,7 @@ describe('Unified Actions Logic', () => {
         it('should create gear action for weapon and compute threshold', () => {
             const weapon = createMockItem('weapon1', 'Longsword', 'weapon', {
                 damageDie: '1d8',
-                ability: 'might',
+                attribute: 'might',
                 expertise: 2,
             });
 
@@ -160,7 +160,7 @@ describe('Unified Actions Logic', () => {
         it('should create gear action for armor and compute threshold', () => {
             const armor = createMockItem('armor1', 'Chainmail', 'armor', {
                 armorClass: 3,
-                ability: 'grace',
+                attribute: 'grace',
                 expertise: 1,
             });
 
@@ -221,7 +221,7 @@ describe('Unified Actions Logic', () => {
             
             const actor = createMockActor('actor1', 'Test Actor', [weapon, armor, gear, action]);
             actor.system.level = 1;
-            actor.system.abilities.might.mod = 0;
+            actor.system.attributes.might.mod = 0;
 
             const result = combineActionSources(actor as any);
 

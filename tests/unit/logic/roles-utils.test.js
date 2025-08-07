@@ -81,7 +81,7 @@ describe('Role Utility Framework', () => {
     describe('validateModifiers', () => {
       it('should validate valid modifier arrays', () => {
         const modifiers = [
-          { label: 'Ability', value: 3 },
+          { label: 'Attribute', value: 3 },
           { label: 'Level', value: 2 }
         ];
         const result = validateModifiers(modifiers);
@@ -128,7 +128,7 @@ describe('Role Utility Framework', () => {
     describe('validateRollConfiguration', () => {
       it('should validate complete roll configurations', () => {
         const modifiers = [
-          { label: 'Ability', value: 3 },
+          { label: 'Attribute', value: 3 },
           { label: 'Level', value: 2 }
         ];
         const result = validateRollConfiguration('2d10', modifiers);
@@ -136,7 +136,7 @@ describe('Role Utility Framework', () => {
       });
 
       it('should reject configurations with invalid dice', () => {
-        const modifiers = [{ label: 'Ability', value: 3 }];
+        const modifiers = [{ label: 'Attribute', value: 3 }];
         const result = validateRollConfiguration('invalid', modifiers);
         expect(result.valid).toBe(false);
         expect(result.error).toContain('Invalid dice expression');
@@ -164,7 +164,7 @@ describe('Role Utility Framework', () => {
     describe('calculateTotalModifier', () => {
       it('should calculate total from positive modifiers', () => {
         const modifiers = [
-          { label: 'Ability', value: 3 },
+          { label: 'Attribute', value: 3 },
           { label: 'Level', value: 2 },
           { label: 'Gear', value: 1 }
         ];
@@ -173,7 +173,7 @@ describe('Role Utility Framework', () => {
 
       it('should calculate total from mixed modifiers', () => {
         const modifiers = [
-          { label: 'Ability', value: 3 },
+          { label: 'Attribute', value: 3 },
           { label: 'Penalty', value: -2 },
           { label: 'Gear', value: 1 }
         ];
@@ -196,18 +196,18 @@ describe('Role Utility Framework', () => {
     describe('formatModifierBreakdown', () => {
       it('should format positive modifiers', () => {
         const modifiers = [
-          { label: 'Ability', value: 3 },
+          { label: 'Attribute', value: 3 },
           { label: 'Level', value: 2 }
         ];
-        expect(formatModifierBreakdown(modifiers)).toBe('+3 (Ability) +2 (Level)');
+        expect(formatModifierBreakdown(modifiers)).toBe('+3 (Attribute) +2 (Level)');
       });
 
       it('should format negative modifiers', () => {
         const modifiers = [
-          { label: 'Ability', value: 3 },
+          { label: 'Attribute', value: 3 },
           { label: 'Penalty', value: -2 }
         ];
-        expect(formatModifierBreakdown(modifiers)).toBe('+3 (Ability) -2 (Penalty)');
+        expect(formatModifierBreakdown(modifiers)).toBe('+3 (Attribute) -2 (Penalty)');
       });
 
       it('should handle empty arrays', () => {
@@ -226,7 +226,7 @@ describe('Role Utility Framework', () => {
     describe('generateRollFormula', () => {
       it('should generate formula with positive modifiers', () => {
         const modifiers = [
-          { label: 'Ability', value: 3 },
+          { label: 'Attribute', value: 3 },
           { label: 'Level', value: 2 }
         ];
         expect(generateRollFormula('2d10', modifiers)).toBe('2d10 + 5');
@@ -234,7 +234,7 @@ describe('Role Utility Framework', () => {
 
       it('should generate formula with negative modifiers', () => {
         const modifiers = [
-          { label: 'Ability', value: 3 },
+          { label: 'Attribute', value: 3 },
           { label: 'Penalty', value: -5 }
         ];
         expect(generateRollFormula('2d10', modifiers)).toBe('2d10 - 2');
@@ -256,15 +256,15 @@ describe('Role Utility Framework', () => {
     describe('generateTooltip', () => {
       it('should generate tooltip with breakdown', () => {
         const modifiers = [
-          { label: 'Ability', value: 3 },
+          { label: 'Attribute', value: 3 },
           { label: 'Level', value: 2 }
         ];
-        expect(generateTooltip('2d10', modifiers, true)).toBe('2d10 +3 (Ability) +2 (Level)');
+        expect(generateTooltip('2d10', modifiers, true)).toBe('2d10 +3 (Attribute) +2 (Level)');
       });
 
       it('should generate tooltip without breakdown', () => {
         const modifiers = [
-          { label: 'Ability', value: 3 },
+          { label: 'Attribute', value: 3 },
           { label: 'Level', value: 2 }
         ];
         expect(generateTooltip('2d10', modifiers, false)).toBe('2d10 + 5');
@@ -288,14 +288,14 @@ describe('Role Utility Framework', () => {
     describe('buildRollPayload', () => {
       it('should build basic roll payload', () => {
         const modifiers = [
-          { label: 'Ability', value: 3 },
+          { label: 'Attribute', value: 3 },
           { label: 'Level', value: 2 }
         ];
         
         const payload = buildRollPayload('2d10', modifiers);
         
         expect(payload.formula).toBe('2d10 + 5');
-        expect(payload.tooltip).toBe('2d10 +3 (Ability) +2 (Level)');
+        expect(payload.tooltip).toBe('2d10 +3 (Attribute) +2 (Level)');
         expect(payload.total).toBe(5);
         expect(payload.baseDice).toBe('2d10');
         expect(payload.modifiers).toEqual(modifiers);
@@ -313,7 +313,7 @@ describe('Role Utility Framework', () => {
       });
 
       it('should handle options parameter', () => {
-        const modifiers = [{ label: 'Ability', value: 3 }];
+        const modifiers = [{ label: 'Attribute', value: 3 }];
         const options = {
           flavor: 'Test Roll',
           showModifierBreakdown: false
@@ -348,7 +348,7 @@ describe('Role Utility Framework', () => {
       });
 
       it('should not mutate input modifiers', () => {
-        const modifiers = [{ label: 'Ability', value: 3 }];
+        const modifiers = [{ label: 'Attribute', value: 3 }];
         const originalModifiers = [...modifiers];
         
         const payload = buildRollPayload('2d10', modifiers);
@@ -360,47 +360,15 @@ describe('Role Utility Framework', () => {
   });
 
   describe('Specialized Roll Builders', () => {
-    let buildAbilityRoll, buildSkillRoll, buildWeaponAttackRoll, buildWeaponDamageRoll, buildArmorRoll, buildGenericRoll;
+    let buildSkillRoll, buildWeaponAttackRoll, buildWeaponDamageRoll, buildArmorRoll, buildGenericRoll;
 
     beforeEach(async () => {
       const module = await import('../../../scripts/logic/rolls-utils.js');
-      buildAbilityRoll = module.buildAbilityRoll;
       buildSkillRoll = module.buildSkillRoll;
       buildWeaponAttackRoll = module.buildWeaponAttackRoll;
       buildWeaponDamageRoll = module.buildWeaponDamageRoll;
       buildArmorRoll = module.buildArmorRoll;
       buildGenericRoll = module.buildGenericRoll;
-    });
-
-    describe('buildAbilityRoll', () => {
-      it('should build ability roll from actor data', () => {
-        const actorData = {
-          system: {
-            abilities: {
-              might: { modifier: 3 }
-            },
-            level: 5
-          }
-        };
-        
-        const payload = buildAbilityRoll('might', actorData);
-        
-        expect(payload.formula).toBe('2d10 + 8');
-        expect(payload.modifiers).toEqual([
-          { label: 'Level', value: 5 },
-          { label: 'Ability', value: 3 }
-        ]);
-      });
-
-      it('should throw error for missing ability', () => {
-        const actorData = { system: { abilities: {} } };
-        
-        expect(() => buildAbilityRoll('missing', actorData)).toThrow("Ability 'missing' not found");
-      });
-
-      it('should handle missing actor data', () => {
-        expect(() => buildAbilityRoll('might', {})).toThrow("Ability 'might' not found");
-      });
     });
 
     describe('buildSkillRoll', () => {
@@ -410,7 +378,7 @@ describe('Role Utility Framework', () => {
             skills: {
               force: 3  // might-based skill
             },
-            abilities: {
+            attributes: {
               might: { modifier: 2 }
             },
             level: 5
@@ -422,7 +390,7 @@ describe('Role Utility Framework', () => {
         expect(payload.formula).toBe('2d10 + 10');
         expect(payload.modifiers).toEqual([
           { label: 'Level', value: 5 },
-          { label: 'Ability', value: 2 },
+          { label: 'Attribute', value: 2 },
           { label: 'Skill', value: 3 }
         ]);
       });
@@ -439,14 +407,14 @@ describe('Role Utility Framework', () => {
         const weaponItem = {
           name: 'Iron Sword',
           system: {
-            ability: 'might',
+            attribute: 'might',
             modifier: 2
           }
         };
         
         const actorData = {
           system: {
-            abilities: {
+            attributes: {
               might: { mod: 3 }
             },
             level: 5
@@ -458,7 +426,7 @@ describe('Role Utility Framework', () => {
         expect(payload.formula).toBe('2d10 + 10');
         expect(payload.modifiers).toEqual([
           { label: 'Level', value: 5 },
-          { label: 'Ability', value: 3 },
+          { label: 'Attribute', value: 3 },
           { label: 'Weapon', value: 2 }
         ]);
       });
@@ -472,7 +440,7 @@ describe('Role Utility Framework', () => {
         expect(payload.formula).toBe('2d10 + 1');
         expect(payload.modifiers).toEqual([
           { label: 'Level', value: 1 },
-          { label: 'Ability', value: 0 },
+          { label: 'Attribute', value: 0 },
           { label: 'Weapon', value: 0 }
         ]);
       });
@@ -484,14 +452,14 @@ describe('Role Utility Framework', () => {
           name: 'Iron Sword',
           system: {
             damageDie: '1d8',
-            ability: 'might',
+            attribute: 'might',
             damageType: 'slashing'
           }
         };
         
         const actorData = {
           system: {
-            abilities: {
+            attributes: {
               might: { mod: 3 }
             }
           }
@@ -501,7 +469,7 @@ describe('Role Utility Framework', () => {
         
         expect(payload.formula).toBe('1d8 + 3');
         expect(payload.modifiers).toEqual([
-          { label: 'Ability', value: 3 }
+          { label: 'Attribute', value: 3 }
         ]);
       });
 
@@ -513,7 +481,7 @@ describe('Role Utility Framework', () => {
         
         expect(payload.formula).toBe('1d6');
         expect(payload.modifiers).toEqual([
-          { label: 'Ability', value: 0 }
+          { label: 'Attribute', value: 0 }
         ]);
       });
     });
@@ -523,14 +491,14 @@ describe('Role Utility Framework', () => {
         const armorItem = {
           name: 'Leather Armor',
           system: {
-            ability: 'grace',
+            attribute: 'grace',
             modifier: 1
           }
         };
         
         const actorData = {
           system: {
-            abilities: {
+            attributes: {
               grace: { mod: 2 }
             },
             level: 3
@@ -542,7 +510,7 @@ describe('Role Utility Framework', () => {
         expect(payload.formula).toBe('2d10 + 6');
         expect(payload.modifiers).toEqual([
           { label: 'Level', value: 3 },
-          { label: 'Ability', value: 2 },
+          { label: 'Attribute', value: 2 },
           { label: 'Armor', value: 1 }
         ]);
       });
@@ -586,7 +554,7 @@ describe('Role Utility Framework', () => {
     describe('buildRollPayload Performance', () => {
       it('should execute within 1ms on average', () => {
         const modifiers = [
-          { label: 'Ability', value: 3 },
+          { label: 'Attribute', value: 3 },
           { label: 'Level', value: 2 },
           { label: 'Gear', value: 1 }
         ];

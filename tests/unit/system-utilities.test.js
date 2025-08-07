@@ -106,15 +106,15 @@ describe('System Integration and Constants', () => {
       const actorSchema = AvantActorData.defineSchema();
       
       expect(actorSchema).toBeObject();
-      expect(actorSchema).toContainKeys(['abilities', 'skills', 'health']);
+      expect(actorSchema).toContainKeys(['attributes', 'skills', 'health']);
     });
 
-    test('should support all defined skill-ability mappings', () => {
-      const skillAbilities = AvantActorData.getSkillAbilities();
-      const expectedAbilities = ['might', 'grace', 'intellect', 'focus'];
+    test('should support all defined skill-attribute mappings', () => {
+      const skillAttributes = AvantActorData.getSkillAttributes();
+      const expectedAttributes = ['might', 'grace', 'intellect', 'focus'];
       
-      const usedAbilities = [...new Set(Object.values(skillAbilities))];
-      expect(usedAbilities).toIncludeAllMembers(expectedAbilities);
+      const usedAttributes = [...new Set(Object.values(skillAttributes))];
+      expect(usedAttributes).toIncludeAllMembers(expectedAttributes);
     });
   });
 
@@ -124,7 +124,7 @@ describe('System Integration and Constants', () => {
         type: 'character',
         system: {
           level: '5',
-          abilities: {
+          attributes: {
             might: { value: '12' }
           }
         }
@@ -133,7 +133,7 @@ describe('System Integration and Constants', () => {
       const validated = ValidationUtils.validateActorData(testData);
       
       expect(validated.system.level).toBe(5); // Should be converted to number
-      expect(validated.system.abilities.might.value).toBe(12);
+      expect(validated.system.attributes.might.value).toBe(12);
     });
 
     test('should integrate validation with item data', () => {
@@ -172,7 +172,7 @@ describe('System Integration and Constants', () => {
         type: 'character',
         system: {
           level: 3,
-          abilities: {
+          attributes: {
             might: { value: 14, mod: 2 }
           },
           skills: {
@@ -185,7 +185,7 @@ describe('System Integration and Constants', () => {
       
       // Should preserve valid values
       expect(validated.system.level).toBe(3);
-      expect(validated.system.abilities.might.value).toBe(14);
+      expect(validated.system.attributes.might.value).toBe(14);
       expect(validated.system.skills.force).toBe(1);
     });
 
@@ -207,27 +207,27 @@ describe('System Integration and Constants', () => {
       const allSkills = ['debate', 'discern', 'endure', 'finesse', 'force', 'command', 'charm', 'hide', 'inspect', 'intuit', 'recall', 'surge'];
       
       allSkills.forEach(skill => {
-        const ability = AvantActorData.getSkillAbility(skill);
-        expect(ability).toBeOneOf(['might', 'grace', 'intellect', 'focus']);
+        const attribute = AvantActorData.getSkillAttribute(skill);
+        expect(attribute).toBeOneOf(['might', 'grace', 'intellect', 'focus']);
       });
     });
 
-    test('should support ability reverse lookup operations', () => {
-      const allAbilities = ['might', 'grace', 'intellect', 'focus'];
+    test('should support attribute reverse lookup operations', () => {
+      const allAttributes = ['might', 'grace', 'intellect', 'focus'];
       
-      allAbilities.forEach(ability => {
-        const skills = AvantActorData.getAbilitySkills(ability);
+      allAttributes.forEach(attribute => {
+        const skills = AvantActorData.getAttributeSkills(attribute);
         expect(skills).toBeArray();
         expect(skills.length).toBeGreaterThan(0);
       });
     });
 
-    test('should maintain bidirectional skill-ability relationships', () => {
-      const skillAbilities = AvantActorData.getSkillAbilities();
+    test('should maintain bidirectional skill-attribute relationships', () => {
+      const skillAttributes = AvantActorData.getSkillAttributes();
       
-      Object.entries(skillAbilities).forEach(([skill, ability]) => {
-        const abilitySkills = AvantActorData.getAbilitySkills(ability);
-        expect(abilitySkills).toContain(skill);
+      Object.entries(skillAttributes).forEach(([skill, attribute]) => {
+        const attributeSkills = AvantActorData.getAttributeSkills(attribute);
+        expect(attributeSkills).toContain(skill);
       });
     });
 
@@ -255,7 +255,7 @@ describe('System Integration and Constants', () => {
           type: 'character',
           system: {
             level: i % 10 + 1,
-            abilities: {
+            attributes: {
               might: { value: i % 20 + 1 }
             }
           }
@@ -293,7 +293,7 @@ describe('System Integration and Constants', () => {
         type: 'character',
         system: {
           level: 1,
-          abilities: {},
+          attributes: {},
           skills: {},
           items: new Array(100).fill(null).map((_, i) => ({ name: `Item ${i}` }))
         }

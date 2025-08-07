@@ -9,7 +9,7 @@
  * Action Item Data Model
  * @class AvantActionData
  * @extends {foundry.abstract.DataModel}
- * @description Data model for action items with ability requirements and difficulty thresholds
+ * @description Data model for action items with attribute requirements and difficulty thresholds
  */
 export class AvantActionData extends foundry.abstract.DataModel {
     /**
@@ -25,7 +25,7 @@ export class AvantActionData extends foundry.abstract.DataModel {
                 initial: "",
                 blank: true
             }),
-            ability: new fields.StringField({
+            attribute: new fields.StringField({
                 required: true,
                 initial: "might",
                 choices: ["might", "grace", "intellect", "focus"]
@@ -338,7 +338,7 @@ export class AvantWeaponData extends foundry.abstract.DataModel {
                 initial: "",
                 blank: true
             }),
-            ability: new fields.StringField({
+            attribute: new fields.StringField({
                 required: true,
                 initial: "might",
                 choices: ["might", "grace", "intellect", "focus"]
@@ -435,7 +435,7 @@ export class AvantArmorData extends foundry.abstract.DataModel {
                 initial: "",
                 blank: true
             }),
-            ability: new fields.StringField({
+            attribute: new fields.StringField({
                 required: true,
                 initial: "grace",
                 choices: ["might", "grace", "intellect", "focus"]

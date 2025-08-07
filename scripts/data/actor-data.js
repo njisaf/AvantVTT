@@ -2,14 +2,14 @@
  * @fileoverview AvantActorData - Actor Data Model for Avant Native System
  * @version 2.0.0
  * @author Avant Development Team
- * @description Complete actor data schema supporting abilities, skills, power points, health, and character details
+ * @description Complete actor data schema supporting attributes, skills, power points, health, and character details
  */
 
 /**
  * Actor Data Model for Avant - v12/v13 Compatible
  * @class AvantActorData
  * @extends {foundry.abstract.DataModel}
- * @description Defines the complete data schema for Avant actors including abilities, skills, power points, and character details
+ * @description Defines the complete data schema for Avant actors including attributes, skills, power points, and character details
  */
 export class AvantActorData extends foundry.abstract.DataModel {
     /**
@@ -33,8 +33,8 @@ export class AvantActorData extends foundry.abstract.DataModel {
             background: new fields.StringField({ required: true, initial: "", blank: true }),
             languages: new fields.StringField({ required: true, initial: "", blank: true }),
             
-            // Core Abilities - Direct modifiers (not D&D-style scores)
-            abilities: new fields.SchemaField({
+            // Core Attributes - Direct modifiers (not D&D-style scores)
+            attributes: new fields.SchemaField({
                 might: new fields.SchemaField({
                     modifier: new fields.NumberField({ required: true, initial: 0, integer: true })
                 }),
@@ -145,11 +145,11 @@ export class AvantActorData extends foundry.abstract.DataModel {
     }
     
     /**
-     * Map skills to their governing abilities
+     * Map skills to their governing attributes
      * @static
-     * @returns {Object} Mapping of skill names to ability names
+     * @returns {Object} Mapping of skill names to attribute names
      */
-    static getSkillAbilities() {
+    static getSkillAttributes() {
         return {
             'debate': 'intellect',
             'discern': 'focus',
@@ -189,28 +189,28 @@ export class AvantActorData extends foundry.abstract.DataModel {
     }
     
     /**
-     * Get the ability that governs a specific skill
+     * Get the attribute that governs a specific skill
      * @static
      * @param {string} skillName - The name of the skill
-     * @returns {string|null} The governing ability name or null if not found
+     * @returns {string|null} The governing attribute name or null if not found
      */
-    static getSkillAbility(skillName) {
-        const skillAbilities = this.getSkillAbilities();
-        return skillAbilities[skillName] || null;
+    static getSkillAttribute(skillName) {
+        const skillAttributes = this.getSkillAttributes();
+        return skillAttributes[skillName] || null;
     }
     
     /**
-     * Get all skills governed by a specific ability
+     * Get all skills governed by a specific attribute
      * @static
-     * @param {string} abilityName - The name of the ability
-     * @returns {Array<string>} Array of skill names governed by this ability
+     * @param {string} attributeName - The name of the attribute
+     * @returns {Array<string>} Array of skill names governed by this attribute
      */
-    static getAbilitySkills(abilityName) {
-        const skillAbilities = this.getSkillAbilities();
+    static getAttributeSkills(attributeName) {
+        const skillAttributes = this.getSkillAttributes();
         const skills = [];
         
-        for (const [skill, ability] of Object.entries(skillAbilities)) {
-            if (ability === abilityName) {
+        for (const [skill, attribute] of Object.entries(skillAttributes)) {
+            if (attribute === attributeName) {
                 skills.push(skill);
             }
         }
@@ -225,11 +225,11 @@ export class AvantActorData extends foundry.abstract.DataModel {
     prepareDerivedData() {
         // Note: DataModel doesn't have prepareDerivedData, so no super call needed
         
-        // No need to calculate ability modifiers - they are direct values now
+        // No need to calculate attribute modifiers - they are direct values now
         
-        // Calculate defense values (base 11 + tier + ability modifier)
-        for (const [abilityName, abilityData] of Object.entries(this.abilities)) {
-            this.defense[abilityName] = 11 + this.tier + (abilityData.modifier || 0);
+        // Calculate defense values (base 11 + tier + attribute modifier)
+        for (const [attributeName, attributeData] of Object.entries(this.attributes)) {
+            this.defense[attributeName] = 11 + this.tier + (attributeData.modifier || 0);
         }
         
         // Ensure current health doesn't exceed max (only constraint we keep)
@@ -249,7 +249,7 @@ export class AvantActorData extends foundry.abstract.DataModel {
         this.expertisePoints.remaining = Math.max(0, this.expertisePoints.total - this.expertisePoints.spent);
         
         // Calculate encumbrance max based on might modifier + base value
-        const mightModifier = this.abilities.might.modifier || 0;
+        const mightModifier = this.attributes.might.modifier || 0;
         const baseEncumbrance = 100; // Base carrying capacity
         this.physical.encumbrance.max = baseEncumbrance + (mightModifier * 10); // Simple encumbrance calculation
     }

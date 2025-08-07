@@ -79,7 +79,7 @@ export function header(item: LayoutItemData): Field[] {
 
 /**
  * Body layout for armor items
- * Order: AC, threshold, description, ability, modifier, weight, cost, traits
+ * Order: AC, threshold, description, attribute, modifier, weight, cost, traits
  */
 export function body(item: LayoutItemData): Field[] {
     const system = item.system as ArmorSystemData;
@@ -115,8 +115,8 @@ export function body(item: LayoutItemData): Field[] {
 
         commonFields.expertise(system.expertise, 'armor'),
 
-        // 3. Ability and modifier
-        commonFields.ability(system.ability, 'armor'),
+        // 3. Attribute and modifier
+        commonFields.attribute(system.attribute, 'armor'),
 
         // when(system.modifier !== undefined, () => field({
         //     type: 'number',

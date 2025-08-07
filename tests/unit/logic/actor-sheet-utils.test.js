@@ -40,13 +40,13 @@ describe('Actor Sheet Utils - Pure Functions', () => {
             });
         });
 
-        test('should set default ability for actions', () => {
+        test('should set default attribute for actions', () => {
             const result = prepareItemData('action', {});
             
             expect(result).toEqual({
                 name: 'New Action',
                 type: 'action',
-                system: { ability: 'might' }
+                system: { attribute: 'might' }
             });
         });
 
@@ -113,60 +113,60 @@ describe('Actor Sheet Utils - Pure Functions', () => {
         test('should prepare weapon attack roll data', () => {
             const weapon = {
                 name: 'Iron Sword',
-                system: { ability: 'might', modifier: 2 }
+                system: { attribute: 'might', modifier: 2 }
             };
             const actor = {
-                system: { 
+                system: {
                     level: 3,
-                    abilities: { might: { mod: 1 } }
+                    attributes: { might: { mod: 1 } }
                 }
             };
 
             const result = prepareWeaponAttackRoll(weapon, actor);
             
             expect(result).toEqual({
-                rollExpression: '2d10 + @level + @abilityMod + @weaponMod',
+                rollExpression: '2d10 + @level + @attributeMod + @weaponMod',
                 rollData: {
                     level: 3,
-                    abilityMod: 1,
+                    attributeMod: 1,
                     weaponMod: 2
                 },
                 flavor: 'Iron Sword Attack'
             });
         });
 
-        test('should use default ability if not specified', () => {
+        test('should use default attribute if not specified', () => {
             const weapon = {
                 name: 'Staff',
                 system: {}
             };
             const actor = {
-                system: { 
+                system: {
                     level: 2,
-                    abilities: { might: { mod: 0 } }
+                    attributes: { might: { mod: 0 } }
                 }
             };
 
             const result = prepareWeaponAttackRoll(weapon, actor);
             
-            expect(result.rollData.abilityMod).toBe(0);
+            expect(result.rollData.attributeMod).toBe(0);
         });
 
-        test('should handle missing ability data', () => {
+        test('should handle missing attribute data', () => {
             const weapon = {
                 name: 'Bow',
-                system: { ability: 'grace' }
+                system: { attribute: 'grace' }
             };
             const actor = {
-                system: { 
+                system: {
                     level: 1,
-                    abilities: {}
+                    attributes: {}
                 }
             };
 
             const result = prepareWeaponAttackRoll(weapon, actor);
             
-            expect(result.rollData.abilityMod).toBe(0);
+            expect(result.rollData.attributeMod).toBe(0);
         });
     });
 
@@ -176,21 +176,21 @@ describe('Actor Sheet Utils - Pure Functions', () => {
                 name: 'Iron Sword',
                 system: { 
                     damageDie: '1d8',
-                    ability: 'might',
+                    attribute: 'might',
                     damageType: 'slashing'
                 }
             };
             const actor = {
-                system: { 
-                    abilities: { might: { mod: 2 } }
+                system: {
+                    attributes: { might: { mod: 2 } }
                 }
             };
 
             const result = prepareWeaponDamageRoll(weapon, actor);
             
             expect(result).toEqual({
-                rollExpression: '1d8 + @abilityMod',
-                rollData: { abilityMod: 2 },
+                rollExpression: '1d8 + @attributeMod',
+                rollData: { attributeMod: 2 },
                 flavor: 'Iron Sword Damage (slashing)'
             });
         });
@@ -201,7 +201,7 @@ describe('Actor Sheet Utils - Pure Functions', () => {
                 system: { damageDie: '1d6' }
             };
             const actor = {
-                system: { abilities: { might: { mod: 1 } } }
+                system: { attributes: { might: { mod: 1 } } }
             };
 
             const result = prepareWeaponDamageRoll(weapon, actor);
@@ -215,12 +215,12 @@ describe('Actor Sheet Utils - Pure Functions', () => {
                 system: {}
             };
             const actor = {
-                system: { abilities: { might: { mod: 0 } } }
+                system: { attributes: { might: { mod: 0 } } }
             };
 
             const result = prepareWeaponDamageRoll(weapon, actor);
             
-            expect(result.rollExpression).toBe('1d6 + @abilityMod');
+            expect(result.rollExpression).toBe('1d6 + @attributeMod');
         });
     });
 
@@ -228,43 +228,43 @@ describe('Actor Sheet Utils - Pure Functions', () => {
         test('should prepare armor roll data', () => {
             const armor = {
                 name: 'Leather Armor',
-                system: { ability: 'grace', modifier: 1 }
+                system: { attribute: 'grace', modifier: 1 }
             };
             const actor = {
-                system: { 
+                system: {
                     level: 2,
-                    abilities: { grace: { mod: 3 } }
+                    attributes: { grace: { mod: 3 } }
                 }
             };
 
             const result = prepareArmorRoll(armor, actor);
             
             expect(result).toEqual({
-                rollExpression: '2d10 + @level + @abilityMod + @armorMod',
+                rollExpression: '2d10 + @level + @attributeMod + @armorMod',
                 rollData: {
                     level: 2,
-                    abilityMod: 3,
+                    attributeMod: 3,
                     armorMod: 1
                 },
                 flavor: 'Leather Armor Armor Check'
             });
         });
 
-        test('should use default grace ability', () => {
+        test('should use default grace attribute', () => {
             const armor = {
                 name: 'Shield',
                 system: {}
             };
             const actor = {
-                system: { 
+                system: {
                     level: 1,
-                    abilities: { grace: { mod: 2 } }
+                    attributes: { grace: { mod: 2 } }
                 }
             };
 
             const result = prepareArmorRoll(armor, actor);
             
-            expect(result.rollData.abilityMod).toBe(2);
+            expect(result.rollData.attributeMod).toBe(2);
         });
     });
 
@@ -423,12 +423,12 @@ describe('Actor Sheet Utils - Pure Functions', () => {
     });
 
     describe('formatFlavorText', () => {
-        test('should capitalize first letter of ability names', () => {
+        test('should capitalize first letter of attribute names', () => {
             const result = formatFlavorText('might', 'Check');
             expect(result).toBe('Might Check');
         });
 
-        test('should format skill with ability', () => {
+        test('should format skill with attribute', () => {
             const result = formatFlavorText('athletics', 'Check', 'might');
             expect(result).toBe('Athletics Check (Might)');
         });

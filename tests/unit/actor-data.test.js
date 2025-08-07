@@ -9,11 +9,11 @@ import { AvantActorData } from '../../scripts/data/actor-data.js';
 
 describe('AvantActorData', () => {
   describe('Static Methods', () => {
-    describe('getSkillAbilities', () => {
-      test('should return complete skill-to-ability mapping', () => {
-        const skillAbilities = AvantActorData.getSkillAbilities();
+    describe('getSkillAttributes', () => {
+      test('should return complete skill-to-attribute mapping', () => {
+        const skillAttributes = AvantActorData.getSkillAttributes();
         
-        expect(skillAbilities)
+        expect(skillAttributes)
           .toBeObject()
           .toContainAllKeys([
             'debate', 'discern', 'endure', 'finesse', 'force',
@@ -21,82 +21,82 @@ describe('AvantActorData', () => {
           ]);
       });
 
-      test('should map skills to correct abilities', () => {
-        const skillAbilities = AvantActorData.getSkillAbilities();
+      test('should map skills to correct attributes', () => {
+        const skillAttributes = AvantActorData.getSkillAttributes();
         
         // Might-based skills
-        expect(skillAbilities.force).toBe('might');
-        expect(skillAbilities.command).toBe('might');
-        expect(skillAbilities.surge).toBe('might');
+        expect(skillAttributes.force).toBe('might');
+        expect(skillAttributes.command).toBe('might');
+        expect(skillAttributes.surge).toBe('might');
         
-        // Grace-based skills  
-        expect(skillAbilities.finesse).toBe('grace');
-        expect(skillAbilities.hide).toBe('grace');
-        expect(skillAbilities.charm).toBe('grace');
+        // Grace-based skills
+        expect(skillAttributes.finesse).toBe('grace');
+        expect(skillAttributes.hide).toBe('grace');
+        expect(skillAttributes.charm).toBe('grace');
         
         // Intellect-based skills
-        expect(skillAbilities.debate).toBe('intellect');
-        expect(skillAbilities.inspect).toBe('intellect');
-        expect(skillAbilities.recall).toBe('intellect');
+        expect(skillAttributes.debate).toBe('intellect');
+        expect(skillAttributes.inspect).toBe('intellect');
+        expect(skillAttributes.recall).toBe('intellect');
         
         // Focus-based skills
-        expect(skillAbilities.discern).toBe('focus');
-        expect(skillAbilities.endure).toBe('focus');
-        expect(skillAbilities.intuit).toBe('focus');
+        expect(skillAttributes.discern).toBe('focus');
+        expect(skillAttributes.endure).toBe('focus');
+        expect(skillAttributes.intuit).toBe('focus');
       });
 
       test('should return consistent mapping on multiple calls', () => {
-        const mapping1 = AvantActorData.getSkillAbilities();
-        const mapping2 = AvantActorData.getSkillAbilities();
+        const mapping1 = AvantActorData.getSkillAttributes();
+        const mapping2 = AvantActorData.getSkillAttributes();
         
         expect(mapping1).toEqual(mapping2);
       });
 
       test('should contain exactly 12 skill mappings', () => {
-        const skillAbilities = AvantActorData.getSkillAbilities();
+        const skillAttributes = AvantActorData.getSkillAttributes();
         
-        expect(Object.keys(skillAbilities)).toHaveLength(12);
+        expect(Object.keys(skillAttributes)).toHaveLength(12);
       });
     });
 
-    describe('getSkillAbility', () => {
-      test('should return correct ability for valid skill names', () => {
-        expect(AvantActorData.getSkillAbility('force')).toBe('might');
-        expect(AvantActorData.getSkillAbility('finesse')).toBe('grace');
-        expect(AvantActorData.getSkillAbility('recall')).toBe('intellect');
-        expect(AvantActorData.getSkillAbility('discern')).toBe('focus');
+    describe('getSkillAttribute', () => {
+      test('should return correct attribute for valid skill names', () => {
+        expect(AvantActorData.getSkillAttribute('force')).toBe('might');
+        expect(AvantActorData.getSkillAttribute('finesse')).toBe('grace');
+        expect(AvantActorData.getSkillAttribute('recall')).toBe('intellect');
+        expect(AvantActorData.getSkillAttribute('discern')).toBe('focus');
       });
 
       test('should return null for invalid skill names', () => {
-        expect(AvantActorData.getSkillAbility('invalidSkill')).toBeNull();
-        expect(AvantActorData.getSkillAbility('nonexistent')).toBeNull();
-        expect(AvantActorData.getSkillAbility('')).toBeNull();
+        expect(AvantActorData.getSkillAttribute('invalidSkill')).toBeNull();
+        expect(AvantActorData.getSkillAttribute('nonexistent')).toBeNull();
+        expect(AvantActorData.getSkillAttribute('')).toBeNull();
       });
 
       test('should handle case sensitivity correctly', () => {
-        expect(AvantActorData.getSkillAbility('Force')).toBeNull();
-        expect(AvantActorData.getSkillAbility('FORCE')).toBeNull();
-        expect(AvantActorData.getSkillAbility('force')).toBe('might');
+        expect(AvantActorData.getSkillAttribute('Force')).toBeNull();
+        expect(AvantActorData.getSkillAttribute('FORCE')).toBeNull();
+        expect(AvantActorData.getSkillAttribute('force')).toBe('might');
       });
 
       test('should handle null and undefined inputs', () => {
-        expect(AvantActorData.getSkillAbility(null)).toBeNull();
-        expect(AvantActorData.getSkillAbility(undefined)).toBeNull();
+        expect(AvantActorData.getSkillAttribute(null)).toBeNull();
+        expect(AvantActorData.getSkillAttribute(undefined)).toBeNull();
       });
 
       test('should work with all defined skills', () => {
-        const skillAbilities = AvantActorData.getSkillAbilities();
+        const skillAttributes = AvantActorData.getSkillAttributes();
         
-        for (const [skill, expectedAbility] of Object.entries(skillAbilities)) {
-          expect(AvantActorData.getSkillAbility(skill))
-            .toBe(expectedAbility);
+        for (const [skill, expectedAttribute] of Object.entries(skillAttributes)) {
+          expect(AvantActorData.getSkillAttribute(skill))
+            .toBe(expectedAttribute);
         }
       });
     });
 
-    describe('getAbilitySkills', () => {
-      test('should return correct skills for might ability', () => {
-        const mightSkills = AvantActorData.getAbilitySkills('might');
+    describe('getAttributeSkills', () => {
+      test('should return correct skills for might attribute', () => {
+        const mightSkills = AvantActorData.getAttributeSkills('might');
         
         expect(mightSkills)
           .toBeArray()
@@ -104,8 +104,8 @@ describe('AvantActorData', () => {
           .toHaveLength(3);
       });
 
-      test('should return correct skills for grace ability', () => {
-        const graceSkills = AvantActorData.getAbilitySkills('grace');
+      test('should return correct skills for grace attribute', () => {
+        const graceSkills = AvantActorData.getAttributeSkills('grace');
         
         expect(graceSkills)
           .toBeArray()
@@ -113,8 +113,8 @@ describe('AvantActorData', () => {
           .toHaveLength(3);
       });
 
-      test('should return correct skills for intellect ability', () => {
-        const intellectSkills = AvantActorData.getAbilitySkills('intellect');
+      test('should return correct skills for intellect attribute', () => {
+        const intellectSkills = AvantActorData.getAttributeSkills('intellect');
         
         expect(intellectSkills)
           .toBeArray()
@@ -122,8 +122,8 @@ describe('AvantActorData', () => {
           .toHaveLength(3);
       });
 
-      test('should return correct skills for focus ability', () => {
-        const focusSkills = AvantActorData.getAbilitySkills('focus');
+      test('should return correct skills for focus attribute', () => {
+        const focusSkills = AvantActorData.getAttributeSkills('focus');
         
         expect(focusSkills)
           .toBeArray()
@@ -131,55 +131,55 @@ describe('AvantActorData', () => {
           .toHaveLength(3);
       });
 
-      test('should return empty array for invalid ability names', () => {
-        expect(AvantActorData.getAbilitySkills('invalid'))
+      test('should return empty array for invalid attribute names', () => {
+        expect(AvantActorData.getAttributeSkills('invalid'))
           .toBeArray()
           .toBeEmpty();
         
-        expect(AvantActorData.getAbilitySkills('nonexistent'))
+        expect(AvantActorData.getAttributeSkills('nonexistent'))
           .toBeArray()
           .toBeEmpty();
         
-        expect(AvantActorData.getAbilitySkills(''))
+        expect(AvantActorData.getAttributeSkills(''))
           .toBeArray()
           .toBeEmpty();
       });
 
       test('should return sorted skill arrays', () => {
-        const mightSkills = AvantActorData.getAbilitySkills('might');
+        const mightSkills = AvantActorData.getAttributeSkills('might');
         const sortedMightSkills = [...mightSkills].sort();
         
         expect(mightSkills).toEqual(sortedMightSkills);
         
-        const intellectSkills = AvantActorData.getAbilitySkills('intellect');
+        const intellectSkills = AvantActorData.getAttributeSkills('intellect');
         const sortedIntellectSkills = [...intellectSkills].sort();
         
         expect(intellectSkills).toEqual(sortedIntellectSkills);
       });
 
       test('should handle case sensitivity correctly', () => {
-        expect(AvantActorData.getAbilitySkills('Might')).toBeEmpty();
-        expect(AvantActorData.getAbilitySkills('MIGHT')).toBeEmpty();
-        expect(AvantActorData.getAbilitySkills('might')).not.toBeEmpty();
+        expect(AvantActorData.getAttributeSkills('Might')).toBeEmpty();
+        expect(AvantActorData.getAttributeSkills('MIGHT')).toBeEmpty();
+        expect(AvantActorData.getAttributeSkills('might')).not.toBeEmpty();
       });
 
       test('should handle null and undefined inputs', () => {
-        expect(AvantActorData.getAbilitySkills(null)).toBeEmpty();
-        expect(AvantActorData.getAbilitySkills(undefined)).toBeEmpty();
+        expect(AvantActorData.getAttributeSkills(null)).toBeEmpty();
+        expect(AvantActorData.getAttributeSkills(undefined)).toBeEmpty();
       });
 
       test('should ensure all skills are accounted for', () => {
-        const allAbilities = ['might', 'grace', 'intellect', 'focus'];
-        const allSkillsFromAbilities = [];
+        const allAttributes = ['might', 'grace', 'intellect', 'focus'];
+        const allSkillsFromAttributes = [];
         
-        allAbilities.forEach(ability => {
-          const skills = AvantActorData.getAbilitySkills(ability);
-          allSkillsFromAbilities.push(...skills);
+        allAttributes.forEach(attribute => {
+          const skills = AvantActorData.getAttributeSkills(attribute);
+          allSkillsFromAttributes.push(...skills);
         });
         
-        const allSkillsFromMapping = Object.keys(AvantActorData.getSkillAbilities());
+        const allSkillsFromMapping = Object.keys(AvantActorData.getSkillAttributes());
         
-        expect(allSkillsFromAbilities.sort()).toEqual(allSkillsFromMapping.sort());
+        expect(allSkillsFromAttributes.sort()).toEqual(allSkillsFromMapping.sort());
       });
     });
 
@@ -201,13 +201,13 @@ describe('AvantActorData', () => {
         ]);
       });
 
-      test('should include abilities structure', () => {
+      test('should include attributes structure', () => {
         const schema = AvantActorData.defineSchema();
         
         expect(schema)
-          .toContainKey('abilities');
+          .toContainKey('attributes');
         
-        expect(schema.abilities.fields).toContainKeys([
+        expect(schema.attributes.fields).toContainKeys([
           'might', 'grace', 'intellect', 'focus'
         ]);
       });
@@ -218,8 +218,8 @@ describe('AvantActorData', () => {
         expect(schema)
           .toContainKey('skills');
         
-        const skillAbilities = AvantActorData.getSkillAbilities();
-        const expectedSkills = Object.keys(skillAbilities);
+        const skillAttributes = AvantActorData.getSkillAttributes();
+        const expectedSkills = Object.keys(skillAttributes);
         
         expect(schema.skills.fields).toContainKeys(expectedSkills);
       });
@@ -267,26 +267,26 @@ describe('AvantActorData', () => {
   });
 
   describe('Data Validation and Structure', () => {
-    test('should validate skill-ability relationships are bidirectional', () => {
-      const skillAbilities = AvantActorData.getSkillAbilities();
+    test('should validate skill-attribute relationships are bidirectional', () => {
+      const skillAttributes = AvantActorData.getSkillAttributes();
       
-      for (const [skill, ability] of Object.entries(skillAbilities)) {
-        const abilitySkills = AvantActorData.getAbilitySkills(ability);
+      for (const [skill, attribute] of Object.entries(skillAttributes)) {
+        const attributeSkills = AvantActorData.getAttributeSkills(attribute);
         
-        expect(abilitySkills)
+        expect(attributeSkills)
           .toContain(skill);
       }
     });
 
-    test('should ensure no duplicate skills across abilities', () => {
-      const allAbilities = ['might', 'grace', 'intellect', 'focus'];
+    test('should ensure no duplicate skills across attributes', () => {
+      const allAttributes = ['might', 'grace', 'intellect', 'focus'];
       const allSkills = new Set();
       
-      allAbilities.forEach(ability => {
-        const skills = AvantActorData.getAbilitySkills(ability);
+      allAttributes.forEach(attribute => {
+        const skills = AvantActorData.getAttributeSkills(attribute);
         skills.forEach(skill => {
           expect(allSkills.has(skill))
-            .toBeFalse(); // No skill should appear in multiple abilities
+            .toBeFalse(); // No skill should appear in multiple attributes
           allSkills.add(skill);
         });
       });
@@ -295,8 +295,8 @@ describe('AvantActorData', () => {
     });
 
     test('should maintain consistent skill naming conventions', () => {
-      const skillAbilities = AvantActorData.getSkillAbilities();
-      const skillNames = Object.keys(skillAbilities);
+      const skillAttributes = AvantActorData.getSkillAttributes();
+      const skillNames = Object.keys(skillAttributes);
       
       // All skill names should be lowercase strings
       skillNames.forEach(skill => {
@@ -306,18 +306,18 @@ describe('AvantActorData', () => {
       });
     });
 
-    test('should maintain consistent ability naming conventions', () => {
-      const skillAbilities = AvantActorData.getSkillAbilities();
-      const abilityNames = [...new Set(Object.values(skillAbilities))];
+    test('should maintain consistent attribute naming conventions', () => {
+      const skillAttributes = AvantActorData.getSkillAttributes();
+      const attributeNames = [...new Set(Object.values(skillAttributes))];
       
-      expect(abilityNames).toIncludeAllMembers(['might', 'grace', 'intellect', 'focus']);
-      expect(abilityNames).toHaveLength(4);
+      expect(attributeNames).toIncludeAllMembers(['might', 'grace', 'intellect', 'focus']);
+      expect(attributeNames).toHaveLength(4);
       
-      // All ability names should be lowercase strings
-      abilityNames.forEach(ability => {
-        expect(ability).toBeString();
-        expect(ability).toBe(ability.toLowerCase());
-        expect(ability).not.toBeEmpty();
+      // All attribute names should be lowercase strings
+      attributeNames.forEach(attribute => {
+        expect(attribute).toBeString();
+        expect(attribute).toBe(attribute.toLowerCase());
+        expect(attribute).not.toBeEmpty();
       });
     });
   });
@@ -325,24 +325,24 @@ describe('AvantActorData', () => {
   describe('Edge Cases and Error Handling', () => {
     test('should handle empty string inputs gracefully', () => {
       expect(() => {
-        AvantActorData.getSkillAbility('');
-        AvantActorData.getAbilitySkills('');
+        AvantActorData.getSkillAttribute('');
+        AvantActorData.getAttributeSkills('');
       }).not.toThrow();
     });
 
     test('should handle whitespace inputs gracefully', () => {
-      expect(AvantActorData.getSkillAbility('  ')).toBeNull();
-      expect(AvantActorData.getAbilitySkills('  ')).toBeEmpty();
+      expect(AvantActorData.getSkillAttribute('  ')).toBeNull();
+      expect(AvantActorData.getAttributeSkills('  ')).toBeEmpty();
     });
 
     test('should handle numeric inputs gracefully', () => {
-      expect(AvantActorData.getSkillAbility(123)).toBeNull();
-      expect(AvantActorData.getAbilitySkills(456)).toBeEmpty();
+      expect(AvantActorData.getSkillAttribute(123)).toBeNull();
+      expect(AvantActorData.getAttributeSkills(456)).toBeEmpty();
     });
 
     test('should handle object inputs gracefully', () => {
-      expect(AvantActorData.getSkillAbility({})).toBeNull();
-      expect(AvantActorData.getAbilitySkills({})).toBeEmpty();
+      expect(AvantActorData.getSkillAttribute({})).toBeNull();
+      expect(AvantActorData.getAttributeSkills({})).toBeEmpty();
     });
 
     test('should maintain performance with repeated calls', () => {
@@ -350,9 +350,9 @@ describe('AvantActorData', () => {
       
       // Run methods many times
       for (let i = 0; i < 1000; i++) {
-        AvantActorData.getSkillAbilities();
-        AvantActorData.getSkillAbility('force');
-        AvantActorData.getAbilitySkills('might');
+        AvantActorData.getSkillAttributes();
+        AvantActorData.getSkillAttribute('force');
+        AvantActorData.getAttributeSkills('might');
       }
       
       const endTime = Date.now();
