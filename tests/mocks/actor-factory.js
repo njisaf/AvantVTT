@@ -53,12 +53,12 @@ export function createMockActor(options = {}) {
 }
 
 /**
- * Creates a mock actor with abilities for testing
- * @param {Object} abilities - Ability scores
- * @returns {Object} Mock actor with abilities
+ * Creates a mock actor with attributes for testing
+ * @param {Object} attributes - Attribute scores
+ * @returns {Object} Mock actor with attributes
  */
-export function createMockActorWithAbilities(abilities = {}) {
-    const defaultAbilities = {
+export function createMockActorWithAttributes(attributes = {}) {
+    const defaultAttributes = {
         might: { modifier: 2 },
         agility: { modifier: 1 },
         intellect: { modifier: 0 }
@@ -66,7 +66,7 @@ export function createMockActorWithAbilities(abilities = {}) {
 
     return createMockActor({
         system: {
-            abilities: { ...defaultAbilities, ...abilities }
+            attributes: { ...defaultAttributes, ...attributes }
         }
     });
 }

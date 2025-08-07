@@ -1,120 +1,94 @@
 /**
- * Image Upload Component Styles
- * 
- * Centralized styling for the unified image upload component.
- * Used across actor sheets, item sheets, and other forms.
- * 
- * @author Avant VTT Team  
- * @version 2.0.0
- * @since Phase 2 - Image Upload Unification
+ * Image Upload Component (unified)
+ * Provides consistent styling and interactions for image upload controls used by
+ * both Actor and Item sheets via the shared partial:
+ *   "systems/avant/templates/shared/partials/image-upload"
+ *
+ * Contract:
+ * - Root element: .image-upload (container)
+ * - Image element: .image-upload__img (interactive target)
+ * - Overlay: .image-upload__overlay (pen icon, appears on hover/focus)
+ *
+ * Accessibility:
+ * - The template sets role="button" and aria-label on the img.
+ * - We surface a clear focus-visible outline and hover affordance.
  */
 
-// Image Upload Component
-.form-group--image-upload {
-    .image-upload {
-        position: relative;
-        display: inline-block;
-        cursor: pointer;
-        border-radius: var(--form-border-radius);
-        overflow: hidden;
-        transition: all 0.2s ease;
+/* Size tokens (fallbacks align with design tokens if present) */
+$image-upload-radius: var(--avant-radius-sm, 6px);
+$image-upload-focus:  var(--avant-focus, #6ea8ff);
+$image-upload-shadow: var(--avant-shadow-sm, 0 0 0 1px rgba(0,0,0,0.06));
 
-        &:hover {
-            transform: scale(1.05);
+.image-upload {
+  position: relative;
+  display: inline-block;
+  /* The container can be sized by caller; otherwise, the img uses explicit width/height attrs. */
+  line-height: 0; /* remove extra whitespace gaps */
+  border-radius: $image-upload-radius;
 
-            .image-upload__overlay {
-                opacity: 1;
-            }
-        }
+  /* Hover/focus affordance handled via overlay; keep pointer to hint interactivity */
+  cursor: pointer;
 
-        &:focus-within {
-            outline: var(--form-focus-ring-width) solid var(--form-input-focus);
-            outline-offset: 2px;
-        }
-    }
-
-    .image-upload__img {
-        display: block;
-        border-radius: var(--form-border-radius);
-        border: var(--form-border-width) solid var(--form-input-border);
-
-        &:focus {
-            outline: none;
-        }
-    }
-
-    .image-upload__overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        transition: opacity 0.2s ease;
-        border-radius: var(--form-border-radius);
-        pointer-events: none; // Allow clicks to pass through to the image below
-
-        i {
-            color: white;
-            font-size: 1.25rem;
-        }
-    }
+  /* Optional utility sizes (caller can also use size parameter in partial) */
+  &.image-upload--32 { width: 32px; height: 32px; }
+  &.image-upload--48 { width: 48px; height: 48px; }
+  &.image-upload--64 { width: 64px; height: 64px; }
+  &.image-upload--96 { width: 96px; height: 96px; }
 }
 
-// Alternative class name support for broader usage
-.image-upload {
-    position: relative;
-    display: inline-block;
-    cursor: pointer;
-    border-radius: var(--form-border-radius, 0.25rem);
-    overflow: hidden;
-    transition: all 0.2s ease;
+.image-upload__img {
+  display: block;
+  /* When width/height attributes are provided on img (from partial), object-fit ensures cover behavior */
+  object-fit: cover;
+  border-radius: $image-upload-radius;
+  box-shadow: $image-upload-shadow;
 
-    &:hover {
-        transform: scale(1.05);
+  /* Keyboard focus ring (when image is focusable through role/button behavior) */
+  &:focus-visible {
+    outline: 2px solid $image-upload-focus;
+    outline-offset: 2px;
+  }
+}
 
-        .image-upload__overlay {
-            opacity: 1;
-        }
-    }
+.image-upload__overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: $image-upload-radius;
 
-    &:focus-within {
-        outline: 2px solid var(--form-input-focus, #00E0DC);
-        outline-offset: 2px;
-    }
+  opacity: 0;
+  transition: opacity 140ms ease-in-out;
+  pointer-events: none; /* overlay is purely visual */
+}
 
-    &__img {
-        display: block;
-        border-radius: var(--form-border-radius, 0.25rem);
-        border: 1px solid var(--form-input-border, #dee2e6);
+.image-upload:hover .image-upload__overlay,
+.image-upload:focus-within .image-upload__overlay {
+  opacity: 1;
+}
 
-        &:focus {
-            outline: none;
-        }
-    }
+/* TEMPORARY COMPATIBILITY ALIASES — DO NOT RELY ON LONG-TERM
+   Purpose: prevent regressions where legacy classnames are targeted by tests or ad‑hoc CSS.
+   These ensure visual parity while templates migrate to the shared image-upload component.
 
-    &__overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        transition: opacity 0.2s ease;
-        border-radius: var(--form-border-radius, 0.25rem);
-        pointer-events: none; // Allow clicks to pass through to the image below
+   Removal conditions (delete this block when ALL are true):
+   1) No templates in the Avant system render <img> elements with .profile-img or .item-sheet__profile-img.
+   2) Test suite (unit + integration) contains no selectors referencing .profile-img or .item-sheet__profile-img.
+   3) Manual audit confirms no downstream theme overrides or modules depend on these legacy selectors.
+   4) One full release cycle has shipped with the unified component in production and no regressions reported.
 
-        i {
-            color: white;
-            font-size: 1.25rem;
-        }
-    }
+   Action to remove:
+   - Search the repo for /\.profile-img|\.item-sheet__profile-img/ to confirm zero usages.
+   - Remove this alias block and update any lingering tests/selectors to target .image-upload / .image-upload__img.
+*/
+.profile-img,
+.item-sheet__profile-img {
+  display: block;
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: $image-upload-radius;
+  box-shadow: $image-upload-shadow;
 }

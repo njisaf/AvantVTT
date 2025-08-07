@@ -2,8 +2,12 @@
 <div class="{{cssClass}} flexcol" autocomplete="off" data-actor-id="{{actor.id}}">
     <!-- Fixed Header with Character Name and Avatar -->
     <header class="sheet-header">
-        <img class="profile-img" src="{{#if actor.img}}{{actor.img}}{{else}}icons/svg/mystery-man.svg{{/if}}"
-            data-edit="img" data-action="editImage" title="{{actor.name}}" role="button" aria-label="Change portrait" />
+        {{> "systems/avant/templates/shared/partials/image-upload"
+        src=actor.img
+        alt=actor.name
+        title=actor.name
+        size=64
+        class="actor-header__image"}}
         <div class="header-fields">
             <h1 class="charname"><input name="name" type="text" value="{{actor.name}}" placeholder="Character Name" />
             </h1>

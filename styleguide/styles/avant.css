@@ -2313,108 +2313,10 @@
  * @version 1.0.0 - Phase 1 Skeleton + ApplicationV2 Integration
  * @since Phase 1 - Item Sheet Unification
  */
-/**
- * Image Upload Component Styles
- * 
- * Centralized styling for the unified image upload component.
- * Used across actor sheets, item sheets, and other forms.
- * 
- * @author Avant VTT Team  
- * @version 2.0.0
- * @since Phase 2 - Image Upload Unification
- */
-.form-group--image-upload .image-upload {
-  position: relative;
-  display: inline-block;
-  cursor: pointer;
-  border-radius: var(--form-border-radius);
-  overflow: hidden;
-  transition: all 0.2s ease;
-}
-.form-group--image-upload .image-upload:hover {
-  transform: scale(1.05);
-}
-.form-group--image-upload .image-upload:hover .image-upload__overlay {
-  opacity: 1;
-}
-.form-group--image-upload .image-upload:focus-within {
-  outline: var(--form-focus-ring-width) solid var(--form-input-focus);
-  outline-offset: 2px;
-}
-.form-group--image-upload .image-upload__img {
-  display: block;
-  border-radius: var(--form-border-radius);
-  border: var(--form-border-width) solid var(--form-input-border);
-}
-.form-group--image-upload .image-upload__img:focus {
-  outline: none;
-}
-.form-group--image-upload .image-upload__overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  border-radius: var(--form-border-radius);
-  pointer-events: none;
-}
-.form-group--image-upload .image-upload__overlay i {
-  color: white;
-  font-size: 1.25rem;
-}
-
-.image-upload {
-  position: relative;
-  display: inline-block;
-  cursor: pointer;
-  border-radius: var(--form-border-radius, 0.25rem);
-  overflow: hidden;
-  transition: all 0.2s ease;
-}
-.image-upload:hover {
-  transform: scale(1.05);
-}
-.image-upload:hover .image-upload__overlay {
-  opacity: 1;
-}
-.image-upload:focus-within {
-  outline: 2px solid var(--form-input-focus, #00E0DC);
-  outline-offset: 2px;
-}
-.image-upload__img {
-  display: block;
-  border-radius: var(--form-border-radius, 0.25rem);
-  border: 1px solid var(--form-input-border, #dee2e6);
-}
-.image-upload__img:focus {
-  outline: none;
-}
-.image-upload__overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  border-radius: var(--form-border-radius, 0.25rem);
-  pointer-events: none;
-}
-.image-upload__overlay i {
-  color: white;
-  font-size: 1.25rem;
-}
-
+/* Image Upload base styles are centralized via avant.scss:
+   Ensure styles/avant.scss contains:
+   @use "components/image-upload";
+   Do not import here to avoid duplicate compilation. */
 .item-sheet {
   /* Grid-first container */
   --item-grid-gap-x: var(--space-md, 12px);
@@ -2558,13 +2460,16 @@
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
+  /* Base .image-upload styles (positioning, cursor, object-fit, overlay)
+     come from components/_image-upload.scss. Only item-header-specific
+     accents are declared here. */
 }
 .application.sheet.avant.item .sheet-header .row-container .form-group--image-upload .image-upload,
 .avant.application.sheet.item .sheet-header .row-container .form-group--image-upload .image-upload,
 .item-sheet.avant.application.sheet .sheet-header .row-container .form-group--image-upload .image-upload,
 .avant.item-sheet .sheet-header .row-container .form-group--image-upload .image-upload,
 .item-sheet.avant .sheet-header .row-container .form-group--image-upload .image-upload {
-  position: relative !important;
+  /* Item header prefers a fixed 64x64 presentation */
 }
 .application.sheet.avant.item .sheet-header .row-container .form-group--image-upload .image-upload .image-upload__img,
 .avant.application.sheet.item .sheet-header .row-container .form-group--image-upload .image-upload .image-upload__img,
@@ -2573,11 +2478,11 @@
 .item-sheet.avant .sheet-header .row-container .form-group--image-upload .image-upload .image-upload__img {
   width: 64px !important;
   height: 64px !important;
+  /* Neon accent border unique to item headers */
   border: 2px solid var(--theme-accent-primary, #00e0dc) !important;
-  cursor: pointer !important;
-  border-radius: 4px !important;
-  object-fit: cover !important;
-  transition: all 0.3s ease !important;
+  /* Align radius with component token for consistency */
+  border-radius: var(--avant-radius-sm, 6px) !important;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease !important;
 }
 .application.sheet.avant.item .sheet-header .row-container .form-group--image-upload .image-upload .image-upload__img:hover,
 .avant.application.sheet.item .sheet-header .row-container .form-group--image-upload .image-upload .image-upload__img:hover,
@@ -2592,18 +2497,9 @@
 .item-sheet.avant.application.sheet .sheet-header .row-container .form-group--image-upload .image-upload .image-upload__overlay,
 .avant.item-sheet .sheet-header .row-container .form-group--image-upload .image-upload .image-upload__overlay,
 .item-sheet.avant .sheet-header .row-container .form-group--image-upload .image-upload .image-upload__overlay {
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
+  /* Only override what differs visually for item header */
   background: rgba(0, 0, 0, 0.7) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  opacity: 0 !important;
-  transition: opacity 0.3s ease !important;
-  border-radius: 4px !important;
+  border-radius: var(--avant-radius-sm, 6px) !important;
 }
 .application.sheet.avant.item .sheet-header .row-container .form-group--image-upload .image-upload .image-upload__overlay i,
 .avant.application.sheet.item .sheet-header .row-container .form-group--image-upload .image-upload .image-upload__overlay i,
@@ -2612,13 +2508,6 @@
 .item-sheet.avant .sheet-header .row-container .form-group--image-upload .image-upload .image-upload__overlay i {
   color: var(--theme-accent-primary, #00e0dc) !important;
   font-size: 16px !important;
-}
-.application.sheet.avant.item .sheet-header .row-container .form-group--image-upload .image-upload:hover .image-upload__overlay,
-.avant.application.sheet.item .sheet-header .row-container .form-group--image-upload .image-upload:hover .image-upload__overlay,
-.item-sheet.avant.application.sheet .sheet-header .row-container .form-group--image-upload .image-upload:hover .image-upload__overlay,
-.avant.item-sheet .sheet-header .row-container .form-group--image-upload .image-upload:hover .image-upload__overlay,
-.item-sheet.avant .sheet-header .row-container .form-group--image-upload .image-upload:hover .image-upload__overlay {
-  opacity: 1 !important;
 }
 .application.sheet.avant.item .sheet-header .row-container .form-group--text-field,
 .avant.application.sheet.item .sheet-header .row-container .form-group--text-field,
@@ -4177,6 +4066,104 @@
 }
 
 /**
+ * Image Upload Component (unified)
+ * Provides consistent styling and interactions for image upload controls used by
+ * both Actor and Item sheets via the shared partial:
+ *   "systems/avant/templates/shared/partials/image-upload"
+ *
+ * Contract:
+ * - Root element: .image-upload (container)
+ * - Image element: .image-upload__img (interactive target)
+ * - Overlay: .image-upload__overlay (pen icon, appears on hover/focus)
+ *
+ * Accessibility:
+ * - The template sets role="button" and aria-label on the img.
+ * - We surface a clear focus-visible outline and hover affordance.
+ */
+/* Size tokens (fallbacks align with design tokens if present) */
+.image-upload {
+  position: relative;
+  display: inline-block;
+  /* The container can be sized by caller; otherwise, the img uses explicit width/height attrs. */
+  line-height: 0; /* remove extra whitespace gaps */
+  border-radius: var(--avant-radius-sm, 6px);
+  /* Hover/focus affordance handled via overlay; keep pointer to hint interactivity */
+  cursor: pointer;
+  /* Optional utility sizes (caller can also use size parameter in partial) */
+}
+.image-upload.image-upload--32 {
+  width: 32px;
+  height: 32px;
+}
+.image-upload.image-upload--48 {
+  width: 48px;
+  height: 48px;
+}
+.image-upload.image-upload--64 {
+  width: 64px;
+  height: 64px;
+}
+.image-upload.image-upload--96 {
+  width: 96px;
+  height: 96px;
+}
+
+.image-upload__img {
+  display: block;
+  /* When width/height attributes are provided on img (from partial), object-fit ensures cover behavior */
+  object-fit: cover;
+  border-radius: var(--avant-radius-sm, 6px);
+  box-shadow: var(--avant-shadow-sm, 0 0 0 1px rgba(0, 0, 0, 0.06));
+  /* Keyboard focus ring (when image is focusable through role/button behavior) */
+}
+.image-upload__img:focus-visible {
+  outline: 2px solid var(--avant-focus, #6ea8ff);
+  outline-offset: 2px;
+}
+
+.image-upload__overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: var(--avant-radius-sm, 6px);
+  opacity: 0;
+  transition: opacity 140ms ease-in-out;
+  pointer-events: none; /* overlay is purely visual */
+}
+
+.image-upload:hover .image-upload__overlay,
+.image-upload:focus-within .image-upload__overlay {
+  opacity: 1;
+}
+
+/* TEMPORARY COMPATIBILITY ALIASES — DO NOT RELY ON LONG-TERM
+   Purpose: prevent regressions where legacy classnames are targeted by tests or ad‑hoc CSS.
+   These ensure visual parity while templates migrate to the shared image-upload component.
+
+   Removal conditions (delete this block when ALL are true):
+   1) No templates in the Avant system render <img> elements with .profile-img or .item-sheet__profile-img.
+   2) Test suite (unit + integration) contains no selectors referencing .profile-img or .item-sheet__profile-img.
+   3) Manual audit confirms no downstream theme overrides or modules depend on these legacy selectors.
+   4) One full release cycle has shipped with the unified component in production and no regressions reported.
+
+   Action to remove:
+   - Search the repo for /\.profile-img|\.item-sheet__profile-img/ to confirm zero usages.
+   - Remove this alias block and update any lingering tests/selectors to target .image-upload / .image-upload__img.
+*/
+.profile-img,
+.item-sheet__profile-img {
+  display: block;
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: var(--avant-radius-sm, 6px);
+  box-shadow: var(--avant-shadow-sm, 0 0 0 1px rgba(0, 0, 0, 0.06));
+}
+
+/**
  * @fileoverview Chat Card Component Styles
  * @version 1.0.0 - Phase 3: TypeScript Conversion & UX Polish
  * @description SCSS styling for talent and augment chat cards with accessibility and responsive design
@@ -4904,7 +4891,6 @@ form.avant.theme-dark *::after {
   text-transform: uppercase;
   letter-spacing: 1px;
   color: var(--theme-accent-primary, #00E0DC);
-  border-bottom: 1px solid var(--theme-border-primary, #404040);
   padding-bottom: 8px;
   margin-bottom: 12px;
 }

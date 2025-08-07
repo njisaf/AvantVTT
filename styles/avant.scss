@@ -14,6 +14,7 @@
 @use 'components/unified-actions';
 @use 'components/foundry-overrides';
 @use 'components/actor-sheet-skills';
+@use 'components/image-upload';
 @use 'themes/base';
 @use 'themes/dark';
 @use 'utilities/variables';
@@ -239,7 +240,6 @@ form.avant.theme-dark {
   h4,
   h5 {
     @include orbitron-header;
-    border-bottom: 1px solid var(--theme-border-primary, $border-primary);
     padding-bottom: $spacing-sm;
     margin-bottom: $spacing-md;
   }

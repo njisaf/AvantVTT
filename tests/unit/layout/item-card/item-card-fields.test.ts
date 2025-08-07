@@ -19,7 +19,7 @@ const mockActionItem = {
   img: 'icons/skills/melee/sword-strike-red.webp',
   type: 'action',
   system: {
-    ability: 'might',
+    attribute: 'might',
     difficulty: 13,
     apCost: 2,
     ppCost: 1,
@@ -61,7 +61,7 @@ describe('Item Card Field Verification', () => {
     
     // Check for key fields that should be present
     expect(fieldNames).toContain('actionName');
-    expect(fieldNames).toContain('ability');
+    expect(fieldNames).toContain('attribute');
     expect(fieldNames).toContain('difficulty');
     expect(fieldNames).toContain('actionCosts');
     expect(fieldNames).toContain('description');
