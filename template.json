@@ -192,6 +192,17 @@
     },
     "talent": {
       "description": "",
+      "action": {
+        "mode": "immediate",
+        "cost": 1,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "range": "",
+      "duration": "",
+      "damage": "",
+      "level": 1,
       "apCost": 1,
       "levelRequirement": 1,
       "tier": 1,

@@ -123,6 +123,34 @@ function generateFoundryId() {
 }
 
 /**
+ * Ensure each document has a valid FoundryVTT-style _id (16 chars).
+ * Does not mutate the original; returns a new array with shallow-cloned docs.
+ * Used because the JSON-first pipeline may provide docs without _id, and
+ * Foundry does not synthesize IDs when importing raw NeDB lines.
+ */
+function ensureDocumentIds(docs, label = 'documents') {
+  let created = 0;
+  let fixed = 0;
+  const withIds = docs.map((doc) => {
+    const clone = { ...doc };
+    if (!clone._id) {
+      clone._id = generateFoundryId();
+      created += 1;
+    } else if (typeof clone._id !== 'string' || clone._id.length !== 16) {
+      clone._id = generateFoundryId();
+      fixed += 1;
+    }
+    return clone;
+  });
+  if (created || fixed) {
+    console.log(`🔧 ID guard for ${label}: created=${created}, fixed=${fixed}, total=${withIds.length}`);
+  } else {
+    console.log(`✅ ID guard for ${label}: all ${withIds.length} already valid`);
+  }
+  return withIds;
+}
+
+/**
  * Generate FoundryVTT item data with proper IDs and validation
  * 
  * @param {Array} seeds - Item seed data
@@ -327,16 +355,17 @@ async function buildPacks() {
     // Generate documents from JSON files
     console.log('🔄 Phase 2: Loading documents from JSON files...');
 
-    const traitDocs = loader.getItemsByType('avant-traits');
+    // Load docs and guard IDs (JSON sources may omit _id; Foundry won't auto-generate for NeDB lines)
+    const traitDocs = ensureDocumentIds(loader.getItemsByType('avant-traits'), 'traits');
     console.log(`📝 Loaded ${traitDocs.length} trait documents`);
-
-    const macroDocs = loader.getItemsByType('avant-macros');
+ 
+    const macroDocs = ensureDocumentIds(loader.getItemsByType('avant-macros'), 'macros');
     console.log(`📝 Loaded ${macroDocs.length} macro documents`);
-
-    const talentDocs = loader.getItemsByType('avant-talents');
+ 
+    const talentDocs = ensureDocumentIds(loader.getItemsByType('avant-talents'), 'talents');
     console.log(`📝 Loaded ${talentDocs.length} talent documents`);
-
-    const augmentDocs = loader.getItemsByType('avant-augments');
+ 
+    const augmentDocs = ensureDocumentIds(loader.getItemsByType('avant-augments'), 'augments');
     console.log(`📝 Loaded ${augmentDocs.length} augment documents`);
 
     // Validate that all items passed validation (this would have thrown errors above if not)

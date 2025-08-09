@@ -2298,6 +2298,59 @@
     display: none !important;
   }
 }
+.avant .row-action-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+}
+.avant .row-action-display .talent-action {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.avant .row-action-display .ap-icons-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.avant .row-action-display .ap-icon {
+  width: 12px;
+  height: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.avant .row-action-display .ap-icon i {
+  font-size: 20px;
+  line-height: 1;
+}
+.avant .row-action-display .ap-icon.filled i {
+  color: var(--theme-accent-primary, #00E0DC);
+  opacity: 1;
+}
+.avant .row-action-display .ap-icon.empty i {
+  color: var(--theme-text-tertiary, #8F8F8F);
+  opacity: 0.9;
+}
+.avant .row-action-display .talent-ap-string {
+  font-family: var(--theme-font-display, "Orbitron", monospace);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--theme-text-secondary, #BFBFBF);
+  letter-spacing: 0.3px;
+}
+.avant .row-action-display .talent-mode-badge.simultaneous {
+  margin-left: 2px;
+  font-size: 10px;
+  color: var(--theme-accent-secondary, #4CE2E1);
+  opacity: 0.9;
+}
+.avant .row-action-display .talent-mode-badge.variable i {
+  font-size: 10px;
+  color: var(--theme-accent-secondary, #4CE2E1);
+  opacity: 0.9;
+}
 
 /**
  * Item Sheet Components - Avant VTT System

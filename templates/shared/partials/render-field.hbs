@@ -6,7 +6,7 @@ the appropriate component partial. It acts as a dispatcher to the
 correct component based on field.type.
 
 Required context:
-- field: Field object with type, name, value, and other properties
+- field: Field object with type, name, and other properties
 - editable: Whether the sheet is editable
 - displayTraits: For traits fields only
 
@@ -21,7 +21,6 @@ Supported field types:
 - uses-counter: current/max counter
 - traits: trait chip input
 --}}
-
 {{#if (eq field.type "description")}}
 {{!-- Description field with rich text editing --}}
 {{> "systems/avant/templates/shared/partials/textarea-field"
@@ -220,6 +219,57 @@ class=field.class}}
   {{#if field.levelRequirement}}
     <span class="row-level-inline">Level {{field.levelRequirement}}+</span>
   {{/if}}
+</div>
+
+{{else if (eq field.type "talent-action-display")}}
+{{!-- Talent action display with AP icons and accessible tooltip --}}
+<div class="row-action-display {{#if field.class}}{{field.class}}{{/if}}">
+  <div class="talent-action"
+       {{#if field.tooltip}}title="{{field.tooltip}}" aria-label="{{field.tooltip}}"{{/if}}
+       role="group"
+       aria-roledescription="Action Point cost">
+
+    {{!-- Fixed-cost actions (immediate/simultaneous): represent AP COUNT by repeating the mode icon exactly "cost" times --}}
+    {{#if (and (ne field.mode "variable") (and (ne field.cost null) (gt field.cost 0)))}}
+      <div class="ap-icons-inline" aria-hidden="true">
+        {{!-- Use a bounded range (1..4) and emit only up to cost for maximum Handlebars compatibility --}}
+        {{#each (range 1 4) as |apValue|}}
+          {{#if (gte ../field.cost apValue)}}
+            <span class="ap-icon filled">
+              <i class="{{../field.icon}}" aria-hidden="true"></i>
+            </span>
+          {{/if}}
+        {{/each}}
+      </div>
+      {{#if field.tooltip}}<span class="sr-only">{{field.tooltip}}</span>{{/if}}
+      <span class="talent-ap-string">{{field.value}}</span>
+    {{/if}}
+
+    {{!-- Variable-cost actions: ONE icon, an arrow, then MAX number of icons --}}
+    {{#if (eq field.mode "variable")}}
+      <div class="ap-icons-inline" aria-hidden="true">
+        <span class="ap-icon filled"><i class="{{field.icon}}" aria-hidden="true"></i></span>
+        <i class="fa-solid fa-arrow-right ap-arrow" aria-hidden="true"></i>
+        {{!-- MAX side: up to maxCost icons (capped for safety) --}}
+        {{#each (range 1 4) as |apValue|}}
+          {{#if (and (ne ../field.maxCost null) (gte ../field.maxCost apValue))}}
+            <span class="ap-icon filled"><i class="{{../field.icon}}" aria-hidden="true"></i></span>
+          {{/if}}
+        {{/each}}
+      </div>
+      {{#if field.tooltip}}<span class="sr-only">{{field.tooltip}}</span>{{/if}}
+      <span class="talent-ap-string">{{field.value}}</span>
+    {{/if}}
+
+    {{!-- Free/zero-cost actions: show a single state icon and 0 AP text --}}
+    {{#if (or (eq field.cost 0) (and (eq field.mode "immediate") field.free) (and (eq field.mode "simultaneous") field.free))}}
+      <div class="ap-icons-inline" aria-hidden="true">
+        {{#if field.icon}}<span class="ap-icon filled"><i class="{{field.icon}}" aria-hidden="true"></i></span>{{/if}}
+      </div>
+      {{#if field.tooltip}}<span class="sr-only">{{field.tooltip}}</span>{{/if}}
+      <span class="talent-ap-string">{{field.value}}</span>
+    {{/if}}
+  </div>
 </div>
 
 {{else if (eq field.type "talent-ap-cost")}}

@@ -27,6 +27,13 @@ export type {
   ItemData
 } from './item';
 
+// Talent-specific types
+export type {
+  TalentMode,
+  TalentAction,
+  TalentDocument
+} from './talent';
+
 
 
 // Sheet-related types

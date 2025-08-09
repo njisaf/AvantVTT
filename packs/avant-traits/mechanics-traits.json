@@ -90,6 +90,21 @@
     "folder": "ZuMoxONEA3iORtKN"
   },
   {
+    "_id": "ZuXN9aH1c877KEJw",
+    "name": "Heal",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "mechanics-traits",
+      "color": "#3498DB",
+      "icon": "fas fa-dice-d20",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Heal"
+    },
+    "sort": 650,
+    "folder": "ZuMoxONEA3iORtKN"
+  },
+  {
     "_id": "SqokF8dfGejXJ6Ts",
     "name": "Hostile",
     "type": "trait",
@@ -255,6 +270,21 @@
     "folder": "ZuMoxONEA3iORtKN"
   },
   {
+    "_id": "pgZL1RHtMUXFJI25",
+    "name": "Social",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "mechanics-traits",
+      "color": "#3498DB",
+      "icon": "fas fa-dice-d20",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Social"
+    },
+    "sort": 1750,
+    "folder": "ZuMoxONEA3iORtKN"
+  },
+  {
     "_id": "ODTQd2fk1pnD0N4N",
     "name": "Splash",
     "type": "trait",
@@ -312,6 +342,21 @@
       "localKey": "AVANT.Trait.Vocal"
     },
     "sort": 2100,
+    "folder": "ZuMoxONEA3iORtKN"
+  },
+  {
+    "_id": "uNkN0wnTR41T0001",
+    "name": "Unknown",
+    "type": "trait",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "category": "mechanics-traits",
+      "color": "#3498DB",
+      "icon": "fas fa-dice-d20",
+      "textColor": "#000000",
+      "localKey": "AVANT.Trait.Unknown"
+    },
+    "sort": 2200,
     "folder": "ZuMoxONEA3iORtKN"
   }
 ]

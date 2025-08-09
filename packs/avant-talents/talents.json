@@ -1,290 +1,1085 @@
 [
   {
-    "_id": "FZr4H1i9jLuGCJP6",
-    "name": "Fireball",
+    "name": "Aegis",
     "type": "talent",
     "img": "icons/svg/item-bag.svg",
     "system": {
-      "description": "Launch a devastating fireball at your enemies",
-      "cost": 3,
-      "range": "60 feet",
-      "damage": "3d6",
+      "action": {
+        "mode": "simultaneous",
+        "cost": 1,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You cloak your body in a thin barrier of magical force. You gain a +1 physical bonus to your DT until the start of your next turn.",
+      "range": "Self",
+      "duration": "Until the start of your next turn",
+      "damage": null,
+      "level": 1,
       "traits": [
-        "lOIFXcPpEzc6ZJxU",
-        "30qrmNpTBNWm5wst",
-        "tzd1cp95Ky6B29T0",
-        "GMglhh7Nf2hHqQZo"
-      ]
+        "Buff",
+        "Conjuration",
+        "Force"
+      ],
+      "category": "general"
     },
     "sort": 100,
-    "folder": "w5IIR14XUz1m2lXz"
+    "folder": "talents",
+    "_id": "iVGPJkLnEesnXcQr"
   },
   {
-    "_id": "dH8pQ2mNvKwYxE7A",
-    "name": "Lightning Bolt",
+    "name": "Assault",
     "type": "talent",
     "img": "icons/svg/item-bag.svg",
     "system": {
-      "description": "Strike enemies with a bolt of lightning",
-      "cost": 2,
-      "range": "100 feet",
-      "damage": "2d8",
+      "action": {
+        "mode": "immediate",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You attack your target with terrifying fervour. If you hit, you deal 2 damage dice plus your key attribute modifier to the target and make the target Scared 1. On a critical success, the target becomes Scared 2. On a failure, you deal half the damage to the target.",
+      "range": "Weapon Reach",
+      "duration": null,
+      "damage": "2 damage dice",
+      "level": 1,
       "traits": [
-        "nF7b16rpNv8uv3Lq",
-        "30qrmNpTBNWm5wst",
-        "tzd1cp95Ky6B29T0"
-      ]
+        "Attack",
+        "Hostile",
+        "Melee",
+        "Debuff"
+      ],
+      "category": "general"
     },
     "sort": 200,
-    "folder": "w5IIR14XUz1m2lXz"
+    "folder": "talents",
+    "_id": "sfSvoS1h9f0cqJQ8"
   },
   {
-    "_id": "kL9tR3nBvCwZxF2D",
-    "name": "Acid Splash",
+    "name": "Bait",
     "type": "talent",
     "img": "icons/svg/item-bag.svg",
     "system": {
-      "description": "Spray acid at nearby enemies",
-      "cost": 1,
-      "range": "30 feet",
-      "damage": "1d4",
+      "action": {
+        "mode": "immediate",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You motion deceptively as you attack your target. If you hit, you deal 2 damage dice plus your key attribute modifier to the target and make the target Off-Guard to you until the end of your current turn. On a critical success, the target becomes Off-Guard until the start of your next turn. On a failure, you deal half the damage to the target. On a critical failure, you become Off-Guard to the target's first attack on their next turn.",
+      "range": "Weapon reach",
+      "duration": null,
+      "damage": "2 damage dice",
+      "level": 1,
       "traits": [
-        "lOIFXcPpEzc6ZJxU",
-        "nF7b16rpNv8uv3Lq",
-        "tzd1cp95Ky6B29T0"
-      ]
+        "Attack",
+        "Hostile",
+        "Melee"
+      ],
+      "category": "general"
     },
     "sort": 300,
-    "folder": "w5IIR14XUz1m2lXz"
+    "folder": "talents",
+    "_id": "fCn2C2xhkkTZ4akS"
   },
   {
-    "_id": "mP4sT7nEwDxZyG5H",
-    "name": "Ice Shield",
+    "name": "Blindside",
     "type": "talent",
     "img": "icons/svg/item-bag.svg",
     "system": {
-      "description": "Create a protective shield of ice",
-      "cost": 2,
-      "range": "Self",
-      "damage": "0",
+      "action": {
+        "mode": "immediate",
+        "cost": 1,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You strike out at your enemy's vital point. If you hit, you deal 1 damage die plus your key attribute modifier and an additional 2d6 damage to the target. On a failure, you deal half the damage to the target. On a critical failure, you become Slow 1 until the start of your next turn.",
+      "range": "Weapon range",
+      "duration": null,
+      "damage": "1 damage",
+      "level": 1,
       "traits": [
-        "wEF8HFrplLzdLBBm",
-        "30qrmNpTBNWm5wst",
-        "tzd1cp95Ky6B29T0"
-      ]
-    },
-    "sort": 100,
-    "folder": "kAFP51DgdgSxtQ1I"
-  },
-  {
-    "_id": "nQ5uU8oFxEyAzH6I",
-    "name": "Stone Skin",
-    "type": "talent",
-    "img": "icons/svg/item-bag.svg",
-    "system": {
-      "description": "Harden your skin like stone for protection",
-      "cost": 3,
-      "range": "Self",
-      "damage": "0",
-      "traits": [
-        "GMglhh7Nf2hHqQZo",
-        "nF7b16rpNv8uv3Lq",
-        "tzd1cp95Ky6B29T0"
-      ]
-    },
-    "sort": 200,
-    "folder": "kAFP51DgdgSxtQ1I"
-  },
-  {
-    "_id": "oR6vV9pGyFzBaI7J",
-    "name": "Healing Light",
-    "type": "talent",
-    "img": "icons/svg/item-bag.svg",
-    "system": {
-      "description": "Channel healing energy to restore health",
-      "cost": 2,
-      "range": "Touch",
-      "damage": "2d4+2",
-      "traits": [
-        "tzd1cp95Ky6B29T0",
-        "lOIFXcPpEzc6ZJxU",
-        "wEF8HFrplLzdLBBm"
-      ]
-    },
-    "sort": 300,
-    "folder": "kAFP51DgdgSxtQ1I"
-  },
-  {
-    "_id": "pS7wW0qHzGaDbJ8K",
-    "name": "Teleport",
-    "type": "talent",
-    "img": "icons/svg/item-bag.svg",
-    "system": {
-      "description": "Instantly transport yourself to another location",
-      "cost": 4,
-      "range": "500 feet",
-      "damage": "0",
-      "traits": [
-        "22N0YjYYbXJ7tuHj",
-        "30qrmNpTBNWm5wst",
-        "tzd1cp95Ky6B29T0"
-      ]
-    },
-    "sort": 100,
-    "folder": "JUxm0qrSAGcEiL9N"
-  },
-  {
-    "_id": "qT8xX1rIaHbEcK9L",
-    "name": "Invisibility",
-    "type": "talent",
-    "img": "icons/svg/item-bag.svg",
-    "system": {
-      "description": "Become invisible to enemies",
-      "cost": 3,
-      "range": "Self",
-      "damage": "0",
-      "traits": [
-        "wEF8HFrplLzdLBBm",
-        "nF7b16rpNv8uv3Lq",
-        "tzd1cp95Ky6B29T0"
-      ]
-    },
-    "sort": 200,
-    "folder": "JUxm0qrSAGcEiL9N"
-  },
-  {
-    "_id": "rU9yY2sJbIcFdL0M",
-    "name": "Detect Magic",
-    "type": "talent",
-    "img": "icons/svg/item-bag.svg",
-    "system": {
-      "description": "Sense magical auras and enchantments",
-      "cost": 1,
-      "range": "60 feet",
-      "damage": "0",
-      "traits": [
-        "30qrmNpTBNWm5wst",
-        "GMglhh7Nf2hHqQZo",
-        "tzd1cp95Ky6B29T0"
-      ]
-    },
-    "sort": 300,
-    "folder": "JUxm0qrSAGcEiL9N"
-  },
-  {
-    "_id": "sV0zZ3tKcJdGeM1N",
-    "name": "Flight",
-    "type": "talent",
-    "img": "icons/svg/item-bag.svg",
-    "system": {
-      "description": "Gain the ability to fly through the air",
-      "cost": 5,
-      "range": "Self",
-      "damage": "0",
-      "traits": [
-        "22N0YjYYbXJ7tuHj",
-        "wEF8HFrplLzdLBBm",
-        "tzd1cp95Ky6B29T0"
-      ]
+        "Attack",
+        "Hostile"
+      ],
+      "category": "general"
     },
     "sort": 400,
-    "folder": "JUxm0qrSAGcEiL9N"
+    "folder": "talents",
+    "_id": "q2fE5w9zOqjgeiqB"
   },
   {
-    "_id": "tW1aA4uLdKeHfN2O",
-    "name": "Mind Control",
+    "name": "Bolt",
     "type": "talent",
     "img": "icons/svg/item-bag.svg",
     "system": {
-      "description": "Dominate the mind of your target",
-      "cost": 6,
-      "range": "30 feet",
-      "damage": "0",
+      "action": {
+        "mode": "immediate",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You send forth a ray of magical energy. If you hit, you deal 2 damage dice to the target. On a critical success, the target takes an additional 1d6 persistent damage. On a failure, you deal half the damage to the target.",
+      "range": "60 feet",
+      "duration": null,
+      "damage": "2 damage dice",
+      "level": 1,
       "traits": [
-        "GMglhh7Nf2hHqQZo",
-        "lOIFXcPpEzc6ZJxU",
-        "tzd1cp95Ky6B29T0"
-      ]
+        "Attack",
+        "Evocation",
+        "Hostile",
+        "Ranged"
+      ],
+      "category": "general"
     },
     "sort": 500,
-    "folder": "JUxm0qrSAGcEiL9N"
+    "folder": "talents",
+    "_id": "F1aODjynUr8GZDWD"
   },
   {
-    "_id": "uX2bB5vMeKfIgO3P",
-    "name": "Energy Drain",
+    "name": "Brandish",
     "type": "talent",
     "img": "icons/svg/item-bag.svg",
     "system": {
-      "description": "Drain energy from your target to restore your own",
-      "cost": 4,
-      "range": "Touch",
-      "damage": "2d6",
+      "action": {
+        "mode": "immediate",
+        "cost": 1,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You move swiftly to reach for your weapon. You use the Draw action and then use the Attack action.",
+      "range": "Weapon Range",
+      "duration": null,
+      "damage": null,
+      "level": 1,
       "traits": [
-        "nF7b16rpNv8uv3Lq",
-        "30qrmNpTBNWm5wst",
-        "tzd1cp95Ky6B29T0"
-      ]
+        "Attack",
+        "Hostile",
+        "Manipulate"
+      ],
+      "category": "general"
     },
     "sort": 600,
-    "folder": "JUxm0qrSAGcEiL9N"
+    "folder": "talents",
+    "_id": "X045bOD7lzeQ1viL"
   },
   {
-    "_id": "vY3cC6wNfLgJhP4Q",
-    "name": "Shockwave",
+    "name": "Clinch",
     "type": "talent",
     "img": "icons/svg/item-bag.svg",
     "system": {
-      "description": "Create a devastating shockwave that knocks down enemies",
-      "cost": 5,
-      "range": "30 feet radius",
-      "damage": "4d6",
+      "action": {
+        "mode": "immediate",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You manipulate yourself to seize your opponent. If you hit, you deal 2 damage dice plus your weapon's attribute modifier to the target and Grab it with your weapon. On a critical success, you disable one of the target's limbs, meaning they can't use any actions or abilities that necessitate it until they are no longer grabbed. On a failure, you deal half the damage to the target. On a critical failure, the target can choose to grab you instead.",
+      "range": "Weapon reach",
+      "duration": null,
+      "damage": "2 damage dice",
+      "level": 1,
       "traits": [
-        "lOIFXcPpEzc6ZJxU",
-        "30qrmNpTBNWm5wst",
-        "nF7b16rpNv8uv3Lq",
-        "tzd1cp95Ky6B29T0"
-      ]
-    },
-    "sort": 400,
-    "folder": "w5IIR14XUz1m2lXz"
-  },
-  {
-    "_id": "wZ4dD7xOgMhKiQ5R",
-    "name": "Barrier",
-    "type": "talent",
-    "img": "icons/svg/item-bag.svg",
-    "system": {
-      "description": "Create a protective barrier to block attacks",
-      "cost": 3,
-      "range": "10 feet",
-      "damage": "0",
-      "traits": [
-        "GMglhh7Nf2hHqQZo",
-        "wEF8HFrplLzdLBBm",
-        "30qrmNpTBNWm5wst",
-        "tzd1cp95Ky6B29T0"
-      ]
-    },
-    "sort": 400,
-    "folder": "kAFP51DgdgSxtQ1I"
-  },
-  {
-    "_id": "xA5eE8yPhNiLjR6S",
-    "name": "Time Stop",
-    "type": "talent",
-    "img": "icons/svg/item-bag.svg",
-    "system": {
-      "description": "Briefly stop time to act freely",
-      "cost": 8,
-      "range": "Self",
-      "damage": "0",
-      "traits": [
-        "22N0YjYYbXJ7tuHj",
-        "GMglhh7Nf2hHqQZo",
-        "tzd1cp95Ky6B29T0"
-      ]
+        "Attack",
+        "Grapple",
+        "Hostile",
+        "Melee"
+      ],
+      "category": "general"
     },
     "sort": 700,
-    "folder": "JUxm0qrSAGcEiL9N"
+    "folder": "talents",
+    "_id": "0bAKoJ1pypQJxRnB"
+  },
+  {
+    "name": "Corrupt",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "variable",
+        "cost": null,
+        "minCost": 1,
+        "maxCost": 2,
+        "free": false
+      },
+      "description": "You employ a disturbing incantation to heal undead or damage non-undead. If you hit, you either restore 1 doom die plus your weapon's attribute modifier to an undead target or deal 1 damage die plus your weapon's attribute modifier to the target if they are not undead. On a critical success, an undead target gains the Virile 1 condition, whereas a non-undead target becomes Sickened 1. On a failure, the target heals for half the amount if they are undead or takes half the damage if they are not undead. If this talent deals damage to a target, it gains the hostile trait.\n\n◯ The talent has a range of touch and gains the Melee trait.\n\n◯◯ The talent has a range of 30 feet and gains the Ranged trait. Additionally, the amount of healing and damage changes to 2 dice, and you no longer add your weapon's attribute modifier.",
+      "range": "Varies",
+      "duration": null,
+      "damage": "1 damage",
+      "level": 1,
+      "traits": [
+        "Attack",
+        "Curse",
+        "Necromancy",
+        "Heal"
+      ],
+      "category": "general"
+    },
+    "sort": 800,
+    "folder": "talents",
+    "_id": "M2G8AzsOkOFQTqG9"
+  },
+  {
+    "name": "Dash",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "simultaneous",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You utilise your magic to move more swiftly. You gain a 5-foot physical bonus to your speed and then use the Move action twice.",
+      "range": "Self",
+      "duration": "Until the end of your turn",
+      "damage": null,
+      "level": 1,
+      "traits": [
+        "Buff",
+        "Movement",
+        "Transmutation"
+      ],
+      "category": "general"
+    },
+    "sort": 900,
+    "folder": "talents",
+    "_id": "YDIGuQf1zW2GutFA"
+  },
+  {
+    "name": "Debilitate",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "immediate",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You shoot a precise beam at the target's weak spot. If you hit, you deal 2 damage dice to the target and the target take a -5-foot physical penalty to its speeds until the end of its next turn. On a critical success, the speed penalty increases to a -10-foot physical penalty. On a failure, you deal half the damage to the target.",
+      "range": "30 feet",
+      "duration": null,
+      "damage": "2 damage dice",
+      "level": 1,
+      "traits": [
+        "Attack",
+        "Evocation",
+        "Hostile",
+        "Ranged",
+        "Debuff"
+      ],
+      "category": "general"
+    },
+    "sort": 1000,
+    "folder": "talents",
+    "_id": "z8e56MPXTjalrCox"
+  },
+  {
+    "name": "Discombobulate",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "immediate",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You invade the target's mind, jumbling its thoughts with psychic energy. If you hit, you deal 2 damage dice to the target. On a critical success, the target is also Dazed 1. On a failure, you deal half the damage to the target.",
+      "range": "60 feet",
+      "duration": null,
+      "damage": "2 damage dice",
+      "level": 1,
+      "traits": [
+        "Attack",
+        "Enchantment",
+        "Debuff",
+        "Hostile",
+        "Mental",
+        "Ranged"
+      ],
+      "category": "general"
+    },
+    "sort": 1100,
+    "folder": "talents",
+    "_id": "2PpFjREii8qRwmgo"
+  },
+  {
+    "name": "Dissonate",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "immediate",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You emit a wave of harmful dissonance. dealing 2 damage dice to each character within the area if they fail the AT test. On a success, the character takes half the damage. On a critical failure, the character is also Scared 1.",
+      "range": "Area 15-foot cone",
+      "duration": null,
+      "damage": "2 damage dice",
+      "level": 1,
+      "traits": [
+        "Area",
+        "Attack",
+        "Evocation",
+        "Hostile"
+      ],
+      "category": "general"
+    },
+    "sort": 1200,
+    "folder": "talents",
+    "_id": "GIR5DeSxgP3HEYpL"
+  },
+  {
+    "name": "Divinate",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "immediate",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You concentrate on your surroundings, tapping into your heightened senses to detect magic. You learn of the presence of any magic you weren't aware of, like magical equipment or ongoing magical effects, but not their exact location. You can only sense magic if the source is at the same level as this talent or at a lower level if the magic possesses the subtle or illusion traits.",
+      "range": "Area 30-foot emanation",
+      "duration": null,
+      "damage": null,
+      "level": 1,
+      "traits": [
+        "Premonition"
+      ],
+      "category": "general"
+    },
+    "sort": 1300,
+    "folder": "talents",
+    "_id": "rvPpgJmtkYqSYjFU"
+  },
+  {
+    "name": "Drain",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "immediate",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You drain your enemy of their vitality, consuming it to fortify your strength. If you hit, you deal 2 damage dice plus your key attribute modifier to the target and gain temporary hit points equal to half the damage (rounded down). On a critical success, the target becomes Drained 1. On a failure, you deal half the damage to the target. On a critical failure, you become Sickened 1.",
+      "range": "Weapon reach",
+      "duration": null,
+      "damage": "2 damage dice",
+      "level": 1,
+      "traits": [
+        "Attack",
+        "Curse",
+        "Melee",
+        "Necromancy"
+      ],
+      "category": "general"
+    },
+    "sort": 1400,
+    "folder": "talents",
+    "_id": "1xFKb7jzzO1TWZl1"
+  },
+  {
+    "name": "Embellish",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "simultaneous",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You lace your words and appearance with a magnetic allure. You gain a +2 magical bonus to your Persuade and Request tests.",
+      "range": "Self",
+      "duration": "10 Minutes",
+      "damage": null,
+      "level": 1,
+      "traits": [
+        "Buff",
+        "Enchantment",
+        "Manipulate"
+      ],
+      "category": "general"
+    },
+    "sort": 1500,
+    "folder": "talents",
+    "_id": "jvSvRizSl30TCBYq"
+  },
+  {
+    "name": "Enhance",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "simultaneous",
+        "cost": 1,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You bolster a creature's next test with magical power. The creature gains a +1 magical bonus to their next test.",
+      "range": "30 feet",
+      "duration": "until the start of your next turn",
+      "damage": null,
+      "level": 1,
+      "traits": [
+        "Buff",
+        "Evocation",
+        "Manipulate"
+      ],
+      "category": "general"
+    },
+    "sort": 1600,
+    "folder": "talents",
+    "_id": "VuQsPCNuxHebBpCM"
+  },
+  {
+    "name": "Envelop",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "immediate",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You enwreathe a target in a thaumic force, dealing 2 damage dice to the target if they fail the AT test. On a success, the target takes half damage. On a critical failure, the target also gains weakness 1 to the damage type dealt until the start of your next turn.",
+      "range": "60 feet",
+      "duration": null,
+      "damage": "2 damage dice",
+      "level": 1,
+      "traits": [
+        "Attack",
+        "Evocation",
+        "Hostile",
+        "Ranged"
+      ],
+      "category": "general"
+    },
+    "sort": 1700,
+    "folder": "talents",
+    "_id": "1bTmwp9dCHFoe7mr"
+  },
+  {
+    "name": "Escape",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "immediate",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You twist, contort and weave magic to make yourself more slippery. You take the Break Out action, with a +2 magical bonus to the test. If you are successful, you may then immediately take the Move action.",
+      "range": "Self",
+      "duration": null,
+      "damage": null,
+      "level": 1,
+      "traits": [
+        "Buff",
+        "Movement",
+        "Transmutation"
+      ],
+      "category": "general"
+    },
+    "sort": 1800,
+    "folder": "talents",
+    "_id": "anD5aOCDuZtvhTWX"
+  },
+  {
+    "name": "Gauge",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "simultaneous",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You channel your magical serenity inwards, reflecting your introspection onto others. You gain a +2 magical bonus to your Perceive and Spot tests.",
+      "range": "Self",
+      "duration": "10 Minutes",
+      "damage": null,
+      "level": 1,
+      "traits": [
+        "Buff",
+        "Manipulate",
+        "Premonition"
+      ],
+      "category": "general"
+    },
+    "sort": 1900,
+    "folder": "talents",
+    "_id": "24NKebdExXpGw8Z1"
+  },
+  {
+    "name": "Glide",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "simultaneous",
+        "cost": 1,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You alter your body so that it's light as a feather. Until the end of your turn, if you would fall as a result of any Move actions, you instead move 5 feet horizontally for every 5 feet you fall, up to the maximum of your total Move actions. If you land at any point while benefitting from this talent, you take no fall damage. If you don't have solid footing and have moved the maximum distance allowed by your Move actions, you fall normally. This talent ends early if you are knocked prone.",
+      "range": "Self",
+      "duration": "Until the end of your turn",
+      "damage": null,
+      "level": 1,
+      "traits": [
+        "Buff",
+        "Movement",
+        "Transmutation"
+      ],
+      "category": "general"
+    },
+    "sort": 2000,
+    "folder": "talents",
+    "_id": "EF8aRrLq8EcX9UnJ"
+  },
+  {
+    "name": "Grasp",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "immediate",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You briefly grasp a target with the magic channelled through your implement. If you hit, you deal 2 damage dice plus your weapon's attribute bonus to the target. On a critical success, the target takes an additional 1d6 persistent damage. On a failure, you deal half the damage to the target.",
+      "range": "Weapon Reach",
+      "duration": null,
+      "damage": "2 damage dice",
+      "level": 1,
+      "traits": [
+        "Attack",
+        "Evocation",
+        "Hostile",
+        "Melee"
+      ],
+      "category": "general"
+    },
+    "sort": 2100,
+    "folder": "talents",
+    "_id": "8QGy68YtvB1JpVKu"
+  },
+  {
+    "name": "Heal",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "variable",
+        "cost": null,
+        "minCost": 1,
+        "maxCost": 2,
+        "free": false
+      },
+      "description": "You transmit soothing radiance to heal non-undead or damage undead. If you hit, you either restore 1 heal die plus your weapon's attribute modifier to a non-undead target or deal 1 damage die plus your weapon's attribute modifier to the target if they are undead. On a critical success, a non-undead target gains the Virile 1 condition, whereas an undead target becomes Sickened 1. On a failure, the target heals for half the amount if they aren't undead or takes half the damage if they are undead. If this talent deals damage to a target, it gains the hostile trait.\n\n◯ The talent has a range of touch and gains the Melee trait.\n\n◯◯ The talent has a range of 30 feet and gains the Ranged trait. Additionally, the amount of healing and damage changes to 2 dice, and you no longer add your weapon's attribute modifier.",
+      "range": "Varies",
+      "duration": null,
+      "damage": "1 damage",
+      "level": 1,
+      "traits": [
+        "Attack",
+        "Holy",
+        "Necromancy",
+        "Heal"
+      ],
+      "category": "general"
+    },
+    "sort": 2200,
+    "folder": "talents",
+    "_id": "pOgR8OtzlFi4irbE"
+  },
+  {
+    "name": "Hover",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "simultaneous",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You create a levitating force around an object, allowing you to move it to any point within range. When you sustain this talent, you can move the object again. If the object is in the air when this talent ends, it falls.",
+      "range": "30 feet",
+      "duration": "sustained",
+      "damage": null,
+      "level": 1,
+      "traits": [
+        "Conjuration",
+        "Manipulate"
+      ],
+      "category": "general"
+    },
+    "sort": 2300,
+    "folder": "talents",
+    "_id": "ZuxOVLcaqK2f78jp"
+  },
+  {
+    "name": "Invoke",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "simultaneous",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You can use your magic to perform simple phenomena. You can produce the following effects using this talent:\n\nClean or Soil You can clean or soil an object of less than 1 mass. You can use this effect to clean or soil larger objects, cleaning or soiling areas of equivalent mass each time you use or sustain this talent.\nHeat or Chill You can heat or chill an object of less than 1 mass up to a non-harmful temperature.\nMark You can mark an object of less than 1 mass, changing its colour or covering it in simple symbols. You can use this effect to mark larger objects, marking areas of equivalent mass each time you use or sustain this talent.",
+      "range": "30 feet",
+      "duration": "sustained",
+      "damage": null,
+      "level": 1,
+      "traits": [
+        "Evocation",
+        "Subtle"
+      ],
+      "category": "general"
+    },
+    "sort": 2400,
+    "folder": "talents",
+    "_id": "ouv0gnn5r7xmIT5t"
+  },
+  {
+    "name": "Light",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "simultaneous",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You cloak a character in a veil of glowing light. The light is a colour of your choosing and sheds bright light in a 20-foot emanation and dim light for a further 20 feet.",
+      "range": "60 feet",
+      "duration": "10 Minutes",
+      "damage": null,
+      "level": 1,
+      "traits": [
+        "Buff",
+        "Conjuration",
+        "Light",
+        "Manipulate"
+      ],
+      "category": "general"
+    },
+    "sort": 2500,
+    "folder": "talents",
+    "_id": "Iy3reKL9x6hdMokG"
+  },
+  {
+    "name": "Lunge",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "simultaneous",
+        "cost": 1,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You extend your body or weapon to hit a target beyond your natural reach. Your weapon's reach increases by 5 feet.",
+      "range": null,
+      "duration": "Until the end of your turn",
+      "damage": null,
+      "level": 1,
+      "traits": [
+        "Buff",
+        "Melee",
+        "Reach"
+      ],
+      "category": "general"
+    },
+    "sort": 2600,
+    "folder": "talents",
+    "_id": "PBpIzGAANQudbolv"
+  },
+  {
+    "name": "Protect",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "simultaneous",
+        "cost": 1,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You position yourself to protect an ally within your reach. The ally gains a +1 physical bonus to their DT so long as they remain within your reach. If you are wielding a shield, this bonus increases to +2.",
+      "range": "Natural Reach",
+      "duration": "1 round",
+      "damage": null,
+      "level": 1,
+      "traits": [
+        "Buff"
+      ],
+      "category": "general"
+    },
+    "sort": 2700,
+    "folder": "talents",
+    "_id": "VIje21OrpIwNY70P"
+  },
+  {
+    "name": "Radiate",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "immediate",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You project magical energy outward from yourself, dealing 2 damage dice to each character in the area if they fail the AT test. On a success, the character takes half the damage. On a critical failure, the character also takes 1 persistent damage.",
+      "range": "Area 5-foot emanation",
+      "duration": null,
+      "damage": "2 damage dice",
+      "level": 1,
+      "traits": [
+        "Area",
+        "Attack",
+        "Evocation",
+        "Hostile"
+      ],
+      "category": "general"
+    },
+    "sort": 2800,
+    "folder": "talents",
+    "_id": "pJndgcneuSiH9EeO"
+  },
+  {
+    "name": "Rend",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "immediate",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You imbue your weapon with cursed energy as you strike your foe. If you hit, you deal 2 damage dice plus your key attribute modifier and an additional 1d8 doom damage to the target. On a critical success, the target also takes 1d8 persistent doom damage. On a failure, you deal half the damage to the target.",
+      "range": "Weapon Reach",
+      "duration": null,
+      "damage": "2 damage dice",
+      "level": 1,
+      "traits": [
+        "Attack",
+        "Curse",
+        "Doom",
+        "Hostile",
+        "Melee",
+        "Necromancy"
+      ],
+      "category": "general"
+    },
+    "sort": 2900,
+    "folder": "talents",
+    "_id": "vUt9zmq6jpCbPpFh"
+  },
+  {
+    "name": "Shove",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "immediate",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You swing at the target with propulsive force. If you hit, you deal 2 damage dice to the target plus your weapon's attribute modifier and can then push the target up to 5 feet away from you. You may then move 5 feet to pursue the target. On a critical success, you can push the target up to 10 feet away from you. You may then move up to 10 feet to pursue the target. On a failure, you deal half the damage to the target. On a critical failure, you are Off-Guard until the start of your next turn.",
+      "range": "Weapon reach",
+      "duration": null,
+      "damage": "2 damage dice",
+      "level": 1,
+      "traits": [
+        "Attack",
+        "Hostile",
+        "Melee",
+        "Push"
+      ],
+      "category": "general"
+    },
+    "sort": 3000,
+    "folder": "talents",
+    "_id": "gK9Pe3Zn9mlc1EvO"
+  },
+  {
+    "name": "Smash",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "immediate",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You hit your target with enough force to stagger them. If you hit, you deal 2 damage dice plus your weapon's attribute modifier to the target and make the target Weakened 1. On a critical success, the target becomes Weakened 2. On a failure, you deal half the damage to the target. On a critical failure, you become Weakened 1 until the start of your next turn.",
+      "range": "Weapon Reach",
+      "duration": null,
+      "damage": "2 damage dice",
+      "level": 1,
+      "traits": [
+        "Attack",
+        "Hostile",
+        "Melee",
+        "Debuff"
+      ],
+      "category": "general"
+    },
+    "sort": 3100,
+    "folder": "talents",
+    "_id": "uRJe6zMMOiLnlHkO"
+  },
+  {
+    "name": "Smite",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "immediate",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You channel holy energy into your weapon before attacking your target. If you hit, you deal 2 damage dice plus your key attribute modifier and an additional 1d8 radiant damage to the target. On a critical success, the target also takes 1d8 persistent radiant damage. On a failure, you deal half the damage to the target.",
+      "range": "Weapon Reach",
+      "duration": null,
+      "damage": "2 damage dice",
+      "level": 1,
+      "traits": [
+        "Attack",
+        "Evocation",
+        "Holy",
+        "Hostile",
+        "Melee",
+        "Radiant"
+      ],
+      "category": "general"
+    },
+    "sort": 3200,
+    "folder": "talents",
+    "_id": "TWkYFrMfrTnpbmWl"
+  },
+  {
+    "name": "Splash",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "immediate",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You splash two targets within five feet of one another. Make an attack roll against each target. If you hit, you deal 2 damage dice to the target. On a critical success, the target also takes 1 persistent damage. On a failure, you deal half the damage to the target.",
+      "range": "30 feet",
+      "duration": null,
+      "damage": "2 damage dice",
+      "level": 1,
+      "traits": [
+        "Attack",
+        "Conjuration",
+        "Hostile",
+        "Ranged"
+      ],
+      "category": "general"
+    },
+    "sort": 3300,
+    "folder": "talents",
+    "_id": "q0rrU9QnFVxSazEn"
+  },
+  {
+    "name": "Summon",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "immediate",
+        "cost": 3,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You manifest an object weighing less than 1 mass that you have designated for summoning. The object appears in a free hand or on the floor in the space you are occupying.",
+      "range": "Self",
+      "duration": null,
+      "damage": null,
+      "level": 1,
+      "traits": [
+        "Conjuration",
+        "Manipulate"
+      ],
+      "category": "general"
+    },
+    "sort": 3400,
+    "folder": "talents",
+    "_id": "odlxoeLxm3DD7Djp"
+  },
+  {
+    "name": "Topple",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "immediate",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You sweep at the base of your target to knock it over. If you hit, you deal 2 damage dice plus your weapon's attribute modifier to the target and knock the target Prone. On a critical success, the target takes an additional 1d6 bludgeoning damage. On a failure, you deal half the damage to the target. On a critical failure, you fall Prone.",
+      "range": "Weapon reach",
+      "duration": null,
+      "damage": "2 damage dice",
+      "level": 1,
+      "traits": [
+        "Attack",
+        "Hostile",
+        "Melee",
+        "Trip"
+      ],
+      "category": "general"
+    },
+    "sort": 3500,
+    "folder": "talents",
+    "_id": "EtTUe3lbkxztsnaV"
+  },
+  {
+    "name": "Unarm",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "immediate",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You aim for your target's weapon in an attempt to disarm them. If you hit, you deal 2 damage dice plus your weapon's attribute modifier to the target, and the target drops their weapon on the space they occupy. On a critical success, one of the target's weapons of your choice that it is holding is flung in a direction of your choice, 5 feet outside of their natural reach. On a failure, you deal half the damage to the target. On a critical failure, you drop the weapon you used to attack in the space you occupy.",
+      "range": "Weapon reach",
+      "duration": null,
+      "damage": "2 damage dice",
+      "level": 1,
+      "traits": [
+        "Attack",
+        "Hostile",
+        "Melee",
+        "Disarm"
+      ],
+      "category": "general"
+    },
+    "sort": 3600,
+    "folder": "talents",
+    "_id": "XtgdYjqZMrjzMnvz"
+  },
+  {
+    "name": "Wound",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "immediate",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You swing your natural weapon with an intense velocity. If you hit, you deal 2 damage dice plus your weapon's attribute modifier plus 2 persistent damage to the target. On a failure, you deal half the damage to the target.",
+      "range": "Weapon reach",
+      "duration": null,
+      "damage": "2 damage dice",
+      "level": 1,
+      "traits": [
+        "Attack",
+        "Hostile",
+        "Melee"
+      ],
+      "category": "general"
+    },
+    "sort": 3700,
+    "folder": "talents",
+    "_id": "uEi2VSTBcexPx5T7"
+  },
+  {
+    "name": "Yell",
+    "type": "talent",
+    "img": "icons/svg/item-bag.svg",
+    "system": {
+      "action": {
+        "mode": "simultaneous",
+        "cost": 2,
+        "minCost": null,
+        "maxCost": null,
+        "free": false
+      },
+      "description": "You imbue your voice with a formidable timbre that resonates in the minds of those who hear it. You gain a +2 morale bonus to your Intimidate and Scare tests.",
+      "range": "Self",
+      "duration": "10 Minutes",
+      "damage": null,
+      "level": 1,
+      "traits": [
+        "Auditory",
+        "Buff",
+        "Enchantment"
+      ],
+      "category": "general"
+    },
+    "sort": 3800,
+    "folder": "talents",
+    "_id": "FEPQAuWhnxfkBnLb"
   }
 ]

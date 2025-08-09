@@ -146,3 +146,170 @@ export function getBodyLayout(item: LayoutItemData): Field[] {
 ```
 
 By following these five steps, you can add any new field to the system with confidence that it will be correctly registered, typed, rendered, and saved.
+
+## Action System (Talent Actions)
+
+The new action system replaces the legacy `apCost` field with a more flexible `action` object that supports different action modes:
+
+- **immediate**: Standard actions that happen immediately
+- **simultaneous**: Actions that happen at the same time as another action
+- **variable**: Actions with variable costs
+
+### Action Object Structure
+
+```typescript
+{
+  mode: 'immediate' | 'simultaneous' | 'variable';
+  cost: number | null;        // For immediate/simultaneous modes
+  minCost: number | null;     // For variable mode minimum
+  maxCost: number | null;    // For variable mode maximum
+  free: boolean;              // Convenience flag for cost === 0
+}
+```
+
+### Displaying Actions
+
+To display action information in item sheets or cards, use the helper functions:
+
+```typescript
+import { formatTalentAP, getActionIcon } from '../utils/formatTalentAP';
+
+// Format the AP cost string for display
+const apString = formatTalentAP(action);
+
+// Get the appropriate Font Awesome icon class
+const iconClass = getActionIcon(action);
+```
+
+### Example: Adding Action Display to an Item Sheet
+
+```typescript
+// in scripts/layout/item-sheet/item-types/talent.ts
+import { formatTalentAP, getActionIcon } from '../../../utils/formatTalentAP';
+
+function actionField(action: TalentAction, itemType: string): Field | null {
+  const apString = formatTalentAP(action);
+  const iconClass = getActionIcon(action);
+  
+  return {
+    type: 'text',
+    name: 'system.action.display',
+    value: apString,
+    label: 'Action',
+    icon: iconClass,
+    readonly: true,
+    class: `${itemType}-action-display`
+  };
+}
+
+export function body(item: LayoutItemData): Field[] {
+    const system = item.system as TalentSystemData;
+
+    return filterFields([
+        sideBy(
+            actionField(system.action, 'talent'),
+            commonFields.levelRequirement(system.levelRequirement, 'talent'),
+        ),
+        // ... other fields
+    ]);
+}
+```
+
+## Action Display Recipe
+
+This recipe shows how to implement a read-only action display field for any item type that supports the new action system.
+
+### Implementation Steps
+
+1. **Import the helper functions**:
+   ```typescript
+   import { formatTalentAP, getActionIcon } from '../../../utils/formatTalentAP';
+   ```
+
+2. **Create a field function for action display**:
+   ```typescript
+   function actionDisplayField(action: TalentAction, itemType: string): Field | null {
+     // Handle undefined action (e.g., for new items)
+     if (!action) {
+       return {
+         type: 'text',
+         name: 'system.action.display',
+         value: 'AP: — (set later)',
+         label: 'Action',
+         readonly: true,
+         class: `${itemType}-action-display muted`
+       };
+     }
+     
+     const apString = formatTalentAP(action);
+     const iconClass = getActionIcon(action);
+     
+     return {
+       type: 'text',
+       name: 'system.action.display',
+       value: apString,
+       label: 'Action',
+       icon: iconClass,
+       readonly: true,
+       class: `${itemType}-action-display`
+     };
+   }
+   ```
+
+3. **Use the field in your layout**:
+   ```typescript
+   export function body(item: LayoutItemData): Field[] {
+       const system = item.system as TalentSystemData;
+       
+       return filterFields([
+           sideBy(
+               actionDisplayField(system.action, item.type),
+               commonFields.levelRequirement(system.levelRequirement, item.type),
+           ),
+           // ... other fields
+       ]);
+   }
+   ```
+
+4. **Add styling support** (in your SCSS files):
+   ```scss
+   .talent-action-display {
+     // Style the action display field
+     font-weight: 500;
+     
+     // Style for muted/placeholder state
+     &.muted {
+       color: #999;
+       font-style: italic;
+     }
+   }
+   ```
+
+### Supported Action Modes
+
+The action display system supports three modes:
+
+1. **Immediate**: Standard actions with fixed cost
+   - Display: "X AP" (where X is the cost)
+   - Icon: `fa-regular fa-circle-dot` (●)
+
+2. **Simultaneous**: Actions that happen at the same time
+   - Display: "X AP ⊕ simultaneous" 
+   - Icon: `fa-clone`
+
+3. **Variable**: Actions with variable costs
+   - Display: "AP: X–Y" (range) or "AP: X+" (minimum) or "AP: ?" (unknown)
+   - Icon: `fa-sliders`
+
+### Helper Functions
+
+The `formatTalentAP` and `getActionIcon` functions handle all the complexity of formatting and icon selection:
+
+- `formatTalentAP(action)`: Returns a formatted string for display
+- `getActionIcon(action)`: Returns the appropriate Font Awesome icon class
+
+These functions are fully tested and handle all edge cases including:
+- Free actions (cost = 0)
+- Variable cost ranges
+- Missing or invalid action data
+- New items with undefined actions
