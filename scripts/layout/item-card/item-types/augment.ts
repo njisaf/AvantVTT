@@ -8,6 +8,7 @@
 import { field, when, filterFields } from '../../shared/helpers';
 import type { CardSection } from '../types';
 import type { LayoutItemData, AugmentSystemData } from '../../shared/types';
+import { formatTalentAP, getActionIcon } from '../../../utils/formatTalentAP';
 
 /**
  * Generate card layout for Augment items
@@ -53,10 +54,10 @@ export function getAugmentCardLayout(item: any): CardSection {
         }),
 
         // AP cost display with visual dots + PP cost inline
-        when(system.apCost > 0, () => field({
+        when(system.action && system.action.cost !== null && system.action.cost > 0, () => field({
             type: 'augment-ap-cost',
             name: 'apCost',
-            value: system.apCost,
+            action: system.action,
             ppCost: system.ppCost,
             class: 'row-ap-cost'
         })),

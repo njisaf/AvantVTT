@@ -166,18 +166,80 @@ export class AvantTalentData extends foundry.abstract.DataModel {
                 initial: "",
                 blank: true
             }),
-            apCost: new fields.NumberField({
+            // New action system replacing apCost
+            action: new fields.SchemaField({
+                mode: new fields.StringField({
+                    required: true,
+                    initial: "immediate",
+                    choices: ["immediate", "simultaneous", "variable"]
+                }),
+                cost: new fields.NumberField({
+                    required: false,
+                    initial: 1,
+                    integer: true,
+                    min: 0,
+                    max: 3
+                }),
+                minCost: new fields.NumberField({
+                    required: false,
+                    initial: null,
+                    integer: true,
+                    min: 0,
+                    max: 3
+                }),
+                maxCost: new fields.NumberField({
+                    required: false,
+                    initial: null,
+                    integer: true,
+                    min: 0,
+                    max: 3
+                }),
+                free: new fields.BooleanField({
+                    required: true,
+                    initial: false
+                })
+            }),
+            // Additional talent fields from JSON data
+            range: new fields.StringField({
+                required: false,
+                initial: "",
+                blank: true
+            }),
+            duration: new fields.StringField({
+                required: false,
+                initial: "",
+                blank: true
+            }),
+            damage: new fields.StringField({
+                required: false,
+                initial: "",
+                blank: true
+            }),
+            level: new fields.NumberField({
                 required: true,
+                initial: 1,
+                integer: true,
+                min: 1
+            }),
+            // Legacy fields for backwards compatibility
+            apCost: new fields.NumberField({
+                required: false,
                 initial: 1,
                 integer: true,
                 min: 0,
                 max: 3
             }),
             levelRequirement: new fields.NumberField({
-                required: true,
+                required: false,
                 initial: 1,
                 integer: true,
                 min: 1
+            }),
+            powerPointCost: new fields.NumberField({
+                required: false,
+                initial: 0,
+                integer: true,
+                min: 0
             }),
             tier: new fields.NumberField({
                 required: true,

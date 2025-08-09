@@ -35,6 +35,8 @@
     "compendium:extract": "tsx scripts/compendium/round-trip-extractor.ts extract",
     "compendium:roundtrip": "tsx scripts/compendium/round-trip-extractor.ts validate",
     "compendium:pipeline": "npm run compendium:check && npm run compendium:folders && npm run compendium:links && npm run compendium:roundtrip",
+    "compendium:normalize-traits": "tsx scripts/compendium/normalize-traits.ts",
+    "prebuild:packs": "npm run compendium:normalize-traits",
     "sounds:validate": "node scripts/tools/sound-validator.js",
     "sounds:check": "node scripts/tools/sound-validator.js",
     "test": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage",

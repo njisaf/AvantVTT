@@ -35,11 +35,11 @@ export const field = <T extends Field>(f: T): T => f;
  * @example
  * ```typescript
  * const fields = [
- *     when(system.apCost !== undefined, () => field({
- *         type: 'ap-selector',
- *         name: 'system.apCost',
- *         value: system.apCost,
- *         label: 'AP'
+ *     when(system.action !== undefined, () => field({
+ *         type: 'text',
+ *         name: 'system.action.display',
+ *         value: formatTalentAP(system.action),
+ *         label: 'Action'
  *     }))
  * ].filter(Boolean);
  * ```
@@ -123,18 +123,6 @@ export const filterFields = (fields: (Field | null)[]): Field[] =>
  * Common field configurations for reuse across layout types
  */
 export const commonFields = {
-    /**
-     * Standard AP cost selector
-     */
-    apCost: (value: number | undefined, itemType: string) => when(value !== undefined, () => field({
-        type: 'ap-selector',
-        name: 'system.apCost',
-        value: value,
-        label: 'AP',
-        hint: `Action Point cost to use this ${itemType}`,
-        max: 3,
-        class: `${itemType}-ap-cost`
-    })),
 
     /**
      * Standard PP cost field
@@ -292,4 +280,4 @@ export const commonFields = {
         required: true,
         class: `${itemType}-name-field`
     })
-}; 
+};

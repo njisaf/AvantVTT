@@ -26,10 +26,16 @@ export interface BaseItemSystemData {
  * Action item system data
  */
 export interface ActionSystemData extends BaseItemSystemData {
-    attribute: 'might' | 'grace' | 'intellect' | 'focus';
-    difficulty: number;
-    apCost: number;
-    ppCost: number;
+  attribute: 'might' | 'grace' | 'intellect' | 'focus';
+  difficulty: number;
+  action: {
+    mode: 'immediate' | 'simultaneous' | 'variable';
+    cost: number | null;
+    minCost: number | null;
+    maxCost: number | null;
+    free: boolean;
+  };
+  ppCost: number;
 }
 
 /**
@@ -53,34 +59,53 @@ export interface FeatureSystemData extends BaseItemSystemData {
  * Talent item system data
  */
 export interface TalentSystemData extends BaseItemSystemData {
-    apCost: number;
-    levelRequirement: number;
-    tier: number;
-    requirements: string;
-    prerequisites: string;
-    uses: {
-        value: number;
-        max: number;
-    };
-    isActive: boolean;
+  action: {
+    mode: 'immediate' | 'simultaneous' | 'variable';
+    cost: number | null;
+    minCost: number | null;
+    maxCost: number | null;
+    free: boolean;
+  };
+  // New fields from talent JSON data
+  range?: string;
+  duration?: string | null;
+  damage?: string | null;
+  level: number;
+  // Legacy fields for backwards compatibility
+  apCost?: number;
+  levelRequirement?: number;
+  tier: number;
+  requirements: string;
+  prerequisites: string;
+  uses: {
+    value: number;
+    max: number;
+  };
+  isActive: boolean;
 }
 
 /**
  * Augment item system data
  */
 export interface AugmentSystemData extends BaseItemSystemData {
-    apCost: number;
-    ppCost: number;
-    levelRequirement: number;
-    uses: {
-        value: number;
-        max: number;
-    };
-    augmentType: 'enhancement' | 'cybernetic' | 'biological' | 'neural';
-    powerPointCost: number;
-    isActive: boolean;
-    rarity: 'common' | 'uncommon' | 'rare' | 'legendary';
-    requirements: string;
+  action: {
+    mode: 'immediate' | 'simultaneous' | 'variable';
+    cost: number | null;
+    minCost: number | null;
+    maxCost: number | null;
+    free: boolean;
+  };
+  ppCost: number;
+  levelRequirement: number;
+  uses: {
+    value: number;
+    max: number;
+  };
+  augmentType: 'enhancement' | 'cybernetic' | 'biological' | 'neural';
+  powerPointCost: number;
+  isActive: boolean;
+  rarity: 'common' | 'uncommon' | 'rare' | 'legendary';
+  requirements: string;
 }
 
 /**

@@ -15,6 +15,10 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Override directory for normalized/exported pack sources
+const PROJECT_ROOT = path.resolve(__dirname, '..', '..');
+const EXPORT_PACKS_DIR = path.join(PROJECT_ROOT, '_export', 'packs');
+
 /**
  * CompendiumLoader - Loads and validates JSON compendium sources
  */
@@ -130,10 +134,17 @@ export class CompendiumLoader {
       const items = [];
 
       for (const file of files) {
-        const filePath = path.join(typeDir, file);
+        // Prefer normalized override from _export/packs/{typeName}/{file} if present
+        const defaultPath = path.join(typeDir, file);
+        const overrideDir = path.join(EXPORT_PACKS_DIR, typeName);
+        const overridePath = path.join(overrideDir, file);
+        const filePath = (fs.existsSync(overridePath)) ? overridePath : defaultPath;
         this.validationSummary.totalFiles++;
 
         try {
+          if (filePath !== defaultPath) {
+            console.log(`  🔁 Using override from _export for ${typeName}: ${file}`);
+          }
           const loadedItems = await this.loadJsonFile(filePath, typeName);
           if (loadedItems) {
             // Handle both single items and arrays (hybrid support)
@@ -141,12 +152,12 @@ export class CompendiumLoader {
               // Monolithic format: array of items
               items.push(...loadedItems);
               this.validationSummary.successfulFiles++;
-              console.log(`  ✅ Loaded: ${file} (${loadedItems.length} items from monolithic file)`);
+              console.log(`  ✅ Loaded: ${path.basename(filePath)} (${loadedItems.length} items from monolithic file)`);
             } else {
               // Split format: single item per file
               items.push(loadedItems);
               this.validationSummary.successfulFiles++;
-              console.log(`  ✅ Loaded: ${file} (${loadedItems.name})`);
+              console.log(`  ✅ Loaded: ${path.basename(filePath)} (${loadedItems.name})`);
             }
           }
         } catch (error) {

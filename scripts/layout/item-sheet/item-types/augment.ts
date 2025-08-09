@@ -8,6 +8,37 @@
 import { field, when, fullWidth, sideBy, filterFields, commonFields } from '../../shared/helpers';
 import type { Field } from '../../shared/types';
 import type { LayoutItemData, AugmentSystemData } from '../../shared/types';
+import { formatTalentAP, getActionIcon } from '../../../utils/formatTalentAP';
+
+/**
+ * Custom field for action display
+ */
+function actionDisplayField(action: any, itemType: string): Field | null {
+  // Handle undefined action (e.g., for new items)
+  if (!action) {
+    return {
+      type: 'text',
+      name: 'system.action.display',
+      value: 'AP: — (set later)',
+      label: 'Action',
+      readonly: true,
+      class: `${itemType}-action-display muted`
+    };
+  }
+  
+  const apString = formatTalentAP(action);
+  const iconClass = getActionIcon(action);
+  
+  return {
+    type: 'text',
+    name: 'system.action.display',
+    value: apString,
+    label: 'Action',
+    icon: iconClass,
+    readonly: true,
+    class: `${itemType}-action-display`
+  };
+}
 
 /**
  * Header layout for augment items
@@ -35,7 +66,7 @@ export function body(item: LayoutItemData): Field[] {
     return filterFields([
         // 1. Meta fields first
         sideBy(
-            commonFields.apCost(system.apCost, 'augment'),
+            actionDisplayField(system.action, 'augment'),
             commonFields.ppCost(system.ppCost, 'augment'),
         ),
 

@@ -691,4 +691,67 @@
       display: none !important;
     }
   }
+// Talent Action Display (sheet + card) — inline dots and badges
+  .row-action-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 4px 0;
+
+    .talent-action {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ap-icons-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    // In action-display we use icon glyphs rather than background circles
+    .ap-icon {
+      width: 12px;
+      height: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      i {
+        font-size: 20px;
+        line-height: 1;
+      }
+
+      &.filled i {
+        color: var(--theme-accent-primary, #00E0DC);
+        opacity: 1;
+      }
+      &.empty i {
+        color: var(--theme-text-tertiary, #8F8F8F);
+        opacity: 0.9;
+      }
+    }
+
+    .talent-ap-string {
+      font-family: var(--theme-font-display, "Orbitron", monospace);
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--theme-text-secondary, #BFBFBF);
+      letter-spacing: 0.3px;
+    }
+
+    .talent-mode-badge.simultaneous {
+      margin-left: 2px;
+      font-size: 10px;
+      color: var(--theme-accent-secondary, #4CE2E1);
+      opacity: 0.9;
+    }
+
+    .talent-mode-badge.variable i {
+      font-size: 10px;
+      color: var(--theme-accent-secondary, #4CE2E1);
+      opacity: 0.9;
+    }
+  }
 } 

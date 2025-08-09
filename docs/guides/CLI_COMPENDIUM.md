@@ -442,3 +442,34 @@ For CLI-related issues:
 - [Compendium Architecture](COMPENDIUM_ARCHITECTURE.md) 
 - [System Development Guide](../README.md#development)
 - [CHANGELOG](../changelogs/) for recent updates 
+## Trait Normalization (Pre-Export)
+
+The build includes a pre-export step that normalizes talent traits from human-readable names to trait document IDs.
+
+- Script: [scripts/compendium/normalize-traits.ts](scripts/compendium/normalize-traits.ts:1)
+- Source talents: [packs/avant-talents/talents.json](packs/avant-talents/talents.json:1)
+- Normalized output: [_export/packs/avant-talents/talents.json](_export/packs/avant-talents/talents.json:1)
+- Fallback trait: “Unknown” in mechanics-traits (required)
+  - Defined in [packs/avant-traits/mechanics-traits.json](packs/avant-traits/mechanics-traits.json:1) with name “Unknown”
+- Loader override: [scripts/data/compendium-loader.js](scripts/data/compendium-loader.js:1) prefers files in _export/packs over packs when the filename matches
+
+What it does:
+- Scans all trait JSON files under [packs/avant-traits](packs/avant-traits:1) to build a name → id map (case-insensitive, trimmed)
+- Rewrites each talent’s `system.traits[]` to trait IDs
+- Synonyms applied:
+  - “Area” → “AOE”
+  - “Force” → “Magical”
+- If no match is found, falls back to the “Unknown” trait id
+- Writes a report to [reports/trait-normalization-YYYYMMDD.json](reports:1) with statistics and any fallbacks
+
+How to run manually:
+- npm run compendium:normalize-traits
+
+When it runs automatically:
+- The npm lifecycle hook “prebuild:packs” runs before “build:packs”, so normalization executes automatically during “npm run build”.
+  - Scripts: see [package.json](package.json:1)
+
+Notes:
+- Keep sources human-readable in packs/; the build consumes normalized copies from _export/.
+- Extend synonyms by editing the constant in [scripts/compendium/normalize-traits.ts](scripts/compendium/normalize-traits.ts:1).
+- If you remove or rename the fallback “Unknown” trait, the script will fail fast with an error.

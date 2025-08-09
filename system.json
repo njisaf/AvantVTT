@@ -2,7 +2,7 @@
   "id": "avant",
   "title": "Avant",
   "description": "A cutting-edge narrative RPG system focused on experimental storytelling, collaborative worldbuilding, and innovative narrative mechanics",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "compatibility": {
     "minimum": "13.346",
     "verified": "13.346",
@@ -128,6 +128,6 @@
   "primaryTokenAttribute": "health",
   "secondaryTokenAttribute": "powerPoints",
   "url": "https://github.com/njisaf/AvantVTT",
-  "manifest": "https://github.com/njisaf/AvantVTT/releases/download/v0.3.0/system.json",
-  "download": "https://github.com/njisaf/AvantVTT/releases/download/v0.3.0/avant-v0.3.0.zip"
+  "manifest": "https://github.com/njisaf/AvantVTT/releases/download/v0.3.2/system.json",
+  "download": "https://github.com/njisaf/AvantVTT/releases/download/v0.3.2/avant-v0.3.2.zip"
 }

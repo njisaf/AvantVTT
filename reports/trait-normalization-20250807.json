@@ -1,0 +1,40 @@
+{
+  "timestamp": "2025-08-08T05:04:08.316Z",
+  "sourceFile": "packs/avant-talents/talents.json",
+  "outputFile": "_export/packs/avant-talents/talents.json",
+  "traitsDirectory": "packs/avant-traits",
+  "totals": {
+    "talentsProcessed": 38,
+    "traitsProcessed": 131,
+    "traitsConverted": 130,
+    "synonymsApplied": 3,
+    "fallbacksUsed": 1,
+    "distinctUnknowns": 1,
+    "duplicatesDetected": 0
+  },
+  "duplicates": [],
+  "fallbacks": [
+    {
+      "talent": "Shove",
+      "originalTrait": "Push"
+    }
+  ],
+  "synonyms": [
+    {
+      "original": "Force",
+      "mapped": "magical",
+      "talent": "Aegis"
+    },
+    {
+      "original": "Area",
+      "mapped": "aoe",
+      "talent": "Dissonate"
+    },
+    {
+      "original": "Area",
+      "mapped": "aoe",
+      "talent": "Radiate"
+    }
+  ],
+  "notes": []
+}

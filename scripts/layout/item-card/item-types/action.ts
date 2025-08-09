@@ -8,6 +8,7 @@
 import { field, when, filterFields } from '../../shared/helpers';
 import type { CardSection } from '../types';
 import type { LayoutItemData, ActionSystemData } from '../../shared/types';
+import { formatTalentAP, getActionIcon } from '../../../utils/formatTalentAP';
 
 /**
  * Generate card layout for Action items with consistent structure
@@ -59,10 +60,10 @@ export function getActionCardLayout(item: any): CardSection {
         })),
 
         // AP and PP cost display
-        when(!!(system.apCost || system.ppCost), () => field({
+        when(!!(system.action || system.ppCost), () => field({
             type: 'action-costs',
             name: 'actionCosts',
-            apCost: system.apCost,
+            action: system.action,
             ppCost: system.ppCost,
             class: 'action-costs'
         })),
