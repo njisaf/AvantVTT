@@ -266,6 +266,7 @@
       "description": "",
       "weight": 1,
       "cost": 0,
+      "attribute": "might",
       "quantity": 1,
       "rarity": "common",
       "category": "miscellaneous",

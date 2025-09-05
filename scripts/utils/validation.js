@@ -217,6 +217,9 @@ export class ValidationUtils {
                 break;
                 
             case "gear":
+                if (!data.system.attribute) {
+                    data.system.attribute = "might";
+                }
                 if (data.system.weight !== undefined) {
                     data.system.weight = validateNumber(data.system.weight, 1, false);
                 }
