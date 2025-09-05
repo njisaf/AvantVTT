@@ -171,7 +171,7 @@ export function validateAttributes(attributes: any): Record<string, any> {
     
     for (const attributeName of defaultAbilities) {
         if (attributes[attributeName] && typeof attributes[attributeName] === 'object') {
-            let modifier = validateNumber(attributes[attributeName].modifier, 0, true);
+            const modifier = validateNumber(attributes[attributeName].modifier, 0, true);
             
             // No bounds checking - allow free input for attribute modifiers
             

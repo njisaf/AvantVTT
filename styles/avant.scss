@@ -1389,14 +1389,16 @@ form.avant.theme-dark {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: $spacing-md; // Reduced from 20px
-    padding-bottom: $spacing-sm; // Reduced from 15px
+    margin-bottom: $spacing-xs;
+    padding: $spacing-sm 0 $spacing-xs 0;
     border-bottom: 1px solid var(--theme-border-primary, $border-primary); // Thinner border
+
 
     h3 {
       margin: 0;
-      @include orbitron-header(13px, 700); // Reduced from 16px
-      letter-spacing: 1px; // Reduced from 2px
+      padding: 0;
+      @include orbitron-header(13px, 700);
+      letter-spacing: 1px;
     }
   }
 
@@ -1645,7 +1647,7 @@ form.avant.theme-dark {
     border: 2px solid var(--theme-accent-primary, $accent-cyan);
     border-radius: 0;
     padding: $spacing-xl;
-    margin-bottom: $spacing-xxl;
+    margin-bottom: $spacing-md;
 
     h3 {
       margin: 0 0 $spacing-lg 0;

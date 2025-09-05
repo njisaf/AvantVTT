@@ -291,7 +291,7 @@ export function filterTraits(traits: Trait[], options: TraitFilterOptions = {}):
 
     let filtered = [...traits];
     let searchQuery = options.query;
-    let searchCategories = options.categories ? [...options.categories] : [];
+    const searchCategories = options.categories ? [...options.categories] : [];
 
     // Parse category prefixes if enabled
     if (options.parseCategoryPrefixes && searchQuery) {

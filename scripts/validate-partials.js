@@ -67,7 +67,7 @@ function validatePartialExists(partialPath, templateFile) {
     // Handle different partial path formats and provide suggestions
     let actualPath;
     let exists = false;
-    let suggestions = [];
+    const suggestions = [];
     
     if (partialPath.startsWith('systems/avant/')) {
         // Full system path format - should work with proper template loading

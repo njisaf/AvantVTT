@@ -68,6 +68,25 @@ export function getGearCardLayout(item: any): CardSection {
             max: system.uses.max,
             class: 'gear-uses'
         })),
+
+        // Core stats tiles (Attribute, EP) — stat-tile pattern to match Actions tab
+        when(!!(system.attribute || (system.expertise !== undefined)), () => field({
+            type: 'display-stat-tiles',
+            name: 'stats',
+            tiles: filterFields([
+                when(!!system.attribute, () => ({ type: 'stat-tile', name: 'attribute', value: system.attribute, label: 'Attribute', variant: 'attribute' } as any)),
+                when(system.expertise !== undefined, () => ({ type: 'stat-tile', name: 'expertise', value: system.expertise, label: 'EP', variant: 'expertise' } as any))
+            ]),
+            class: 'gear-stat-tiles'
+        })),
+
+        // Description (compact, reuse Actions card style)
+        when(!!system.description, () => field({
+            type: 'action-description',
+            name: 'description',
+            value: system.description,
+            class: 'gear-description'
+        })),
         
         // Traits display
         when(item.displayTraits && item.displayTraits.length > 0, () => field({
@@ -109,7 +128,7 @@ export function getGearCardLayout(item: any): CardSection {
         left: leftFields,
         center: centerFields,
         right: rightFields,
-        containerClass: 'gear-item',
+        containerClass: 'avant-item-card --accent-gear gear-item',
         containerData: {
             'data-item-id': item._id,
             'data-item-type': 'gear'

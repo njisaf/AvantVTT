@@ -96,7 +96,7 @@ describe('TraitProvider Integration Tests - Stage 3', () => {
     };
     
     // Mock custom pack (initially empty) - use default TraitProvider worldPackName
-    let customPackDocs: any[] = [];
+    const customPackDocs: any[] = [];
     const mockCustomPack = {
       name: 'world.custom-traits',
       collection: 'world.custom-traits',

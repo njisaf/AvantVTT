@@ -43,22 +43,21 @@ export function getWeaponCardLayout(item: any): CardSection {
             class: 'item-header weapon-header'
         }),
 
-        // Damage and type display
-        when(!!(system.damageDie || system.damageType), () => field({
-            type: 'weapon-damage',
-            name: 'damage',
-            damageDie: system.damageDie,
-            damageType: system.damageType,
-            class: 'weapon-damage-info'
+        // Core stats tiles (Attribute, EP, Damage) — stat-tile pattern to match Actions tab
+        when(!!(system.attribute || (system.expertise !== undefined) || system.damageDie), () => field({
+            type: 'display-stat-tiles',
+            name: 'stats',
+            tiles: filterFields([
+                when(!!system.attribute, () => ({ type: 'stat-tile', name: 'attribute', value: system.attribute, label: 'Attribute', variant: 'attribute' } as any)),
+                when(system.expertise !== undefined, () => ({ type: 'stat-tile', name: 'expertise', value: system.expertise, label: 'EP', variant: 'expertise' } as any)),
+                when(!!system.damageDie, () => ({ type: 'stat-tile', name: 'damage', value: system.damageDie, label: 'Damage', variant: 'damage' } as any))
+            ]),
+            class: 'weapon-stat-tiles'
         })),
 
-        // Properties and other details
-        when(!!system.properties, () => field({
-            type: 'weapon-attribute',
-            name: 'attribute-modifier',
-            value: system.attribute,
-            class: 'weapon-attribute'
-        })),
+        // Attribute moved into stat-tile group above
+
+        // EP moved into stat-tile group above
 
         field({
             type: 'weapon-description',
@@ -108,7 +107,9 @@ export function getWeaponCardLayout(item: any): CardSection {
         left: leftFields,
         center: centerFields,
         right: rightFields,
-        containerClass: 'weapon-item',
+        // Keep containerClass minimal — partial adds the shared avant-item-card wrapper.
+        // Use a type-specific class and accent modifier for styling hooks.
+        containerClass: 'weapon-item --accent-weapon',
         containerData: {
             'data-item-id': item._id,
             'data-item-type': 'weapon'

@@ -5,6 +5,9 @@
     "node": true,
     "jest": true
   },
+  // Ignore generated or vendored release artifacts which are not
+  // intended to be linted by the project's ESLint configuration.
+  "ignorePatterns": ["_releases/**"],
   "extends": [
     "eslint:recommended"
   ],
@@ -19,7 +22,10 @@
   },
   "overrides": [
     {
-      "files": ["**/*.ts", "**/*.js"],
+      // Apply TypeScript parser and plugin only to .ts files to avoid
+      // forcing @typescript-eslint rules on plain JavaScript files which
+      // may be parsed differently in the repo (tests, legacy scripts).
+      "files": ["**/*.ts"],
       "parser": "@typescript-eslint/parser",
       "plugins": ["@typescript-eslint"],
       "extends": [
@@ -34,4 +40,4 @@
       }
     }
   ]
-} 
+}
