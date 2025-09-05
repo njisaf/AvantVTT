@@ -1120,7 +1120,7 @@ global.foundry = {
           }
         } else {
           let isEmpty = true;
-          for (let p in current) {
+          for (const p in current) {
             isEmpty = false;
             flatten(current[p], prop ? prop + "." + p : p);
           }

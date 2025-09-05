@@ -43,12 +43,11 @@ export function getArmorCardLayout(item: any): CardSection {
             class: 'item-header armor-header'
         }),
 
-        // AC and threshold display
-        when(!!(system.armorClass || system.threshold), () => field({
+        // AC display (threshold rendered as stat tile below)
+        when(!!system.armorClass, () => field({
             type: 'armor-protection',
             name: 'protection',
             armorClass: system.armorClass,
-            threshold: system.threshold,
             class: 'armor-protection-info'
         })),
 
@@ -60,6 +59,19 @@ export function getArmorCardLayout(item: any): CardSection {
         //     properties: system.properties,
         //     class: 'armor-properties'
         // })),
+        // Core stats tiles (Attribute, EP, Threshold) — stat-tile pattern to match Actions tab
+        when(!!(system.attribute || (system.expertise !== undefined) || (system.threshold !== undefined)), () => field({
+            type: 'display-stat-tiles',
+            name: 'stats',
+            tiles: filterFields([
+                when(!!system.attribute, () => ({ type: 'stat-tile', name: 'attribute', value: system.attribute, label: 'Attribute', variant: 'attribute' } as any)),
+                when(system.expertise !== undefined, () => ({ type: 'stat-tile', name: 'expertise', value: system.expertise, label: 'EP', variant: 'expertise' } as any)),
+                when(system.threshold !== undefined, () => ({ type: 'stat-tile', name: 'threshold', value: system.threshold, label: 'Threshold', variant: 'threshold' } as any))
+            ]),
+            class: 'armor-stat-tiles'
+        })),
+
+        // Description
         field({
             type: 'armor-description',
             name: 'description',
@@ -107,7 +119,7 @@ export function getArmorCardLayout(item: any): CardSection {
         left: leftFields,
         center: centerFields,
         right: rightFields,
-        containerClass: 'armor-item',
+        containerClass: 'avant-item-card --accent-armor armor-item',
         containerData: {
             'data-item-id': item._id,
             'data-item-type': 'armor'

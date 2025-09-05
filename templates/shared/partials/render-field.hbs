@@ -193,6 +193,28 @@ class=field.class}}
   <span class="status-badge">{{field.value}}</span>
 </div>
 
+{{!-- Stat tiles aggregator for item-card center content (matches Actions tab styling) --}}
+{{else if (eq field.type "display-stat-tiles")}}
+<div class="action-stats {{#if field.class}}{{field.class}}{{/if}}">
+  {{#each field.tiles as |tile|}}
+    {{#if tile}}
+      <div class="stat-tile {{#if tile.variant}}stat-tile--{{tile.variant}}{{/if}}">
+        {{#if tile.tooltip}}<span class="sr-only">{{tile.tooltip}}</span>{{/if}}
+        <span class="stat-value">{{tile.value}}</span>
+        <span class="stat-label">{{tile.label}}</span>
+      </div>
+    {{/if}}
+  {{/each}}
+</div>
+
+{{!-- Single stat-tile (rarely used directly; aggregator preferred) --}}
+{{else if (eq field.type "stat-tile")}}
+<div class="stat-tile {{#if field.variant}}stat-tile--{{field.variant}}{{/if}} {{#if field.class}}{{field.class}}{{/if}}">
+  {{#if field.tooltip}}<span class="sr-only">{{field.tooltip}}</span>{{/if}}
+  <span class="stat-value">{{field.value}}</span>
+  <span class="stat-label">{{field.label}}</span>
+</div>
+
 {{else if (eq field.type "talent-chat-button")}}
 {{!-- Talent chat/roll button --}}
 <button type="button" 
@@ -477,9 +499,9 @@ class=field.class}}
 {{!-- Weapon image and name --}}
 <div class="item-header weapon-header">
   <div class="item-image">
-    <img src="{{field.img}}" title="{{field.title}}" width="24" height="24" />
+    <img src="{{field.img}}" title="{{field.title}}" alt="{{field.title}}" width="24" height="24" loading="lazy" decoding="async" />
   </div>
-  <h4 class="item-name"
+  <h4 id="item-card-title-{{field.itemId}}" class="item-name"
       data-action="editItem"
       data-item-id="{{field.itemId}}"
       title="Edit {{field.title}}"
@@ -491,7 +513,7 @@ class=field.class}}
 
 {{else if (eq field.type "weapon-damage")}}
 {{!-- Weapon damage display --}}
-<div class="weapon-damage-info">
+<div class="weapon-damage-info" aria-label="Damage {{#if field.damageDie}}{{field.damageDie}}{{/if}} {{#if field.damageType}}{{field.damageType}}{{/if}}">
   {{#if field.damageDie}}<span class="item-damage">{{field.damageDie}}</span>{{/if}}
   {{#if field.damageType}}<span class="item-damage-type">{{field.damageType}}</span>{{/if}}
 </div>
@@ -562,9 +584,9 @@ class=field.class}}
 {{!-- Armor image and name --}}
 <div class="item-header armor-header">
   <div class="item-image">
-    <img src="{{field.img}}" title="{{field.title}}" width="24" height="24" />
+    <img src="{{field.img}}" title="{{field.title}}" alt="{{field.title}}" width="24" height="24" loading="lazy" decoding="async" />
   </div>
-  <h4 class="item-name"
+  <h4 id="item-card-title-{{field.itemId}}" class="item-name"
       data-action="editItem"
       data-item-id="{{field.itemId}}"
       title="Edit {{field.title}}"
@@ -576,7 +598,7 @@ class=field.class}}
 
 {{else if (eq field.type "armor-protection")}}
 {{!-- Armor protection display --}}
-<div class="armor-protection-info">
+<div class="armor-protection-info" aria-label="{{#if field.armorClass}}Armor Class {{field.armorClass}}{{/if}}{{#if field.threshold}} Threshold {{field.threshold}}{{/if}}">
   {{#if field.armorClass}}<span class="item-ac">AC +{{field.armorClass}}</span>{{/if}}
   {{#if field.threshold}}<span class="item-threshold">Threshold {{field.threshold}}</span>{{/if}}
 </div>
@@ -641,9 +663,9 @@ class=field.class}}
 {{!-- Gear image and name --}}
 <div class="item-header gear-header">
   <div class="item-image">
-    <img src="{{field.img}}" title="{{field.title}}" width="24" height="24" />
+    <img src="{{field.img}}" title="{{field.title}}" alt="{{field.title}}" width="24" height="24" loading="lazy" decoding="async" />
   </div>
-  <h4 class="item-name"
+  <h4 id="item-card-title-{{field.itemId}}" class="item-name"
       data-action="editItem"
       data-item-id="{{field.itemId}}"
       title="Edit {{field.title}}"
@@ -668,13 +690,14 @@ class=field.class}}
 
 {{else if (eq field.type "gear-uses")}}
 {{!-- Gear uses display --}}
-<div class="gear-uses">
-  Uses: {{field.current}}/{{field.max}}
+<div class="gear-uses" aria-label="Uses {{field.current}} of {{field.max}}">
+  <span class="sr-only">Uses: {{field.current}} of {{field.max}}</span>
+  <span aria-hidden="true">Uses: {{field.current}}/{{field.max}}</span>
 </div>
 
 {{else if (eq field.type "gear-quantity")}}
 {{!-- Gear quantity display --}}
-<div class="gear-quantity">
+<div class="gear-quantity" aria-label="Quantity {{field.value}}">
   Qty: {{field.value}}
 </div>
 

@@ -2302,7 +2302,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 4px 0;
+  margin: 4px 0 4px 5px;
 }
 .avant .row-action-display .talent-action {
   display: flex;
@@ -3628,8 +3628,15 @@
  * Unified Actions Tab Styles
  * Styles for the unified actions system that combines gear and standalone actions
  * Updated to match talent/augment icon-only styling for consistency
+ *
+ * Introduced shared .avant-item-card base so item-cards (actions, weapons, armor, gear)
+ * reuse the same grid and visual language. Existing .unified-action-item is left as an
+ * alias to avoid regressions.
  */
-.unified-action-item .stat-tile {
+/* Stat tile (preserved) */
+.unified-action-item .stat-tile,
+.avant-item-card .stat-tile {
+  /* --- Stat Tile Refactor --- */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -3638,14 +3645,16 @@
   height: 38px;
   flex-shrink: 0;
   background-color: var(--avant-stat-tile-bg, #2a2a2a);
-  border: 1px solid grey;
+  border: 1px solid var(--theme-border-primary, #404040);
   border-radius: 4px;
   padding: 4px;
   text-align: center;
   transition: all 0.2s ease-in-out;
   text-decoration: none !important;
+  color: var(--avant-text-primary, #fff);
 }
-.unified-action-item .stat-tile--threshold {
+.unified-action-item .stat-tile--threshold,
+.avant-item-card .stat-tile--threshold {
   --threshold-bg: rgba(33, 150, 243, 0.15);
   --threshold-border: rgba(33, 150, 243, 0.5);
   --threshold-text: #82c6ff;
@@ -3653,11 +3662,13 @@
   border: 1px solid var(--threshold-border);
   border-bottom: 1px solid var(--threshold-border) !important;
 }
-.unified-action-item .stat-tile--threshold .stat-value {
+.unified-action-item .stat-tile--threshold .stat-value,
+.avant-item-card .stat-tile--threshold .stat-value {
   color: var(--threshold-text);
 }
 
-.unified-actions-list {
+.unified-actions-list,
+.avant-items-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -3665,9 +3676,10 @@
   margin: 0;
 }
 
-.unified-action-item {
+.avant .unified-action-item,
+.avant .avant-item-card {
   display: grid;
-  grid-template-columns: 75px 1fr auto;
+  grid-template-columns: var(--avant-actions-left-col-width, 32px) 1fr auto;
   grid-template-areas: "buttons content controls";
   gap: 12px;
   padding: 8px 12px;
@@ -3677,36 +3689,47 @@
   transition: all 0.3s ease;
   align-items: start;
   min-height: 44px;
+  /* Different accent colors based on source type (variants) */
 }
-.unified-action-item:hover {
+.avant .unified-action-item:hover,
+.avant .avant-item-card:hover {
   background: var(--theme-bg-secondary, #2A2A2A);
-  box-shadow: var(--theme-shadow-primary, 0 4px 20px rgba(0, 224, 220, 0.1));
+  box-shadow: var(--theme-shadow-primary, 0 4px 20px rgba(0, 224, 220, 0.06));
 }
-.unified-action-item.weapon-action {
-  border-left-color: #ff6b6b;
+.avant .unified-action-item.--accent-weapon, .avant .unified-action-item.weapon-action,
+.avant .avant-item-card.--accent-weapon,
+.avant .avant-item-card.weapon-action {
+  border-left-color: #ff6b6b; /* Red for weapons */
 }
-.unified-action-item.armor-action {
-  border-left-color: #128e1f;
+.avant .unified-action-item.--accent-armor, .avant .unified-action-item.armor-action,
+.avant .avant-item-card.--accent-armor,
+.avant .avant-item-card.armor-action {
+  border-left-color: #128e1f; /* Green for armor */
 }
-.unified-action-item.gear-action {
-  border-left-color: #ffe66d;
+.avant .unified-action-item.--accent-gear, .avant .unified-action-item.gear-action,
+.avant .avant-item-card.--accent-gear,
+.avant .avant-item-card.gear-action {
+  border-left-color: #ffe66d; /* Yellow for gear */
 }
-.unified-action-item.action-action {
-  border-left-color: var(--theme-accent-primary, #00E0DC);
+.avant .unified-action-item.--accent-action, .avant .unified-action-item.action-action,
+.avant .avant-item-card.--accent-action,
+.avant .avant-item-card.action-action {
+  border-left-color: var(--theme-accent-primary, #00E0DC); /* Default cyan for actions */
 }
 
-.avant .action-buttons {
+.avant .avant-item-card .action-buttons, .avant .unified-action-item .action-buttons {
   grid-area: buttons;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  width: 75px;
+  width: var(--avant-actions-left-col-width, 32px);
   padding-top: 2px;
   gap: 4px;
 }
 
-.action-button-row {
+.avant .avant-item-card .action-button-row,
+.avant .unified-action-item .action-button-row {
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -3714,7 +3737,8 @@
   gap: 10px;
 }
 
-.roll-summary {
+.avant .avant-item-card .roll-summary,
+.avant .unified-action-item .roll-summary {
   font-size: 0.8rem;
   font-family: var(--font-mono);
   min-width: 3ch;
@@ -3723,7 +3747,10 @@
   white-space: nowrap;
 }
 
-.action-btn {
+.avant .avant-item-card .item-card__btn,
+.avant .unified-action-item .item-card__btn,
+.avant .avant-item-card .action-btn,
+.avant .unified-action-item .action-btn {
   background: transparent;
   border: none !important;
   outline: none !important;
@@ -3733,29 +3760,44 @@
   width: 28px;
   height: 28px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.18s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
 }
-.action-btn i {
+.avant .avant-item-card .item-card__btn i,
+.avant .unified-action-item .item-card__btn i,
+.avant .avant-item-card .action-btn i,
+.avant .unified-action-item .action-btn i {
   font-size: 14px;
 }
-.action-btn:hover {
+.avant .avant-item-card .item-card__btn:hover,
+.avant .unified-action-item .item-card__btn:hover,
+.avant .avant-item-card .action-btn:hover,
+.avant .unified-action-item .action-btn:hover {
   background: var(--theme-accent-primary, #00E0DC);
   color: var(--theme-bg-primary, #1C1C1C);
-  box-shadow: 0 0 8px rgba(0, 224, 220, 0.4) !important;
+  box-shadow: 0 0 8px rgba(0, 224, 220, 0.16) !important;
 }
-.action-btn:focus {
+.avant .avant-item-card .item-card__btn:focus,
+.avant .unified-action-item .item-card__btn:focus,
+.avant .avant-item-card .action-btn:focus,
+.avant .unified-action-item .action-btn:focus {
   outline: none !important;
   box-shadow: none !important;
 }
-.action-btn:active {
+.avant .avant-item-card .item-card__btn:active,
+.avant .unified-action-item .item-card__btn:active,
+.avant .avant-item-card .action-btn:active,
+.avant .unified-action-item .action-btn:active {
   transform: scale(0.95);
 }
 
-.action-content {
+.avant .avant-item-card .item-card__content,
+.avant .unified-action-item .item-card__content,
+.avant .avant-item-card .action-content,
+.avant .unified-action-item .action-content {
   grid-area: content;
   display: flex;
   flex-direction: column;
@@ -3764,14 +3806,18 @@
   min-width: 0;
 }
 
-.action-header {
+.avant .avant-item-card .action-header,
+.avant .unified-action-item .action-header {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-bottom: 2px;
 }
 
-.action-name {
+.avant .avant-item-card .item-card__title,
+.avant .unified-action-item .item-card__title,
+.avant .avant-item-card .action-name,
+.avant .unified-action-item .action-name {
   font-size: 14px;
   font-weight: 600;
   color: var(--avant-text-primary, #fff);
@@ -3780,7 +3826,25 @@
   text-overflow: ellipsis;
 }
 
-.action-source-type {
+/* Align Gear-tab item-card headers to Actions look */
+.avant .avant-item-card .item-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.avant .avant-item-card .item-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--avant-text-primary, #fff);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.avant .avant-item-card .action-source-type,
+.avant .unified-action-item .action-source-type {
   font-size: 10px;
   font-weight: 400;
   color: var(--avant-text-secondary, #aaa);
@@ -3793,7 +3857,8 @@
   flex-shrink: 0;
 }
 
-.action-stats {
+.avant .avant-item-card .action-stats,
+.avant .unified-action-item .action-stats {
   display: flex;
   gap: 8px;
   align-items: center;
@@ -3817,7 +3882,8 @@
   line-height: 1.2;
 }
 
-.action-description {
+.avant .avant-item-card .action-description,
+.avant .unified-action-item .action-description {
   font-size: 11px;
   color: var(--avant-text-secondary, #ccc);
   margin-top: 2px;
@@ -3828,7 +3894,10 @@
   -webkit-box-orient: vertical;
 }
 
-.action-controls {
+.avant .avant-item-card .item-card__controls,
+.avant .unified-action-item .item-card__controls,
+.avant .avant-item-card .action-controls,
+.avant .unified-action-item .action-controls {
   grid-area: controls;
   display: flex;
   gap: 4px;
@@ -3836,7 +3905,10 @@
   justify-content: flex-end;
 }
 
-.control-btn {
+/* Edit and delete buttons (matching .row-edit and .row-delete exactly) */
+.control-btn,
+.row-edit,
+.row-delete {
   background: transparent;
   border: none;
   color: var(--theme-text-secondary, #BFBFBF);
@@ -3846,22 +3918,32 @@
   height: 20px;
   border-radius: 50%;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.18s ease;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.control-btn:focus {
+.control-btn:focus,
+.row-edit:focus,
+.row-delete:focus {
   outline: 2px solid var(--theme-accent-primary, #00E0DC);
   outline-offset: 2px;
 }
-.control-btn.edit-btn:hover {
+.control-btn.edit-btn:hover, .control-btn.row-edit:hover,
+.row-edit.edit-btn:hover,
+.row-edit.row-edit:hover,
+.row-delete.edit-btn:hover,
+.row-delete.row-edit:hover {
   color: var(--theme-accent-secondary, #4CE2E1);
-  background: rgba(76, 226, 225, 0.1);
+  background: rgba(76, 226, 225, 0.08);
 }
-.control-btn.delete-btn:hover {
+.control-btn.delete-btn:hover, .control-btn.row-delete:hover,
+.row-edit.delete-btn:hover,
+.row-edit.row-delete:hover,
+.row-delete.delete-btn:hover,
+.row-delete.row-delete:hover {
   color: #ff4757;
-  background: rgba(255, 71, 87, 0.1);
+  background: rgba(255, 71, 87, 0.08);
 }
 
 .no-actions-message {
@@ -3877,12 +3959,12 @@
 }
 
 @media (max-width: 768px) {
-  .unified-action-item {
+  .avant .avant-item-card, .avant .unified-action-item {
     grid-template-columns: 1fr;
     grid-template-areas: "buttons" "content" "controls";
     text-align: left;
   }
-  .avant .action-buttons {
+  .avant .avant-item-card .action-buttons, .avant .unified-action-item .action-buttons {
     justify-content: flex-start;
   }
   .action-controls {
@@ -3890,7 +3972,7 @@
   }
 }
 @media (prefers-contrast: high) {
-  .unified-action-item {
+  .avant .avant-item-card, .avant .unified-action-item {
     border-width: 2px;
   }
   .action-btn {
@@ -3908,6 +3990,309 @@
     --threshold-text: #1565c0;
   }
 }
+/* ==========================================================================
+   Shared Item Cards Integration with Unified Actions
+   ========================================================================== */
+.avant .avant-item-card.weapon-action {
+  border-left-color: #ff6b6b;
+} /* Red for weapons */
+.avant .avant-item-card.armor-action {
+  border-left-color: #128e1f;
+} /* Green for armor */
+.avant .avant-item-card.gear-action {
+  border-left-color: #ffe66d;
+} /* Yellow for gear */
+/* Left column: chat-roll-btn parity with .action-btn (icon-only) */
+.avant .avant-item-card .action-buttons .chat-roll-btn {
+  background: transparent;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  color: var(--theme-accent-primary, #00E0DC);
+  font-size: 16px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.avant .avant-item-card .action-buttons .chat-roll-btn i {
+  font-size: 14px;
+}
+
+.avant .avant-item-card .action-buttons .chat-roll-btn:hover {
+  background: var(--theme-accent-primary, #00E0DC);
+  color: var(--theme-bg-primary, #1C1C1C);
+  box-shadow: 0 0 8px rgba(0, 224, 220, 0.4) !important;
+}
+
+.avant .avant-item-card .action-buttons .chat-roll-btn:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.avant .avant-item-card .action-buttons .chat-roll-btn:active {
+  transform: scale(0.95);
+}
+
+/* Right column: edit/delete parity with .control-btn */
+.avant .avant-item-card .action-controls .row-edit,
+.avant .avant-item-card .action-controls .row-delete {
+  background: transparent;
+  border: none;
+  color: var(--theme-text-secondary, #BFBFBF);
+  font-size: 12px;
+  padding: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avant .avant-item-card .action-controls .row-edit:focus,
+.avant .avant-item-card .action-controls .row-delete:focus {
+  outline: 2px solid var(--theme-accent-primary, #00E0DC);
+  outline-offset: 2px;
+}
+
+.avant .avant-item-card .action-controls .row-edit:hover {
+  color: var(--theme-accent-secondary, #4CE2E1);
+  background: rgba(76, 226, 225, 0.1);
+}
+
+.avant .avant-item-card .action-controls .row-delete:hover {
+  color: #ff4757;
+  background: rgba(255, 71, 87, 0.1);
+}
+
+/* Center content: align common stat rows */
+.avant .avant-item-card .weapon-damage-info,
+.avant .avant-item-card .armor-protection-info,
+.avant .avant-item-card .gear-uses {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  flex-wrap: wrap;
+  color: var(--avant-text-secondary, #aaa);
+}
+
+/* Description clamp (visual parity with Actions) */
+.avant .avant-item-card .weapon-description,
+.avant .avant-item-card .armor-description,
+.avant .avant-item-card .gear-description,
+.avant .avant-item-card .action-description {
+  font-size: 11px;
+  color: var(--avant-text-secondary, #ccc);
+  margin-top: 2px;
+  line-height: 1.3;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Trait chips spacing inside cards */
+.avant-item-card .trait-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+/* ==========================================================================
+   Enforce single-row 3-column layout for Weapon and Armor item-cards
+   This ensures action-buttons (left), action-content (center), and
+   action-controls (right) are always placed in the same grid cells.
+   ========================================================================== */
+.avant .avant-item-card.weapon-action,
+.avant .avant-item-card.armor-action {
+  display: grid;
+  grid-template-columns: var(--avant-actions-left-col-width, 32px) 1fr auto;
+  grid-template-areas: "buttons content controls";
+  gap: 12px;
+  padding: 8px 12px;
+  align-items: center;
+}
+
+/* Explicit grid-area placement for direct children to avoid accidental wrapping */
+.avant .avant-item-card.weapon-action > .action-buttons,
+.avant .avant-item-card.armor-action > .action-buttons {
+  grid-area: buttons;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+}
+
+.avant .avant-item-card.weapon-action > .action-content,
+.avant .avant-item-card.armor-action > .action-content {
+  grid-area: content;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.avant .avant-item-card.weapon-action > .action-controls,
+.avant .avant-item-card.armor-action > .action-controls {
+  grid-area: controls;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* Keep header elements inline so they don't form additional grid cells */
+.avant .avant-item-card.weapon-action .item-header,
+.avant .avant-item-card.armor-action .item-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Keep core stat rows compact and inline (prevent accidental column spill) */
+.avant .avant-item-card.weapon-action .weapon-damage-info,
+.avant .avant-item-card.armor-action .armor-protection-info,
+.avant .avant-item-card.weapon-action .weapon-details,
+.avant .avant-item-card.armor-action .armor-details {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  flex-wrap: nowrap;
+}
+
+/* Ensure item-image remains inline and small */
+.avant .avant-item-card .item-image {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ==========================================================================
+   Weapon / Armor single-row grid overrides
+   Ensure weapon and armor cards always render as a single row with three zones:
+     - Left: action buttons (row-control / action-buttons)
+     - Center: main content (row-content / action-content)
+     - Right: edit/delete controls (row-actions / action-controls)
+   These descendant-level rules override accidental stacking caused by other row utilities.
+   ========================================================================== */
+.avant .avant-item-card.weapon-action,
+.avant .avant-item-card.armor-action {
+  display: grid;
+  grid-template-columns: var(--avant-actions-left-col-width, 32px) 1fr auto;
+  grid-template-areas: "buttons content controls";
+  gap: var(--space-sm, 12px);
+  align-items: center;
+  /* Prevent inherited grid/row rules from changing flow */
+  grid-auto-flow: column;
+}
+
+/* Left zone -> buttons */
+.avant-item-card.weapon-action .row-control,
+.avant-item-card.armor-action .row-control,
+.avant-item-card.weapon-action .action-buttons,
+.avant-item-card.armor-action .action-buttons {
+  grid-area: buttons;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* Middle zone -> content */
+.avant-item-card.weapon-action .row-content,
+.avant-item-card.armor-action .row-content,
+.avant-item-card.weapon-action .action-content,
+.avant-item-card.armor-action .action-content {
+  grid-area: content;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0; /* allow truncation/ellipsis */
+}
+
+/* Right zone -> controls (edit/delete) */
+.avant-item-card.weapon-action .row-actions,
+.avant-item-card.armor-action .row-actions,
+.avant-item-card.weapon-action .action-controls,
+.avant-item-card.armor-action .action-controls {
+  grid-area: controls;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* Keep header elements inline inside the content area */
+.avant-item-card.weapon-action .item-header,
+.avant-item-card.armor-action .item-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* Small images: keep them from forcing layout changes */
+.avant .avant-item-card .item-image img {
+  width: 24px;
+  height: 24px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Defensive: ensure trait-chips and stat rows do not force grid reflow */
+.avant .avant-item-card.weapon-action .trait-chips,
+.avant .avant-item-card.armor-action .trait-chips,
+.avant .avant-item-card.weapon-action .weapon-damage-info,
+.avant .avant-item-card.armor-action .armor-protection-info {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Responsive fallback: on narrow screens stack into rows (preserve accessibility) */
+@media (max-width: 480px) {
+  .avant .avant-item-card.weapon-action,
+  .avant .avant-item-card.armor-action {
+    grid-template-columns: 1fr;
+    grid-template-areas: "buttons" "content" "controls";
+    gap: 8px;
+  }
+  .avant .avant-item-card.weapon-action .row-control,
+  .avant .avant-item-card.armor-action .row-control,
+  .avant .avant-item-card.weapon-action .row-actions,
+  .avant .avant-item-card.armor-action .row-actions {
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+  .avant .avant-item-card.weapon-action .action-controls,
+  .avant .avant-item-card.armor-action .action-controls {
+    justify-content: flex-end;
+  }
+}
+.avant .unified-action-item {
+  --avant-actions-left-col-width: 70px;
+  grid-template-columns: minmax(70px, var(--avant-actions-left-col-width, 70px)) 1fr auto;
+}
+.avant .unified-action-item .action-buttons {
+  min-width: 70px;
+  width: var(--avant-actions-left-col-width, 70px);
+}
+
 /**
  * FoundryVTT Overrides
  * 
@@ -4018,7 +4403,7 @@
 
 .avant.sheet .tabs,
 .avant.sheet .tab {
-  background: var(--theme-bg-secondary, #2A2A2A) !important;
+  background: var(--theme-bg-primary, #1C1C1C) !important;
   color: var(--theme-text-primary, #FFFFFF) !important;
   border-color: var(--theme-border-primary, #404040) !important;
 }
@@ -6131,12 +6516,13 @@ form.avant.theme-dark *::after {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
-  padding-bottom: 8px;
+  margin-bottom: 4px;
+  padding: 8px 0 4px 0;
   border-bottom: 1px solid var(--theme-border-primary, #404040);
 }
 .avant .items-header h3 {
   margin: 0;
+  padding: 0;
   font-family: var(--theme-font-display, "Orbitron", monospace);
   font-size: 13px;
   font-weight: 700;
@@ -6436,7 +6822,7 @@ form.avant.theme-dark *::after {
   border: 2px solid var(--theme-accent-primary, #00E0DC);
   border-radius: 0;
   padding: 20px;
-  margin-bottom: 30px;
+  margin-bottom: 12px;
 }
 .avant .points-section h3, .avant .power-points-section h3,
 .avant .expertise-points-section h3 {

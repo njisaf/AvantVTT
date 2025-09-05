@@ -48,7 +48,7 @@ async function validatePaths() {
     console.log(`📋 System: ${systemJson.title} v${systemJson.version}`);
     
     const pathsToValidate = [];
-    let validationErrors = [];
+    const validationErrors = [];
     
     // Collect all paths that need validation
     

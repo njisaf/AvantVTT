@@ -535,8 +535,8 @@ export class LinkRewriter {
     console.log('🔍 Validating link integrity...');
 
     let allValid = true;
-    let totalLinks = 0;
-    let brokenLinks = 0;
+    const totalLinks = 0;
+    const brokenLinks = 0;
 
     // Process each pack
     for (const packName of this.compendiumMap.keys()) {

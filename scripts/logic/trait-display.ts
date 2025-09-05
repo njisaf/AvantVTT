@@ -252,7 +252,7 @@ export function prepareTraitDisplayData(
         }
         
         // Determine icon
-        let icon = traitData.icon || fallbackConfig.defaultIcon.class || 'fas fa-tag';
+        const icon = traitData.icon || fallbackConfig.defaultIcon.class || 'fas fa-tag';
         
         // Generate CSS classes
         const cssClasses = generateTraitCssClasses(traitData, options);
