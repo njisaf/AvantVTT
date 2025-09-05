@@ -591,6 +591,11 @@ export class AvantGearData extends foundry.abstract.DataModel {
                 initial: "",
                 blank: true
             }),
+            attribute: new fields.StringField({
+                required: true,
+                initial: "might",
+                choices: ["might", "grace", "intellect", "focus"]
+            }),
             weight: new fields.NumberField({
                 required: true,
                 initial: 1,
